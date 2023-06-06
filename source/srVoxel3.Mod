@@ -20,23 +20,23 @@ BEGIN
 	core.passable := TRUE;
 END init;
 
-PROCEDURE probe*(x,y,z: SREAL):Voxel;
+PROCEDURE { OVERRIDE } probe*(x,y,z: SREAL):Voxel;
 BEGIN
 	core.containscamera := TRUE; (*never used*)
 	RETURN core.probe(x,y,z);
 END probe;
 
-PROCEDURE probeShade*(VAR ray: Ray; VAR dx,dy,dz: SREAL);
+PROCEDURE { OVERRIDE } probeShade*(VAR ray: Ray; VAR dx,dy,dz: SREAL);
 BEGIN
 	core.probeShade(ray,dx,dy,dz);
 END probeShade;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 BEGIN
 	core.Shade(ray);
 END Shade;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 (*BEGIN IF GO THEN core.tick END*)
 END tick;
 
@@ -51,12 +51,12 @@ BEGIN
 	passable := TRUE;
 END init;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 BEGIN
 	core.Shade(ray);
 END Shade;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 END tick;
 
 END Tower;
@@ -94,7 +94,7 @@ BEGIN
 	END END END;
 END Fill;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 (*
 VAR
 	v: Voxel;
@@ -128,7 +128,7 @@ BEGIN
 	END
 END limit;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	oldxyz, xyz: srBase.PT;
 	drx, dry, drz: SREAL;
@@ -226,13 +226,13 @@ BEGIN
 END Shade;
 
 
-PROCEDURE probe*(x,y,z: SREAL):Voxel;
+PROCEDURE { OVERRIDE } probe*(x,y,z: SREAL):Voxel;
 BEGIN
 (* RETURN(core); *)
 	RETURN(NIL);
 END probe;
 
-PROCEDURE probeShade*(VAR ray: Ray; VAR dx,dy,dz: SREAL);
+PROCEDURE { OVERRIDE } probeShade*(VAR ray: Ray; VAR dx,dy,dz: SREAL);
 VAR
 	oldxyz, xyz: srBase.PT;
 	drx, dry, drz: SREAL;
@@ -615,7 +615,7 @@ END probeShade;
 END cacheSerpBloc; *)
 
 TYPE BraidBloc* = OBJECT(SerpBloc);
-PROCEDURE & init*(kore, mid: Voxel);
+PROCEDURE (* OVERRIDE *) & init*(kore, mid: Voxel);
 BEGIN
 	core := kore;
 	rlimit := srBase.rlimit + 3;
@@ -639,7 +639,7 @@ END init;
 END BraidBloc;
 
 TYPE TowerBloc* = OBJECT(SerpBloc);
-PROCEDURE & init*(a,b: Voxel);
+PROCEDURE (* OVERRIDE *) & init*(a,b: Voxel);
 BEGIN
 	rlimit := srBase.rlimit + 3;
 	Fill(NIL);
@@ -673,7 +673,7 @@ BEGIN
 	RETURN(0);
 END fn;
 
-PROCEDURE & init*(a,b: Voxel);
+PROCEDURE (* OVERRIDE *) & init*(a,b: Voxel);
 VAR
 	i, j, k, r: SIGNED16;
 BEGIN
@@ -692,7 +692,7 @@ END init;
 END SlantBloc;
 
 TYPE VegeBloc* = OBJECT(SerpBloc);
-PROCEDURE&init*(kore, mid: Voxel);
+PROCEDURE (* OVERRIDE *) & init*(kore, mid: Voxel);
 BEGIN
 	rlimit := 3;
 	core := kore;

@@ -36,7 +36,7 @@ TYPE
 		END Init;
 
 		(* returns TRUE iff two MemoryContents are equal *)
-		PROCEDURE Equals(c: Content): BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals(c: Content): BOOLEAN;
 		BEGIN
 			IF (c IS MemoryContent) THEN
 				WITH c: MemoryContent DO
@@ -67,11 +67,11 @@ TYPE
 		VAR
 			pc-: SIGNED32;
 
-		PROCEDURE &Init*(pc, offset, size: SIGNED32);
+		PROCEDURE (* OVERRIDE *) & Init*(pc, offset, size: SIGNED32);
 		BEGIN Init^(PC, offset, size); SELF.pc := pc
 		END Init;
 
-		PROCEDURE Equals(c: Content): BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals(c: Content): BOOLEAN;
 		BEGIN
 			IF (c IS PCRelMemContent) THEN
 				WITH c: PCRelMemContent DO
@@ -95,7 +95,7 @@ TYPE
 		BEGIN SELF.adr := adr; SELF.offset := offset
 		END Init;
 
-		PROCEDURE Equals(c: Content): BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals(c: Content): BOOLEAN;
 		VAR b: BOOLEAN;
 		BEGIN
 			IF TraceDetail THEN
@@ -130,7 +130,7 @@ TYPE
 		BEGIN v := value
 		END Init;
 
-		PROCEDURE Equals(c: Content): BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals(c: Content): BOOLEAN;
 		BEGIN
 			RETURN (c IS IntConstant) & (v = c(IntConstant).v)
 		END Equals;
@@ -144,7 +144,7 @@ TYPE
 		BEGIN v := value
 		END Init;
 
-		PROCEDURE Equals(c: Content): BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals(c: Content): BOOLEAN;
 		BEGIN
 			RETURN (c IS RealConstant) & (v = c(RealConstant).v)
 		END Equals;
@@ -158,7 +158,7 @@ TYPE
 		BEGIN v := value
 		END Init;
 
-		PROCEDURE Equals(c: Content): BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals(c: Content): BOOLEAN;
 		BEGIN
 			RETURN (c IS LongRealConstant) & (v = c(LongRealConstant).v)
 		END Equals;

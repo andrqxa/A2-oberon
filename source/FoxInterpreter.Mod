@@ -56,7 +56,7 @@ TYPE
 
 	Parser*= OBJECT(FoxParser.Parser)
 
-		PROCEDURE Statement*(statements: SyntaxTree.StatementSequence; outer: SyntaxTree.Statement): BOOLEAN;
+		PROCEDURE { OVERRIDE } Statement*(statements: SyntaxTree.StatementSequence; outer: SyntaxTree.Statement): BOOLEAN;
 		VAR statement: SyntaxTree.Statement;
 		BEGIN
 			IF (Symbol() = Scanner.ExclamationMark) THEN
@@ -152,7 +152,7 @@ TYPE
 
 		(** expressions *)
 
-		PROCEDURE VisitSet*(x: SyntaxTree.Set);
+		PROCEDURE { OVERRIDE } VisitSet*(x: SyntaxTree.Set);
 		VAR s: SET; i: SIZE; value: Value;
 		BEGIN
 			FOR i := 0 TO x.elements.Length()-1 DO
@@ -166,7 +166,7 @@ TYPE
 			NewSet(s)
 		END VisitSet;
 
-		PROCEDURE VisitMathArrayExpression*(x: SyntaxTree.MathArrayExpression);
+		PROCEDURE { OVERRIDE } VisitMathArrayExpression*(x: SyntaxTree.MathArrayExpression);
 		VAR numberElements, i: SIZE; a: MathArrayValue;
 		BEGIN
 			numberElements := x.elements.Length();
@@ -220,7 +220,7 @@ TYPE
 			NEW(v, c); item.object := v; value := TRUE;
 		END NewChar;
 
-		PROCEDURE VisitUnaryExpression*(x: SyntaxTree.UnaryExpression);
+		PROCEDURE { OVERRIDE } VisitUnaryExpression*(x: SyntaxTree.UnaryExpression);
 		VAR value: Value; i: SIGNED64; r: FLOAT64; b: BOOLEAN; operator: SIGNED32;
 		BEGIN
 			operator := x.operator;
@@ -258,7 +258,7 @@ TYPE
 			END;
 		END VisitUnaryExpression;
 
-		PROCEDURE VisitBinaryExpression*(x: SyntaxTree.BinaryExpression);
+		PROCEDURE { OVERRIDE } VisitBinaryExpression*(x: SyntaxTree.BinaryExpression);
 		VAR left, right: Value; operator: SIGNED32; li, ri: SIGNED64; lr, rr: FLOAT64; lb, rb:  BOOLEAN; sl, sr: SET;
 		BEGIN
 			operator := x.operator;
@@ -346,7 +346,7 @@ TYPE
 			END;
 		END VisitBinaryExpression;
 
-		PROCEDURE VisitRangeExpression*(x: SyntaxTree.RangeExpression);
+		PROCEDURE { OVERRIDE } VisitRangeExpression*(x: SyntaxTree.RangeExpression);
 		VAR first,last,step: SIGNED64; value: Integer;
 		BEGIN
 			IF ~ExpectInteger(x.first, value) THEN RETURN END;
@@ -361,17 +361,17 @@ TYPE
 			NewRange(first ..last BY step);
 		END VisitRangeExpression;
 
-		PROCEDURE VisitTensorRangeExpression*(x: SyntaxTree.TensorRangeExpression);
+		PROCEDURE { OVERRIDE } VisitTensorRangeExpression*(x: SyntaxTree.TensorRangeExpression);
 		BEGIN HALT(100) (* abstract *) END VisitTensorRangeExpression;
 
-		PROCEDURE VisitConversion*(x: SyntaxTree.Conversion);
+		PROCEDURE { OVERRIDE } VisitConversion*(x: SyntaxTree.Conversion);
 		BEGIN HALT(100) (* abstract *) END VisitConversion;
 
 		(** designators (expressions) *)
-		PROCEDURE VisitDesignator*(x: SyntaxTree.Designator);
+		PROCEDURE { OVERRIDE } VisitDesignator*(x: SyntaxTree.Designator);
 		BEGIN HALT(100) (* abstract *) END VisitDesignator;
 
-		PROCEDURE VisitQualifiedType*(x: SyntaxTree.QualifiedType);
+		PROCEDURE { OVERRIDE } VisitQualifiedType*(x: SyntaxTree.QualifiedType);
 		VAR moduleName, name: Modules.Name;
 		BEGIN
 			IF x.qualifiedIdentifier.prefix # SyntaxTree.invalidIdentifier THEN
@@ -453,7 +453,7 @@ TYPE
 
 *)
 
-		PROCEDURE VisitIdentifierDesignator*(x: SyntaxTree.IdentifierDesignator);
+		PROCEDURE { OVERRIDE } VisitIdentifierDesignator*(x: SyntaxTree.IdentifierDesignator);
 		VAR moduleName: Modules.Name; msg: ARRAY 128 OF CHAR; res: INTEGER;
 			builtin : Builtin; anyValue: Any;
 		BEGIN
@@ -479,7 +479,7 @@ TYPE
 			END;
 		END VisitIdentifierDesignator;
 
-		PROCEDURE VisitSelectorDesignator*(x: SyntaxTree.SelectorDesignator);
+		PROCEDURE { OVERRIDE } VisitSelectorDesignator*(x: SyntaxTree.SelectorDesignator);
 		VAR traverse: BOOLEAN; name: ARRAY 128 OF CHAR; num: SIGNED32;
 		BEGIN
 			Expression(x.left); traverse := FALSE;
@@ -499,7 +499,7 @@ TYPE
 			END;
 		END VisitSelectorDesignator;
 
-		PROCEDURE VisitParameterDesignator*(x: SyntaxTree.ParameterDesignator);
+		PROCEDURE { OVERRIDE } VisitParameterDesignator*(x: SyntaxTree.ParameterDesignator);
 		VAR e: SyntaxTree.Expression; proc: InterpreterSymbols.ProcedureResult; i: SIZE;
 			adr: ADDRESS; adrValue: Value; any: InterpreterSymbols.AnyValue;
 		BEGIN
@@ -542,10 +542,10 @@ TYPE
 			END;
 		END VisitParameterDesignator;
 
-		PROCEDURE VisitArrowDesignator*(x: SyntaxTree.ArrowDesignator);
+		PROCEDURE { OVERRIDE } VisitArrowDesignator*(x: SyntaxTree.ArrowDesignator);
 		BEGIN HALT(100) (* abstract *) END VisitArrowDesignator;
 
-		PROCEDURE VisitBracketDesignator*(x: SyntaxTree.BracketDesignator);
+		PROCEDURE { OVERRIDE } VisitBracketDesignator*(x: SyntaxTree.BracketDesignator);
 		VAR array: MathArrayValue; i: SIZE; element: Value; index: Integer; obj: PersistentObjects.Object;
 			leftValue, rightValue: Value; filter: InterpreterSymbols.ObjectFilter; expression: SyntaxTree.Expression;
 			attribute, value: ARRAY 128 OF CHAR; val: SIGNED32;
@@ -597,13 +597,13 @@ TYPE
 			END;
 		END VisitBracketDesignator;
 
-		PROCEDURE VisitSymbolDesignator*(x: SyntaxTree.SymbolDesignator);
+		PROCEDURE { OVERRIDE } VisitSymbolDesignator*(x: SyntaxTree.SymbolDesignator);
 		BEGIN HALT(100) (* abstract *) END VisitSymbolDesignator;
 
-		PROCEDURE VisitIndexDesignator*(x: SyntaxTree.IndexDesignator);
+		PROCEDURE { OVERRIDE } VisitIndexDesignator*(x: SyntaxTree.IndexDesignator);
 		BEGIN HALT(100) (* abstract *) END VisitIndexDesignator;
 
-		PROCEDURE VisitProcedureCallDesignator*(x: SyntaxTree.ProcedureCallDesignator);
+		PROCEDURE { OVERRIDE } VisitProcedureCallDesignator*(x: SyntaxTree.ProcedureCallDesignator);
 		BEGIN HALT(100)
 		END VisitProcedureCallDesignator;
 
@@ -644,7 +644,7 @@ TYPE
 			RETURN NIL;
 		END FindType;
 
-		PROCEDURE VisitBuiltinCallDesignator*(x: SyntaxTree.BuiltinCallDesignator);
+		PROCEDURE { OVERRIDE } VisitBuiltinCallDesignator*(x: SyntaxTree.BuiltinCallDesignator);
 		VAR p,p0,p1,p2: SyntaxTree.Expression;
 			type,t0,t1,t2: SyntaxTree.Type;
 			len: SIZE;
@@ -700,93 +700,93 @@ TYPE
 			END;
 		END VisitBuiltinCallDesignator;
 
-		PROCEDURE VisitTypeGuardDesignator*(x: SyntaxTree.TypeGuardDesignator);
+		PROCEDURE { OVERRIDE } VisitTypeGuardDesignator*(x: SyntaxTree.TypeGuardDesignator);
 		BEGIN HALT(100) (* abstract *) END VisitTypeGuardDesignator;
 
-		PROCEDURE VisitDereferenceDesignator*(x: SyntaxTree.DereferenceDesignator);
+		PROCEDURE { OVERRIDE } VisitDereferenceDesignator*(x: SyntaxTree.DereferenceDesignator);
 		BEGIN HALT(100) (* abstract *) END VisitDereferenceDesignator;
 
-		PROCEDURE VisitSupercallDesignator*(x: SyntaxTree.SupercallDesignator);
+		PROCEDURE { OVERRIDE } VisitSupercallDesignator*(x: SyntaxTree.SupercallDesignator);
 		BEGIN HALT(100) (* abstract *) END VisitSupercallDesignator;
 
-		PROCEDURE VisitSelfDesignator*(x: SyntaxTree.SelfDesignator);
+		PROCEDURE { OVERRIDE } VisitSelfDesignator*(x: SyntaxTree.SelfDesignator);
 		BEGIN HALT(100) (* abstract *) END VisitSelfDesignator;
 
-		PROCEDURE VisitResultDesignator*(x: SyntaxTree.ResultDesignator);
+		PROCEDURE { OVERRIDE } VisitResultDesignator*(x: SyntaxTree.ResultDesignator);
 		BEGIN HALT(100) (* abstract *) END VisitResultDesignator;
 
 		(** values *)
-		PROCEDURE VisitValue*(x: SyntaxTree.Value);
+		PROCEDURE { OVERRIDE } VisitValue*(x: SyntaxTree.Value);
 		BEGIN HALT(100) (* abstract *) END VisitValue;
 
-		PROCEDURE VisitBooleanValue*(x: SyntaxTree.BooleanValue);
+		PROCEDURE { OVERRIDE } VisitBooleanValue*(x: SyntaxTree.BooleanValue);
 		BEGIN
 			NewBool(x.value)
 		END VisitBooleanValue;
 
-		PROCEDURE VisitIntegerValue*(x: SyntaxTree.IntegerValue);
+		PROCEDURE { OVERRIDE } VisitIntegerValue*(x: SyntaxTree.IntegerValue);
 		BEGIN
 			NewInt(x.value)
 		END VisitIntegerValue;
 
-		PROCEDURE VisitCharacterValue*(x: SyntaxTree.CharacterValue);
+		PROCEDURE { OVERRIDE } VisitCharacterValue*(x: SyntaxTree.CharacterValue);
 		BEGIN
 			NewChar(x.value);
 		END VisitCharacterValue;
 
-		PROCEDURE VisitSetValue*(x: SyntaxTree.SetValue);
+		PROCEDURE { OVERRIDE } VisitSetValue*(x: SyntaxTree.SetValue);
 		BEGIN
 			NewSet(SET(x.value))
 		END VisitSetValue;
 
-		PROCEDURE VisitMathArrayValue*(x: SyntaxTree.MathArrayValue);
+		PROCEDURE { OVERRIDE } VisitMathArrayValue*(x: SyntaxTree.MathArrayValue);
 		BEGIN HALT(100) (* abstract *) END VisitMathArrayValue;
 
-		PROCEDURE VisitRealValue*(x: SyntaxTree.RealValue);
+		PROCEDURE { OVERRIDE } VisitRealValue*(x: SyntaxTree.RealValue);
 		BEGIN
 			NewReal(x.value)
 		END VisitRealValue;
 
-		PROCEDURE VisitComplexValue*(x: SyntaxTree.ComplexValue);
+		PROCEDURE { OVERRIDE } VisitComplexValue*(x: SyntaxTree.ComplexValue);
 		BEGIN HALT(100) (* abstract *) END VisitComplexValue;
 
-		PROCEDURE VisitStringValue*(x: SyntaxTree.StringValue);
+		PROCEDURE { OVERRIDE } VisitStringValue*(x: SyntaxTree.StringValue);
 		BEGIN
 			NewString(x.value^);
 		END VisitStringValue;
 
-		PROCEDURE VisitNilValue*(x: SyntaxTree.NilValue);
+		PROCEDURE { OVERRIDE } VisitNilValue*(x: SyntaxTree.NilValue);
 		BEGIN HALT(100) (* abstract *) END VisitNilValue;
 
-		PROCEDURE VisitEnumerationValue*(x: SyntaxTree.EnumerationValue);
+		PROCEDURE { OVERRIDE } VisitEnumerationValue*(x: SyntaxTree.EnumerationValue);
 		BEGIN HALT(100) (* abstract *) END VisitEnumerationValue;
 
 		(** symbols *)
-		PROCEDURE VisitSymbol*(x: SyntaxTree.Symbol);
+		PROCEDURE { OVERRIDE } VisitSymbol*(x: SyntaxTree.Symbol);
 		BEGIN HALT(100) (* abstract *) END VisitSymbol;
 
-		PROCEDURE VisitTypeDeclaration*(x: SyntaxTree.TypeDeclaration);
+		PROCEDURE { OVERRIDE } VisitTypeDeclaration*(x: SyntaxTree.TypeDeclaration);
 		BEGIN HALT(100) (* abstract *) END VisitTypeDeclaration;
 
-		PROCEDURE VisitConstant*(x: SyntaxTree.Constant);
+		PROCEDURE { OVERRIDE } VisitConstant*(x: SyntaxTree.Constant);
 		BEGIN HALT(100) (* abstract *) END VisitConstant;
 
-		PROCEDURE VisitVariable*(x: SyntaxTree.Variable);
+		PROCEDURE { OVERRIDE } VisitVariable*(x: SyntaxTree.Variable);
 		BEGIN HALT(100) (* abstract *) END VisitVariable;
 
-		PROCEDURE VisitParameter*(x: SyntaxTree.Parameter);
+		PROCEDURE { OVERRIDE } VisitParameter*(x: SyntaxTree.Parameter);
 		BEGIN HALT(100) (* abstract *) END VisitParameter;
 
-		PROCEDURE VisitProcedure*(x: SyntaxTree.Procedure);
+		PROCEDURE { OVERRIDE } VisitProcedure*(x: SyntaxTree.Procedure);
 		BEGIN HALT(100) (* abstract *) END VisitProcedure;
 
-		PROCEDURE VisitBuiltin*(x: SyntaxTree.Builtin);
+		PROCEDURE { OVERRIDE } VisitBuiltin*(x: SyntaxTree.Builtin);
 		BEGIN HALT(100) (* abstract *) END VisitBuiltin;
 
-		PROCEDURE VisitOperator*(x: SyntaxTree.Operator);
+		PROCEDURE { OVERRIDE } VisitOperator*(x: SyntaxTree.Operator);
 		BEGIN HALT(100) (* abstract *) END VisitOperator;
 
-		PROCEDURE VisitImport*(x: SyntaxTree.Import);
+		PROCEDURE { OVERRIDE } VisitImport*(x: SyntaxTree.Import);
 		BEGIN HALT(100) (* abstract *) END VisitImport;
 
 		(* copy src to value string replacing substrings that are embraced between refSymbols by expression value *)
@@ -950,7 +950,7 @@ TYPE
 		END VisitPrintStatement;
 
 		(** statements *)
-		PROCEDURE VisitStatement*(x: SyntaxTree.Statement);
+		PROCEDURE { OVERRIDE } VisitStatement*(x: SyntaxTree.Statement);
 		BEGIN
 			IF x IS CommandStatement THEN
 				VisitCommandStatement(x(CommandStatement));
@@ -960,7 +960,7 @@ TYPE
 			END;
 		END VisitStatement;
 
-		PROCEDURE VisitProcedureCallStatement*(x: SyntaxTree.ProcedureCallStatement);
+		PROCEDURE { OVERRIDE } VisitProcedureCallStatement*(x: SyntaxTree.ProcedureCallStatement);
 		VAR call: SyntaxTree.Expression;
 		BEGIN
 			IF ~(x.call IS SyntaxTree.ParameterDesignator) THEN
@@ -1037,7 +1037,7 @@ TYPE
 			END;
 		END PutValue;
 
-		PROCEDURE VisitAssignment*(x: SyntaxTree.Assignment);
+		PROCEDURE { OVERRIDE } VisitAssignment*(x: SyntaxTree.Assignment);
 		VAR value: Value;
 		BEGIN
 			IF GetValue(x.right, value) THEN
@@ -1059,7 +1059,7 @@ TYPE
 			RETURN FALSE
 		END IfPart;
 
-		PROCEDURE VisitIfStatement*(x: SyntaxTree.IfStatement);
+		PROCEDURE { OVERRIDE } VisitIfStatement*(x: SyntaxTree.IfStatement);
 		VAR i: SIZE; elsif: SyntaxTree.IfPart;
 		BEGIN
 			IF IfPart(x.ifPart) THEN RETURN END;
@@ -1072,7 +1072,7 @@ TYPE
 			END;
 		END VisitIfStatement;
 
-		PROCEDURE VisitWithStatement*(x: SyntaxTree.WithStatement);
+		PROCEDURE { OVERRIDE } VisitWithStatement*(x: SyntaxTree.WithStatement);
 		BEGIN HALT(100) (* abstract *) END VisitWithStatement;
 
 		PROCEDURE CasePart(x: SyntaxTree.CasePart; b: SyntaxTree.BinaryExpression): BOOLEAN;
@@ -1088,7 +1088,7 @@ TYPE
 			RETURN FALSE
 		END CasePart;
 
-		PROCEDURE VisitCaseStatement*(x: SyntaxTree.CaseStatement);
+		PROCEDURE { OVERRIDE } VisitCaseStatement*(x: SyntaxTree.CaseStatement);
 		VAR binary: SyntaxTree.BinaryExpression; i: SIZE;
 		BEGIN
 			binary := SyntaxTree.NewBinaryExpression(Basic.invalidPosition, x.variable, x.variable, Scanner.Equal);
@@ -1100,7 +1100,7 @@ TYPE
 			END;
 		END VisitCaseStatement;
 
-		PROCEDURE VisitWhileStatement*(x: SyntaxTree.WhileStatement);
+		PROCEDURE { OVERRIDE } VisitWhileStatement*(x: SyntaxTree.WhileStatement);
 		VAR value: Boolean;
 		BEGIN
 			WHILE ExpectBoolean(x.condition, value) & value.value DO
@@ -1108,7 +1108,7 @@ TYPE
 			END;
 		END VisitWhileStatement;
 
-		PROCEDURE VisitRepeatStatement*(x: SyntaxTree.RepeatStatement);
+		PROCEDURE { OVERRIDE } VisitRepeatStatement*(x: SyntaxTree.RepeatStatement);
 		VAR value: Boolean;
 		BEGIN
 			REPEAT
@@ -1116,7 +1116,7 @@ TYPE
 			UNTIL ~ExpectBoolean(x.condition, value) OR value.value
 		END VisitRepeatStatement;
 
-		PROCEDURE VisitForStatement*(x: SyntaxTree.ForStatement);
+		PROCEDURE { OVERRIDE } VisitForStatement*(x: SyntaxTree.ForStatement);
 		VAR fromV, toV, byV: Integer; from, to, by,i: SIGNED64; int: Integer;
 		BEGIN
 			IF ExpectInteger(x.from, fromV) & ExpectInteger(x.to, toV) THEN
@@ -1134,7 +1134,7 @@ TYPE
 			END;
 		END VisitForStatement;
 
-		PROCEDURE VisitLoopStatement*(x: SyntaxTree.LoopStatement);
+		PROCEDURE { OVERRIDE } VisitLoopStatement*(x: SyntaxTree.LoopStatement);
 		VAR prevExit: BOOLEAN;
 		BEGIN
 			prevExit := exit;
@@ -1146,23 +1146,23 @@ TYPE
 			exit := prevExit
 		END VisitLoopStatement;
 
-		PROCEDURE VisitExitStatement*(x: SyntaxTree.ExitStatement);
+		PROCEDURE { OVERRIDE } VisitExitStatement*(x: SyntaxTree.ExitStatement);
 		BEGIN
 			exit := TRUE
 		END VisitExitStatement;
 
-		PROCEDURE VisitReturnStatement*(x: SyntaxTree.ReturnStatement);
+		PROCEDURE { OVERRIDE } VisitReturnStatement*(x: SyntaxTree.ReturnStatement);
 		BEGIN HALT(100) (* abstract *) END VisitReturnStatement;
 
-		PROCEDURE VisitAwaitStatement*(x: SyntaxTree.AwaitStatement);
+		PROCEDURE { OVERRIDE } VisitAwaitStatement*(x: SyntaxTree.AwaitStatement);
 		BEGIN HALT(100) (* abstract *) END VisitAwaitStatement;
 
-		PROCEDURE VisitStatementBlock*(x: SyntaxTree.StatementBlock);
+		PROCEDURE { OVERRIDE } VisitStatementBlock*(x: SyntaxTree.StatementBlock);
 		BEGIN
 			StatementSequence(x.statements)
 		END VisitStatementBlock;
 
-		PROCEDURE VisitCode*(x: SyntaxTree.Code);
+		PROCEDURE { OVERRIDE } VisitCode*(x: SyntaxTree.Code);
 		BEGIN HALT(100) (* abstract *) END VisitCode;
 
 		PROCEDURE Expression(x: SyntaxTree.Expression);

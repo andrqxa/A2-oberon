@@ -169,18 +169,18 @@ TYPE
 	VAR
 		val*: SIGNED32;
 
-		PROCEDURE  (*VAR seed: tLongintSeedDesc*) Store*( VAR r: Files.Rider );
+		PROCEDURE  (*VAR seed: tLongintSeedDesc*) { OVERRIDE } Store*( VAR r: Files.Rider );
 		BEGIN
 			Files.WriteLInt( r, (*seed.*)val )
 		END Store;
 
-		PROCEDURE  (*VAR seed: tLongintSeedDesc*) Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
+		PROCEDURE  (*VAR seed: tLongintSeedDesc*) { OVERRIDE } Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
 		BEGIN
 			IF seedVersion # cLongintSeedVersion THEN HALT( 100 ) END;
 			Files.ReadLInt( r, (*seed.*)val )
 		END Load;
 
-		PROCEDURE  (*VAR seed: tLongintSeedDesc*) Copy*( ): tSeed;   (* fof 020625 *)
+		PROCEDURE  (*VAR seed: tLongintSeedDesc*) { OVERRIDE } Copy*( ): tSeed;   (* fof 020625 *)
 		VAR cp: tSeed;  copy: tLongintSeed;
 		BEGIN
 			cp := AllocLongintSeed();  copy := cp( tLongintSeed );

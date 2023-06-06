@@ -459,7 +459,7 @@ TYPE
 			SetWordWrap(wordWrap);
 		END FromXml;
 
-		PROCEDURE Handle*(VAR m: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m: WMMessages.Message);
 		BEGIN
 			IF m.msgType = WMMessages.MsgKey THEN
 				IF ~HandleShortcut(m.x, m.flags, m.y) THEN
@@ -536,7 +536,7 @@ TYPE
 			END;
 		END EnsureSearchPanel;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF (editor.text # NIL) THEN
@@ -544,7 +544,7 @@ TYPE
 			END;
 		END Finalize;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrDocumentEditor);

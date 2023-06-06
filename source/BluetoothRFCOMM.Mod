@@ -517,7 +517,7 @@ TYPE
 
 		(* TO DO *)
 
-		PROCEDURE ReceiveUIH(info : ARRAY OF CHAR; length : SIGNED32);
+		PROCEDURE { OVERRIDE } ReceiveUIH(info : ARRAY OF CHAR; length : SIGNED32);
 		BEGIN
 
 			IF TraceControlChannel THEN

@@ -98,7 +98,7 @@ TYPE
 
 
 		(** Close and deactivate the interface, i.e. remove it from the configuration. *)
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN {EXCLUSIVE}
 			ASSERT(~closed);
 
@@ -112,7 +112,7 @@ TYPE
 
 
 		(** Send an IP packet on this interface. *)
-		PROCEDURE Send*(type: SIGNED32; fip:IP. Adr; CONST l4hdr, data: ARRAY OF CHAR; h4len, dofs, dlen, TTL: SIGNED32);
+		PROCEDURE { OVERRIDE } Send*(type: SIGNED32; fip:IP. Adr; CONST l4hdr, data: ARRAY OF CHAR; h4len, dofs, dlen, TTL: SIGNED32);
 		VAR
 			l3hdr: ARRAY MaxIPHdrLen OF CHAR;
 
@@ -143,7 +143,7 @@ TYPE
 
 
 		(* Internal procedure to perform the rest of the send operation. Used by "Send" and for IP forwarding. *)
-		PROCEDURE DoSend*(destAdr: IP.Adr; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32) ;
+		PROCEDURE { OVERRIDE } DoSend*(destAdr: IP.Adr; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32) ;
 		VAR
 			linkDst: Network.LinkAdr;
 
@@ -225,7 +225,7 @@ TYPE
 
 
 		(* Receive an IP packet *)
-		PROCEDURE IPInput(dev: Network.LinkDevice; type: SIGNED32; buffer: Network.Buffer);
+		PROCEDURE { OVERRIDE } IPInput(dev: Network.LinkDevice; type: SIGNED32; buffer: Network.Buffer);
 		VAR
 			hlen: SIGNED32;
 			src, dst: IP.Adr;
@@ -278,7 +278,7 @@ TYPE
 
 
 		(** Check if adr is a broadcast address *)
-		PROCEDURE IsBroadcast*(adr: IP.Adr) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsBroadcast*(adr: IP.Adr) : BOOLEAN;
 		BEGIN
 			ASSERT (adr.usedProtocol = 4, 2345);
 
@@ -288,7 +288,7 @@ TYPE
 
 
 		(** Check if adr is a multicast address *)
-		PROCEDURE IsMulticast*(adr: IP.Adr) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsMulticast*(adr: IP.Adr) : BOOLEAN;
 		VAR
 			arr: ARRAY 4 OF CHAR;
 
@@ -338,7 +338,7 @@ TYPE
 			If "gatewayAdr" is "NilAdr", the subnet is considered to have no gateway, else it must be in the same
 			subnet as the "localAdr".
 			"domain" can be an empty string. It is normally used by a DNS implementation. It is not used in IP directly. *)
-		PROCEDURE SetAdrs*(localAdr, maskAdr, gatewayAdr: IP.Adr; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } SetAdrs*(localAdr, maskAdr, gatewayAdr: IP.Adr; VAR res: INTEGER);
 		VAR
 			maskSet: SET;
 
@@ -386,7 +386,7 @@ TYPE
 
 
 		(* Reads the source address of a IPv4 packet buffer *)
-		PROCEDURE ReadSrcAdr* (buffer: Network.Buffer): IP.Adr;
+		PROCEDURE { OVERRIDE } ReadSrcAdr* (buffer: Network.Buffer): IP.Adr;
 		VAR
 			adr: IP.Adr;
 
@@ -398,7 +398,7 @@ TYPE
 
 
 		(* Reads the destination address of a IPv4 packet buffer *)
-		PROCEDURE ReadDestAdr* (buffer: Network.Buffer): IP.Adr;
+		PROCEDURE { OVERRIDE } ReadDestAdr* (buffer: Network.Buffer): IP.Adr;
 		VAR
 			adr: IP.Adr;
 
@@ -411,7 +411,7 @@ TYPE
 
 
 		(** Creates a pseudo-header for checksum calculation (TCP/UDP) and returns the length of this header *)
-		PROCEDURE WritePseudoHeader*(VAR pseudoHdr: ARRAY OF CHAR;  src, dst: IP.Adr; protocol, pktLengthUpperLayer: SIGNED32): SIGNED32;
+		PROCEDURE { OVERRIDE } WritePseudoHeader*(VAR pseudoHdr: ARRAY OF CHAR;  src, dst: IP.Adr; protocol, pktLengthUpperLayer: SIGNED32): SIGNED32;
 		BEGIN
 			(* UDP/TCP Pseudo-header (for checksum calculation)
 
@@ -455,7 +455,7 @@ TYPE
 
 
 		(** Enumerate all ARP table entries. *)
-		PROCEDURE ARPEnumerate*(handle: IP.ARPHandler);
+		PROCEDURE { OVERRIDE } ARPEnumerate*(handle: IP.ARPHandler);
 		VAR
 			p: ARPEntry;
 			i: SIGNED32;
@@ -630,7 +630,7 @@ TYPE
 
 
 		(** Writes the configuration of this interface *)
-		PROCEDURE OutInterface*;
+		PROCEDURE { OVERRIDE } OutInterface*;
 		VAR i: SIGNED32;
 			str : ARRAY 32 OF CHAR;
 		BEGIN

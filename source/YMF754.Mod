@@ -468,19 +468,19 @@ TYPE
 		END CallListeners;
 
 		(** Return the name (as UTF-8 Unicode) of this channel *)
-		PROCEDURE GetName*(VAR name : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetName*(VAR name : ARRAY OF CHAR);
 		BEGIN
 			COPY(SELF.name, name);
 		END GetName;
 
 		(** Return the description string (as UTF-8 Unicode) of this channel *)
-		PROCEDURE GetDesc*(VAR desc : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetDesc*(VAR desc : ARRAY OF CHAR);
 		BEGIN
 			COPY(SELF.desc, desc);
 		END GetDesc;
 
 		(** Set the volume of the channel (0-255) *)
-		PROCEDURE SetVolume*(volume : SIGNED32);
+		PROCEDURE { OVERRIDE } SetVolume*(volume : SIGNED32);
 		BEGIN {EXCLUSIVE}
 			ASSERT((volume >= 0) & (volume <= 255));
 			SELF.volume := volume;
@@ -497,13 +497,13 @@ TYPE
 		END SetVolume;
 
 		(** Get the volume of the channel (0-255) *)
-		PROCEDURE GetVolume*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetVolume*() : SIGNED32;
 		BEGIN
 			RETURN SELF.volume;
 		END GetVolume;
 
 		(** Mute or unmute the channel *)
-		PROCEDURE SetMute*(mute : BOOLEAN);
+		PROCEDURE { OVERRIDE } SetMute*(mute : BOOLEAN);
 		VAR volume: SET;
 		BEGIN {EXCLUSIVE}
 			SELF.mute := mute;
@@ -518,7 +518,7 @@ TYPE
 		END SetMute;
 
 		(** Get the mute-state of the channel *)
-		PROCEDURE GetIsMute*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } GetIsMute*() : BOOLEAN;
 		BEGIN
 			RETURN SELF.mute;
 		END GetIsMute;
@@ -560,7 +560,7 @@ TYPE
 		(** Register a delegate that handles reuse / processing of buffers.
 			Only one Buffer listener can be registered per channel.
 		*)
-		PROCEDURE RegisterBufferListener*(bufferListener : BufferListener);
+		PROCEDURE { OVERRIDE } RegisterBufferListener*(bufferListener : BufferListener);
 		BEGIN {EXCLUSIVE}
 			ASSERT(~closed);
 			bufferListenerCaller.RegisterBufferListener(bufferListener);
@@ -575,7 +575,7 @@ TYPE
 		END RegisterBufferListener;
 
 		(** Queue another buffer for playing / recording *)
-		PROCEDURE QueueBuffer*(x : Buffer);
+		PROCEDURE { OVERRIDE } QueueBuffer*(x : Buffer);
 		VAR buffItem: ListBuffer;
 		BEGIN {EXCLUSIVE}
 			ASSERT(~closed);
@@ -626,7 +626,7 @@ TYPE
 		END SetPlayRecVol;
 
 		(** Set the current volume of the channel (8.8 bit fixed point value) *)
-		PROCEDURE SetVolume*(volume : SIGNED32);
+		PROCEDURE { OVERRIDE } SetVolume*(volume : SIGNED32);
 		BEGIN {EXCLUSIVE}
 			ASSERT(~closed);
 			ASSERT(volume >= 0);
@@ -638,21 +638,21 @@ TYPE
 		END SetVolume;
 
 		(** Get the current volume of the channel (8.8 bit fixed point value) *)
-		PROCEDURE GetVolume*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetVolume*() : SIGNED32;
 		BEGIN
 			ASSERT(~closed);
 			RETURN SELF.volume;
 		END GetVolume;
 
 		(** GetPosition returns the current position in samples. MAY CHANGE TO SIGNED64*)
-		PROCEDURE GetPosition*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetPosition*() : SIGNED32;
 		BEGIN
 			ASSERT(~closed);
 			RETURN samplePosition(SIGNED32);
 		END GetPosition;
 
 		(** Start playing / recording *)
-		PROCEDURE Start*;
+		PROCEDURE { OVERRIDE } Start*;
 		BEGIN {EXCLUSIVE}
 			ASSERT(~closed);
 			IF ~running THEN
@@ -662,14 +662,14 @@ TYPE
 		END Start;
 
 		(** Pause playing / recording, no buffers are returned *)
-		PROCEDURE Pause*;
+		PROCEDURE { OVERRIDE } Pause*;
 		BEGIN {EXCLUSIVE}
 			ASSERT(~closed);
 			PauseChannel;
 		END Pause;
 
 		(** Stop the playing / recording and return all buffers *)
-		PROCEDURE Stop*;
+		PROCEDURE { OVERRIDE } Stop*;
 		BEGIN {EXCLUSIVE}
 			ASSERT(~closed);
 			StopChannel;
@@ -780,7 +780,7 @@ TYPE
 		END ConstrPlay;
 
 		(* Prepare data - this procedure is called for each channel every time PCI Audio generates an interrupt *)
-		PROCEDURE PrepareData;
+		PROCEDURE { OVERRIDE } PrepareData;
 		VAR
 			curBuffPos: SIZE; (* current recording position in ring buffer in bytes *)
 			copySize: SIZE; (* size of next block to copy in bytes *)
@@ -818,7 +818,7 @@ TYPE
 		END PrepareData;
 
 		(* Init banks and start playback/record *)
-		PROCEDURE Activate;
+		PROCEDURE { OVERRIDE } Activate;
 		VAR copySize, i, j: SIZE;
 		BEGIN
 			IF Logging THEN
@@ -859,7 +859,7 @@ TYPE
 		END Activate;
 
 		(* Stop playback/record *)
-		PROCEDURE Deactivate;
+		PROCEDURE { OVERRIDE } Deactivate;
 		VAR i: SIGNED32;
 		BEGIN
 			IF Logging THEN
@@ -873,7 +873,7 @@ TYPE
 		END Deactivate;
 
 		(* Set volume for play or record channel (0-255) *)
-		PROCEDURE SetPlayRecVol(volume: SIGNED32);
+		PROCEDURE { OVERRIDE } SetPlayRecVol(volume: SIGNED32);
 		VAR i, j: SIGNED32;
 		BEGIN
 			volume := LSH(volume, 22);
@@ -890,7 +890,7 @@ TYPE
 		END SetPlayRecVol;
 
 		(** Get kind of channel *)
-		PROCEDURE GetChannelKind*(): SIGNED32;
+		PROCEDURE { OVERRIDE } GetChannelKind*(): SIGNED32;
 		BEGIN
 			ASSERT(~closed);
 			RETURN SoundDevices.ChannelPlay;
@@ -898,7 +898,7 @@ TYPE
 
 		(** Close the channel, the driver may release any ressources reserved for it.
 		The object is still there but can never be opened again *)
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN {EXCLUSIVE}
 			ASSERT(~closed);
 			IF Logging THEN
@@ -961,7 +961,7 @@ TYPE
 		END ConstrRec;
 
 		(* Prepare data - this procedure is called for each channel every time PCI Audio generates an interrupt *)
-		PROCEDURE PrepareData;
+		PROCEDURE { OVERRIDE } PrepareData;
 		VAR
 			curBuffPos: SIZE; (* current recording position in ring buffer in bytes *)
 			copySize: SIZE; (* size of next block to copy in bytes *)
@@ -994,7 +994,7 @@ TYPE
 		END PrepareData;
 
 		(* Init banks and start playback/record *)
-		PROCEDURE Activate;
+		PROCEDURE { OVERRIDE } Activate;
 		VAR i: SIGNED32;
 		BEGIN
 			IF Logging THEN
@@ -1007,7 +1007,7 @@ TYPE
 		END Activate;
 
 		(* Stop playback/record *)
-		PROCEDURE Deactivate;
+		PROCEDURE { OVERRIDE } Deactivate;
 		BEGIN
 			IF Logging THEN
 				KernelLog.String("YMF754 - Stopping/Pausing RecordChannel"); KernelLog.Ln;
@@ -1017,14 +1017,14 @@ TYPE
 		END Deactivate;
 
 		(* Set volume for play or record channel (0-255) *)
-		PROCEDURE SetPlayRecVol(volume: SIGNED32);
+		PROCEDURE { OVERRIDE } SetPlayRecVol(volume: SIGNED32);
 		BEGIN
 			volume := LSH(volume, 6);
 			drv.PCC.RegWrite32(PCCRegVolADCIn, volume + LSH(volume, 16));
 		END SetPlayRecVol;
 
 		(** Get kind of channel *)
-		PROCEDURE GetChannelKind*(): SIGNED32;
+		PROCEDURE { OVERRIDE } GetChannelKind*(): SIGNED32;
 		BEGIN
 			ASSERT(~closed);
 			RETURN SoundDevices.ChannelRecord;
@@ -1032,7 +1032,7 @@ TYPE
 
 		(** Close the channel, the driver may release any ressources reserved for it.
 		The object is still there but can never be opened again *)
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN {EXCLUSIVE}
 			ASSERT(~closed);
 			IF Logging THEN
@@ -1226,20 +1226,20 @@ TYPE
 		END HandleInterrupt;
 
 		(** Sound device routines *)
-		PROCEDURE Init*;
+		PROCEDURE { OVERRIDE } Init*;
 			(* Not used *)
 		END Init;
 
-		PROCEDURE Enable*;
+		PROCEDURE { OVERRIDE } Enable*;
 			(* Not used *)
 		END Enable;
 
-		PROCEDURE Disable*;
+		PROCEDURE { OVERRIDE } Disable*;
 			(* Not used *)
 		END Disable;
 
 		(** Capabilities *)
-		PROCEDURE NofNativeFrequencies*():SIGNED32;
+		PROCEDURE { OVERRIDE } NofNativeFrequencies*():SIGNED32;
 		BEGIN
 			RETURN NofNativeFreq;
 		END NofNativeFrequencies;
@@ -1249,12 +1249,12 @@ TYPE
 			RETURN NativeFreqTab[nr].hz;
 		END GetNativeFrequeny;
 
-		PROCEDURE NofSamplingResolutions*():SIGNED32;
+		PROCEDURE { OVERRIDE } NofSamplingResolutions*():SIGNED32;
 		BEGIN
 			RETURN 2; (* 16 Bit and 8 Bit *)
 		END NofSamplingResolutions;
 
-		PROCEDURE GetSamplingResolution*(nr : SIGNED32):SIGNED32;
+		PROCEDURE { OVERRIDE } GetSamplingResolution*(nr : SIGNED32):SIGNED32;
 		BEGIN
 			ASSERT((nr >= 0) & (nr < 2));
 			IF nr = 0 THEN
@@ -1265,13 +1265,13 @@ TYPE
 		END GetSamplingResolution;
 
 		(** How many different sub channel settings are possible *)
-		PROCEDURE NofSubChannelSettings*():SIGNED32;
+		PROCEDURE { OVERRIDE } NofSubChannelSettings*():SIGNED32;
 		BEGIN
 			RETURN 2; (* mono and stereo *)
 		END NofSubChannelSettings;
 
 		(** Get sub channel setting nr. *)
-		PROCEDURE GetSubChannelSetting*(nr : SIGNED32):SIGNED32;
+		PROCEDURE { OVERRIDE } GetSubChannelSetting*(nr : SIGNED32):SIGNED32;
 		BEGIN
 			ASSERT((nr >= 0) & (nr < 2));
 			IF nr = 0 THEN
@@ -1282,13 +1282,13 @@ TYPE
 		END GetSubChannelSetting;
 
 		(** How many different wave formats are possible *)
-		PROCEDURE NofWaveFormats*():SIGNED32;
+		PROCEDURE { OVERRIDE } NofWaveFormats*():SIGNED32;
 		BEGIN
 			RETURN 1; (* only PCM *)
 		END NofWaveFormats;
 
 		(** Get wave format nr. *)
-		PROCEDURE GetWaveFormat*(nr : SIGNED32):SIGNED32;
+		PROCEDURE { OVERRIDE } GetWaveFormat*(nr : SIGNED32):SIGNED32;
 		BEGIN
 			ASSERT(nr = 0);
 			RETURN SoundDevices.FormatPCM; (* PCM *)
@@ -1304,7 +1304,7 @@ TYPE
 			nofSubChannes = 1 for Mono, 2 for Stereo
 			format is the wave format
 		*)
-		PROCEDURE OpenPlayChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution, nofSubChannels, format : SIGNED32; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } OpenPlayChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution, nofSubChannels, format : SIGNED32; VAR res : INTEGER);
 		VAR
 			playSlotPair: SIGNED32;
 			playChannel: PlayerChannel;
@@ -1355,7 +1355,7 @@ TYPE
 			nofSubChannes = 1 for Mono, 2 for Stereo
 			format is the wave format
 		*)
-		PROCEDURE OpenRecordChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution, nofSubChannels, format : SIGNED32; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } OpenRecordChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution, nofSubChannels, format : SIGNED32; VAR res : INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF Logging THEN
 				KernelLog.String("YMF754 - Opening RecordChannel");
@@ -1477,7 +1477,7 @@ TYPE
 			Listeners run in the thread of the changeing program, therefore they have to
 			return control immediately after beeing called.
 		*)
-		PROCEDURE RegisterMixerChangeListener*(mixChangedProc : MixerChangedProc);
+		PROCEDURE { OVERRIDE } RegisterMixerChangeListener*(mixChangedProc : MixerChangedProc);
 		VAR item: ListMixerChangedProc;
 		BEGIN {EXCLUSIVE}
 			ASSERT(mixChangedProc # NIL);
@@ -1491,7 +1491,7 @@ TYPE
 		END RegisterMixerChangeListener;
 
 		(** Unregister a previously registered listener *)
-		PROCEDURE UnregisterMixerChangeListener*(mixChangedProc : MixerChangedProc);
+		PROCEDURE { OVERRIDE } UnregisterMixerChangeListener*(mixChangedProc : MixerChangedProc);
 		VAR item: ListMixerChangedProc;
 		BEGIN {EXCLUSIVE}
 			IF Logging THEN
@@ -1535,7 +1535,7 @@ TYPE
 			Drivers may ignore channel 0 or 1 but need to return a generic "Channel" object for these channel numbers
 			GetMixerChannel returns NIL if the channelNr is invalid
 		*)
-		PROCEDURE GetMixerChannel*(channelNr : SIGNED32; VAR channel : SoundDevices.MixerChannel);
+		PROCEDURE { OVERRIDE } GetMixerChannel*(channelNr : SIGNED32; VAR channel : SoundDevices.MixerChannel);
 		VAR name: NameStr;
 		BEGIN
 			IF (channelNr >= 0) & (channelNr < NofMixerChannels) THEN
@@ -1553,7 +1553,7 @@ TYPE
 		END GetMixerChannel;
 
 		(** Returns the number of mixer channels available, at least 2 *)
-		PROCEDURE GetNofMixerChannels*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetNofMixerChannels*() : SIGNED32;
 		BEGIN
 			RETURN NofMixerChannels;
 		END GetNofMixerChannels;

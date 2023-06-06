@@ -13,12 +13,12 @@ TYPE
 		color* : SIGNED32;
 		behind* : BOOLEAN;
 
-		PROCEDURE SetPos*(p : Vectors.TVector3d);
+		PROCEDURE { OVERRIDE } SetPos*(p : Vectors.TVector3d);
 		BEGIN
 			SELF.p := p
 		END SetPos;
 
-		PROCEDURE SetUV*(u, v : FLOAT64);
+		PROCEDURE { OVERRIDE } SetUV*(u, v : FLOAT64);
 		BEGIN
 			SELF.u := u; SELF.v := v
 		END SetUV;

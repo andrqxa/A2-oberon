@@ -20,7 +20,7 @@ TYPE
 	 *  <WebStd:Hyperlink href="site.dxp" target="mainview" ...>text or image</WebStd:Hyperlink> *)
 	Hyperlink* = OBJECT (DynamicWebpage.StateLessActiveElement)
 
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR a: XML.Element; hrefString, attrName, sessionCounterStr: Strings.String; newUri: ARRAY 4096 OF CHAR;
 			enum: XMLObjects.Enumerator; p: ANY; attr: XML.Attribute; content: XML.Content;
 			dynStr: DynamicStrings.DynamicString; session: HTTPSession.Session;
@@ -78,7 +78,7 @@ TYPE
 	 *     <WebStd:GetHeaderField name="referer" />
 	 *)
 	GetHeaderField* = OBJECT(DynamicWebpage.StateLessActiveElement)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR fieldName : Strings.String;
 			result : ARRAY 256 OF CHAR;
 		BEGIN
@@ -95,7 +95,7 @@ TYPE
 	 *  <WebStd:SetVariable name="myvar" value="myVal"/>
 	*)
 	SetVariable* = OBJECT(DynamicWebpage.StateLessActiveElement)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR varName, varValue, encVarName: Strings.String; session: HTTPSession.Session;
 			dynVarValue, dynVarName: DynamicStrings.DynamicString;
 		BEGIN (* only DynamicString can have a type guard for PTR *)
@@ -117,7 +117,7 @@ TYPE
 	 *  <WebStd:GetVariable name="myvar"/>
 	*)
 	GetVariable* = OBJECT(DynamicWebpage.StateLessActiveElement)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR varName, varValue, encVarName: Strings.String; session: HTTPSession.Session;
 			dynVarValue, dynVarName: DynamicStrings.DynamicString; p: ANY;
 		BEGIN
@@ -158,7 +158,7 @@ TYPE
 		 * SessionGuardNamePrefix followed by the request.shortUri to support parallel requests of the same client
 		 * for different documents with if statements. The use of a state full active element would result in worse
 		 * performance, since each 'Guard'-occurence would have its own instances *)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR conditionElem, expressionElem: XML.Element; session: HTTPSession.Session;
 			dynVarName: DynamicStrings.DynamicString; varName, condText: Strings.String; p: ANY;
 			outContainer: XML.Container;
@@ -200,7 +200,7 @@ TYPE
 			END
 		END Transform;
 
-		PROCEDURE PreTransform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } PreTransform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR expressionElem: XML.Element; session: HTTPSession.Session; dynVarName: DynamicStrings.DynamicString;
 			varName: Strings.String;
 		BEGIN
@@ -236,11 +236,11 @@ TYPE
 		BEGIN stateCounter := 0
 		END Init;
 
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		BEGIN RETURN elem
 		END Transform;
 
-		PROCEDURE PreTransform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } PreTransform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR p: ANY; enum: XMLObjects.Enumerator; counter: SIGNED32; state, actState: XML.Element;
 			stateName: Strings.String; container: XML.Container; content: XML.Content; circularVal: Strings.String;
 		BEGIN
@@ -295,7 +295,7 @@ TYPE
 		 	END
 	 	END SetState;
 
-    	PROCEDURE GetEventHandlers*() : DynamicWebpage.EventHandlerList;
+    	PROCEDURE { OVERRIDE } GetEventHandlers*() : DynamicWebpage.EventHandlerList;
 		VAR list: DynamicWebpage.EventHandlerList;
 		BEGIN
 			NEW(list, 1);
@@ -405,7 +405,7 @@ TYPE
 			END
 		END Compare;
 
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR arg1, arg2: XML.Element; enum1, enum2: XMLObjects.Enumerator; p1, p2: ANY; content1, content2: XML.Content;
 		BEGIN
 			arg1 := GetXMLSubElement(elem, "Arg1"); arg2 := GetXMLSubElement(elem, "Arg2");
@@ -432,7 +432,7 @@ TYPE
 	 * The content could be the results of active elements like 'IsEqual'.
 	 * <WebStd:Not>true|false</WebStd:Not> *)
 	Not* = OBJECT(DynamicWebpage.StateLessActiveElement)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR str: Strings.String;
 		BEGIN
 			str := GetXMLCharContent(elem);
@@ -453,7 +453,7 @@ TYPE
 	 *    <Arg2>true|false</Arg2>
 	 * </WebStd:And> *)
 	 And* = OBJECT(DynamicWebpage.StateLessActiveElement)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR arg1, arg2: XML.Element; str1, str2: Strings.String;
 		BEGIN
 			arg1 := GetXMLSubElement(elem, "Arg1");
@@ -485,7 +485,7 @@ TYPE
 	 *    <Arg2>true|false</Arg2>
 	 * </WebStd:Or> *)
 	 Or* = OBJECT(DynamicWebpage.StateLessActiveElement)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR arg1, arg2: XML.Element; str1, str2: Strings.String;
 		BEGIN
 			arg1 := GetXMLSubElement(elem, "Arg1");
@@ -517,7 +517,7 @@ TYPE
 	 *    <Arg2>true|false</Arg2>
 	 * </WebStd:Xor> *)
 	 Xor* = OBJECT(DynamicWebpage.StateLessActiveElement)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR arg1, arg2: XML.Element; str1, str2: Strings.String;
 		BEGIN
 			arg1 := GetXMLSubElement(elem, "Arg1");
@@ -551,7 +551,7 @@ TYPE
 	 *     ...
 	 *  </WebStd:EventButton> *)
 	EventButton* = OBJECT (DynamicWebpage.StateLessActiveElement)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR labelName, methodName, objectName, objectIdName, moduleName, elemName, paramName, paramValue,
 			hrefString, sessionCounterStr: Strings.String; form, input, param: XML.Element; enum: XMLObjects.Enumerator;
 			p: ANY; newParamName, encStr: ARRAY 128 OF CHAR; content: XML.Content; session: HTTPSession.Session;
@@ -669,7 +669,7 @@ TYPE
 	 *     ...
 	 *  </WebStd:EventLink> *)
 	EventLink* = OBJECT(DynamicWebpage.StateLessActiveElement)
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR a: XML.Element; newUri: ARRAY 4096 OF CHAR; enum, labelEnum: XMLObjects.Enumerator;
 			p, labelp: ANY; attr: XML.Attribute; content, labelContent: XML.Content;
 			methodName, objectName, objectIdName, moduleName, attrName, subElemName, paramName, paramValue,
@@ -786,7 +786,7 @@ TYPE
 	 *  </WebStd:Formular> *)
 	Formular* = OBJECT(DynamicWebpage.StateLessActiveElement)
 
-		PROCEDURE Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR methodName, objectName, objectIdName, moduleName, attrName, hrefString, sessionCounterStr: Strings.String;
 			session: HTTPSession.Session; form, input: XML.Element; enum: XMLObjects.Enumerator; p: ANY;
 			content: XML.Content; attr: XML.Attribute; dynStr: DynamicStrings.DynamicString;
@@ -1082,7 +1082,7 @@ TYPE
 			RETURN FALSE
 		END FilterContainerByName;
 
-		PROCEDURE Externalize*() : XML.Content;
+		PROCEDURE { OVERRIDE } Externalize*() : XML.Content;
 		VAR elem: XML.Element; i: SIZE; p: ANY; obj: PersistentDataObject; container: XML.Container;
 			oidString: ARRAY 14 OF CHAR;
 		BEGIN
@@ -1105,7 +1105,7 @@ TYPE
 			RETURN container
 		END Externalize;
 
-		PROCEDURE Internalize*(xml: XML.Content);
+		PROCEDURE { OVERRIDE } Internalize*(xml: XML.Content);
 		VAR container: XML.Container; elem: XML.Element; enumContainer: XMLObjects.Enumerator; p: ANY;
 		BEGIN
 			dataObjList.Clear; (* ! *)
@@ -1152,7 +1152,7 @@ TYPE
 			END
 		END InternalizeElem;
 
-		PROCEDURE GetReferrencedObjects*() : PrevalenceSystem.PersistentObjectList;
+		PROCEDURE { OVERRIDE } GetReferrencedObjects*() : PrevalenceSystem.PersistentObjectList;
 		VAR list: PrevalenceSystem.PersistentObjectList; i: SIZE; pers: PrevalenceSystem.PersistentObject; p: ANY;
 		BEGIN
 			IF (dataObjList.GetCount() > 0) THEN
@@ -1169,7 +1169,7 @@ TYPE
 			END
 		END GetReferrencedObjects;
 
-		PROCEDURE ToXML*(request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } ToXML*(request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR elem: XML.Element; i: SIZE; p: ANY; obj: PersistentDataObject; container: XML.Container;
 			nameText: XML.ArrayChars; oidString, posString: ARRAY 14 OF CHAR; objSer: XML.Content;
 			persList: PersistentDataObjectList;
@@ -1228,7 +1228,7 @@ TYPE
 	 *   <WebStd:DataContainer name="Persons" prevalencesystem="standardPrevalenceSystem"/> *)
     DataContainer* = OBJECT (DynamicWebpage.StateLessActiveElement)
 
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR errStr: ARRAY 256 OF CHAR; persCont: PersistentDataContainer; prevSys: PrevalenceSystem.PrevalenceSystem;
 			containerName, prevSysName: Strings.String;
 		BEGIN
@@ -1392,7 +1392,7 @@ TYPE
 			END
 		END RemoveSessionDataObject;
 
-		PROCEDURE ToXML*(request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } ToXML*(request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR elem: XML.Element; i: SIZE; p: ANY; obj: SessionDataObject; container: XML.Container;
 			nameText: XML.ArrayChars; objSer: XML.Content; posString, oidString: ARRAY 14 OF CHAR;
 		BEGIN
@@ -1448,7 +1448,7 @@ TYPE
 	 *   <WebStd:SessionContainer name="Persons"/> *)
 	SessionContainer* = OBJECT (DynamicWebpage.StateLessActiveElement)
 		(* the container is stored in the session object, hence the SessionContainer can be stateless *)
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR errStr: ARRAY 128 OF CHAR; sessionCont: SessionDataContainer; containerName: Strings.String;
 			session: HTTPSession.Session;
 		BEGIN
@@ -1505,7 +1505,7 @@ TYPE
 			pos := 0
 		END Init;
 
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR table, tr, td, tdHeader, data, header, footer, elem, paging, subElem, eventButton, eventParam: XML.Element; p, pElem: ANY;
 			content: XML.Content; gridEnum, elemEnum, enum: XMLObjects.Enumerator; elemName, pagingSizeStr,
 			subElemName, labelName, objectId: Strings.String; columns, pagingSize, counter, k: SIGNED32;
@@ -1676,7 +1676,7 @@ TYPE
 			END
 		END SetPos;
 
-		PROCEDURE GetEventHandlers*() : DynamicWebpage.EventHandlerList;
+		PROCEDURE { OVERRIDE } GetEventHandlers*() : DynamicWebpage.EventHandlerList;
 		VAR list: DynamicWebpage.EventHandlerList;
 		BEGIN
 			NEW(list, 1);
@@ -1701,7 +1701,7 @@ TYPE
 		BEGIN isShowing := TRUE; firstAccess := TRUE
 		END Init;
 
-		PROCEDURE PreTransform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } PreTransform*(elem: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR pTag, label, eventLink, show, hide: XML.Element; container: XML.Container;
 			showLabel, hideLabel, objectId, startWith: Strings.String;
 		BEGIN
@@ -1765,7 +1765,7 @@ TYPE
 		BEGIN isShowing := FALSE
 		END Hide;
 
-		PROCEDURE GetEventHandlers*() : DynamicWebpage.EventHandlerList;
+		PROCEDURE { OVERRIDE } GetEventHandlers*() : DynamicWebpage.EventHandlerList;
 		VAR list: DynamicWebpage.EventHandlerList;
 		BEGIN
 			NEW(list, 2);
@@ -1794,7 +1794,7 @@ TYPE
 			EndModification
 		END IncreaseCounter;
 
-		PROCEDURE Internalize*(xml: XML.Content);
+		PROCEDURE { OVERRIDE } Internalize*(xml: XML.Content);
 		VAR container: XML.Container;
 		BEGIN
 			container := xml(XML.Container);
@@ -1802,7 +1802,7 @@ TYPE
 			counter := InternalizeInteger(container, "Counter")
 		END Internalize;
 
-		PROCEDURE Externalize*() : XML.Content;
+		PROCEDURE { OVERRIDE } Externalize*() : XML.Content;
 		VAR container: XML.Container;
 		BEGIN
 			NEW(container);
@@ -1825,7 +1825,7 @@ TYPE
 		BEGIN nameLock := FALSE
 		END Init;
 
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR name: Strings.String; persCounter: PersistentCounter; numberStr: ARRAY 14 OF CHAR;
 			session: HTTPSession.Session; p: ANY; dynVarName, dynVarValue: DynamicStrings.DynamicString;
 			varName: Strings.String;

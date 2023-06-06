@@ -19,7 +19,7 @@ TYPE
 	VAR
 		l : Network.LinkDevice;
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := PluginName; p.description := "Network Send Performance";
@@ -34,7 +34,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		VAR sentKB, receivedKB : FLOAT32;
 		BEGIN
 			sentKB := l.sendCount / 1024;

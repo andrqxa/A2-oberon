@@ -219,14 +219,14 @@ TYPE
 		END SetDevice;
 
 		(** Close the remote control window *)
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		BEGIN
 			FreeWindow(SELF);
 			Close^
 		END Close;
 
 		(** Handle window messages *)
-		PROCEDURE Handle(VAR m : Messages.Message);
+		PROCEDURE { OVERRIDE } Handle(VAR m : Messages.Message);
 		VAR
 			data: XML.Element;
 			str: ARRAY 10 OF CHAR;

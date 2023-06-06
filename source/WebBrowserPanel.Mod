@@ -67,7 +67,7 @@ TYPE
 		pending : BOOLEAN;
 		loadID : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 			s : String;
 		BEGIN
@@ -387,7 +387,7 @@ TYPE
 			rc.Release();
 		END Load;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		VAR
 			item : HTMLTransformer.EmbeddedObject;
 			width : SIZE;
@@ -591,7 +591,7 @@ TYPE
 			END;
 		END Resize;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			width := bounds.GetWidth();
 			height := bounds.GetHeight();

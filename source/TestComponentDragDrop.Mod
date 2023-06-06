@@ -7,7 +7,7 @@ IMPORT
 
 TYPE
 	TestComponent = OBJECT(WMComponents.VisualComponent)
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF 0 IN keys THEN
 				IF StartDrag(NIL, WMGraphics.LoadImage("Bart.Pict", TRUE), 0,0,DragAccepted, DragRejected) THEN KernelLog.String("DraggingStarted")
@@ -20,12 +20,12 @@ TYPE
 			END
 		END PointerDown;
 
-		PROCEDURE DragOver*(x, y : SIZE; dragInfo : WM.DragInfo);
+		PROCEDURE { OVERRIDE } DragOver*(x, y : SIZE; dragInfo : WM.DragInfo);
 		BEGIN
 			KernelLog.String("Drag Over @ "); KernelLog.Int(x, 4); KernelLog.Int(y, 4); KernelLog.Ln
 		END DragOver;
 
-		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
 		BEGIN
 			KernelLog.String("Drag dropped @ "); KernelLog.Int(x, 4); KernelLog.Int(y, 4); KernelLog.Ln;
 			IF dragInfo.sender = SELF THEN ConfirmDrag(FALSE, dragInfo)
@@ -81,7 +81,7 @@ TYPE
 			manager.Add(100, 100, SELF, {WM.FlagFrame})
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			window := NIL

@@ -305,14 +305,14 @@ TYPE
 
 		text : Texts.Text;
 
-		PROCEDURE SetText*(text : Texts.Text);
+		PROCEDURE { OVERRIDE } SetText*(text : Texts.Text);
 		BEGIN
 			SetText^(text);
 			SELF.text := text;
 			NEW(utilreader, text);
 		END SetText;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR pos : SIZE;
 		BEGIN
 			IF keys * {0, 1, 2} = {2} THEN
@@ -342,7 +342,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		CONST DragDist = 5;
 		VAR pos : SIZE;
 		BEGIN
@@ -368,14 +368,14 @@ TYPE
 			END
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN
 			selecting := FALSE;
 			IF dragPossible THEN selection.SetFromTo(0, 0); Texts.ClearLastSelection (* reset selection *) END;
 			dragPossible := FALSE
 		END PointerUp;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrCustomTextView);
@@ -433,7 +433,7 @@ TYPE
 		running : BOOLEAN;
 		timer : Kernel.Timer;
 
-		PROCEDURE Handle*(VAR m: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m: WMMessages.Message);
 		BEGIN
 			IF m.msgType = WMMessages.MsgKey THEN
 				IF ~settings.shortcutsEnabled OR ~HandleShortcut(m.x, m.flags, m.y) THEN
@@ -859,7 +859,7 @@ TYPE
 			timer.Sleep(ms);
 		END Wait;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMV24Component.NewTerminalComponent");
@@ -1093,7 +1093,7 @@ TYPE
 			END;
 		END ToggleOpen;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF settings.showStatusBar THEN statusUpdater.Terminate; END;
@@ -1273,13 +1273,13 @@ TYPE
 
 	ProgressWindow = OBJECT(WMComponents.FormWindow);
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 			ELSE Handle^(x)
@@ -1369,14 +1369,14 @@ TYPE
 			END;
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			T.String("closing window"); T.Ln;
 			Close^;
 			DecCount
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		VAR configuration : WMRestorable.XmlElement; string : ARRAY 64 OF CHAR;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN

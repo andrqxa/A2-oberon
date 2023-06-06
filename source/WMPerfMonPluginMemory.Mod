@@ -13,7 +13,7 @@ TYPE
 	VAR
 		free, total, largest : SIZE;
 
-		PROCEDURE Update;
+		PROCEDURE { OVERRIDE } Update;
 		BEGIN
 			Heaps.GetHeapInfo(total, free, largest);
 		END Update;
@@ -26,7 +26,7 @@ TYPE
 	VAR
 		h : HeapHelper;
 
-		PROCEDURE Init(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "Heap"; p.description := "Heap statistics"; p.modulename := ModuleName;
@@ -40,7 +40,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset;
+		PROCEDURE { OVERRIDE } UpdateDataset;
 		BEGIN
 			dataset[0] := h.total DIV 1024;
 			dataset[1] := h.free DIV 1024;
@@ -55,7 +55,7 @@ TYPE
 	VAR
 		h : HeapHelper;
 
-		PROCEDURE Init(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init(p : WMPerfMonPlugins.Parameter);
 		BEGIN
 			p.name := "StackSize"; p.description := "Approximate size of stack"; p.modulename := ModuleName;
 			p.autoMax := TRUE; p.unit := "KB"; p.minDigits := 6;
@@ -63,7 +63,7 @@ TYPE
 			p.helper := heapHelper; h := heapHelper;
 		END Init;
 
-		PROCEDURE UpdateDataset;
+		PROCEDURE { OVERRIDE } UpdateDataset;
 		VAR current, totMem, lowFree, highFree : SIZE;
 		BEGIN
 			Machine.GetFreeK(totMem, lowFree, highFree);
@@ -79,7 +79,7 @@ TYPE
 	VAR
 		h : HeapHelper;
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR total, lowFree, highFree : SIZE;
 		BEGIN
 			p.name := "MemoryUsage"; p.description := "Stack & Heap memory usage"; p.modulename := ModuleName;
@@ -89,7 +89,7 @@ TYPE
 			p.helper := heapHelper; h := heapHelper;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		VAR current, totMem, lowFree, highFree : SIZE;
 		BEGIN
 			Machine.GetFreeK(totMem, lowFree, highFree);

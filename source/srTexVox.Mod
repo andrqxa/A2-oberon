@@ -21,7 +21,7 @@ BEGIN
 	IF img#NIL THEN W := img.width-1; H:= img.height-1; END;
 END init;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
 	xi,yj: SIZE;
@@ -86,7 +86,7 @@ BEGIN
 	a := srBase.clamp(alpha);
 END SetColor;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
 	xi,yj: SIZE;
@@ -162,7 +162,7 @@ BEGIN
 	register;
 END init;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
 	x,y: SIZE;
@@ -233,7 +233,7 @@ BEGIN
 	register;
 END init;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
 	x,y: SIZE;
@@ -264,7 +264,7 @@ BEGIN
 	ray.a := 0;
 END Shade;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 BEGIN
 	off := SIGNED16((off+1) MOD w);
 END tick;
@@ -317,7 +317,7 @@ VAR
 	cx, cy, cz: SREAL;
 	D2: SREAL;
 
-PROCEDURE & init*(n: Name);
+PROCEDURE (* OVERRIDE *) & init*(n: Name);
 BEGIN
 	img :=Graphics.LoadImage(n, TRUE);
 	W := img.width-1; H:= img.height-1;
@@ -333,7 +333,7 @@ BEGIN
 	ph :=  6.28*srMath.cos((y-cy)/d);
 END ctop;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	x,y,z, th,ph,r2, radius, r,g,b: SREAL;
 	ax, ay, az, bx, by, bz : SREAL;

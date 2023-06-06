@@ -453,14 +453,14 @@ TYPE
 			encoderV.SetupDefaultsChroma;
 		END Init;
 
-		PROCEDURE Open*(output: Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(output: Streams.Writer);
 		BEGIN
 			out := output;
 			headerWriter.SetOutput(out);
 			bitstreamWriter.Init(out.Char);
 		END Open;
 
-		PROCEDURE SetQuality*(quality: SIGNED32);
+		PROCEDURE { OVERRIDE } SetQuality*(quality: SIGNED32);
 		BEGIN
 			(*!TODO: implement support of quality regulation *)
 		END SetQuality;
@@ -470,7 +470,7 @@ TYPE
 			grayScale := enableGrayscale;
 		END SetGrayscale;
 
-		PROCEDURE WriteImage*(img: Raster.Image; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } WriteImage*(img: Raster.Image; VAR res: INTEGER);
 		VAR
 			getRgbBlock8x8: PROCEDURE(CONST src: ARRAY OF CHAR; srcOffs: SIZE; x0, x1: INTEGER; rowStride: SIZE; VAR r, g, b: Block8x8);
 			i0, i1: INTEGER;

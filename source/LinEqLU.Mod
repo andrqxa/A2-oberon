@@ -49,7 +49,7 @@ TYPE
 		END Decompose;
 
 	(** Requires NEW to pass matrix A as a parameter when creating a solver object. *)
-		PROCEDURE & Initialize*( VAR A: Mtx.Matrix );
+		PROCEDURE (* OVERRIDE *) & Initialize*( VAR A: Mtx.Matrix );
 		BEGIN
 			IF A # NIL THEN lu := A.Copy();  LinEq.NormalizeMatrix( lu, mtxMag );  Decompose
 			ELSE Errors.Error( "A NIL matrix was supplied." )
@@ -57,7 +57,7 @@ TYPE
 		END Initialize;
 
 	(** Solves  Ax = b  for  x  given  b. *)
-		PROCEDURE Solve*( VAR b: Vec.Vector ): Vec.Vector;
+		PROCEDURE { OVERRIDE } Solve*( VAR b: Vec.Vector ): Vec.Vector;
 		VAR i, k: SIGNED32;  adjustment, factor, mag, ratio, zero: Nbr.Real;  x: Vec.Vector;
 		BEGIN
 			IF b # NIL THEN

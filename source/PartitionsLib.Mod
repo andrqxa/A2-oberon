@@ -1577,7 +1577,7 @@ TYPE
 			filename := ""; Strings.Append(filename, name); SELF.block := block; SELF.numblocks := numblocks;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		VAR res : INTEGER; temp: ARRAY 256 OF CHAR;
 		BEGIN
 			IF (block = -1) & (numblocks = -1) THEN (* optional parameters block & numblocks not set; whole partition *)
@@ -1604,7 +1604,7 @@ TYPE
 
 	PartitionToFile* = OBJECT(Image);
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR f : Files.File; w: Files.Writer; error : String; pos, i, num : SIGNED32; res : INTEGER; temp: ARRAY 256 OF CHAR;
 		BEGIN
 			f := Files.New(filename);
@@ -1637,7 +1637,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "PartitionToFile"; desc := "Write a partition to a file"; locktype := ReaderLock;
@@ -1649,7 +1649,7 @@ TYPE
 
 	FileToPartition* = OBJECT(Image);
 
-		PROCEDURE DoOperation*; (** dev#part filename [block numblocks] ~ *)
+		PROCEDURE { OVERRIDE } DoOperation*; (** dev#part filename [block numblocks] ~ *)
 		VAR f: Files.File; r: Files.Reader; error : String; len: SIZE; pos, num, i : SIGNED32; res: INTEGER;
 		BEGIN
 			f := Files.Old(filename);
@@ -1686,7 +1686,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "FileToPartition"; desc := "Write file to partition"; locktype := WriterLock;
@@ -1710,7 +1710,7 @@ TYPE
 			COPY(fsPars, SELF.fsPars);
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF (prefix = "") THEN ReportError("No prefix specified"); RETURN FALSE;
 			ELSIF (alias = "") THEN ReportError("No alias specified"); RETURN FALSE;
@@ -1718,7 +1718,7 @@ TYPE
 			RETURN TRUE;
 		END ValidParameters;
 
-		PROCEDURE DoOperation*; (** prefix alias [volpar] ["|" fspar] ~ *)
+		PROCEDURE { OVERRIDE } DoOperation*; (** prefix alias [volpar] ["|" fspar] ~ *)
 		VAR
 			errorString, par : ARRAY 512 OF CHAR;
 			context : Commands.Context;
@@ -1749,7 +1749,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "Mount"; desc := "Mount partition"; locktype := WriterLock;
@@ -1763,13 +1763,13 @@ TYPE
 	VAR
 		timer : Kernel.MilliTimer;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			RETURN TRUE; (* operation has no parameters *)
 		END ValidParameters;
 
 		(* parameters : dev#part *)
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		CONST Size = 16*512; Max = 50;
 		VAR
 			maxblocks : SIGNED32;
@@ -1826,7 +1826,7 @@ TYPE
 			RETURN seed MOD N
 		END Random;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "CheckPartition"; desc := "Sequentially read all blocks on partition"; locktype := ReaderLock;
@@ -1857,7 +1857,7 @@ TYPE
 			COPY(bootname, bootName);
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF disk.device.blockSize # BS THEN ReportError("Blocksize not supported"); RETURN FALSE; END;
 
@@ -1874,7 +1874,7 @@ TYPE
 		END ValidParameters;
 
 		(** dev#part [ "AosFS" | "NatFS" | "NatFS2" [ FSRes [ BootFile [ Flag ] ] ] ] ~ *)
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR
 			f : Files.File;
 			error : String;
@@ -2064,7 +2064,7 @@ TYPE
 			END
 		END InitOBL;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "Format"; desc := "Format partition"; dev := disk.device; locktype := WriterLock;
@@ -2095,7 +2095,7 @@ TYPE
 			SELF.callback := callback;
 		END SetCallback;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF block < 0 THEN
 				ReportError("Wrong parameter: block must be >= 0"); RETURN FALSE;
@@ -2109,7 +2109,7 @@ TYPE
 			RETURN TRUE;
 		END ValidParameters;
 
-		PROCEDURE DoOperation*; (** dev#part block [numblocks] ~ *)
+		PROCEDURE { OVERRIDE } DoOperation*; (** dev#part block [numblocks] ~ *)
 		VAR
 			text : Texts.Text; tw : TextUtilities.TextWriter;
 			pos, num : SIGNED32; res : INTEGER;
@@ -2161,7 +2161,7 @@ TYPE
 			END
 		END WriteHexDump;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "ShowBlocks"; desc := "Show block(s) of partition"; locktype := ReaderLock;
@@ -2178,7 +2178,7 @@ TYPE
 		(* parameters *)
 		bootloader : ARRAY 32 OF CHAR;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		VAR valid : BOOLEAN;
 		BEGIN
 			valid := FALSE;
@@ -2198,7 +2198,7 @@ TYPE
 			SELF.bootloader := ""; Strings.Append(SELF.bootloader, bootloader);
 		END SetParameters;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR  res: INTEGER; fs : SIGNED32; string: ARRAY 256 OF CHAR; f : Files.File;
 		BEGIN
 			fs := DetectFS(disk.device, partition);
@@ -2258,7 +2258,7 @@ TYPE
 			END
 		END UpdateOBL;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "UpdateLoader"; desc := "Update Boot Loader on partition"; locktype := WriterLock;
@@ -2278,7 +2278,7 @@ TYPE
 			SELF.bootfilename := ""; Strings.Append(SELF.bootfilename, bootfilename);
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		VAR valid : BOOLEAN;
 		BEGIN
 			valid := FALSE;
@@ -2293,7 +2293,7 @@ TYPE
 		END ValidParameters;
 
 		(* Update the boot file in an existing Oberon partition. *)
-		PROCEDURE DoOperation*; (** dev#part [ BootFile ] ~ *)
+		PROCEDURE { OVERRIDE } DoOperation*; (** dev#part [ BootFile ] ~ *)
 		VAR  f : Files.File; res: INTEGER; fs : SIGNED32; temp: ARRAY 256 OF CHAR;
 		BEGIN
 			fs := DetectFS(disk.device, partition);
@@ -2313,7 +2313,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "UpdateBootFile"; desc := "Updates boot file on partition "; locktype := WriterLock;
@@ -2330,7 +2330,7 @@ TYPE
 		preserveTable : BOOLEAN; (* if TRUE, the partition table is not altered *)
 		preserveSignature : BOOLEAN; (* if TRUE, the disk signature used by Windows Vista (Offset 1B8H-1BBH) is not altered *)
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		VAR valid : BOOLEAN;
 		BEGIN
 			valid := FALSE;
@@ -2352,7 +2352,7 @@ TYPE
 			SELF.preserveSignature := preserveSignature;
 		END SetParameters;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR
 			f: Files.File; r: Files.Reader; buf1, buf2: ARRAY BS OF CHAR;
 			string : ARRAY 256 OF CHAR;
@@ -2397,7 +2397,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "WriteMBR"; desc := "Write MBR to disk"; locktype := WriterLock;
@@ -2411,7 +2411,7 @@ TYPE
 	VAR
 		table : ConfigString;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF disk.device.blockSize # BS THEN ReportError("Unsupported blocksize"); RETURN FALSE; END;
 			RETURN TRUE;
@@ -2423,7 +2423,7 @@ TYPE
 			RETURN NIL;
 		END GetTable;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR config : Configuration; fs : SIGNED32; res : INTEGER; temp: ARRAY 256 OF CHAR;
 		BEGIN
 			fs := DetectFS(disk.device, partition);
@@ -2439,7 +2439,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "GetConfig"; desc := "Read config string to partition"; locktype := ReaderLock;
@@ -2455,7 +2455,7 @@ TYPE
 		configString : Strings.String;
 		pos : SIGNED32;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF disk.device.blockSize = BS THEN
 				RETURN TRUE;
@@ -2471,7 +2471,7 @@ TYPE
 			SELF.configString := configString; SELF.pos := pos;
 		END SetParameters;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR config : Configuration; fs, i  : SIGNED32; res : INTEGER; temp: ARRAY 256 OF CHAR;
 		BEGIN
 			fs := DetectFS(disk.device, partition);
@@ -2498,7 +2498,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "SetConfig"; desc := "Write config string to partition"; locktype := WriterLock;
@@ -3015,7 +3015,7 @@ TYPE
 			SELF.oldtype := oldtype; SELF.newtype := newtype;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		VAR valid : BOOLEAN;
 		BEGIN
 			valid := FALSE;
@@ -3032,7 +3032,7 @@ TYPE
 		END ValidParameters;
 
 		(* Change type of partition from oldtype to newtype *)
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR
 			b: ARRAY BS OF CHAR; e: SIGNED32; res : INTEGER; temp: ARRAY 256 OF CHAR;
 		BEGIN
@@ -3057,7 +3057,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "ChangeType"; desc := "Change type of partition"; locktype := WriterLock;
@@ -3080,7 +3080,7 @@ TYPE
 			SELF.size := size; SELF.type := type; SELF.override := override;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		VAR temp: ARRAY 256 OF CHAR;
 		BEGIN
 			IF disk.device.blockSize # BS THEN ReportError("Blocksize # 512B not supported"); RETURN FALSE; END;
@@ -3094,7 +3094,7 @@ TYPE
 			RETURN TRUE;
 		END ValidParameters;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR done : BOOLEAN;
 		BEGIN
 			IF (disk.device.openCount = 1) OR override THEN (* only "mounted" once, so ok to change names *)
@@ -3264,7 +3264,7 @@ TYPE
 			RETURN result;
 		END GetEPBR;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "Create"; desc := "Create partition"; locktype := WriterLock;
@@ -3286,7 +3286,7 @@ TYPE
 		END SetParameters;
 
 		(* dev#part type *)
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		VAR valid : BOOLEAN;
 		BEGIN
 			valid := FALSE;
@@ -3309,7 +3309,7 @@ TYPE
 			RETURN valid;
 		END ValidParameters;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR  done : BOOLEAN;
 		BEGIN
 			ASSERT((type > 0) & (type < 256));
@@ -3465,7 +3465,7 @@ TYPE
 			RETURN result;
 		END GetEPBR;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "Delete"; desc := "Delete partition"; locktype := WriterLock;
@@ -3486,7 +3486,7 @@ TYPE
 			SELF.on := on;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		VAR valid : BOOLEAN;
 		BEGIN
 			valid := FALSE;
@@ -3501,7 +3501,7 @@ TYPE
 		END ValidParameters;
 
 		(* Set active bit of dev#part to <on> *)
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR
 			res: INTEGER; e: SIGNED32; b: ARRAY BS OF CHAR; mod: BOOLEAN;
 			string : ARRAY 256 OF CHAR;
@@ -3540,7 +3540,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "(In)Activate"; desc := "Set/clear active bit of partition"; locktype := WriterLock;
@@ -3563,7 +3563,7 @@ TYPE
 			SELF.restFilename := ""; Strings.Append(SELF.restFilename, restFilename);
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF disk.device.blockSize # BS THEN
 				ReportError("InstallBootManager only works with 512B block size"); RETURN FALSE;
@@ -3574,7 +3574,7 @@ TYPE
 			RETURN TRUE;
 		END ValidParameters;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR
 			writeMBR : WriteMBR; fileToPartition : FileToPartition;
 			nofSectors : SIGNED32;
@@ -3622,7 +3622,7 @@ TYPE
 
 		END DoOperation;
 
-		PROCEDURE & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "InstallBootManager"; desc := "Install Boot Manager on partition"; locktype := WriterLock;

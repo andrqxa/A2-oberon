@@ -28,15 +28,15 @@ TYPE	WriterMonitor* = OBJECT (Streams.Writer);
 			res:=out.res;
 		END Sender;
 
-		PROCEDURE CanSetPos*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*(): BOOLEAN;
 		BEGIN RETURN out.CanSetPos()
 		END CanSetPos;
 
-		PROCEDURE SetPos*(pos: Streams.Position);
+		PROCEDURE { OVERRIDE } SetPos*(pos: Streams.Position);
 		BEGIN Reset; out.SetPos(pos);
 		END SetPos;
 
-		PROCEDURE Pos*(): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 		BEGIN RETURN out.Pos()
 		END Pos;
 
@@ -68,7 +68,7 @@ TYPE	EncryptingWriter* = OBJECT (Streams.Writer);
 			res:=out.res;
 		END Sender;
 
-		PROCEDURE Pos*(): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 		BEGIN RETURN out.Pos()
 		END Pos;
 
@@ -97,7 +97,7 @@ TYPE	EncryptingWriter* = OBJECT (Streams.Writer);
 			res:=in.res;
 		END Receiver;
 
-		PROCEDURE Pos*(): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 		BEGIN RETURN in.Pos()
 		END Pos;
 
@@ -120,7 +120,7 @@ TYPE
 		size: SIZE;
 		sender: Streams.Sender;
 
-		PROCEDURE & InitWriter(sender: Streams.Sender; size: SIZE);
+		PROCEDURE (* OVERRIDE *) & InitWriter(sender: Streams.Sender; size: SIZE);
 		BEGIN
 			first := NIL; last := NIL; free := NIL;
 			SELF.size := size;
@@ -213,17 +213,17 @@ TYPE
 			InitWriter(Sender, WriterBufSize);
 		END Init;
 
-		PROCEDURE CanSetPos*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*(): BOOLEAN;
 		BEGIN RETURN out.CanSetPos()
 		END CanSetPos;
 
-		PROCEDURE SetPos*(pos: Streams.Position);
+		PROCEDURE { OVERRIDE } SetPos*(pos: Streams.Position);
 		BEGIN{EXCLUSIVE}
 			AWAIT(first = NIL);
 			Reset; out.SetPos(pos);
 		END SetPos;
 
-		PROCEDURE Pos*(): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 		BEGIN{EXCLUSIVE}
 			AWAIT(first = NIL);
 			RETURN out.Pos()
@@ -262,15 +262,15 @@ TYPE
 			monitor.Update;
 		END Receiver;
 
-		PROCEDURE CanSetPos*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*(): BOOLEAN;
 		BEGIN RETURN in.CanSetPos()
 		END CanSetPos;
 
-		PROCEDURE SetPos*(pos: Streams.Position);
+		PROCEDURE { OVERRIDE } SetPos*(pos: Streams.Position);
 		BEGIN Reset; in.SetPos(pos)
 		END SetPos;
 
-		PROCEDURE Pos*(): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 		BEGIN RETURN in.Pos()
 		END Pos;
 
@@ -297,7 +297,7 @@ TYPE
 			IF num<len THEN res:=Streams.EOF ELSE res:=out.res END;
 		END Sender;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN
 			remain:=size;
 		END Reset;
@@ -326,7 +326,7 @@ TYPE
 			res:=in.res;
 		END Receiver;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN
 			remain:=total;
 		END Reset;
@@ -346,7 +346,7 @@ TYPE	Base64Writer* = OBJECT (Streams.Writer);
 			Reset;
 		END Init;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN
 			Reset^;
 			group := 0;  i := 0;  ll := 0; done:=FALSE;
@@ -390,7 +390,7 @@ TYPE	Base64Writer* = OBJECT (Streams.Writer);
 			res:=out.res;
 		END Close;
 
-		PROCEDURE Pos*(): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 		BEGIN RETURN out.Pos()
 		END Pos;
 
@@ -412,7 +412,7 @@ TYPE	Base64Writer* = OBJECT (Streams.Writer);
 			Reset;
 		END Init;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN
 			Reset^;
 			group := 0;  i := 0; code:=0; done:=FALSE;
@@ -462,7 +462,7 @@ TYPE	Base64Writer* = OBJECT (Streams.Writer);
 			INC(received,len);
 		END Receiver;
 
-		PROCEDURE Pos*(): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 		BEGIN RETURN in.Pos()
 		END Pos;
 

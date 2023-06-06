@@ -124,13 +124,13 @@ TYPE
 		END GetWMPosition;
 
 		(**  Return the modifier keys that are pressed in the view *)
-		PROCEDURE GetKeyState*(VAR state : SET);
+		PROCEDURE { OVERRIDE } GetKeyState*(VAR state : SET);
 		BEGIN
 			state := {};
 		END GetKeyState;
 
 		(** Set the observed range. *)
-		PROCEDURE SetRange*(x, y, w, h : FLOAT32; showTransition : BOOLEAN);
+		PROCEDURE { OVERRIDE } SetRange*(x, y, w, h : FLOAT32; showTransition : BOOLEAN);
 		VAR
 			sx, sy, sx2, sy2, dx, dy, dx2, dy2, x2, y2  : FLOAT32;
 			i, steps : SIGNED32;
@@ -176,14 +176,14 @@ TYPE
 		END SetRange;
 
 		(** r in wm coordinates *)
-		PROCEDURE Update*(r : WMRectangles.Rectangle; top : WMWindowManager.Window);
+		PROCEDURE { OVERRIDE } Update*(r : WMRectangles.Rectangle; top : WMWindowManager.Window);
 		BEGIN
 			lock.Acquire;
 			Draw(WMRectangles.ResizeRect(r, 1), top.prev);(* assuming the src-domain is only 1 *)
 			lock.Release;
 		END Update;
 
-		PROCEDURE Refresh*(top : WMWindowManager.Window);
+		PROCEDURE { OVERRIDE } Refresh*(top : WMWindowManager.Window);
 		BEGIN
 			Update(WMRectangles.MakeRect(ENTIER(range.l)-1, ENTIER(range.t)-1, ENTIER(range.r) + 1, ENTIER(range.b) + 1), top)
 		END Refresh;
@@ -284,7 +284,7 @@ TYPE
 		offsetX, offsetY : SIZE;
 		lastX, lastY : SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR style : WMWindowManager.WindowStyle;
 		BEGIN
 			Init^;
@@ -298,7 +298,7 @@ TYPE
 			END;
 		END Init;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			BEGIN {EXCLUSIVE} alive := FALSE; END;
@@ -306,7 +306,7 @@ TYPE
 			manager.RemoveView(viewPort);
 		END Finalize;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			PropertyChanged^(sender, data);
 			IF (data = bounds) THEN
@@ -314,7 +314,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			viewPort.ReInit(bounds.GetWidth(), bounds.GetHeight(), Displays.color8888, Refresh);
@@ -322,12 +322,12 @@ TYPE
 			Invalidate;
 		END RecacheProperties;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			PointerLeave^;
 		END PointerLeave;
 
-		PROCEDURE PointerDown*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y: SIZE; keys: SET);
 		VAR xg, yg : SIZE; rect : WMRectangles.Rectangle; title : Strings.String;
 		BEGIN
 			PointerDown^(x, y, keys);
@@ -352,7 +352,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y: SIZE; keys: SET);
 		VAR xg, yg : SIZE;
 		BEGIN
 			lastX := x; lastY := y;
@@ -365,7 +365,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE WheelMove*(dz: SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz: SIZE);
 		VAR xg, yg : SIZE;
 		BEGIN
 			WheelMove^(dz);
@@ -373,7 +373,7 @@ TYPE
 			viewPort.ChangeZoom(dz, xg, yg);
 		END WheelMove;
 
-		PROCEDURE PointerUp*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y: SIZE; keys: SET);
 		BEGIN
 			PointerUp^(x, y, keys);
 			selectedWindow := NIL;
@@ -384,7 +384,7 @@ TYPE
 			refresh := TRUE;
 		END Refresh;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas);
 		VAR r0, r1, res : WMWindowManager.RealRect; rect : WMRectangles.Rectangle;
 		BEGIN
 			IF (viewPort.backbuffer.width = bounds.GetWidth()) & (viewPort.backbuffer.height = bounds.GetHeight()) THEN
@@ -430,7 +430,7 @@ TYPE
 
 	Window = OBJECT(WMComponents.FormWindow)
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			window := NIL;

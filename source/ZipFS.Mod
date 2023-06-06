@@ -10,7 +10,7 @@ MODULE ZipFS; (** AUTHOR "ejz"; PURPOSE "mount a zipped file as a file-system"; 
 				SELF.zip := zip
 			END Init;
 
-			PROCEDURE Old0*(CONST name: ARRAY OF CHAR): Files.File;
+			PROCEDURE { OVERRIDE } Old0*(CONST name: ARRAY OF CHAR): Files.File;
 				VAR E: Unzip.Entry; key: SIGNED32; res: INTEGER; F: File; F0: Files.File; W: Files.Writer;
 			BEGIN {EXCLUSIVE}
 				key := 0;
@@ -31,7 +31,7 @@ MODULE ZipFS; (** AUTHOR "ejz"; PURPOSE "mount a zipped file as a file-system"; 
 				RETURN NIL
 			END Old0;
 
-			PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
+			PROCEDURE { OVERRIDE } Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
 				VAR E: Unzip.Entry; name: Files.FileName; d, t: SIGNED32;
 			BEGIN {EXCLUSIVE}
 				E := zip.GetFirst();
@@ -47,7 +47,7 @@ MODULE ZipFS; (** AUTHOR "ejz"; PURPOSE "mount a zipped file as a file-system"; 
 				END
 			END Enumerate0;
 
-			PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
+			PROCEDURE { OVERRIDE } FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
 				VAR E: Unzip.Entry; key: SIGNED32;
 			BEGIN {EXCLUSIVE}
 				key := 0;
@@ -60,7 +60,7 @@ MODULE ZipFS; (** AUTHOR "ejz"; PURPOSE "mount a zipped file as a file-system"; 
 				RETURN 0
 			END FileKey;
 
-			PROCEDURE Finalize*;
+			PROCEDURE { OVERRIDE } Finalize*;
 			BEGIN {EXCLUSIVE}
 				Finalize^()
 			END Finalize;
@@ -70,42 +70,42 @@ MODULE ZipFS; (** AUTHOR "ejz"; PURPOSE "mount a zipped file as a file-system"; 
 		File = OBJECT (Files.File)
 			VAR F: Files.File; E: Unzip.Entry;
 
-			PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
+			PROCEDURE { OVERRIDE } Set*(VAR r: Files.Rider; pos: Files.Position);
 			BEGIN
 				F.Set(r, pos); r.file := SELF
 			END Set;
 
-			PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
+			PROCEDURE { OVERRIDE } Pos*(VAR r: Files.Rider): Files.Position;
 			BEGIN
 				RETURN F.Pos(r)
 			END Pos;
 
-			PROCEDURE Read*(VAR r: Files.Rider; VAR x: CHAR);
+			PROCEDURE { OVERRIDE } Read*(VAR r: Files.Rider; VAR x: CHAR);
 			BEGIN
 				F.Read(r, x)
 			END Read;
 
-			PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+			PROCEDURE { OVERRIDE } ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 			BEGIN
 				F.ReadBytes(r, x, ofs, len)
 			END ReadBytes;
 
-			PROCEDURE Length*(): Files.Size;
+			PROCEDURE { OVERRIDE } Length*(): Files.Size;
 			BEGIN
 				RETURN F.Length()
 			END Length;
 
-			PROCEDURE GetDate*(VAR t, d: SIGNED32);
+			PROCEDURE { OVERRIDE } GetDate*(VAR t, d: SIGNED32);
 			BEGIN
 				Dates.DateTimeToOberon(E.td, d, t)
 			END GetDate;
 
-			PROCEDURE GetName*(VAR name: ARRAY OF CHAR);
+			PROCEDURE { OVERRIDE } GetName*(VAR name: ARRAY OF CHAR);
 			BEGIN
 				Files.JoinName(fs.prefix, E.name^, name)
 			END GetName;
 
-			PROCEDURE Update*;
+			PROCEDURE { OVERRIDE } Update*;
 			BEGIN
 				F.Update END
 			Update;

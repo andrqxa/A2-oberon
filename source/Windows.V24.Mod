@@ -99,7 +99,7 @@ TYPE
 			NEW( fn ); fn.finalizer := SELF.FinalizePort; Heaps.AddFinalizer( SELF, fn );
 		END Init;
 
-		PROCEDURE Open*( bps, data, parity, stop: SIGNED32;  VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } Open*( bps, data, parity, stop: SIGNED32;  VAR res: INTEGER );
 		BEGIN {EXCLUSIVE}
 			IF handle = Kernel32.InvalidHandleValue THEN
 				SetPortState( bps, data, parity, stop, res );
@@ -116,7 +116,7 @@ TYPE
 		END Open;
 
 	(** Send len characters from buf to output, starting at ofs. res is non-zero on error. *)
-		PROCEDURE Send*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } Send*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
 		VAR written: SIGNED32;  ret: Kernel32.BOOL;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + len );   (* array bound check not implemented in Kernel32.WriteFile *)
@@ -138,7 +138,7 @@ TYPE
 		END Send;
 
 	(** Send a single character to the UART. *)
-		PROCEDURE SendChar*( ch: CHAR; VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } SendChar*( ch: CHAR; VAR res: INTEGER );
 		VAR ret: Kernel32.BOOL;  written: SIGNED32;
 		BEGIN
 			IF handle # Kernel32.InvalidHandleValue THEN
@@ -162,7 +162,7 @@ TYPE
 		Wait until at least min bytes (possibly zero) are available.
 			res is non-zero on error. *)
 
-		PROCEDURE Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER);
 		VAR l, read, ret: Kernel32.DWORD;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + size );
@@ -203,7 +203,7 @@ TYPE
 		END Receive;
 
 	(** Wait for the next character is received in the input buffer.  *)
-		PROCEDURE ReceiveChar*( VAR ch: CHAR;  VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } ReceiveChar*( VAR ch: CHAR;  VAR res: INTEGER );
 		VAR l, ret, read: SIGNED32;
 		BEGIN
 			IF handle # Kernel32.InvalidHandleValue THEN
@@ -223,7 +223,7 @@ TYPE
 			END
 		END ReceiveChar;
 
-		PROCEDURE Available*( ): SIZE;
+		PROCEDURE { OVERRIDE } Available*( ): SIZE;
 		VAR errors: Kernel32.DWORD;  stat: Kernel32.ComStat;  res: Kernel32.BOOL;
 		BEGIN
 			IF handle # Kernel32.InvalidHandleValue THEN
@@ -314,7 +314,7 @@ TYPE
 		END FinalizePort;
 
 	(** Get the port state: speed, no. of data bits, parity, no. of stop bits (only valid if openstat is TRUE) *)
-		PROCEDURE GetPortState*( VAR openstat: BOOLEAN;  VAR bps, data, parity, stop: SIGNED32 );
+		PROCEDURE { OVERRIDE } GetPortState*( VAR openstat: BOOLEAN;  VAR bps, data, parity, stop: SIGNED32 );
 		VAR dcb: Kernel32.DCB;  ret: Kernel32.BOOL;
 		BEGIN {EXCLUSIVE}
 			openstat := FALSE;
@@ -347,7 +347,7 @@ TYPE
 		END GetPortState;
 
 	(** ClearMC - Clear the specified modem control lines.  s may contain DTR, RTS & Break. *)
-		PROCEDURE ClearMC*( s: SET );
+		PROCEDURE { OVERRIDE } ClearMC*( s: SET );
 		BEGIN {EXCLUSIVE}
 			IF (handle # Kernel32.InvalidHandleValue) THEN
 				IF Serials.Break IN s THEN IGNORE Kernel32.ClearCommBreak( handle ) END;
@@ -357,7 +357,7 @@ TYPE
 		END ClearMC;
 
 	(** SetMC - Set the specified modem control lines.  s may contain DTR, RTS & Break. *)
-		PROCEDURE SetMC*( s: SET );
+		PROCEDURE { OVERRIDE } SetMC*( s: SET );
 		VAR res: INTEGER;
 		BEGIN {EXCLUSIVE}
 			IF handle # Kernel32.InvalidHandleValue THEN
@@ -373,7 +373,7 @@ TYPE
 
 	(** GetMC - Return the state of the specified modem control lines.  s contains
 			the current state of DSR, CTS, RI, DCD & Break Interrupt. *)
-		PROCEDURE GetMC*( VAR s: SET );
+		PROCEDURE { OVERRIDE } GetMC*( VAR s: SET );
 		VAR state: INTEGERSET;  res: INTEGER;
 		BEGIN {EXCLUSIVE}
 			s := {};
@@ -391,7 +391,7 @@ TYPE
 			timer.Sleep(1);
 		END Wait;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN {EXCLUSIVE}
 			IF handle # Kernel32.InvalidHandleValue THEN
 				IGNORE Kernel32.CancelIoEx(handle, NIL);

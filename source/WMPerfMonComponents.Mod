@@ -50,13 +50,13 @@ TYPE
 			END;
 		END SetPluginHeights;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			SetPluginHeights;
 			Resized^;
 		END Resized;
 
-		PROCEDURE AlignSubComponents*;
+		PROCEDURE { OVERRIDE } AlignSubComponents*;
 		BEGIN
 			SetPluginHeights;
 			AlignSubComponents^;
@@ -85,7 +85,7 @@ TYPE
 			HALT(301); RETURN FALSE; (* abstract *)
 		END LocatePlugins;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR l : WMStandardComponents.Label;
 		BEGIN
 			Init^;
@@ -123,7 +123,7 @@ TYPE
 		w : Streams.StringWriter;
 		alive, dead, update : BOOLEAN;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		VAR sum, w : SIZE; i : SIZE; rect : WMRectangles.Rectangle;
 		BEGIN
 			rect := bounds.Get(); w := rect.r - rect.l;
@@ -313,7 +313,7 @@ TYPE
 			RETURN panel;
 		END CreateBottomPanel;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrSelectionComponent);
@@ -337,7 +337,7 @@ TYPE
 			update := TRUE;
 		END EventHandler;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Plugins.updater.RemoveListener(EventHandler);
 			BEGIN {EXCLUSIVE} alive := FALSE; END;
@@ -380,7 +380,7 @@ TYPE
 		value : ARRAY 128 OF CHAR;
 		textColor : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrIndicator);
@@ -394,7 +394,7 @@ TYPE
 			Invalidate;
 		END SetCaption;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		BEGIN
 			DrawBackground^(canvas);
 			canvas.SetColor(textColor);
@@ -454,7 +454,7 @@ TYPE
 			RETURN statistics.valid;
 		END UpdateStats;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			plugin.DecNbrOfClients;
@@ -495,7 +495,7 @@ TYPE
 			Invalidate;
 		END Update;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			IF bounds.GetHeight() < 100 THEN
 				info.visible.Set(FALSE);
@@ -505,7 +505,7 @@ TYPE
 			Resized^;
 		END Resized;
 
-		PROCEDURE InitView*;
+		PROCEDURE { OVERRIDE } InitView*;
 		VAR temp : ARRAY 16 OF CHAR;
 		BEGIN
 			NEW(pview);
@@ -665,7 +665,7 @@ TYPE
 			grid.Release;
 		END InitGrid;
 
-		PROCEDURE InitView*;
+		PROCEDURE { OVERRIDE } InitView*;
 		BEGIN
 			ds := plugin.p.datasetDescriptor;
 			IF ds # NIL THEN
@@ -680,7 +680,7 @@ TYPE
 			SetNameAsString(StrPluginGridView);
 		END InitView;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		VAR sum, w : SIZE; i: SIZE; rect : WMRectangles.Rectangle;
 		BEGIN
 			rect := bounds.Get(); w := rect.r - rect.l - 20 (*scrollbar width*);
@@ -711,7 +711,7 @@ TYPE
 			Resized^;
 		END Resized;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			plugin.datamodel.onChanged.Remove(UpdateGrid);
@@ -727,7 +727,7 @@ TYPE
 		ds : Plugins.DatasetDescriptor;
 		heights : POINTER TO ARRAY OF FLOAT64;
 
-		PROCEDURE InitView*;
+		PROCEDURE { OVERRIDE } InitView*;
 		VAR
 			labels : POINTER TO ARRAY OF Strings.String;
 			colors : POINTER TO ARRAY OF WMGraphics.Color;
@@ -783,7 +783,7 @@ TYPE
 			END;
 		END UpdateChart;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			plugin.datamodel.onChanged.Remove(UpdateChart);
@@ -803,7 +803,7 @@ TYPE
 		pview : WMDiagramComponents.MultiPointView;
 		pluginInstance : Plugins.Plugin;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 
@@ -863,14 +863,14 @@ TYPE
 			END;
 		END InstallPlugin;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			pview.showValues.Set(showValues.Get());
 			InstallPlugin;
 		END RecacheProperties;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = plugin) THEN
 				RecacheProperties;
@@ -883,7 +883,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			IF pluginInstance # NIL THEN
 				pluginInstance.DecNbrOfClients();
@@ -909,7 +909,7 @@ TYPE
 			HALT(301); RETURN NIL; (* abstract *)
 		END CreateForm;
 
-		PROCEDURE Resized*(width, height : SIZE);
+		PROCEDURE { OVERRIDE } Resized*(width, height : SIZE);
 		BEGIN
 			IF (width >= MinPwWidth) & (height >= MinPwHeight) THEN
 				scaling := FALSE;
@@ -1005,7 +1005,7 @@ TYPE
 			RETURN data;
 		END StoreToXml;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		VAR data : XML.Element;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
@@ -1019,7 +1019,7 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^; DecCount;
 		END Close;
@@ -1064,7 +1064,7 @@ TYPE
 			END;
 		END ButtonHandler;
 
-		PROCEDURE CreateForm*(): WMComponents.VisualComponent;
+		PROCEDURE { OVERRIDE } CreateForm*(): WMComponents.VisualComponent;
 		VAR panel, toolbar : WMStandardComponents.Panel;
 		BEGIN
 			panel := NewPanel(WMComponents.AlignClient, 0, 0); panel.bearing.Set(WMRectangles.MakeRect(2,5,2,2));
@@ -1113,7 +1113,7 @@ TYPE
 			RETURN panel;
 		END CreateForm;
 
-		PROCEDURE LoadFromXml*(configuration : XML.Element);
+		PROCEDURE { OVERRIDE } LoadFromXml*(configuration : XML.Element);
 		BEGIN
 			LoadFromXml^(configuration);
 			IF configuration # NIL THEN
@@ -1122,7 +1122,7 @@ TYPE
 			END;
 		END LoadFromXml;
 
-		PROCEDURE StoreToXml() : XML.Element;
+		PROCEDURE { OVERRIDE } StoreToXml() : XML.Element;
 		VAR elem, data : XML.Element;
 		BEGIN
 			data := StoreToXml^();
@@ -1208,7 +1208,7 @@ TYPE
 			END;
 		END ButtonHandler;
 
-		PROCEDURE CreateForm*(): WMComponents.VisualComponent;
+		PROCEDURE { OVERRIDE } CreateForm*(): WMComponents.VisualComponent;
 		VAR panel, toolbar : WMStandardComponents.Panel; label : WMStandardComponents.Label;
 		BEGIN
 			panel := NewPanel(WMComponents.AlignClient, 0, 0); panel.bearing.Set(WMRectangles.MakeRect(2,5,2,2));
@@ -1247,7 +1247,7 @@ TYPE
 			END;
 		END ButtonHandler;
 
-		PROCEDURE CreateForm*(): WMComponents.VisualComponent;
+		PROCEDURE { OVERRIDE } CreateForm*(): WMComponents.VisualComponent;
 		VAR panel, toolbar : WMStandardComponents.Panel;
 		BEGIN
 			panel := NewPanel(WMComponents.AlignClient, 0, 0); panel.bearing.Set(WMRectangles.MakeRect(2,5,2,2));

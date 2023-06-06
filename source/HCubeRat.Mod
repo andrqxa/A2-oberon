@@ -21,19 +21,19 @@ TYPE
 		Get-: PROCEDURE {DELEGATE} ( x, y, z, t: Index ): Value;
 
 		(** override *)
-		PROCEDURE AlikeX*( ): ArrayXdBytes.Array;
+		PROCEDURE { OVERRIDE } AlikeX*( ): ArrayXdBytes.Array;
 		VAR copy: HCube;
 		BEGIN
 			NEW( copy, origin[0], len[0], origin[1], len[1], origin[2], len[2], origin[3], len[3] );  RETURN copy;
 		END AlikeX;
 
-		PROCEDURE NewRangeX*( neworigin, newlen: ArrayXdBytes.IndexArray;  copydata: BOOLEAN );
+		PROCEDURE { OVERRIDE } NewRangeX*( neworigin, newlen: ArrayXdBytes.IndexArray;  copydata: BOOLEAN );
 		BEGIN
 			IF LEN( newlen ) # 4 THEN HALT( 1001 ) END;
 			NewRangeX^( neworigin, newlen, copydata );
 		END NewRangeX;
 
-		PROCEDURE ValidateCache*;
+		PROCEDURE { OVERRIDE } ValidateCache*;
 		BEGIN
 			ValidateCache^;
 			IF dim # 4 THEN HALT( 100 ) END;
@@ -42,7 +42,7 @@ TYPE
 			ot := origin[2];
 		END ValidateCache;
 
-		PROCEDURE SetBoundaryCondition*( c: SIGNED8 );   (* called by new, load and directly *)
+		PROCEDURE { OVERRIDE } SetBoundaryCondition*( c: SIGNED8 );   (* called by new, load and directly *)
 		BEGIN
 			SetBoundaryCondition^( c );
 			CASE c OF

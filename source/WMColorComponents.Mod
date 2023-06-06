@@ -21,7 +21,7 @@ TYPE
 			setColor := cch
 		END Init;
 
-		PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 		VAR cdi : ColorDropInterface;
 		BEGIN
 			IF type = WMDropTarget.TypeInt32 THEN
@@ -41,7 +41,7 @@ TYPE
 			setColor := cch
 		END Init;
 
-		PROCEDURE Set*(i : SIGNED32);
+		PROCEDURE { OVERRIDE } Set*(i : SIGNED32);
 		VAR c : Color;
 		BEGIN
 			NEW(c); c.value := i; setColor(SELF, c)
@@ -60,7 +60,7 @@ TYPE
 
 		changeHandler : ChangeHandler;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR plus, minus : WMStandardComponents.Button;
 		BEGIN
 			Init^;
@@ -91,13 +91,13 @@ TYPE
 		END Init;
 
 		(* update input editor *)
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR buf : ARRAY 128 OF CHAR;
 		BEGIN
 			Strings.IntToStr(value.Get(), buf); input.SetAsString(buf)
 		END RecacheProperties;
 
-		PROCEDURE PropertyChanged*(sender, prop : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, prop : ANY);
 		BEGIN
 			IF prop = value THEN
 				RecacheProperties
@@ -147,7 +147,7 @@ TYPE
 	VAR r, g, b, t : NumberInput; (* red, green, blue, transparency *)
 		colorChangeHandler : ColorChangeHandler; (* to be called when color has been changed from inside this object *)
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrNumericColorChooser);
@@ -202,7 +202,7 @@ TYPE
 	VAR dragPossible : BOOLEAN;
 		colorChangeHandler : ColorChangeHandler;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrColorPot);
@@ -211,7 +211,7 @@ TYPE
 		END Init;
 
 		(* draw a line around the panel *)
-		PROCEDURE DrawBackground*(c : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(c : WMGraphics.Canvas);
 		VAR rect : WMRectangles.Rectangle; h, w : SIZE;
 		BEGIN
 			rect := GetClientRect(); w := rect.r DIV 2; h := rect.b DIV 2;
@@ -256,18 +256,18 @@ TYPE
 
 		(* ----- mouse handlers ----------------------------------------- *)
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			ASSERT(IsCallFromSequencer());
 			dragPossible := TRUE
 		END PointerDown;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN
 			dragPossible := FALSE
 		END PointerUp;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF dragPossible THEN dragPossible := FALSE; AutoStartDrag() END
 		END PointerMove;
@@ -328,7 +328,7 @@ TYPE
 		END DragArrived;
 
 		(* called by MyDraggedDropped *)
-		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR dt : ColorDropTarget;
 		BEGIN
 			NEW(dt, colorChangeHandler); dragInfo.data := dt; ConfirmDrag(TRUE, dragInfo)
@@ -347,7 +347,7 @@ TYPE
 		onColorChosen : WMEvents.EventSource;
 		color : WMGraphics.Color;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR main, pnl : WMStandardComponents.Panel; pot : ColorPot;
 		BEGIN
 			Init^;

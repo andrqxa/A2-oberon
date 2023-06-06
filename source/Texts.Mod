@@ -266,7 +266,7 @@ TYPE
 		END SetBufAsUTF8;
 
 		(** Return a copy of the piece, prev/next pointers nil and pos 0 *)
-		PROCEDURE Clone*() : Piece;
+		PROCEDURE { OVERRIDE } Clone*() : Piece;
 		VAR m : MemUnicodePiece; i : SIZE;
 		BEGIN
 			NEW(m);
@@ -281,7 +281,7 @@ TYPE
 		END Clone;
 
 		(** index in text position; index and (index + length) must be in the piece *)
-		PROCEDURE GetUCS32Buf*(index : SIZE; length : SIZE; VAR ucs : UCS32String; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetUCS32Buf*(index : SIZE; length : SIZE; VAR ucs : UCS32String; VAR res : INTEGER);
 		VAR i, j : SIZE;
 		BEGIN
 			i := index - startpos; IF (i < 0) OR (i >= len) THEN ucs[0] := 0; res := -1; RETURN END;
@@ -292,14 +292,14 @@ TYPE
 			ucs[j] := 0
 		END GetUCS32Buf;
 
-		PROCEDURE GetUCS32*(index : SIZE; VAR ucs : Char32);
+		PROCEDURE { OVERRIDE } GetUCS32*(index : SIZE; VAR ucs : Char32);
 		VAR i: SIZE;
 		BEGIN
 			i := index - startpos; IF (i < 0) OR (i >= len) THEN ucs := 0 ELSE ucs := buffer[i] END;
 		END GetUCS32;
 
 		(** Split the UnicodePiece at pos in text position and return right piece *)
-		PROCEDURE Split*(pos : SIZE; VAR right : Piece);
+		PROCEDURE { OVERRIDE } Split*(pos : SIZE; VAR right : Piece);
 		VAR mp : MemUnicodePiece; i, j : SIZE;
 		BEGIN
 			IF pos - startpos < len THEN
@@ -325,7 +325,7 @@ TYPE
 		END Split;
 
 		(** Merge right to self; return true if ok *)
-		PROCEDURE Merge*(right : Piece) : BOOLEAN;
+		PROCEDURE { OVERRIDE } Merge*(right : Piece) : BOOLEAN;
 		VAR temp : PUCS32String; i, j : SIZE;
 		BEGIN
 			IF right = NIL THEN RETURN FALSE END;
@@ -362,7 +362,7 @@ TYPE
 		END Init;
 
 		(** Return a copy of the piece, prev/next pointers nil and pos 0 *)
-		PROCEDURE Clone*() : Piece;
+		PROCEDURE { OVERRIDE } Clone*() : Piece;
 		VAR p : ObjectPiece;
 		BEGIN
 			NEW(p);
@@ -375,7 +375,7 @@ TYPE
 			RETURN p
 		END Clone;
 
-		PROCEDURE Split*(pos : SIZE; VAR right : Piece);
+		PROCEDURE { OVERRIDE } Split*(pos : SIZE; VAR right : Piece);
 		BEGIN
 			IF pos - startpos < len THEN
 				KernelLog.String("Should never happen"); KernelLog.Ln;
@@ -384,7 +384,7 @@ TYPE
 		END Split;
 
 		(** Merge right to self; return true if ok *)
-		PROCEDURE Merge*(right : Piece) : BOOLEAN;
+		PROCEDURE { OVERRIDE } Merge*(right : Piece) : BOOLEAN;
 		BEGIN
 			RETURN FALSE
 		END Merge;
@@ -401,7 +401,7 @@ TYPE
 		END Init;
 
 		(** Return a copy of the piece, prev/next pointers nil and pos 0 *)
-		PROCEDURE Clone*() : Piece;
+		PROCEDURE { OVERRIDE } Clone*() : Piece;
 		VAR p :  LabelPiece;
 		BEGIN
 			NEW(p);
@@ -410,7 +410,7 @@ TYPE
 			RETURN p
 		END Clone;
 
-		PROCEDURE Split*(pos : SIZE; VAR right : Piece);
+		PROCEDURE { OVERRIDE } Split*(pos : SIZE; VAR right : Piece);
 		BEGIN
 			IF pos - startpos < len THEN
 				KernelLog.String("Should never happen"); KernelLog.Ln;
@@ -419,7 +419,7 @@ TYPE
 		END Split;
 
 		(** Merge right to self; return true if ok *)
-		PROCEDURE Merge*(right : Piece) : BOOLEAN;
+		PROCEDURE { OVERRIDE } Merge*(right : Piece) : BOOLEAN;
 		BEGIN
 			RETURN FALSE
 		END Merge;
@@ -507,7 +507,7 @@ TYPE
 		link- : Link;
 		object- : ANY;
 
-		PROCEDURE &New*(t : UnicodeText);
+		PROCEDURE (* OVERRIDE *) & New*(t : UnicodeText);
 		BEGIN
 			New^(t); backwards := FALSE;
 		END New;
@@ -527,7 +527,7 @@ TYPE
 		END CloneProperties;
 
 		(** Listens for text changes *)
-		PROCEDURE Changed*(op : INTEGER; pos, len : SIZE);
+		PROCEDURE { OVERRIDE } Changed*(op : INTEGER; pos, len : SIZE);
 		BEGIN
 			Changed^(op, pos, len); piece := NIL
 		END Changed;
@@ -577,7 +577,7 @@ TYPE
 		END ReadCh;
 
 		(** Position in elements from text start.  *)
-		PROCEDURE SetPosition*(pos : SIZE);
+		PROCEDURE { OVERRIDE } SetPosition*(pos : SIZE);
 		VAR length : SIZE;
 		BEGIN
 			length := text.GetLength();

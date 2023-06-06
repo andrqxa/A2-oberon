@@ -20,7 +20,7 @@ TYPE
 	VAR
 		events : EventsUtils.EventContainer;
 
-		PROCEDURE Handle*(event : Events.Event);
+		PROCEDURE { OVERRIDE } Handle*(event : Events.Event);
 		BEGIN
 			IF ~events.IsFull() THEN
 				events.Handle(event);

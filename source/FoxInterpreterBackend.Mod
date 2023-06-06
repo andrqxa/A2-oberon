@@ -373,7 +373,7 @@ TYPE
 		BEGIN InitBackend;
 		END InitInterpreterBackend;
 
-		PROCEDURE GetSystem*(): Global.System;
+		PROCEDURE { OVERRIDE } GetSystem*(): Global.System;
 		VAR system: Global.System;
 		BEGIN
 			NEW (system, 8, 8, 32, 1, 1, 1, 1, addressSize * 2,0,cooperative);
@@ -382,7 +382,7 @@ TYPE
 			RETURN system;
 		END GetSystem;
 
-		PROCEDURE ProcessSyntaxTreeModule *(x: SyntaxTree.Module): Formats.GeneratedModule;
+		PROCEDURE { OVERRIDE } ProcessSyntaxTreeModule *(x: SyntaxTree.Module): Formats.GeneratedModule;
 		VAR module: Sections.Module; section: Sections.Section; interpreter: Interpreter;
 		BEGIN
 			module := GenerateIntermediate (x, SupportedInstruction, SupportedImmediate);
@@ -397,19 +397,19 @@ TYPE
 			RETURN NIL
 		END ProcessSyntaxTreeModule;
 
-		PROCEDURE DefineOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } DefineOptions*(options: Options.Options);
 		BEGIN DefineOptions^(options);
 			options.Add("a","addressSize", Options.Integer);
 			options.Add("s","setSize", Options.Integer);
 		END DefineOptions;
 
-		PROCEDURE GetOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } GetOptions*(options: Options.Options);
 		BEGIN GetOptions^(options);
 			IF ~options.GetInteger("addressSize", addressSize) THEN addressSize := 2 END;
 			IF ~options.GetInteger("setSize", setSize) THEN setSize := 2 END;
 		END GetOptions;
 
-		PROCEDURE DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
+		PROCEDURE { OVERRIDE } DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
 		BEGIN RETURN SymbolFileFormat.Get ();
 		END DefaultSymbolFileFormat;
 

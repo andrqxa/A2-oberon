@@ -204,7 +204,7 @@ TYPE
 		(* if underlying stream is FileINputStream										*)
 		(* @params: none																*)
 		(* @returns: nothing															*)
-		PROCEDURE Next*;
+		PROCEDURE { OVERRIDE } Next*;
 		VAR c:CHAR;
 			i: SIGNED32;
 			found: BOOLEAN;
@@ -1404,7 +1404,7 @@ TYPE
 			END;
 		END DCT;
 
-		PROCEDURE Open*(in: Streams.Reader; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in: Streams.Reader; VAR res: INTEGER);
 		VAR
 			tmp: Streams.Position;
 		BEGIN
@@ -1460,18 +1460,18 @@ TYPE
 		END Open;
 
 		(* Returns the current sample position *)
-		PROCEDURE GetCurrentSample*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetCurrentSample*() : SIGNED32;
 		BEGIN
 			RETURN ENTIER(8 * s.Pos() / bitRate / 1000 * samplesPerSec)
 		END GetCurrentSample;
 
 		(* Returns the current time in 1/10 sec *)
-		PROCEDURE GetCurrentTime*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetCurrentTime*() : SIGNED32;
 		BEGIN
 			RETURN ENTIER(10 * GetCurrentSample() / samplesPerSec)
 		END GetCurrentTime;
 
-		PROCEDURE GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample: SIGNED32);
+		PROCEDURE { OVERRIDE } GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample: SIGNED32);
 		BEGIN
 			nofChannels := channels;
 			bitsPerSample := SELF.bitsPerSample;
@@ -1479,13 +1479,13 @@ TYPE
 		END GetAudioInfo;
 
 		(* Returns the total number of Samples in this file or -1 if streaming or VBR *)
-		PROCEDURE GetTotalSamples*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetTotalSamples*() : SIGNED32;
 		BEGIN
 			RETURN totSamples
 		END GetTotalSamples;
 
 		(* Sets the size of the Stream in Bytes. Only works for CBR *)
-		PROCEDURE SetStreamLength*(length : SIGNED32);
+		PROCEDURE { OVERRIDE } SetStreamLength*(length : SIGNED32);
 		BEGIN
 			totSamples := ENTIER(8 * length / bitRate / 1000 * samplesPerSec)
 		END SetStreamLength;
@@ -1493,7 +1493,7 @@ TYPE
 		(* Returns TRUE if the underlying stream and therefore this decoder supports seeking.			*)
 		(* @params: none																			*)
 		(* @returns: seekability of underlying stream/fileabstraction									*)
-		PROCEDURE CanSeek*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSeek*(): BOOLEAN;
 		BEGIN
 			RETURN (s # NIL) & (s.CanSetPos());
 		END CanSeek;
@@ -1502,7 +1502,7 @@ TYPE
 		(* @params: sample: the sample to seek, goKeySample: if we have a containerformat which 	*)
 		(*		        specifies keysamples, this flag can be set, res: the result of the seekoperation		*)
 		(* @returns: nothing																		*)
-		PROCEDURE SeekSample*(sample : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekSample*(sample : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		BEGIN
 			IF ~CanSeek() THEN res := Codecs.ResFailed; RETURN; END;
 			COPY("0000", cHeader);
@@ -1513,7 +1513,7 @@ TYPE
 		END SeekSample;
 
 		(* Seeks the Sample at the position given in ms *)
-		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		BEGIN
 			SeekSample(ENTIER(millisecond*samplesPerSec/1000), goKeySample, res);
 		END SeekMillisecond;
@@ -1532,7 +1532,7 @@ TYPE
 		(* buffersize																				*)
 		(* @params: buffer: SoundDevices.Buffer														*)
 		(* @returns: nothing																	*)
-		PROCEDURE FillBuffer*(buffer: SoundDevices.Buffer);
+		PROCEDURE { OVERRIDE } FillBuffer*(buffer: SoundDevices.Buffer);
 		VAR
 			j: SIZE;
 		BEGIN
@@ -1656,7 +1656,7 @@ TYPE
 		(* This procedure returns the status of filereading: FALSE -> EOF has been reached				*)
 		(* @params: none																			*)
 		(* @returns: flag, indicating the status of filereading											*)
-		PROCEDURE HasMoreData*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } HasMoreData*(): BOOLEAN;
 		BEGIN
 			RETURN hasMoreBytes;
 		END HasMoreData;

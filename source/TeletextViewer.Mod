@@ -33,7 +33,7 @@ TYPE
 			content: TeletextPage;
 			colors : ARRAY 8 OF SIGNED32;
 
-		PROCEDURE &Init*(suite: TeletextDecoder.TeletextSuite);
+		PROCEDURE (* OVERRIDE *) & Init*(suite: TeletextDecoder.TeletextSuite);
 		BEGIN
 			Init^(suite);
 			NEW(content);
@@ -239,7 +239,7 @@ TYPE
 		END OnPushButton;
 
 		(** Close the channel selector *)
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		BEGIN
 			viewer.channelSwitcher := NIL;
 			Close^
@@ -401,7 +401,7 @@ TYPE
 		END New;
 
 		(** Handle window messages *)
-		PROCEDURE Handle(VAR m : Messages.Message);
+		PROCEDURE { OVERRIDE } Handle(VAR m : Messages.Message);
 		VAR
 			data: XML.Element;
 			str: ARRAY 10 OF CHAR;
@@ -426,7 +426,7 @@ TYPE
 		END Handle;
 
 		(** Close the Viewer window *)
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		BEGIN
 			IF timer # NIL THEN
 				timer.Stop(NIL, NIL)
@@ -649,7 +649,7 @@ TYPE
 
 		(** Overwrite standard 'Draw' routine: Move the channel selector window
 			   together with the viewer window. *)
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
+		PROCEDURE { OVERRIDE } Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			Draw^(canvas, w, h, q);
 			IF (channelSwitcher # NIL) & ((bounds.l # l) OR (bounds.t # t)) THEN

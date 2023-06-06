@@ -30,14 +30,14 @@ TYPE
 	Interval = OBJECT (Data.Datum)
 	VAR a, b, error: NbrRe.Real;
 
-		PROCEDURE & Initialize*;
+		PROCEDURE (* OVERRIDE *) & Initialize*;
 		BEGIN
 			Initialize^;
 			(* Intialize the local data. *)
 			a := 0;  b := 0;  error := 0
 		END Initialize;
 
-		PROCEDURE Copy*( VAR copy: Data.Datum );
+		PROCEDURE { OVERRIDE } Copy*( VAR copy: Data.Datum );
 		VAR new, obj: Interval;
 		BEGIN
 			(* Create object copy. *)
@@ -57,14 +57,14 @@ TYPE
 	ReInterval = OBJECT (Interval)
 	VAR soln: NbrRe.Real;
 
-		PROCEDURE & Initialize*;
+		PROCEDURE (* OVERRIDE *) & Initialize*;
 		BEGIN
 			Initialize^;
 			(* Intialize the local data. *)
 			soln := 0
 		END Initialize;
 
-		PROCEDURE Copy*( VAR copy: Data.Datum );
+		PROCEDURE { OVERRIDE } Copy*( VAR copy: Data.Datum );
 		VAR new, obj: ReInterval;
 		BEGIN
 			(* Create object copy. *)
@@ -84,14 +84,14 @@ TYPE
 	CplxInterval = OBJECT (Interval)
 	VAR soln: NbrCplx.Complex;
 
-		PROCEDURE & Initialize*;
+		PROCEDURE (* OVERRIDE *) & Initialize*;
 		BEGIN
 			Initialize^;
 			(* Intialize the local data. *)
 			soln := 0
 		END Initialize;
 
-		PROCEDURE Copy*( VAR copy: Data.Datum );
+		PROCEDURE { OVERRIDE } Copy*( VAR copy: Data.Datum );
 		VAR new, obj: CplxInterval;
 		BEGIN
 			(* Create object copy. *)

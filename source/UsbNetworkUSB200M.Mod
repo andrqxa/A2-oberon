@@ -156,14 +156,14 @@ TYPE
 		device : Usbdi.UsbDevice;
 		buffer : Usbdi.BufferPtr;
 
-		PROCEDURE AcquirePhyOwnership*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } AcquirePhyOwnership*() : BOOLEAN;
 		VAR status : Usbdi.Status;
 		BEGIN
 			status := device.Request(WriteCommand, SetSoftwareSerialManagement, 0, 0, 0, Usbdi.NoData);
 			RETURN status = Usbdi.Ok;
 		END AcquirePhyOwnership;
 
-		PROCEDURE ReleasePhyOwnership*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ReleasePhyOwnership*() : BOOLEAN;
 		VAR status : Usbdi.Status;
 		BEGIN
 			status := device.Request(WriteCommand, SetHardwareSerialManagement, 0, 0, 0, Usbdi.NoData);
@@ -182,7 +182,7 @@ TYPE
 			RETURN ownership;
 		END HasPhyOwnership;
 
-		PROCEDURE ReadRegister16*(register: SIGNED32; VAR value : SET; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } ReadRegister16*(register: SIGNED32; VAR value : SET; VAR res : INTEGER);
 		VAR status : Usbdi.Status;
 		BEGIN
 			status := device.Request(ReadCommand, ReadPhyRegister, phyId, register, 2, buffer^);
@@ -194,7 +194,7 @@ TYPE
 			END;
 		END ReadRegister16;
 
-		PROCEDURE WriteRegister16*(register : SIGNED32; value : SET; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteRegister16*(register : SIGNED32; value : SET; VAR res : INTEGER);
 		VAR status : Usbdi.Status;
 		BEGIN
 			buffer[0] := CHR(SYSTEM.VAL(SIGNED32, value));
@@ -245,7 +245,7 @@ TYPE
 
 		gpioConfiguration : SET;
 
-		PROCEDURE SendFrame*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32);
+		PROCEDURE { OVERRIDE } SendFrame*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32);
 		VAR status : Usbdi.Status; i, packetSize, padLength : SIGNED32;
 		BEGIN {EXCLUSIVE}
 			(* 4 Byte USB header *)
@@ -309,7 +309,7 @@ TYPE
 			RETURN status = Usbdi.Ok;
 		END SoftwareReset;
 
-		PROCEDURE GetLinkAddress(VAR linkAddress : Network.LinkAdr; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetLinkAddress(VAR linkAddress : Network.LinkAdr; VAR res : INTEGER);
 		VAR buffer : Usbdi.BufferPtr; status : Usbdi.Status; i : SIGNED32;
 		BEGIN
 			NEW(buffer, 6);
@@ -322,7 +322,7 @@ TYPE
 			END;
 		END GetLinkAddress;
 
-		PROCEDURE SetLinkAddress(linkAddress : Network.LinkAdr; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetLinkAddress(linkAddress : Network.LinkAdr; VAR res : INTEGER);
 		VAR buffer : Usbdi.BufferPtr; status : Usbdi.Status; i : SIGNED32;
 		BEGIN
 			NEW(buffer, 6);
@@ -541,7 +541,7 @@ TYPE
 			rxBufferBytes := 0; headerBytes := 0;
 		END ResetRxBuffer;
 
-		PROCEDURE HandleBulkIn*(status : Usbdi.Status; actLen : SIZE);
+		PROCEDURE { OVERRIDE } HandleBulkIn*(status : Usbdi.Status; actLen : SIZE);
 		VAR i : SIZE;
 		BEGIN
 			IF (status = Usbdi.Ok) OR (status = Usbdi.ShortPacket) THEN
@@ -590,7 +590,7 @@ TYPE
 			END;
 		END HandleBulkIn;
 
-		PROCEDURE HandleInterrupt*(status : Usbdi.Status; actLen : SIZE);
+		PROCEDURE { OVERRIDE } HandleInterrupt*(status : Usbdi.Status; actLen : SIZE);
 		VAR s, register1, register2 : SET; oldLinkStatus : SIGNED32; res : INTEGER;
 		BEGIN
 			IF (status = Usbdi.Ok) OR ((status = Usbdi.ShortPacket) & (actLen >=8)) THEN
@@ -646,7 +646,7 @@ TYPE
 			END;
 		END HandleInterrupt;
 
-		PROCEDURE InitController*(VAR rxBuffer : Usbdi.BufferPtr) : BOOLEAN;
+		PROCEDURE { OVERRIDE } InitController*(VAR rxBuffer : Usbdi.BufferPtr) : BOOLEAN;
 		VAR
 			rxControl : SET;
 			res : INTEGER; timer : Kernel.Timer;
@@ -963,11 +963,11 @@ TYPE
 			RETURN status = Usbdi.Ok;
 		END ReadSRAM;
 
-		PROCEDURE Finalize;
+		PROCEDURE { OVERRIDE } Finalize;
 			(* do nothing *)
 		END Finalize;
 
-		PROCEDURE Diag;
+		PROCEDURE { OVERRIDE } Diag;
 		VAR
 			linkAdr : Network.LinkAdr;
 			embeddedPhy, autoSelect : BOOLEAN;

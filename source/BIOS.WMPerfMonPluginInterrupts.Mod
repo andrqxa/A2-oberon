@@ -32,7 +32,7 @@ TYPE
 
 	InterruptStatistics = OBJECT(WMPerfMonPlugins.Plugin)
 
-		PROCEDURE Init(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "Interrupts"; p.description := "Interrupt statistics";
@@ -92,7 +92,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset;
+		PROCEDURE { OVERRIDE } UpdateDataset;
 		VAR i, offset, temp : SIGNED32;
 		BEGIN
 			FOR i := 0 TO 19 DO (* pre-defined interrupts *)

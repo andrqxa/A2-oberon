@@ -81,7 +81,7 @@ TYPE
 			RETURN panel;
 		END GetLegend;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			bounds.SetWidth(LbaEditorWidth + 3*ChsEditorWidth);
@@ -167,7 +167,7 @@ TYPE
 			RETURN panel;
 		END GetLegend;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR rect : WMRectangles.Rectangle;
 		BEGIN
 			Init^;
@@ -281,7 +281,7 @@ TYPE
 			END;
 		END RegisterOnEnterHandlers;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 			panel : WMStandardComponents.Panel;
 			label : WMStandardComponents.Label;

@@ -46,7 +46,7 @@ TYPE
 		timer : Kernel.Timer;
 		state, currentState : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 
@@ -101,7 +101,7 @@ TYPE
 			RETURN selection;
 		END GetSelection;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = sort) THEN
 				CheckSort;
@@ -113,7 +113,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			CheckVisibility;
@@ -185,7 +185,7 @@ TYPE
 			END;
 		END Pause;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		VAR width, height, w, add : SIZE; i : SIZE; newColWidth : WMGrids.Spacings;
 		BEGIN
 			width := bounds.GetWidth(); height := bounds.GetHeight();
@@ -333,7 +333,7 @@ TYPE
 			Release;
 		END Refresh;
 
-		PROCEDURE Finalize*; (* override *)
+		PROCEDURE { OVERRIDE } Finalize*; (* override *)
 		BEGIN
 			Finalize^;
 			BEGIN {EXCLUSIVE}
@@ -395,7 +395,7 @@ TYPE
 
 		toolbar- : WMStandardComponents.Panel;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR font : WMGraphics.Font; dx, dy : SIZE; sortInfo : SortInfo;
 		BEGIN
 			Init^;

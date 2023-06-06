@@ -329,7 +329,7 @@ TYPE
 			RETURN panel;
 		END CreateRulefilesPanel;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			alive := FALSE;
 			timer.Wakeup;
@@ -337,7 +337,7 @@ TYPE
 			Finalize^;
 		END Finalize;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR panel : WMStandardComponents.Panel;
 		BEGIN
 			Init^;

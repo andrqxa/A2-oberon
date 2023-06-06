@@ -22,7 +22,7 @@ TYPE
 			END;
 		END New;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		VAR t : ARRAY 128 OF CHAR;
 			font : WMGraphics.Font;
 			x, y : SIZE;
@@ -53,7 +53,7 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END KeyEvent;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS WMRestorable.Storage) THEN
@@ -64,7 +64,7 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			winstance := NIL

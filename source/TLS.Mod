@@ -594,7 +594,7 @@ TYPE
 			version -: ARRAY 2 OF CHAR;
 			client, trapped: BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			state := TCP.Unused;
 			tlsErrorCause := NoError;
@@ -660,7 +660,7 @@ TYPE
 
 		(** open a TLS connection (only use once per Connection instance). Use IP.NilPort for lport to automatically assign
 		an unused local port. Use IP.NilAdr for fip to open a passive connection. *)
-		PROCEDURE Open*(  lport: SIGNED32; fip: IP.Adr; fport: SIGNED32; VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } Open*(  lport: SIGNED32; fip: IP.Adr; fport: SIGNED32; VAR res: INTEGER );
 		BEGIN
 			(*ASSERT( IP.IsNilAdr(fip) );	(* only server-side is implemented *)*)
 			(*ASSERT( context # NIL );*)	(* context must be set before calling Open *)
@@ -702,7 +702,7 @@ TYPE
 		END SetConnection;
 
 		(** Call this method only on a passive (listenig server-side) TLS.Connection. Non blocking *)
-		PROCEDURE Accept*( VAR client: TCP.Connection; VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } Accept*( VAR client: TCP.Connection; VAR res: INTEGER );
 			VAR
 				newTLSConn: Connection;
 				newTCPConn: TCP.Connection;
@@ -728,7 +728,7 @@ TYPE
 		END Connect;
 
 		(** Close this TLS.Connection *)
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			IF Trace THEN KernelLog.String("Close"); KernelLog.Ln; END;
 			ASSERT( SELF.conn # NIL );
@@ -742,7 +742,7 @@ TYPE
 		END Close;
 
 		(** Send secured data *)
-		PROCEDURE Send*( CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } Send*( CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER );
 			VAR i, size: SIZE;
 		BEGIN {EXCLUSIVE}
 			AWAIT((state = TCP.Established) OR (state = TCP.Closed));
@@ -764,7 +764,7 @@ TYPE
 		END Send;
 
 		(** Receive secured data *)
-		PROCEDURE Receive*( VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Receive*( VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		BEGIN
 			applicationDataPipe.Receive(data, ofs, size, min, len ,res);
 		END Receive;

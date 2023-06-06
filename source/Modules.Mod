@@ -122,7 +122,7 @@ TYPE
 			init, published: BOOLEAN;
 
 		#IF ~COOP THEN
-			PROCEDURE FindRoots*;	(* override *)
+			PROCEDURE { OVERRIDE } FindRoots*;	(* override *)
 			VAR i: SIZE; ptr {UNTRACED}: ANY; false: BOOLEAN;
 			VAR name: Name;
 			BEGIN

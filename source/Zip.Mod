@@ -142,19 +142,19 @@ TYPE
 			COPY(name, SELF.name); SELF.size := size
 		END Init;
 
-		PROCEDURE GetName*() : Strings.String;
+		PROCEDURE { OVERRIDE } GetName*() : Strings.String;
 		VAR n : Strings.String;
 		BEGIN
 			NEW(n, EntryNameSize); COPY(name, n^);
 			RETURN n
 		END GetName;
 
-		PROCEDURE GetSize*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetSize*() : SIGNED32;
 		BEGIN
 			RETURN size
 		END GetSize;
 
-		PROCEDURE GetInfoString*() : Strings.String;
+		PROCEDURE { OVERRIDE } GetInfoString*() : Strings.String;
 		VAR s : Strings.String;
 			temp : ARRAY 10 OF CHAR;
 		BEGIN
@@ -184,18 +184,18 @@ TYPE
 			NEW(lock)
 		END Init;
 
-		PROCEDURE Acquire*;
+		PROCEDURE { OVERRIDE } Acquire*;
 		BEGIN
 			lock.Acquire
 		END Acquire;
 
-		PROCEDURE Release*;
+		PROCEDURE { OVERRIDE } Release*;
 		BEGIN
 			lock.Release
 		END Release;
 
 		(** return list of archive entries *)
-		PROCEDURE GetIndex*(): Archives.Index;
+		PROCEDURE { OVERRIDE } GetIndex*(): Archives.Index;
 		VAR i : SIGNED32;
 			e : Entry;
 			result : Archives.Index;
@@ -218,7 +218,7 @@ TYPE
 		END GetIndex;
 
 		(** get info for a specific entry. return NIL if no such entry exists *)
-		PROCEDURE GetEntryInfo*(CONST name: ARRAY OF CHAR) : Archives.EntryInfo;
+		PROCEDURE { OVERRIDE } GetEntryInfo*(CONST name: ARRAY OF CHAR) : Archives.EntryInfo;
 		VAR
 			res: INTEGER;
 			e: Entry;
@@ -232,7 +232,7 @@ TYPE
 		END GetEntryInfo;
 
 		(** remove named entry *)
-		PROCEDURE RemoveEntry*(CONST name: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } RemoveEntry*(CONST name: ARRAY OF CHAR);
 		VAR
 			res: INTEGER;
 			e: Entry;
@@ -245,17 +245,17 @@ TYPE
 		END RemoveEntry;
 
 		(** rename an archive entry. return new EntryInfo or NIL if failed. *)
-		PROCEDURE RenameEntry*(CONST from, to : ARRAY OF CHAR) : Archives.EntryInfo;
+		PROCEDURE { OVERRIDE } RenameEntry*(CONST from, to : ARRAY OF CHAR) : Archives.EntryInfo;
 		BEGIN HALT(301)
 		END RenameEntry;
 
 		(** open a sender to write an entry with name to archive. the data will be written when Update is called *)
-		PROCEDURE OpenSender*(CONST name : ARRAY OF CHAR) : Streams.Sender;
+		PROCEDURE { OVERRIDE } OpenSender*(CONST name : ARRAY OF CHAR) : Streams.Sender;
 		BEGIN HALT(301)
 		END OpenSender;
 
 		(** read entry from archive *)
-		PROCEDURE OpenReceiver*(CONST name : ARRAY OF CHAR): Streams.Receiver;
+		PROCEDURE { OVERRIDE } OpenReceiver*(CONST name : ARRAY OF CHAR): Streams.Receiver;
 		VAR
 			res: INTEGER;
 			e: Entry;
@@ -271,7 +271,7 @@ TYPE
 		END OpenReceiver;
 
 		(** save a clone of the archive under a different name *)
-		PROCEDURE Copy*(CONST name : ARRAY OF CHAR) : Archives.Archive;
+		PROCEDURE { OVERRIDE } Copy*(CONST name : ARRAY OF CHAR) : Archives.Archive;
 		BEGIN HALT(301)
 		END Copy;
 

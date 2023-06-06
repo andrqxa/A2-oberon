@@ -408,7 +408,7 @@ TYPE
 			SELF.next := NIL
 		END InitInt;
 
-		PROCEDURE Print;
+		PROCEDURE { OVERRIDE } Print;
 		BEGIN
 			w.Int(long, 3)
 		END Print;

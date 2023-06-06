@@ -630,23 +630,23 @@ TYPE
 		BEGIN InitBasicWriter(w);
 		END InitW;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN w.Reset;
 		END Reset;
 
-		PROCEDURE CanSetPos*( ): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*( ): BOOLEAN;
 		BEGIN RETURN w.CanSetPos();
 		END CanSetPos;
 
-		PROCEDURE SetPos*( pos: Streams.Position );
+		PROCEDURE { OVERRIDE } SetPos*( pos: Streams.Position );
 		BEGIN w.SetPos(pos);
 		END SetPos;
 
-		PROCEDURE Update*;
+		PROCEDURE { OVERRIDE } Update*;
 		BEGIN w.Update;
 		END Update;
 
-		PROCEDURE Pos*( ): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*( ): Streams.Position;
 		BEGIN RETURN w.Pos()
 		END Pos;
 
@@ -661,103 +661,103 @@ TYPE
 			END;
 		END Indent;
 
-		PROCEDURE Char*( x: CHAR );
+		PROCEDURE { OVERRIDE } Char*( x: CHAR );
 		BEGIN Indent; w.Char(x);
 		END Char;
 
-		PROCEDURE Bytes*(CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
+		PROCEDURE { OVERRIDE } Bytes*(CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
 		BEGIN  w.Bytes(x,ofs,len);
 		END Bytes;
 
-		PROCEDURE RawSInt*( x: SIGNED8 );
+		PROCEDURE { OVERRIDE } RawSInt*( x: SIGNED8 );
 		BEGIN  w.RawSInt(x)
 		END RawSInt;
 
-		PROCEDURE RawInt*( x: SIGNED16 );
+		PROCEDURE { OVERRIDE } RawInt*( x: SIGNED16 );
 		BEGIN  w.RawInt(x)
 		END RawInt;
 
-		PROCEDURE RawLInt*( x: SIGNED32 );
+		PROCEDURE { OVERRIDE } RawLInt*( x: SIGNED32 );
 		BEGIN  w.RawLInt(x)
 		END RawLInt;
 
-		PROCEDURE RawHInt*( x: SIGNED64 );
+		PROCEDURE { OVERRIDE } RawHInt*( x: SIGNED64 );
 		BEGIN  w.RawHInt(x)
 		END RawHInt;
 
-		PROCEDURE Net32*( x: SIGNED32 );
+		PROCEDURE { OVERRIDE } Net32*( x: SIGNED32 );
 		BEGIN  w.Net32(x)
 		END Net32;
 
-		PROCEDURE Net16*( x: SIGNED32 );
+		PROCEDURE { OVERRIDE } Net16*( x: SIGNED32 );
 		BEGIN  w.Net16(x)
 		END Net16;
 
-		PROCEDURE Net8*( x: SIGNED32 );
+		PROCEDURE { OVERRIDE } Net8*( x: SIGNED32 );
 		BEGIN  w.Net8(x)
 		END Net8;
 
-		PROCEDURE RawSet*( x: SET );
+		PROCEDURE { OVERRIDE } RawSet*( x: SET );
 		BEGIN  w.RawSet(x)
 		END RawSet;
 
-		PROCEDURE RawBool*( x: BOOLEAN );
+		PROCEDURE { OVERRIDE } RawBool*( x: BOOLEAN );
 		BEGIN  w.RawBool(x)
 		END RawBool;
 
-		PROCEDURE RawReal*( x: FLOAT32 );
+		PROCEDURE { OVERRIDE } RawReal*( x: FLOAT32 );
 		BEGIN  w.RawReal(x)
 		END RawReal;
 
-		PROCEDURE RawLReal*( x: Real );
+		PROCEDURE { OVERRIDE } RawLReal*( x: Real );
 		BEGIN  w.RawLReal(x)
 		END RawLReal;
 
-		PROCEDURE RawString*(CONST x: ARRAY OF CHAR );
+		PROCEDURE { OVERRIDE } RawString*(CONST x: ARRAY OF CHAR );
 		BEGIN  w.RawString(x)
 		END RawString;
 
-		PROCEDURE RawNum*( x: SIGNED64 );
+		PROCEDURE { OVERRIDE } RawNum*( x: SIGNED64 );
 		BEGIN  w.RawNum(x)
 		END RawNum;
 
-		PROCEDURE Ln*;
+		PROCEDURE { OVERRIDE } Ln*;
 		BEGIN w.Ln; doindent := TRUE;
 		END Ln;
 
-		PROCEDURE String*(CONST x: ARRAY OF CHAR );
+		PROCEDURE { OVERRIDE } String*(CONST x: ARRAY OF CHAR );
 		BEGIN Indent; w.String(x)
 		END String;
 
-		PROCEDURE Int*( x: SIGNED64; wd: SIZE );
+		PROCEDURE { OVERRIDE } Int*( x: SIGNED64; wd: SIZE );
 		BEGIN Indent; w.Int(x,wd)
 		END Int;
 
-		PROCEDURE Set*( s: SET );   (* from P. Saladin *)
+		PROCEDURE { OVERRIDE } Set*( s: SET );   (* from P. Saladin *)
 		BEGIN Indent; w.Set(s)
 		END Set;
 
-		PROCEDURE Hex*(x: SIGNED64; wd: SIZE );
+		PROCEDURE { OVERRIDE } Hex*(x: SIGNED64; wd: SIZE );
 		BEGIN Indent; w.Hex(x,wd)
 		END Hex;
 
-		PROCEDURE Address* (x: ADDRESS);
+		PROCEDURE { OVERRIDE } Address* (x: ADDRESS);
 		BEGIN Indent; w.Address(x)
 		END Address;
 
-		PROCEDURE Date*( t, d: SIGNED32 );
+		PROCEDURE { OVERRIDE } Date*( t, d: SIGNED32 );
 		BEGIN Indent; w.Date(t,d)
 		END Date;
 
-		PROCEDURE Date822*( t, d, tz: SIGNED32 );
+		PROCEDURE { OVERRIDE } Date822*( t, d, tz: SIGNED32 );
 		BEGIN Indent; w.Date822(t,d,tz)
 		END Date822;
 
-		PROCEDURE Float*( x: Real;  n: SIGNED32 );
+		PROCEDURE { OVERRIDE } Float*( x: Real;  n: SIGNED32 );
 		BEGIN Indent; w.Float(x,n)
 		END Float;
 
-		PROCEDURE FloatFix*( x: Real;  n, f, D: SIGNED32 );
+		PROCEDURE { OVERRIDE } FloatFix*( x: Real;  n, f, D: SIGNED32 );
 		BEGIN Indent; w.FloatFix(x,n,f,D)
 		END FloatFix;
 
@@ -809,7 +809,7 @@ TYPE
 			SELF.diagnostics := diagnostics
 		END InitDiagnostics;
 
-		PROCEDURE Error*(CONST source: ARRAY OF CHAR; position: Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Error*(CONST source: ARRAY OF CHAR; position: Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN
 			IF diagnostics # NIL THEN
 				diagnostics.Error(source,position,message);
@@ -823,14 +823,14 @@ TYPE
 			D.TraceBack
 		END Error;
 
-		PROCEDURE Warning*(CONST source : ARRAY OF CHAR; position: Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Warning*(CONST source : ARRAY OF CHAR; position: Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN
 			IF diagnostics # NIL THEN
 				diagnostics.Warning(source,position,message);
 			END;
 		END Warning;
 
-		PROCEDURE Information*(CONST source : ARRAY OF CHAR; position: Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Information*(CONST source : ARRAY OF CHAR; position: Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN
 			IF diagnostics # NIL THEN
 				diagnostics.Information(source,position,message);

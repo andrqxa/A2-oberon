@@ -432,7 +432,7 @@ BEGIN
 	RETURN TRUE;
 END SendCommand;
 
-PROCEDURE Handle *(VAR msg: Disks.Message; VAR diskres: INTEGER);
+PROCEDURE { OVERRIDE } Handle *(VAR msg: Disks.Message; VAR diskres: INTEGER);
 (* VAR command: Command; cylinders,heads,sectors,i: SIGNED32; *)
 BEGIN
 	KernelLog.String("HANDLE"); KernelLog.Ln;
@@ -466,7 +466,7 @@ BEGIN
 	(* KernelLog.Int(SELF.blockSize,2); *)
 END Handle;
 
-PROCEDURE Transfer*(op,block,num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR diskres: INTEGER);
+PROCEDURE { OVERRIDE } Transfer*(op,block,num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR diskres: INTEGER);
 VAR i, payloadNotCoded: SIGNED32; command: Command; numOfBlocks,tries: SIGNED32;
 BEGIN
 
@@ -513,7 +513,7 @@ BEGIN
 	END;
 END Transfer;
 
-PROCEDURE GetSize*(VAR size: SIGNED32;VAR diskres: INTEGER);
+PROCEDURE { OVERRIDE } GetSize*(VAR size: SIGNED32;VAR diskres: INTEGER);
 VAR command: Command; i: SIGNED32; (* dev: Sbp2Dev; *)
 BEGIN
 

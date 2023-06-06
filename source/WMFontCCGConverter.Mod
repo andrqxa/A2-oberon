@@ -278,7 +278,7 @@ TYPE
 			RETURN result
 		END CalcBB;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			testWindow := NIL

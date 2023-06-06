@@ -140,7 +140,7 @@ TYPE
 			out.String(string^); out.Update;
 		END CopyFromClipboard;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 (*			pipeIn.Close; pipeOut.Close; *)
 			shell.Exit;
@@ -185,7 +185,7 @@ TYPE
 			DeleteNCharacters(backspaces);
 		END ReceiveCharacters;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			running := TRUE;
@@ -252,13 +252,13 @@ TYPE
 			shell.editor.editor.SetFocus();
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS KillerMsg) THEN

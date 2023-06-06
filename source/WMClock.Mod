@@ -74,7 +74,7 @@ TYPE
 
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;
@@ -114,7 +114,7 @@ TYPE
 			END
 		END HandleToggleView;
 
-		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y:SIZE; keys:SET);
 		BEGIN
 			lastX := bounds.l + x; lastY:=bounds.t + y;
 			IF keys = {0} THEN
@@ -134,7 +134,7 @@ TYPE
 			END
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x,y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x,y:SIZE; keys:SET);
 		VAR dx, dy, width, height : SIZE;
 		BEGIN
 			IF dragging OR resizing THEN
@@ -154,7 +154,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y:SIZE; keys:SET);
 		BEGIN
 			dragging := FALSE;
 			IF (keys # {1,2}) THEN
@@ -165,7 +165,7 @@ TYPE
 			END;
 		END PointerUp;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		VAR configuration : WMRestorable.XmlElement;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
@@ -220,7 +220,7 @@ TYPE
 		alive, dead : BOOLEAN;
 		timer : Kernel.Timer;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrClock);
@@ -245,7 +245,7 @@ TYPE
 			SetFont(WMGraphics.GetFont("Oberon", 24, {WMGraphics.FontBold}));
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR vmValue : SIGNED32;
 		BEGIN
 			IF (property = viewMode) THEN
@@ -277,7 +277,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR string : Strings.String; newImage, resizedImage : WMGraphics.Image; vmValue : SIGNED32;
 		BEGIN
 			RecacheProperties^;
@@ -337,7 +337,7 @@ TYPE
 			END;
 		END DrawHands;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR time : Dates.DateTime; formatString: Strings.String;
 		BEGIN
 			DrawBackground^(canvas);
@@ -360,7 +360,7 @@ TYPE
 			END;
 		END DrawBackground;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			alive := FALSE;

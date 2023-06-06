@@ -16,7 +16,7 @@ BEGIN
 	manager.Add(300, 0, SELF, { WMWindowManager.FlagFrame, WMWindowManager.FlagStayOnTop});
 END New;
 
-PROCEDURE Close*;
+PROCEDURE { OVERRIDE } Close*;
 BEGIN
 	alive := FALSE;
 	Close^;

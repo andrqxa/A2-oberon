@@ -154,7 +154,7 @@ TYPE
 
 
 				(** Send data on a TCP connection. *)
-				PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
+				PROCEDURE { OVERRIDE } Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
 				BEGIN
 					IF trace THEN  Out.String( "Send: socket=" );  Out.Int( socket, 0 )  END;
 					IF state = Established THEN
@@ -177,7 +177,7 @@ TYPE
 					res parameter returns 0 if ok, or a non-zero error code otherwise (e.g. if the connection is closed
 					by the communication partner, or by a call of the Close method). *)
 
-				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
+				PROCEDURE { OVERRIDE } Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 				VAR p, x: SIZE;
 				BEGIN {EXCLUSIVE}
 					ASSERT( (ofs >= 0) & (ofs + size <= LEN( data )) & (min <= size) );   (* parameter consistency check *)
@@ -271,7 +271,7 @@ TYPE
 				END AwaitState;
 
 				(** Close a TCP connection (half-close). *)
-				PROCEDURE Close*;
+				PROCEDURE { OVERRIDE } Close*;
 				BEGIN
 					Sockets.Close( socket );  state := Closed;
 				END Close;

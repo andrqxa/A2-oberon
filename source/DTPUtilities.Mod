@@ -144,7 +144,7 @@ TYPE
 			manager.Remove(SELF); shown := FALSE;
 		END Hide;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			SetResult(1);
 		END FocusLost;
@@ -176,7 +176,7 @@ TYPE
 		colors : ARRAY 19 OF SIGNED32;
 		theCaller: ColorChooserWindow;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			BuildPalette;
@@ -187,7 +187,7 @@ TYPE
 			theCaller := caller;
 		END SetCaller;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR r, g, b, a: SIGNED32; i, j: SIZE; cColor: WMGraphics.Color;
 		BEGIN
 			i := y DIV 10; j := x DIV 10;
@@ -218,7 +218,7 @@ TYPE
 			theCaller.SetResult(1);
 		END FocusLost;
 *)
-		PROCEDURE Draw*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas: WMGraphics.Canvas);
 		VAR r, g, b, a, i, j: SIGNED32; color: WMGraphics.Color;
 		BEGIN
 			Draw^(canvas);
@@ -687,7 +687,7 @@ TYPE
 			manager.Remove(SELF); shown := FALSE;
 		END Hide;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			IF UpdateProc # NIL THEN UpdateProc END;
@@ -1574,7 +1574,7 @@ TYPE
 	Tab* = OBJECT(WMStandardComponents.Button)
 	VAR openSides* : SET;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			openSides := {};
@@ -1651,7 +1651,7 @@ TYPE
 		checked*, default*, hasThreeStates*, inactive*: BOOLEAN;
 		imgChecked, imgUnchecked, imgCheckedDefault, imgCheckedInactive, imgUncheckedInactive: WMGraphics.Image;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			caption := "";
@@ -1665,7 +1665,7 @@ TYPE
 			checked := FALSE; hasThreeStates := FALSE; inactive := FALSE;
 		END Init;
 
-		PROCEDURE PointerDown*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y: SIZE; keys: SET);
 		BEGIN
 			IF ~inactive THEN
 				IF hasThreeStates THEN
@@ -1682,7 +1682,7 @@ TYPE
 			Invalidate;
 		END PointerDown;
 
-		PROCEDURE Draw*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas: WMGraphics.Canvas);
 		VAR rect: WMRectangles.Rectangle;
 		BEGIN
 			Draw^(canvas);
@@ -1726,7 +1726,7 @@ TYPE
 		fontBackColor*: WMGraphics.Color;
 		oldFont : WMGraphics.Font;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			fontColor := 0000000FFH;
@@ -1734,7 +1734,7 @@ TYPE
 			SetFont(WMGraphics.GetFont("Oberon", 16, {})); (* WMGraphics.FontBold *)
 		END Init;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR str : Strings.String;
 		BEGIN
 			DrawBackground^(canvas); str := caption.Get();
@@ -1754,7 +1754,7 @@ TYPE
 		captionColor*: SIGNED32;
 		captionFont : WMGraphics.Font;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			caption := "";
@@ -1763,7 +1763,7 @@ TYPE
 			isHorizontal := TRUE;
 		END Init;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR rect: WMRectangles.Rectangle;
 			highlight, shadow: SIGNED32; w, h, dist : SIZE;
 		BEGIN
@@ -1795,7 +1795,7 @@ TYPE
 		centerContent, panel: WMStandardComponents.Panel;
 		spacerLeft, spacerTop, spacerRight, spacerBottom : WMStandardComponents.Panel;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			border := WMRectangles.MakeRect(10,14,10,10);
@@ -1820,7 +1820,7 @@ TYPE
 
 		END CreateComponent;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR rect: WMRectangles.Rectangle;
 			highlight, shadow: SIGNED32; w, h : SIZE;
 
@@ -1863,7 +1863,7 @@ TYPE
 			COPY(string, caption);
 		END SetCaption;
 
-		PROCEDURE AddContent*(content: XML.Content);
+		PROCEDURE { OVERRIDE } AddContent*(content: XML.Content);
 		BEGIN
 			centerContent.AddContent(content);
 		END AddContent;
@@ -1876,7 +1876,7 @@ TYPE
 		centerContent, panel: WMStandardComponents.Panel;
 		spacerLeft, spacerTop, spacerRight, spacerBottom : WMStandardComponents.Panel;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			border := WMRectangles.MakeRect(0,0,0,0);
@@ -1917,7 +1917,7 @@ TYPE
 			RETURN border;
 		END GetBorder;
 
-		PROCEDURE AddContent*(content: XML.Content);
+		PROCEDURE { OVERRIDE } AddContent*(content: XML.Content);
 		BEGIN
 			centerContent.AddContent(content);
 		END AddContent;
@@ -1964,7 +1964,7 @@ TYPE
 											(* 	7:	Image Special					*)
 											(* 	8:	Image Border Special			*)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			border := WMRectangles.MakeRect(0,0,0,0);
@@ -2010,12 +2010,12 @@ TYPE
 			RETURN border;
 		END GetBorder;
 
-		PROCEDURE AddContent*(content: XML.Content);
+		PROCEDURE { OVERRIDE } AddContent*(content: XML.Content);
 		BEGIN
 			centerContent.AddContent(content);
 		END AddContent;
 
-		PROCEDURE Draw*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas: WMGraphics.Canvas);
 		VAR rect, rect1, rect2: WMRectangles.Rectangle;
 			color: WMGraphics.Color; mode: SIGNED32;
 		BEGIN

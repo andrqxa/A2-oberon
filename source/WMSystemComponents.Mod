@@ -38,7 +38,7 @@ TYPE
 			overwriteAll := FALSE; overwriteNever := FALSE; abort := FALSE;
 		END New;
 
-		PROCEDURE OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : INTEGER);
 		VAR oldFile : Files.File; name : ARRAY 1024 OF CHAR;
 		BEGIN
 			res := -1;
@@ -80,7 +80,7 @@ TYPE
 			IF TraceCopy IN Trace THEN KernelLog.Ln; END;
 		END OpenPut;
 
-		PROCEDURE ClosePut*(VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } ClosePut*(VAR res : INTEGER);
 		BEGIN
 			IF (f # NIL) & (w # NIL)  THEN
 				w.Update;
@@ -102,7 +102,7 @@ TYPE
 			eh := e
 		END New;
 
-		PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 		VAR di : FilesDropInterface;
 		BEGIN
 			IF type = WMDropTarget.TypeFiles THEN
@@ -129,7 +129,7 @@ TYPE
 		onPathChanged* : WMEvents.EventSource;
 		tr : WMTrees.TreeNode;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(GSDirectoryTree);
@@ -188,7 +188,7 @@ TYPE
 			tree.Release
 		END NodeSelected;
 
-		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
 		VAR node : WMTrees.TreeNode;
 			dropTarget : FilesDropTarget;
 			p : ANY;
@@ -204,7 +204,7 @@ TYPE
 			END
 		END DragDropped;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = currentPath) THEN (*SetPath(currentPath.Get()) *)
 			ELSE PropertyChanged^(sender, property)
@@ -361,7 +361,7 @@ TYPE
 		px, py : SIZE;
 		colWidths : WMGrids.Spacings;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(GSFileList);
@@ -760,7 +760,7 @@ END Open;
 			DragDropped(x, y, dragInfo)
 		END MyDragDropped;
 
-		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
 		VAR dropTarget : FilesDropTarget;
 		BEGIN
 			NEW(dropTarget, path, Refresh);
@@ -825,7 +825,7 @@ END Open;
 			END
 		END Refresh;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			grid.model.Acquire;
 			IF fullView THEN

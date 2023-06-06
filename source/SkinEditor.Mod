@@ -58,7 +58,7 @@ TYPE
 	VAR image : WMStandardComponents.ImagePanel;
 		titleLbl, infoLbl : WMStandardComponents.Label;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrPreviewPanel);
@@ -585,13 +585,13 @@ TYPE
 			RETURN skin
 		END CheckSkin;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		VAR data : XML.Element; a : XML.Attribute; n, str : ARRAY 16 OF CHAR;
 			filename : ARRAY 256 OF CHAR;
 		BEGIN

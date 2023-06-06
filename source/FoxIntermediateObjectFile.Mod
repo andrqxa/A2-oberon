@@ -166,7 +166,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			SectionList(module.allSections);
 		END ExportModuleBinary;
 
-		PROCEDURE Export*(module: Formats.GeneratedModule; symbolFileFormat: Formats.SymbolFileFormat): BOOLEAN;
+		PROCEDURE { OVERRIDE } Export*(module: Formats.GeneratedModule; symbolFileFormat: Formats.SymbolFileFormat): BOOLEAN;
 		VAR
 			filename: Files.FileName;
 			file: Files.File;
@@ -408,29 +408,29 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END;
 		END Import;
 
-		PROCEDURE DefineOptions* (options: Options.Options);
+		PROCEDURE { OVERRIDE } DefineOptions* (options: Options.Options);
 		BEGIN
 			options.Add(0X,"objectFileExtension",Options.String);
 			options.Add(0X,"objectFilePrefix",Options.String);
 			options.Add(0X,"textualObjectFile",Options.Flag);
 		END DefineOptions;
 
-		PROCEDURE GetOptions* (options: Options.Options);
+		PROCEDURE { OVERRIDE } GetOptions* (options: Options.Options);
 		BEGIN
 			IF ~options.GetString("objectFileExtension",extension) THEN extension := "Fil"; END;
 			IF ~options.GetString("objectFilePrefix",prefix) THEN prefix := ""; END;
 			textual := options.GetFlag("textualObjectFile");
 		END GetOptions;
 
-		PROCEDURE DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
+		PROCEDURE { OVERRIDE } DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
 		BEGIN RETURN SymbolFileFormat.Get();
 		END DefaultSymbolFileFormat;
 
-		PROCEDURE GetExtension*(VAR ext: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetExtension*(VAR ext: ARRAY OF CHAR);
 		BEGIN COPY(extension, ext)
 		END GetExtension;
 
-		PROCEDURE SetExtension*(CONST ext: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } SetExtension*(CONST ext: ARRAY OF CHAR);
 		BEGIN COPY(ext, extension)
 		END SetExtension;
 

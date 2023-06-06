@@ -2151,7 +2151,7 @@ TYPE
 				Reads the next bit in the stream (i.e. the next bit in the buffer which contains the
 				most recently read "stream byte". Bit unstuffing is performed, where necessary.
 			*)
-			PROCEDURE NextBit*() : SIGNED32;
+			PROCEDURE { OVERRIDE } NextBit*() : SIGNED32;
 				BEGIN
 					IF curBytePos =  0 THEN
 
@@ -5070,13 +5070,13 @@ TYPE
 													layer range, and which not)
 												*)
 
-			PROCEDURE &InitNew* (crOpt : J2KU.CodestreamReaderOptions;
+			PROCEDURE (* OVERRIDE *) & InitNew* (crOpt : J2KU.CodestreamReaderOptions;
 									stream : Streams.Reader);
 				BEGIN
 					ReInit(crOpt, stream);
 			END InitNew;
 
-			PROCEDURE ReInit* (crOpt : J2KU.CodestreamReaderOptions;
+			PROCEDURE { OVERRIDE } ReInit* (crOpt : J2KU.CodestreamReaderOptions;
 								stream : Streams.Reader);
 				BEGIN
 					ReInit^(crOpt, stream);
@@ -5089,7 +5089,7 @@ TYPE
 			END ReInit;
 
 
-			PROCEDURE InitTile () : BOOLEAN;
+			PROCEDURE { OVERRIDE } InitTile () : BOOLEAN;
 				VAR
 					c, r, nblocks, subband, nband, ndec : SIGNED32;
 					cstyle : CodingStyle;
@@ -5191,7 +5191,7 @@ TYPE
 				IMPORTANT:	This procedure MUST NOT be called before the image has been
 								reconstructed once.
 			*)
-			PROCEDURE SetReBuildMode*;
+			PROCEDURE { OVERRIDE } SetReBuildMode*;
 				BEGIN
 					reBuildMode := TRUE;
 
@@ -5429,7 +5429,7 @@ TYPE
 			(**
 				-> See CodestreamReader.GetCodeBlocks
 			*)
-			PROCEDURE GetCodeBlocks* (VAR cblocks : ARRAY OF J2KU.CodedCblk; VAR cblockInfos : ARRAY OF J2KU.CblkInfo; ncblocks : SIGNED32) : SIGNED32;
+			PROCEDURE { OVERRIDE } GetCodeBlocks* (VAR cblocks : ARRAY OF J2KU.CodedCblk; VAR cblockInfos : ARRAY OF J2KU.CblkInfo; ncblocks : SIGNED32) : SIGNED32;
 				VAR
 					i, j, tmpCblkInBuf, cblkDecLvl, subbIdx, cblkSubbIdx : SIGNED32;
 					startPos: Streams.Position;
@@ -5683,7 +5683,7 @@ TYPE
 					RETURN ncblocksRet;
 			END GetBufferedBlocks;
 
-			PROCEDURE TilePartAvailable* () : BOOLEAN;
+			PROCEDURE { OVERRIDE } TilePartAvailable* () : BOOLEAN;
 				BEGIN
 					IF reBuildMode THEN
 						RETURN	(curComp < cmax)
@@ -5700,7 +5700,7 @@ TYPE
 					END;
 			END TilePartAvailable;
 
-			PROCEDURE JumpToTilePartEnd () : Streams.Position;
+			PROCEDURE { OVERRIDE } JumpToTilePartEnd () : Streams.Position;
 				BEGIN
 					IF reBuildMode THEN
 						curComp := cmax + 1;
@@ -5715,7 +5715,7 @@ TYPE
 			END JumpToTilePartEnd;
 
 
-			PROCEDURE NextTilePart*() : BOOLEAN;
+			PROCEDURE { OVERRIDE } NextTilePart*() : BOOLEAN;
 				VAR
 					imgInfo : ImageInfo;
 					ntiles : SIGNED32;
@@ -5759,7 +5759,7 @@ TYPE
 					END;
 			END NextTilePart;
 
-			PROCEDURE EndOfCodestream* () : BOOLEAN;
+			PROCEDURE { OVERRIDE } EndOfCodestream* () : BOOLEAN;
 				VAR
 					imgInfo : ImageInfo;
 				BEGIN
@@ -5772,7 +5772,7 @@ TYPE
 					END;
 			END EndOfCodestream;
 
-			PROCEDURE FreeNonRebuildResources*;
+			PROCEDURE { OVERRIDE } FreeNonRebuildResources*;
 				BEGIN
 					s := NIL;
 					progChanges := NIL;
@@ -5780,7 +5780,7 @@ TYPE
 					curPrec := NIL;
 			END FreeNonRebuildResources;
 
-			PROCEDURE FreeResources*;
+			PROCEDURE { OVERRIDE } FreeResources*;
 				BEGIN
 					FreeResources^();
 					bufferedBlocks := NIL;

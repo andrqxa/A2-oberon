@@ -52,7 +52,7 @@ TYPE
 		flags : SET;
 		position : Streams.Position;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			commandName := NIL;
@@ -76,7 +76,7 @@ TYPE
 		definesEdit: WMEditors.Editor;
 		showPublicOnly : BOOLEAN;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(showTypeHierarchy, PrototypeShowTypeHierarchy, NIL, NIL); properties.Add(showTypeHierarchy);
@@ -106,7 +106,7 @@ TYPE
 			toolbar.AddContent(definesEdit);
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			IF (data = showTypeHierarchy) OR (data = showImportedModules) THEN
 				RefreshHandler(NIL, NIL);
@@ -187,13 +187,13 @@ TYPE
 			SetNodeVisibilities(node, showPublicOnly);
 		END AddModule;
 
-		PROCEDURE GetNewNode*() : PETTrees.TreeNode; (* overwrite *)
+		PROCEDURE { OVERRIDE } GetNewNode*() : PETTrees.TreeNode; (* overwrite *)
 		VAR node : TreeNode;
 		BEGIN
 			NEW(node); RETURN node;
 		END GetNewNode;
 
-		PROCEDURE AddNodes*(parent : PETTrees.TreeNode; diagnostics : Diagnostics.Diagnostics; log : Streams.Writer);
+		PROCEDURE { OVERRIDE } AddNodes*(parent : PETTrees.TreeNode; diagnostics : Diagnostics.Diagnostics; log : Streams.Writer);
 		VAR module : ModuleParser.Module; scanner : FoxScanner.Scanner; reader : TextUtilities.TextReader; definitions: ARRAY 32 OF CHAR;
 		BEGIN
 			ASSERT(diagnostics # NIL);
@@ -220,7 +220,7 @@ TYPE
 			END;
 		END AddNodes;
 
-		PROCEDURE ClickNode*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } ClickNode*(sender, data : ANY);
 		VAR node : WMTrees.TreeNode; extInfo : PETTrees.ExternalInfo;
 		BEGIN
 			IF (data # NIL) & (data IS WMTrees.TreeNode) THEN
@@ -245,7 +245,7 @@ TYPE
 			END
 		END ClickNode;
 
-		PROCEDURE MiddleClickNode*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } MiddleClickNode*(sender, data : ANY);
 		VAR commandStr, ignoreMsg : ARRAY 128 OF CHAR; len: SIZE; ignore: INTEGER;
 		BEGIN
 			IF (data # NIL) & (data IS TreeNode) & (data(TreeNode).commandName # NIL) & (data(TreeNode).modulename # "") THEN
@@ -303,7 +303,7 @@ TYPE
 			RETURN (identDef.vis = ModuleParser.Public) OR (identDef.vis = ModuleParser.PublicRO);
 		END IsPublic;
 
-		PROCEDURE IsNodeGreater*(left, right: WMTrees.TreeNode): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsNodeGreater*(left, right: WMTrees.TreeNode): BOOLEAN;
 		VAR leftCaption, rightCaption, leftTmp, rightTmp: Strings.String;
 		BEGIN
 			IF (left IS TreeNode) & (right IS TreeNode) &

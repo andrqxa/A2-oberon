@@ -58,7 +58,7 @@ TYPE
 	 		superEntry*: WebForumEntry;
 
 		(** override, methods Internalize/Externlaize , this methods persist subEntries and superEntry fields *)
-	    PROCEDURE Internalize*(input: XML.Content);
+	    PROCEDURE { OVERRIDE } Internalize*(input: XML.Content);
 	    VAR container: XML.Container; elem: XML.Element; oidStr: Strings.String;
 			persObj: PrevalenceSystem.PersistentObject; oidNr: SIGNED32;
 	    BEGIN
@@ -95,7 +95,7 @@ TYPE
 			END
 	    END Internalize;
 
-	    PROCEDURE Externalize*() : XML.Content;
+	    PROCEDURE { OVERRIDE } Externalize*() : XML.Content;
 	    VAR container: XML.Container; elem: XML.Element; oidStr: ARRAY 14 OF CHAR;
 	    BEGIN
 	    	NEW(container);
@@ -115,11 +115,11 @@ TYPE
 			RETURN container
 		END Externalize;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN subEntries := NIL; superEntry := NIL (* subEntries is initialized to NIL for better performance if no hierarchy is used *)
 		END Init;
 
-		PROCEDURE GetReferrencedObjects*() : PrevalenceSystem.PersistentObjectList;
+		PROCEDURE { OVERRIDE } GetReferrencedObjects*() : PrevalenceSystem.PersistentObjectList;
 		VAR list: PrevalenceSystem.PersistentObjectList; count, pos: SIGNED32;
 		BEGIN
 			count := 0;
@@ -150,7 +150,7 @@ TYPE
 		BEGIN HALT(309);
 		END EditView;
 
-		PROCEDURE ToXML*(request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } ToXML*(request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR container: XML.Container; td: XML.Element;
 		BEGIN
 			IF (superEntry = NIL) THEN
@@ -264,7 +264,7 @@ TYPE
 			RETURN FALSE
 		END RootEntryFilter;
 
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR persCont: WebStd.PersistentDataContainer; prevSysName, reInitStr: Strings.String;
 		BEGIN
 			reInitStr := input.GetAttributeValue("reinitialize");
@@ -1132,7 +1132,7 @@ TYPE
 			END
 		END InsertEditEntry;
 
-		PROCEDURE GetEventHandlers*() : DynamicWebpage.EventHandlerList;
+		PROCEDURE { OVERRIDE } GetEventHandlers*() : DynamicWebpage.EventHandlerList;
 		VAR list, addList: DynamicWebpage.EventHandlerList; listLength, addListCount, i: SIZE
 		BEGIN
 			addList := GetAdditionalEventHandlers();

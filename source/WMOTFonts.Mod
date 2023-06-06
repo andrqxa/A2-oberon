@@ -63,7 +63,7 @@ TYPE
 
 		ras: OpenTypeScan.Rasterizer;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR mode : Raster.Mode; pix : Raster.Pixel;
 		BEGIN
 			Init^;
@@ -83,7 +83,7 @@ TYPE
 			IF (code >= 126) & (code <= 155) THEN code := OpenType.CharToUnicode[code] END;
 		END MapCode;
 
-		PROCEDURE GetGlyphMap*(code : Char32; VAR map : WMGraphics.Image);
+		PROCEDURE { OVERRIDE } GetGlyphMap*(code : Char32; VAR map : WMGraphics.Image);
 		VAR g : Glyph; range : SIZE;
 		BEGIN
 			IF FindGlyphRange(code, range) THEN
@@ -95,13 +95,13 @@ TYPE
 			END
 		END GetGlyphMap;
 
-		PROCEDURE HasChar*(code : Char32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } HasChar*(code : Char32) : BOOLEAN;
 		VAR dummy : SIZE;
 		BEGIN
 			RETURN FindGlyphRange(code, dummy)
 		END HasChar;
 
-		PROCEDURE GetGlyphSpacings*(code : Char32; VAR glyphSpacings : WMGraphics.GlyphSpacings);
+		PROCEDURE { OVERRIDE } GetGlyphSpacings*(code : Char32; VAR glyphSpacings : WMGraphics.GlyphSpacings);
 		VAR g : Glyph; range : SIZE;
 		BEGIN
 			IF FindGlyphRange(code, range) THEN

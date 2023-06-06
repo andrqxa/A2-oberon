@@ -18,12 +18,12 @@ CONST
 
 TYPE
 	DynamicWebpagePlugin = OBJECT (WebHTTPServer.HTTPPlugin)
-		PROCEDURE &Init*(CONST name: WebHTTPServer.Name);
+		PROCEDURE (* OVERRIDE *) & Init*(CONST name: WebHTTPServer.Name);
 		BEGIN
 			Init^(PluginName)
 		END Init;
 
-		PROCEDURE CanHandle*(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; secure : BOOLEAN) : BOOLEAN;
+		PROCEDURE { OVERRIDE } CanHandle*(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; secure : BOOLEAN) : BOOLEAN;
 		VAR name, ext: Files.FileName; f: Files.File; newuri : ARRAY 4096 OF CHAR;
 		BEGIN
 			HTTPSupport.RemoveVariablesFromURI(request.uri, newuri);
@@ -43,7 +43,7 @@ TYPE
 			END
 		END CanHandle;
 
-		PROCEDURE Handle*(host: WebHTTPServer.Host; VAR requestHeader: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader;
+		PROCEDURE { OVERRIDE } Handle*(host: WebHTTPServer.Host; VAR requestHeader: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader;
 				VAR in: Streams.Reader; VAR out: Streams.Writer);
 		VAR chunker: WebHTTP.ChunkedOutStream; w: Streams.Writer; f: Files.File; backupUri: ARRAY 4096 OF CHAR;
 			request: HTTPSupport.HTTPRequest; session: HTTPSession.Session;

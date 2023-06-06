@@ -89,27 +89,27 @@ TYPE
 		VAR
 			hash: SHA1;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			SetNameAndSize( "sha1", HashSize );
 			initialized := FALSE
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			hash.Initialize;
 			initialized := TRUE
 		END Initialize;
 
 		(** data: value to be hashed *)
-		PROCEDURE Update*( CONST data: ARRAY OF CHAR;  pos, len: SIZE );
+		PROCEDURE { OVERRIDE } Update*( CONST data: ARRAY OF CHAR;  pos, len: SIZE );
 		BEGIN
 			ASSERT( initialized );
 			hash(data, pos, len);
 		END Update;
 
 		(** get the hashvalue of length SELF.size *)
-		PROCEDURE GetHash*( VAR buf: ARRAY OF CHAR;  pos: SIZE );
+		PROCEDURE { OVERRIDE } GetHash*( VAR buf: ARRAY OF CHAR;  pos: SIZE );
 		BEGIN
 			hash.GetHash(buf, pos);
 		END GetHash;

@@ -30,7 +30,7 @@ TYPE
 				key, dkey: RKeys;
 				iv: Block;
 
-				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE );
+				PROCEDURE { OVERRIDE } InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE );
 				BEGIN
 					InitKey^( src, keybits );
 					IF keybits = 128 THEN  rounds := Init128( src )
@@ -40,7 +40,7 @@ TYPE
 					InvertKeys
 				END InitKey;
 
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
+				PROCEDURE { OVERRIDE } SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
 				BEGIN
 					SetIV^( src, mode );   (* set mode *)
 					U.BufferToBlockBE( src, 0, iv );
@@ -56,7 +56,7 @@ TYPE
 					UNTIL (x # 0) OR (i = 0)
 				END IncIV;
 
-				PROCEDURE Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR i, j: SIZE;  x, y: Block;
 				BEGIN
 					ASSERT( isKeyInitialized );
@@ -83,7 +83,7 @@ TYPE
 					END
 				END Encrypt;
 
-				PROCEDURE Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR x0, x, y: Block;  i, j: SIZE;
 				BEGIN
 					ASSERT( isKeyInitialized );
@@ -260,7 +260,7 @@ TYPE
 				END InvertKeys;
 
 
-				PROCEDURE & Init*;
+				PROCEDURE (* OVERRIDE *) & Init*;
 				BEGIN
 					SetNameAndBlocksize( "aes", 16 )
 				END Init;

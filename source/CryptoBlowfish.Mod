@@ -30,7 +30,7 @@ TYPE
 				s: TS;
 				ivl, ivr: SET32;
 
-				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE );
+				PROCEDURE { OVERRIDE } InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE );
 				VAR i, m: SIZE;  xl, xr: SET32;
 				BEGIN
 					InitKey^( src, keybits );  m := keybits DIV 8;  s := s0;
@@ -57,13 +57,13 @@ TYPE
 					END
 				END InitKey;
 
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
+				PROCEDURE { OVERRIDE } SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
 				BEGIN
 					SetIV^( src, mode );
 					ivl := U.SetFromBufferBE( src, 0 );  ivr := U.SetFromBufferBE( src, 4 );
 				END SetIV;
 
-				PROCEDURE Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR i: SIZE;
 				BEGIN
 					ASSERT( isKeyInitialized & (mode IN {Ciphers.ECB, Ciphers.CBC}) );
@@ -72,7 +72,7 @@ TYPE
 					WHILE i < len DO  EncryptBlock( buf, ofs + i );  INC( i, blockSize );   END
 				END Encrypt;
 
-				PROCEDURE Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR i: SIZE;
 				BEGIN
 					ASSERT( isKeyInitialized );
@@ -133,7 +133,7 @@ TYPE
 					yr := xr/p[1];  yl := xl/p[0];
 				END decrypt0;
 
-				PROCEDURE & Init*;
+				PROCEDURE (* OVERRIDE *) & Init*;
 				BEGIN
 					Init^;  SetNameAndBlocksize( "blowfish", 8 );
 				END Init;

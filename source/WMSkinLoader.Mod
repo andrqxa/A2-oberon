@@ -84,7 +84,7 @@ TYPE
 			END
 		END LoadSkin;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			FreeWindow(SELF)

@@ -1064,7 +1064,7 @@ TYPE
 
 			'_' is the underscore character
 		**)
-		PROCEDURE GetIdentifier( VAR token: Token );
+		PROCEDURE { OVERRIDE } GetIdentifier( VAR token: Token );
 		VAR
 			i: SIGNED32;
 
@@ -1086,7 +1086,7 @@ TYPE
 		END GetIdentifier;
 
 		(** get next token **)
-		PROCEDURE GetNextToken*(VAR token: Token ): BOOLEAN;
+		PROCEDURE { OVERRIDE } GetNextToken*(VAR token: Token ): BOOLEAN;
 		VAR s: SIGNED32;
 
 			PROCEDURE SkipBlanks;

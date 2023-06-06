@@ -146,7 +146,7 @@ TYPE
 		END Initialize;
 
 		(* Finalize the file system. *)
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		VAR purge: FilePurger; update: FileUpdater;
 		BEGIN {EXCLUSIVE}
 			NEW(purge); purge.count := 0;
@@ -196,7 +196,7 @@ TYPE
 		END SetRootDirectoryX;
 
 		(* Create a new file with the specified name.  End users use Files.New instead. *)
-		PROCEDURE New0*(CONST name: ARRAY OF CHAR): Files.File;
+		PROCEDURE { OVERRIDE } New0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR path, filename: Filename; dir: Directory; f: File;
 		BEGIN {EXCLUSIVE}
 			IF UTF8Strings.Valid(name) THEN
@@ -225,7 +225,7 @@ TYPE
 		END New0;
 
 		(* Open an existing file. The same file descriptor is returned if a file is opened multiple times.  End users use Files.Old instead. *)
-		PROCEDURE Old0*(CONST name: ARRAY OF CHAR): Files.File;
+		PROCEDURE { OVERRIDE } Old0*(CONST name: ARRAY OF CHAR): Files.File;
 		BEGIN {EXCLUSIVE} RETURN OldX(name)
 		END Old0;
 
@@ -262,7 +262,7 @@ TYPE
 		END OldX;
 
 		(** Delete a file. res = 0 indicates success.  End users use Files.Delete instead. *)
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE} Delete0X(name, key, res)
 		END Delete0;
 
@@ -310,7 +310,7 @@ TYPE
 		END Delete0X;
 
 		(* Rename a file. res = 0 indicates success.  End users use Files.Rename instead. *)
-		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
 		VAR oldpath, oldname, newpath, newname: Filename; r: File; dir: Directory; s: SearchByName;
 		BEGIN {EXCLUSIVE}
 			res := ErrInvalidFilename;
@@ -363,7 +363,7 @@ TYPE
 			END
 		END Enumerate;
 
-		PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
+		PROCEDURE { OVERRIDE } Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
 		VAR d: Directory; maskUp, path: Filename; par: EnumParam;
 		BEGIN {EXCLUSIVE}
 			IF UTF8Strings.Valid(mask) THEN
@@ -386,7 +386,7 @@ TYPE
 		END Enumerate0;
 
 		(* Return the unique non-zero key of the named file, if it exists. *)
-		PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
+		PROCEDURE { OVERRIDE } FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
 		VAR s: SearchByName; path, filename: Filename; dir: Directory; f: File; key: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF UTF8Strings.Valid(name) THEN
@@ -412,7 +412,7 @@ TYPE
 			RETURN key
 		END FileKey;
 
-		PROCEDURE CreateDirectory0*(CONST path: ARRAY OF CHAR; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateDirectory0*(CONST path: ARRAY OF CHAR; VAR res: INTEGER);
 		VAR f: File; d: Directory; i,j: SIGNED32; name: Filename; lookup: BOOLEAN; s: SearchByName;
 		BEGIN {EXCLUSIVE}
 			IF (Files.ReadOnly IN vol.flags) THEN res := ErrReadOnly; RETURN END;
@@ -461,7 +461,7 @@ TYPE
 		BEGIN INC(par(CountFiles).count); RETURN TRUE
 		END RmDirCallback;
 
-		PROCEDURE RemoveDirectory0*(CONST path: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } RemoveDirectory0*(CONST path: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: INTEGER);
 		VAR f: File; par: CountFiles; s: SearchByName; parent: Directory;
 		BEGIN {EXCLUSIVE}
 			IF (Files.ReadOnly IN vol.flags) THEN res := ErrReadOnly; RETURN END;
@@ -639,7 +639,7 @@ TYPE
 
 		(* Position a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file.
 			A Rider cannot be positioned beyond the end of a file. *)
-		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
+		PROCEDURE { OVERRIDE } Set*(VAR r: Files.Rider; pos: Files.Position);
 		BEGIN {EXCLUSIVE} SetX(r, pos)
 		END Set;
 
@@ -659,7 +659,7 @@ TYPE
 		END SetX;
 
 		(* Return the offset of a Rider positioned on a file. *)
-		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
+		PROCEDURE { OVERRIDE } Pos*(VAR r: Files.Rider): Files.Position;
 		BEGIN RETURN r.apos*clusterSize + r.bpos;
 		END Pos;
 
@@ -764,7 +764,7 @@ TYPE
 		END WriteBuffer;
 
 		(* Read a byte from a file, advancing the Rider one byte further.  R.eof indicates if the end of the file has been passed. *)
-		PROCEDURE Read*(VAR r: Files.Rider; VAR x: CHAR);
+		PROCEDURE { OVERRIDE } Read*(VAR r: Files.Rider; VAR x: CHAR);
 		BEGIN {EXCLUSIVE} ReadX(r, x)
 		END Read;
 
@@ -782,7 +782,7 @@ TYPE
 
 		(* Read a sequence of len bytes into the buffer x at offset ofs, advancing the Rider. Less bytes will be read when
 			reading over the end of the file. r.res indicates the number of unread bytes. x must be big enough to hold all the bytes. *)
-		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE { OVERRIDE } ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 		BEGIN {EXCLUSIVE} ReadBytesX(r, x, ofs, len)
 		END ReadBytes;
 
@@ -807,7 +807,7 @@ TYPE
 		END ReadBytesX;
 
 		(* Write a byte into the file at the Rider position, advancing the Rider by one. *)
-		PROCEDURE Write*(VAR r: Files.Rider; x: CHAR);
+		PROCEDURE { OVERRIDE } Write*(VAR r: Files.Rider; x: CHAR);
 		BEGIN {EXCLUSIVE} WriteX(r, x)
 		END Write;
 
@@ -826,7 +826,7 @@ TYPE
 		END WriteX;
 
 		(* Write the buffer x containing len bytes (starting at offset ofs) into a file at the Rider position. *)
-		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE { OVERRIDE } WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		BEGIN {EXCLUSIVE} WriteBytesX(r, x, ofs, len)
 		END WriteBytes;
 
@@ -854,7 +854,7 @@ TYPE
 		END WriteBytesX;
 
 		(* Return the current length of a file. *)
-		PROCEDURE Length*(): Files.Size;
+		PROCEDURE { OVERRIDE } Length*(): Files.Size;
 		BEGIN
 			(* Length() should in principle be exlusive, however it won't do any harm if it is not, it just reflects the
 				current size if called from outside. Internal methods that call Length() are exclusive whenever needed *)
@@ -862,25 +862,25 @@ TYPE
 		END Length;
 
 		(* Return the time (t) and date (d) when a file was last modified. *)
-		PROCEDURE GetDate*(VAR t, d: SIGNED32);
+		PROCEDURE { OVERRIDE } GetDate*(VAR t, d: SIGNED32);
 		BEGIN {EXCLUSIVE}
 			t := writeTime; d := writeDate;
 		END GetDate;
 
 		(* Set the modification time (t) and date (d) of a file. *)
-		PROCEDURE SetDate*(t, d: SIGNED32);
+		PROCEDURE { OVERRIDE } SetDate*(t, d: SIGNED32);
 		BEGIN {EXCLUSIVE}
 			writeTime := t; writeDate := d; modH := TRUE;
 		END SetDate;
 
 		(** Return the file attributes *)
-		PROCEDURE GetAttributes*(): SET;
+		PROCEDURE { OVERRIDE } GetAttributes*(): SET;
 		BEGIN {EXCLUSIVE}
 			RETURN attr
 		END GetAttributes;
 
 		(** Set the file attributes *)
-		PROCEDURE SetAttributes*(Attr: SET);
+		PROCEDURE { OVERRIDE } SetAttributes*(Attr: SET);
 		BEGIN {EXCLUSIVE}
 			Attr := Attr * faValidMask;
 			attr := attr - faValidMask + Attr;
@@ -906,14 +906,14 @@ TYPE
 		END ExclAttribute;
 
 		(* Return the canonical name of a file. *)
-		PROCEDURE GetName*(VAR name: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetName*(VAR name: ARRAY OF CHAR);
 		BEGIN (* {GetFullName is EXCLUSIVE} *)
 			GetFullName(name, TRUE)
 		END GetName;
 
 		(* Register a file created with New in the directory, replacing the previous file in the directory with the same name.
 			The file is automatically updated.  End users use Files.Register instead. *)
-		PROCEDURE Register0*(VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Register0*(VAR res: INTEGER);
 		VAR dir: Directory; old: File; s: SearchByName;
 		BEGIN {EXCLUSIVE}
 			IF ~registered THEN
@@ -949,7 +949,7 @@ TYPE
 		END Register0;
 
 		(* Flush the changes made to a file from its buffers. Register0 will automatically update a file. *)
-		PROCEDURE Update*;
+		PROCEDURE { OVERRIDE } Update*;
 		BEGIN {EXCLUSIVE} UpdateX
 		END Update;
 
@@ -1044,7 +1044,7 @@ TYPE
 			firstFreePos: SIGNED32;	(* position of first known free entry in directory, 'NotAssigned' if unknown *)
 			extendable: BOOLEAN; (* TRUE if the directory can grow *)
 
-		PROCEDURE &Init*(fs: Files.FileSystem);
+		PROCEDURE (* OVERRIDE *) & Init*(fs: Files.FileSystem);
 		BEGIN
 			Init^(fs);
 			attr :=  {faDirectory, faReadOnly};
@@ -1103,14 +1103,14 @@ TYPE
 
 		(* Position a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file.
 			A Rider cannot be positioned beyond the end of a file. *)
-		PROCEDURE SetX(VAR r: Files.Rider; pos: Files.Position);
+		PROCEDURE { OVERRIDE } SetX(VAR r: Files.Rider; pos: Files.Position);
 		BEGIN
 			IF (size = 0) THEN InitSize END;
 			SetX^(r, pos)
 		END SetX;
 
 		(* Return the current length of a file. *)
-		PROCEDURE Length*(): Files.Size;
+		PROCEDURE { OVERRIDE } Length*(): Files.Size;
 		BEGIN {EXCLUSIVE}
 			IF (size = 0) THEN InitSize END;
 			RETURN Length^()
@@ -1641,7 +1641,7 @@ TYPE
 	END Directory;
 
 	RootDirectory = OBJECT(Directory)
-		PROCEDURE GetFullName*(VAR name: ARRAY OF CHAR; WithPrefix: BOOLEAN);
+		PROCEDURE { OVERRIDE } GetFullName*(VAR name: ARRAY OF CHAR; WithPrefix: BOOLEAN);
 		VAR pos, i: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			pos := 0; i := 0;
@@ -1660,19 +1660,19 @@ TYPE
 	END RootDirectory;
 
 	RootDirectory1216 = OBJECT(RootDirectory) (* for FAT12/FAT16 file systems *)
-		PROCEDURE &Init*(fs: Files.FileSystem);
+		PROCEDURE (* OVERRIDE *) & Init*(fs: Files.FileSystem);
 		BEGIN
 			Init^(fs);
 			clusterSize := FATVolumes.BS;
 			extendable := FALSE
 		END Init;
 
-		PROCEDURE InitSize;
+		PROCEDURE { OVERRIDE } InitSize;
 		BEGIN
 			size := fs.vol(FATVolumes.FAT1216Volume).numRootSectors*FATVolumes.BS
 		END InitSize;
 
-		PROCEDURE ReadBuffer(buffer: Buffer; pos: SIGNED32);
+		PROCEDURE { OVERRIDE } ReadBuffer(buffer: Buffer; pos: SIGNED32);
 		VAR vol: FATVolumes.FAT1216Volume; res: INTEGER;
 		BEGIN
 			vol := fs.vol(FATVolumes.FAT1216Volume);
@@ -1682,7 +1682,7 @@ TYPE
 			IF (res # Ok) THEN HALT(ErrIOError) END
 		END ReadBuffer;
 
-		PROCEDURE WriteBuffer(buffer: Buffer);
+		PROCEDURE { OVERRIDE } WriteBuffer(buffer: Buffer);
 		VAR vol: FATVolumes.FAT1216Volume; res: INTEGER;
 		BEGIN
 			vol := fs.vol(FATVolumes.FAT1216Volume);

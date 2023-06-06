@@ -21,7 +21,7 @@ BEGIN
 	center.x:=1/2; center.y:=1/2; center.z:=1/2;
 END init;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 BEGIN
 	phi:=phi+dtick;
 	IF phi > 6.2832 THEN phi:=0 END
@@ -37,7 +37,7 @@ BEGIN
 	 RETURN Math.sqrt((a.x-b.x)*(a.x-b.x)+ (a.y-b.y)*(a.y-b.y) + (a.z-b.z)*(a.z-b.z));
 END dia;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	a,b,c,dxyz:PT;
 	dc,x,y,z: FLOAT32;

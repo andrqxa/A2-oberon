@@ -422,7 +422,7 @@ TYPE
 			sync[dev] := set
 		END Synchronize;
 
-		PROCEDURE Submit*(VAR c: SCSI.Command);
+		PROCEDURE { OVERRIDE } Submit*(VAR c: SCSI.Command);
 		BEGIN
 			Synchronize(c.target, Free, InUse);
 			BusSchedule(SELF, c);		(* return only when command Terminated *)

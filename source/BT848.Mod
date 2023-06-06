@@ -502,7 +502,7 @@ TYPE
 		radioMode: SIGNED32;
 
 	(** Initialize the tuner object. *)
-	PROCEDURE &Init*(vcd: TVDriver.VideoCaptureDevice);
+	PROCEDURE (* OVERRIDE *) & Init*(vcd: TVDriver.VideoCaptureDevice);
 	BEGIN
 		ASSERT (vcd IS VideoCaptureDevice);
 		SELF.vcd := vcd (VideoCaptureDevice);
@@ -510,7 +510,7 @@ TYPE
 
 	(** Open the VBI device. *)
 	(** return value:	-1 if the device is already open, otherwise 0 *)
-	PROCEDURE OpenVbi*(): SIGNED32;
+	PROCEDURE { OVERRIDE } OpenVbi*(): SIGNED32;
 	BEGIN
 		IF vcd.vbiFlags * VbiOpen # {} THEN
 			IF DEBUG # DebugOff THEN KernelLog.String("{BT848} vbi device already open."); KernelLog.Ln; END;
@@ -526,7 +526,7 @@ TYPE
 	END OpenVbi;
 
 	(** Close the VBI device. *)
-	PROCEDURE CloseVbi*;
+	PROCEDURE { OVERRIDE } CloseVbi*;
 	BEGIN
 		IF VbiOpen * vcd.vbiFlags # {} THEN
 			IF DEBUG # DebugOff THEN KernelLog.String("{BT848} vbi device ."); KernelLog.Ln; END;
@@ -535,7 +535,7 @@ TYPE
 	END CloseVbi;
 
 	(** Open the tuner. *)
-	PROCEDURE Open*;
+	PROCEDURE { OVERRIDE } Open*;
 	VAR temp: SET;
 	BEGIN
 		frequency := 0;
@@ -552,7 +552,7 @@ TYPE
 	END Open;
 
 	(** Close the tuner. *)
-	PROCEDURE Close*;
+	PROCEDURE { OVERRIDE } Close*;
 	VAR temp: SET;
 	BEGIN
 		vcd.audio.SetAudioMute;
@@ -562,21 +562,21 @@ TYPE
 
 	(** Set the channel set. *)
 	(** chnlSet:	channel set (only WesternEuropeanChnlSet available at the moment). *)
-	PROCEDURE SetChannelSet*(chnlSet: SIGNED32);
+	PROCEDURE { OVERRIDE } SetChannelSet*(chnlSet: SIGNED32);
 	BEGIN
 		ASSERT((chnlSet >= 0) & (chnlSet < NoOfChnlSets));
 		SELF.chnlSet := chnlSet;
 	END SetChannelSet;
 
 	(** Get the channel set. *)
-	PROCEDURE GetChannelSet*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetChannelSet*(): SIGNED32;
 	BEGIN
 		RETURN chnlSet;
 	END GetChannelSet;
 
 	(** Set a channel. *)
 	(** chnl:	channel to set (see range of channel set). *)
-	PROCEDURE SetChannel*(chnl: SIGNED32);
+	PROCEDURE { OVERRIDE } SetChannel*(chnl: SIGNED32);
 	VAR
 		i: SIZE;
 		freq: SIGNED32;
@@ -608,21 +608,21 @@ TYPE
 
 	(** Get channel. *)
 	(** return value:	channel *)
-	PROCEDURE GetChannel*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetChannel*(): SIGNED32;
 	BEGIN
 		RETURN chnl;
 	END GetChannel;
 
 	(* Get maximum channel number of selected channel set. *)
 	(* return value:	maximum channel number of channel set *)
-	PROCEDURE GetMaxChannel*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetMaxChannel*(): SIGNED32;
 	BEGIN
 		RETURN freqTable[chnlSet].maxChnl;
 	END GetMaxChannel;
 
 	(** Set TV frequency. *)
 	(** freq:	frequency expressed as frequency * 16. *)
-	PROCEDURE SetTVFrequencyImpl (freq: SIGNED32);
+	PROCEDURE { OVERRIDE } SetTVFrequencyImpl (freq: SIGNED32);
 	VAR
 		bandSelect, n: SIGNED32;
 		addr, control, band: SIGNED32;
@@ -667,7 +667,7 @@ TYPE
 
 	(** Set radio frequency. *)
 	(** freq:	frequency expressed as frequency * 100. *)
-	PROCEDURE SetRadioFrequency*(freq: SIGNED32);
+	PROCEDURE { OVERRIDE } SetRadioFrequency*(freq: SIGNED32);
 	VAR
 		bandSelect, n: SIGNED32;
 		addr, control, band: SIGNED32;
@@ -702,28 +702,28 @@ TYPE
 
 	(** Get the tuner status. *)
 	(** return value:	tuner status *)
-	PROCEDURE GetTunerStatus*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetTunerStatus*(): SIGNED32;
 	BEGIN
 		RETURN vcd.i2cBus.I2CRead(vcd.card.tunerPLLAddr + 1);
 	END GetTunerStatus;
 
 	(** Calculates the field strength of the radio signal. *)
 	(** return value:	field strength (3-bit value) *)
-	PROCEDURE CalcFieldStrength*(): SIGNED32;
+	PROCEDURE { OVERRIDE } CalcFieldStrength*(): SIGNED32;
 	BEGIN
 		RETURN SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, GetTunerStatus()) * {0..2});
 	END CalcFieldStrength;
 
 	(** Returns wether tuner is locked to a stable video signal or not. *)
 	(** return value:	TRUE if tuner is locked to a stable video signal, otherwise FALSE *)
-	PROCEDURE IsLocked*(): BOOLEAN;
+	PROCEDURE { OVERRIDE } IsLocked*(): BOOLEAN;
 	BEGIN
 		RETURN SYSTEM.VAL(SET, vcd.GetStatus()) * Bt848DStatusHLoc # {};
 	END IsLocked;
 
 	(** Returns wether the sound is received in stereo or mono. *)
 	(** return value:	TRUE if stereo is enabled, otherwise FALSE *)
-	PROCEDURE IsStereo*(): BOOLEAN;
+	PROCEDURE { OVERRIDE } IsStereo*(): BOOLEAN;
 	BEGIN
 		RETURN SYSTEM.VAL(SET, GetTunerStatus()) * {16} # {};
 	END IsStereo;
@@ -734,14 +734,14 @@ TYPE
 	(** 256 steps in the range -90 dgr to +89.3 dgr, in increments of 0.7 dgr. *)
 	(** Note: not applicable to PAL/SECAM, or digital video *)
 	(** hue:	a value between 0x7F and 0x80 results in a hue adjustment by -89 and +90% *)
-	PROCEDURE SetHue*(hue: SIGNED32);
+	PROCEDURE { OVERRIDE } SetHue*(hue: SIGNED32);
 	BEGIN
 		SYSTEM.PUT8(vcd.base + BktrHue, hue);
 	END SetHue;
 
 	(** Get the hue *)
 	(** return value:	the hue offset *)
-	PROCEDURE GetHue*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetHue*(): SIGNED32;
 	BEGIN
 		RETURN SYSTEM.GET8(vcd.base + BktrHue);
 	END GetHue;
@@ -752,14 +752,14 @@ TYPE
 	(** steps, from -128 to +127. The resolution of brightness change is *)
 	(** one LSB (0.39% with respect to the full luma range). *)
 	(** brightness:	a value between 0x7F and 0x80 results in a brightness adjustment of +49 and -50% of full scale *)
-	PROCEDURE SetBrightness*(brightness: SIGNED32);
+	PROCEDURE { OVERRIDE } SetBrightness*(brightness: SIGNED32);
 	BEGIN
 		SYSTEM.PUT8(vcd.base + BktrBright, brightness);
 	END SetBrightness;
 
 	(** Get the brightness. *)
 	(** return value:	the brightness offset *)
-	PROCEDURE GetBrightness*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetBrightness*(): SIGNED32;
 	BEGIN
 		RETURN SYSTEM.GET8(vcd.base + BktrBright);
 	END GetBrightness;
@@ -767,7 +767,7 @@ TYPE
 	(** Set the chroma saturation. *)
 	(** Adds a gain adjustment to the U- and V-component of the video signal. *)
 	(** saturation:	a value between 0x000 and 0x1FF adjusts the saturation in the range of 0 to 200% *)
-	PROCEDURE SetChromaSaturation*(saturation: SIGNED32);
+	PROCEDURE { OVERRIDE } SetChromaSaturation*(saturation: SIGNED32);
 	VAR temp1, temp2: SIGNED32;
 	BEGIN
 		temp1 := SYSTEM.GET8(vcd.base + BktrEControl);
@@ -791,7 +791,7 @@ TYPE
 
 	(** Get chroma saturation. *)
 	(** return value:	the chroma saturation *)
-	PROCEDURE GetChromaSaturation*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetChromaSaturation*(): SIGNED32;
 	VAR temp1, temp2: SIGNED32;
 	BEGIN
 		temp1 := SYSTEM.GET8(vcd.base + BktrSatVLo);
@@ -806,7 +806,7 @@ TYPE
 	(** Set chroma V saturation *)
 	(** Adds a gain adjustment to the V-component of the video signal. *)
 	(** saturation:	a value between 0x000 and 0x1FF adjusts the V saturation in the range of 0 to 200% *)
-	PROCEDURE SetChromaVSaturation*(saturation: SIGNED32);
+	PROCEDURE { OVERRIDE } SetChromaVSaturation*(saturation: SIGNED32);
 	VAR temp1, temp2: SIGNED32;
 	BEGIN
 		temp1 := SYSTEM.GET8(vcd.base + BktrEControl);
@@ -825,7 +825,7 @@ TYPE
 
 	(** Get the chroma V saturation. *)
 	(** return value:	the chroma V saturation *)
-	PROCEDURE GetChromaVSaturation*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetChromaVSaturation*(): SIGNED32;
 	VAR temp1, temp2: SIGNED32;
 	BEGIN
 		temp1 := SYSTEM.GET8(vcd.base + BktrSatVLo);
@@ -840,7 +840,7 @@ TYPE
 	(** Set the chroma U saturation. *)
 	(** Adds a gain adjustment to the U-component of the video signal. *)
 	(** saturation:	a value between 0x000 and 0x1FF adjusts the U saturation in the range of 0 to 200% *)
-	PROCEDURE SetChromaUSaturation*(saturation: SIGNED32);
+	PROCEDURE { OVERRIDE } SetChromaUSaturation*(saturation: SIGNED32);
 	VAR temp1, temp2: SIGNED32;
 	BEGIN
 		temp1 := SYSTEM.GET8(vcd.base + BktrEControl);
@@ -859,7 +859,7 @@ TYPE
 
 	(** Get the chroma U saturation. *)
 	(** return value:	the chroma U saturation *)
-	PROCEDURE GetChromaUSaturation*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetChromaUSaturation*(): SIGNED32;
 	VAR temp1, temp2: SIGNED32;
 	BEGIN
 		temp1 := SYSTEM.GET8(vcd.base + BktrSatULo);
@@ -880,7 +880,7 @@ TYPE
 	(**				[0] 0 enables luma decimation using selectable H filter, 1 disables luma decimation *)
 	(**				[1] 0 composite video, 1 Y/C component video *)
 	(**				[2] 0 enables the luma notch filter, 1 disables the luma notch filter *)
-	PROCEDURE SetLumaNotch*(notch: SIGNED32);
+	PROCEDURE { OVERRIDE } SetLumaNotch*(notch: SIGNED32);
 	VAR temp1: SIGNED32; temp2: SIGNED32;
 	BEGIN
 		temp1 := ASH(SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, notch) * {0..2}), 5);
@@ -900,7 +900,7 @@ TYPE
 
 	(** Get status of luma notch filters. *)
 	(** return value:	3 bits of EControl/OControl *)
-	PROCEDURE GetLumaNotch*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetLumaNotch*(): SIGNED32;
 	VAR temp1: SIGNED32;
 	BEGIN
 		temp1 := SYSTEM.GET8(vcd.base + BktrEControl);
@@ -911,7 +911,7 @@ TYPE
 	(** Set the contrast. *)
 	(** This value ist multiplied by the luminance value to provide contrast adjustment. *)
 	(** contrast:	a value between 0x000 and 0x1FF for an adjustment between 0 and 236% *)
-	PROCEDURE SetContrast*(contrast: SIGNED32);
+	PROCEDURE { OVERRIDE } SetContrast*(contrast: SIGNED32);
 	VAR temp1, temp2: SIGNED32;
 	BEGIN
 		temp1 := SYSTEM.GET8(vcd.base + BktrEControl);
@@ -930,7 +930,7 @@ TYPE
 
 	(** Get contrast value. *)
 	(** return value:	value of contrast multiplication factor *)
-	PROCEDURE GetContrast*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetContrast*(): SIGNED32;
 	VAR temp1, temp2: SIGNED32;
 	BEGIN
 		temp1 := SYSTEM.GET8(vcd.base + BktrContrastLo);
@@ -944,7 +944,7 @@ TYPE
 
 	(** Enable or disable color bars. *)
 	(** enable:	TRUE to enable color bars, FALSE for disabling color bars *)
-	PROCEDURE SetColorBars*(enable: BOOLEAN);
+	PROCEDURE { OVERRIDE } SetColorBars*(enable: BOOLEAN);
 	VAR
 		temp1: SIGNED32;
 	BEGIN
@@ -1066,7 +1066,7 @@ TYPE
 		fps: SIGNED32;	(* frames per second *)
 
 	(* Initialize the VideoCaptureDevice object. *)
-	PROCEDURE &Init*(base: ADDRESS; irq, product, rev: SIGNED32);
+	PROCEDURE (* OVERRIDE *) & Init*(base: ADDRESS; irq, product, rev: SIGNED32);
 	BEGIN
 		SELF.base := base;
 		SELF.irq := irq;
@@ -1322,21 +1322,21 @@ TYPE
 	END HandleInterrupt;
 
 	(** Get Ringbuffer for Vbi (Teletext) data *)
-	PROCEDURE GetVbiBuffer* () : TVDriver.VbiBuffer;
+	PROCEDURE { OVERRIDE } GetVbiBuffer* () : TVDriver.VbiBuffer;
 	BEGIN
 		RETURN vbiBuffer;
 	END GetVbiBuffer;
 
 	(** Get the TVTuner object of this VideoCaptureDevice object. *)
 	(** return value:	TVTuner object of this card *)
-	PROCEDURE GetTuner*(): TVDriver.TVTuner;
+	PROCEDURE { OVERRIDE } GetTuner*(): TVDriver.TVTuner;
 	BEGIN
 		RETURN tuner;
 	END GetTuner;
 
 	(** Get the Audio object of this VideoCaptureDevice object. *)
 	(** return value:	Audio object of this card *)
-	PROCEDURE GetAudio*(): TVDriver.Audio;
+	PROCEDURE { OVERRIDE } GetAudio*(): TVDriver.Audio;
 	BEGIN
 		RETURN audio;
 	END GetAudio;
@@ -2148,7 +2148,7 @@ TYPE
 
 	(** Install a notification handler for RISC events. *)
 	(** handler:	procedure of type NotificationHandler *)
-	PROCEDURE InstallNotificationHandler*(handler: NotificationHandler);
+	PROCEDURE { OVERRIDE } InstallNotificationHandler*(handler: NotificationHandler);
 	BEGIN
 		ASSERT(notificationProcess = NIL);
 		NEW(notificationProcess, handler);
@@ -2332,7 +2332,7 @@ TYPE
 	END DumpRisc;
 
 	(** Opens the VideoCaptureDevice object. *)
-	PROCEDURE VideoOpen*;
+	PROCEDURE { OVERRIDE } VideoOpen*;
 	VAR
 		temp1: SIGNED32;
 	BEGIN
@@ -2396,7 +2396,7 @@ TYPE
 	END VideoOpen;
 
 	(** Closes the VideoCaptureDevice object. *)
-	PROCEDURE VideoClose*;
+	PROCEDURE { OVERRIDE } VideoClose*;
 	BEGIN
 		flags := flags * SET (-(FileHandlers + AosSingle + AosCapMask + AosWantMask));
 
@@ -2415,33 +2415,33 @@ TYPE
 	END VideoClose;
 
 	(** Is Video device already in use? *)
-	PROCEDURE IsVideoOpen* (): BOOLEAN;
+	PROCEDURE { OVERRIDE } IsVideoOpen* (): BOOLEAN;
 	BEGIN
 		RETURN (flags * FileHandlers) # {}
 	END IsVideoOpen;
 
 	(** Is the Vbi signal (Teletext) being captured? *)
-	PROCEDURE IsVbiOpen* (): BOOLEAN;
+	PROCEDURE { OVERRIDE } IsVbiOpen* (): BOOLEAN;
 	BEGIN
 		RETURN (vbiFlags * VbiOpen) # {}
 	END IsVbiOpen;
 
 	(** Set a list of clipping region. *)
-	PROCEDURE SetClipRegion*;
+	PROCEDURE { OVERRIDE } SetClipRegion*;
 	BEGIN
 		KernelLog.String("VideoCaptureDevice.SetClipRegion not implemented yet."); KernelLog.Ln;
 	END SetClipRegion;
 
 	(** Get the device status. *)
 	(** return value:	device status *)
-	PROCEDURE GetStatus*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetStatus*(): SIGNED32;
 	BEGIN
 		RETURN SYSTEM.GET8(base + BktrDStatus);
 	END GetStatus;
 
 	(** Set the video input format *)
 	(** format:	format of video signal (Bt848IFormPalBDGHI etc.) *)
-	PROCEDURE SetInputFormat*(format: SIGNED32);
+	PROCEDURE { OVERRIDE } SetInputFormat*(format: SIGNED32);
 	VAR temp1, temp2: SET;
 	BEGIN
 		temp1 := SYSTEM.VAL(SET, format) * Bt848IFormFormat;
@@ -2473,7 +2473,7 @@ TYPE
 	END SetInputFormat;
 
 	(** Get the video input format. *)
-	PROCEDURE GetInputFormat*(): SIGNED32;
+	PROCEDURE { OVERRIDE } GetInputFormat*(): SIGNED32;
 	VAR
 		temp1: SIGNED32;
 	BEGIN
@@ -2481,13 +2481,13 @@ TYPE
 		RETURN SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, temp1) * Bt848IFormFormat);
 	END GetInputFormat;
 
-	PROCEDURE SetPixelFormat*(format: SIGNED32);
+	PROCEDURE { OVERRIDE } SetPixelFormat*(format: SIGNED32);
 	BEGIN
 		pixFormat := format;
 	END SetPixelFormat;
 
 	(** Select RCA as input. *)
-	PROCEDURE SetInputDev0*;
+	PROCEDURE { OVERRIDE } SetInputDev0*;
 	VAR
 		temp1: SIGNED32;
 	BEGIN
@@ -2510,7 +2510,7 @@ TYPE
 	END SetInputDev0;
 
 	(** Select the tuner as input. *)
-	PROCEDURE SetInputDev1*;
+	PROCEDURE { OVERRIDE } SetInputDev1*;
 	VAR
 		temp1: SIGNED32;
 	BEGIN
@@ -2527,7 +2527,7 @@ TYPE
 	END SetInputDev1;
 
 	(** Select S-VHS (composite camera) as input. *)
-	PROCEDURE SetInputDev2*;
+	PROCEDURE { OVERRIDE } SetInputDev2*;
 	VAR
 		temp1: SIGNED32;
 	BEGIN
@@ -2544,7 +2544,7 @@ TYPE
 	END SetInputDev2;
 
 	(** Select S-VHS as input. *)
-	PROCEDURE SetInputDevSVideo*;
+	PROCEDURE { OVERRIDE } SetInputDevSVideo*;
 	VAR
 		temp1: SIGNED32;
 	BEGIN
@@ -2561,7 +2561,7 @@ TYPE
 	END SetInputDevSVideo;
 
 	(** Select MUX 3 as input. *)
-	PROCEDURE SetInputDev3*;
+	PROCEDURE { OVERRIDE } SetInputDev3*;
 	VAR
 		temp1: SIGNED32;
 	BEGIN
@@ -2587,7 +2587,7 @@ TYPE
 	(** Set the video data buffer. *)
 	(** addr:	physical address of target buffer for video data. *)
 	(** width:	line length of video frame buffer *)
-	PROCEDURE SetVideo*(addr: ADDRESS; width: SIZE);
+	PROCEDURE { OVERRIDE } SetVideo*(addr: ADDRESS; width: SIZE);
 	BEGIN
 		ASSERT(flags * AosCapMask = {});
 		videoAddr := addr(Machine.Address32);
@@ -2596,7 +2596,7 @@ TYPE
 	END SetVideo;
 
 	(** Capture a single frame. *)
-	PROCEDURE CaptureSingle*;
+	PROCEDURE { OVERRIDE } CaptureSingle*;
 	VAR
 		fp: FormatParams;
 		temp1: SIGNED32;
@@ -2657,7 +2657,7 @@ TYPE
 	END CaptureSingle;
 
 	(** Start continuous frame capture. *)
-	PROCEDURE CaptureContinuous*;
+	PROCEDURE { OVERRIDE } CaptureContinuous*;
 	VAR
 		iFlag: SIGNED32;
 		temp1: SIGNED32;
@@ -2696,7 +2696,7 @@ TYPE
 	END CaptureContinuous;
 
 	(** Stop continuous video data capture. *)
-	PROCEDURE StopCaptureContinuous*;
+	PROCEDURE { OVERRIDE } StopCaptureContinuous*;
 	BEGIN
 		IF flags * AosContin # {} THEN
 			(* turn off capture *)
@@ -2711,7 +2711,7 @@ TYPE
 	(** rows:	number of rows of a frame *)
 	(** frames:	number of frames allocated *)
 	(** format:	AosEvenOnly, AosOddOnly, none (interlaced) *)
-	PROCEDURE SetGeometry*(columns, rows, frames: SIGNED32; format: SET);
+	PROCEDURE { OVERRIDE } SetGeometry*(columns, rows, frames: SIGNED32; format: SET);
 	BEGIN
 		ASSERT(flags * AosCapMask = {});	(* can't change parameters while capturing *)
 		ASSERT(~((format * AosOnlyEvenFields # {}) & (format * AosOnlyOddFields # {})));	(* geometry odd or even only *)
@@ -3014,7 +3014,7 @@ TYPE
 		vcd: VideoCaptureDevice;
 
 	(* Initialize the Audio object. *)
-	PROCEDURE &Init*(vcd: TVDriver.VideoCaptureDevice);
+	PROCEDURE (* OVERRIDE *) & Init*(vcd: TVDriver.VideoCaptureDevice);
 	BEGIN
 		ASSERT (vcd IS VideoCaptureDevice);
 		SELF.vcd := vcd(VideoCaptureDevice);
@@ -3258,35 +3258,35 @@ TYPE
 	END MspDplReset;
 
 	(** Select the tuner for audio input. *)
-	PROCEDURE SetAudioTuner*;
+	PROCEDURE { OVERRIDE } SetAudioTuner*;
 	BEGIN
 		IF vcd.reverseMute THEN vcd.audioMUXSelect := 0; ELSE vcd.audioMUXSelect := 3; END;
 		SetAudio;
 	END SetAudioTuner;
 
 	(** Select external input for audio input. *)
-	PROCEDURE SetAudioExtern*;
+	PROCEDURE { OVERRIDE } SetAudioExtern*;
 	BEGIN
 		vcd.audioMUXSelect := 1;
 		SetAudio;
 	END SetAudioExtern;
 
 	(** Select internal input for audio input. *)
-	PROCEDURE SetAudioIntern*;
+	PROCEDURE { OVERRIDE } SetAudioIntern*;
 	BEGIN
 		vcd.audioMUXSelect := 2;
 		SetAudio;
 	END SetAudioIntern;
 
 	(** Set audio to mute. *)
-	PROCEDURE SetAudioMute*;
+	PROCEDURE { OVERRIDE } SetAudioMute*;
 	BEGIN
 		vcd.audioMuteState := TRUE;
 		SetAudio;
 	END SetAudioMute;
 
 	(** Unmute audio. *)
-	PROCEDURE SetAudioUnmute*;
+	PROCEDURE { OVERRIDE } SetAudioUnmute*;
 	BEGIN
 		vcd.audioMuteState := FALSE;
 		SetAudio;
@@ -3294,7 +3294,7 @@ TYPE
 
 	(** Returns the mute state. *)
 	(** return value:	TRUE if audio is mute, otherwise FALSE *)
-	PROCEDURE IsAudioMute*(): BOOLEAN;
+	PROCEDURE { OVERRIDE } IsAudioMute*(): BOOLEAN;
 	BEGIN
 		RETURN vcd.audioMuteState;
 	END IsAudioMute;

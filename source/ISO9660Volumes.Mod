@@ -21,7 +21,7 @@ MODULE ISO9660Volumes;	(* AUTHOR "?/be"; PURPOSE "ISO 9660 volume (ported from N
 			bpc: SIGNED32;	(* bytes per sector *)
 			spc: SIGNED32;	(* sectors per cluster *)
 
-			PROCEDURE Finalize*;
+			PROCEDURE { OVERRIDE } Finalize*;
 			VAR res: INTEGER;
 			BEGIN {EXCLUSIVE}
 				IF debug THEN KernelLog.String("Entering OFSISO9660Volumes.Finalize"); KernelLog.Ln END;
@@ -29,12 +29,12 @@ MODULE ISO9660Volumes;	(* AUTHOR "?/be"; PURPOSE "ISO 9660 volume (ported from N
 				dev.Close(res)
 			END Finalize;
 
-			PROCEDURE Available*(): SIGNED32;
+			PROCEDURE { OVERRIDE } Available*(): SIGNED32;
 			BEGIN
 				RETURN 0
 			END Available;
 
-			PROCEDURE GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
+			PROCEDURE { OVERRIDE } GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
 			VAR res: INTEGER; i: SIGNED32;
 			BEGIN {EXCLUSIVE}
 				ASSERT(dev # NIL, 101);
@@ -47,19 +47,19 @@ MODULE ISO9660Volumes;	(* AUTHOR "?/be"; PURPOSE "ISO 9660 volume (ported from N
 				ASSERT(res = 0, 102)
 			END GetBlock;
 
-			PROCEDURE AllocBlock*(hint: Files.Address; VAR adr: Files.Address);
+			PROCEDURE { OVERRIDE } AllocBlock*(hint: Files.Address; VAR adr: Files.Address);
 			BEGIN HALT(301)
 			END AllocBlock;
 
-			PROCEDURE FreeBlock*(adr: Files.Address);
+			PROCEDURE { OVERRIDE } FreeBlock*(adr: Files.Address);
 			BEGIN HALT(301)
 			END FreeBlock;
 
-			PROCEDURE MarkBlock*(adr: Files.Address);
+			PROCEDURE { OVERRIDE } MarkBlock*(adr: Files.Address);
 			BEGIN HALT(301)
 			END MarkBlock;
 
-			PROCEDURE Marked*(adr: Files.Address): BOOLEAN;
+			PROCEDURE { OVERRIDE } Marked*(adr: Files.Address): BOOLEAN;
 			BEGIN HALT(301)
 			END Marked;
 		END Volume;

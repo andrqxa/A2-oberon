@@ -739,7 +739,7 @@ TYPE
 		BEGIN SELF.imm := imm;
 		END New;
 
-		PROCEDURE Print (w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Print (w : Streams.Writer);
 		BEGIN PrintImm (imm, w);
 		END Print;
 
@@ -754,7 +754,7 @@ TYPE
 		BEGIN SELF.reg := reg;
 		END New;
 
-		PROCEDURE Print (w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Print (w : Streams.Writer);
 		BEGIN PrintReg (w, reg);
 		END Print;
 
@@ -774,7 +774,7 @@ TYPE
 			SELF.disp := disp;
 		END New;
 
-		PROCEDURE Print (w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Print (w : Streams.Writer);
 		BEGIN
 			IF segment # regNONE THEN
 				PrintReg (w, segment); w.String (":")
@@ -825,7 +825,7 @@ TYPE
 		arg : ARRAY maxArgs OF Arg;
 		hidePrefixes: BOOLEAN;
 
-		PROCEDURE &New*(proc : Decoder.ProcedureInfo; stream : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & New*(proc : Decoder.ProcedureInfo; stream : Streams.Writer);
 		BEGIN
 			New^(proc, stream);
 			prefixCount := 0;
@@ -833,7 +833,7 @@ TYPE
 			hidePrefixes := FALSE;
 		END New;
 
-		PROCEDURE PrintOpcodeBytes*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } PrintOpcodeBytes*(w : Streams.Writer);
 		VAR
 			i : SIZE;
 		BEGIN
@@ -847,7 +847,7 @@ TYPE
 			END
 		END PrintOpcodeBytes;
 
-		PROCEDURE PrintInstruction*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } PrintInstruction*(w : Streams.Writer);
 		BEGIN
 			IF ~hidePrefixes THEN
 				IF prREP IN prefixes THEN w.String ("REP ") END;
@@ -1364,7 +1364,7 @@ TYPE
 			END;
 		END PrintInstruction;
 
-		PROCEDURE PrintArguments*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } PrintArguments*(w : Streams.Writer);
 		VAR
 			i: SIGNED32;
 		BEGIN
@@ -1376,7 +1376,7 @@ TYPE
 			END
 		END PrintArguments;
 
-		PROCEDURE PrintVariables*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } PrintVariables*(w : Streams.Writer);
 		VAR
 			i, count: SIGNED32;
 			argMem: ArgMem;
@@ -1410,7 +1410,7 @@ TYPE
 	(* AMD dissassembler*)
 	AMD64Decoder = OBJECT (Decoder.Decoder)
 
-		PROCEDURE NewOpcode*() : Decoder.Opcode;
+		PROCEDURE { OVERRIDE } NewOpcode*() : Decoder.Opcode;
 		VAR
 			opcode : AMD64Opcode;
 		BEGIN
@@ -1418,7 +1418,7 @@ TYPE
 			RETURN opcode
 		END NewOpcode;
 
-		PROCEDURE DecodeThis*(opcode : Decoder.Opcode);
+		PROCEDURE { OVERRIDE } DecodeThis*(opcode : Decoder.Opcode);
 		VAR
 			opc : AMD64Opcode;
 			byte, code, arg, mod, segment, reg, rm, scale, index, base, disp: SIGNED32;

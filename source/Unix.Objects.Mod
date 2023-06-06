@@ -236,7 +236,7 @@ TYPE
 				Machine.Release(Machine.Heaps);
 		END SetMode;
 
-		PROCEDURE FindRoots;
+		PROCEDURE { OVERRIDE } FindRoots;
 		VAR sp, bp, sb, n, a0, a1, adr, pc: ADDRESS; desc {UNTRACED}: Modules.ProcedureDescPointer; i: SIZE; p {UNTRACED}: ANY;
 			contextPos: SIZE; suspended: BOOLEAN;
 		BEGIN {UNTRACKED}
@@ -388,7 +388,7 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 		(*	called from Heaps.InvokeGC, i.e. this is a hidden upcall. However, it is necessary to take the Machine.Objects
 			lock here since writing the set of variables here must not be interrupted, i.e. atomic writing of the set of variables
 			is absolutely necessary.  They system may hang if the lock is not taken. *)
-		PROCEDURE SetgcOngoing( value: BOOLEAN );
+		PROCEDURE { OVERRIDE } SetgcOngoing( value: BOOLEAN );
 		BEGIN
 			IF value THEN
 				Machine.Acquire( Machine.Heaps );

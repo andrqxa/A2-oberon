@@ -84,7 +84,7 @@ TYPE
 	ActiveXPValue* = OBJECT  (* POINTER TO ActiveXPValueDesc;
 	ActiveXPValueDesc* = RECORD (XPValueDesc)*)
 	(XPValue)
-	PROCEDURE (* VAR xp: ActiveXPValueDesc*)GetGenString*( VAR s: ARRAY OF CHAR );
+	PROCEDURE { OVERRIDE } (* VAR xp: ActiveXPValueDesc*) GetGenString*( VAR s: ARRAY OF CHAR );
 	BEGIN
 		COPY( "vyXPValues.AllocActiveXPValue", s )
 	END GetGenString;
@@ -104,12 +104,12 @@ TYPE
 	CalcPXP* = OBJECT  (* POINTER TO CalcPXPDesc;
 	CalcPXPDesc* = RECORD (ActiveXPValueDesc) *)
 	(ActiveXPValue)
-		PROCEDURE (* VAR xp: CalcPXPDesc*)GetGenString*( VAR s: ARRAY OF CHAR );
+		PROCEDURE { OVERRIDE } (* VAR xp: CalcPXPDesc*) GetGenString*( VAR s: ARRAY OF CHAR );
 	BEGIN
 		COPY( "vyXPValues.AllocCalcPXP", s )
 	END GetGenString;
 
-	PROCEDURE (*obj: CalcPXP*)TakeNewSource*( newSource: Objects.Object;  VAR accepted: BOOLEAN );
+	PROCEDURE { OVERRIDE } (*obj: CalcPXP*) TakeNewSource*( newSource: Objects.Object;  VAR accepted: BOOLEAN );
 	BEGIN
 		IF newSource IS vyLongrealVec.tLONGREAL THEN
 			WITH newSource: vyLongrealVec.tLONGREAL DO
@@ -124,12 +124,12 @@ TYPE
 	StdNormalXP* = OBJECT  (* POINTER TO StdNormalXPDesc;
 	StdNormalXPDesc* = RECORD (CalcPXPDesc) *)
 	(CalcPXP)
-		PROCEDURE (* VAR xp: StdNormalXPDesc*)GetGenString*( VAR s: ARRAY OF CHAR );
+		PROCEDURE { OVERRIDE } (* VAR xp: StdNormalXPDesc*) GetGenString*( VAR s: ARRAY OF CHAR );
 	BEGIN
 		COPY( "vyXPValues.AllocStdNormalXP", s )
 	END GetGenString;
 
-	PROCEDURE (* VAR obj: StdNormalXPDesc*)NewData*;
+	PROCEDURE { OVERRIDE } (* VAR obj: StdNormalXPDesc*) NewData*;
 	BEGIN
 		SELF.p.x := jbrtStdNormal.Phi( SELF.x.x );  vyBase.Update( SELF.p )
 	END NewData;
@@ -141,22 +141,22 @@ TYPE
 	(CalcPXP)
 	VAR lambda-: Real;
 
-	PROCEDURE (* VAR xp: ExpXPDesc*)GetGenString*( VAR s: ARRAY OF CHAR );
+	PROCEDURE { OVERRIDE } (* VAR xp: ExpXPDesc*) GetGenString*( VAR s: ARRAY OF CHAR );
 	BEGIN
 		COPY( "vyXPValues.AllocExpXP", s )
 	END GetGenString;
 
-	PROCEDURE (*v: ExpXP*)Store*( VAR M: Objects.FileMsg );
+	PROCEDURE { OVERRIDE } (*v: ExpXP*) Store*( VAR M: Objects.FileMsg );
 	BEGIN
 		Files.WriteLReal( M.R, SELF.lambda );  SELF.Store^( M )
 	END Store;
 
-	PROCEDURE (*v: ExpXP*)Load*( VAR M: Objects.FileMsg );
+	PROCEDURE { OVERRIDE } (*v: ExpXP*) Load*( VAR M: Objects.FileMsg );
 	BEGIN
 		Files.ReadLReal( M.R, SELF.lambda );  SELF.Load^( M )
 	END Load;
 
-	PROCEDURE (* VAR obj: ExpXPDesc*)NewData*;
+	PROCEDURE { OVERRIDE } (* VAR obj: ExpXPDesc*) NewData*;
 	BEGIN
 		SELF.p.x := 1.0 - M.exp( -SELF.lambda * SELF.x.x );  vyBase.Update( SELF.p )
 	END NewData;
@@ -169,12 +169,12 @@ TYPE
 		n-: SIGNED32;
 		values: POINTER TO ARRAY OF Real;
 		cur: SIGNED32;
-		PROCEDURE (* VAR xp: KolSmirXPDesc*)GetGenString*( VAR s: ARRAY OF CHAR );
+		PROCEDURE { OVERRIDE } (* VAR xp: KolSmirXPDesc*)GetGenString*( VAR s: ARRAY OF CHAR );
 	BEGIN
 		COPY( "vyXPValues.AllocKolSmirXP", s )
 	END GetGenString;
 
-	PROCEDURE (* VAR obj: KolSmirXPDesc*)NewData*;
+	PROCEDURE (* VAR obj: KolSmirXPDesc*){ OVERRIDE } NewData*;
 	BEGIN
 		SELF.values[SELF.cur] := SELF.source.x;  INC( SELF.cur );
 		IF SELF.cur >= SELF.n THEN
@@ -183,7 +183,7 @@ TYPE
 		END
 	END NewData;
 
-	PROCEDURE (*obj: KolSmirXP*)TakeNewSource*( newSource: Objects.Object;  VAR accepted: BOOLEAN );
+	PROCEDURE (*obj: KolSmirXP*){ OVERRIDE } TakeNewSource*( newSource: Objects.Object;  VAR accepted: BOOLEAN );
 	BEGIN
 		IF newSource IS vyLongrealVec.tLONGREAL THEN
 			WITH newSource: vyLongrealVec.tLONGREAL DO
@@ -193,7 +193,7 @@ TYPE
 		ELSE accepted := FALSE
 		END
 	END TakeNewSource;
-	PROCEDURE (*v: KolSmirXP*)Store*( VAR M: Objects.FileMsg );
+	PROCEDURE (*v: KolSmirXP*){ OVERRIDE } Store*( VAR M: Objects.FileMsg );
 	VAR i, len: SIGNED32;
 	BEGIN
 		Gadgets.WriteRef( M.R, SELF.lib, SELF.source );  Files.WriteLInt( M.R, SELF.n );  len := LEN( SELF.values^ );  Files.WriteLInt( M.R, len );
@@ -201,7 +201,7 @@ TYPE
 		Files.WriteLInt( M.R, SELF.cur );  SELF.Store^( M )
 	END Store;
 
-	PROCEDURE (*v: KolSmirXP*)Load*( VAR M: Objects.FileMsg );
+	PROCEDURE (*v: KolSmirXP*){ OVERRIDE } Load*( VAR M: Objects.FileMsg );
 	VAR i, len: SIGNED32;  objsub: Objects.Object;
 	BEGIN
 		Gadgets.ReadRef( M.R, SELF.lib, objsub );
@@ -220,12 +220,12 @@ TYPE
 	VAR source-: vyBase.tVector;
 		n-: SIGNED32;
 		a: POINTER TO ARRAY OF Real;
-	PROCEDURE (* VAR xp: KolSmirVecXPDesc*)GetGenString*( VAR s: ARRAY OF CHAR );
+	PROCEDURE (* VAR xp: KolSmirVecXPDesc*){ OVERRIDE } GetGenString*( VAR s: ARRAY OF CHAR );
 	BEGIN
 		COPY( "vyXPValues.AllocKolSmirVecXP", s )
 	END GetGenString;
 
-	PROCEDURE (*v: KolSmirVecXP*)Store*( VAR M: Objects.FileMsg );
+	PROCEDURE (*v: KolSmirVecXP*){ OVERRIDE } Store*( VAR M: Objects.FileMsg );
 	VAR len, i: SIGNED32;
 	BEGIN
 		Gadgets.WriteRef( M.R, SELF.lib, SELF.source );  Files.WriteLInt( M.R, SELF.n );  len := LEN( SELF.a^ );  Files.WriteLInt( M.R, len );
@@ -233,7 +233,7 @@ TYPE
 		SELF.Store^( M )
 	END Store;
 
-	PROCEDURE (*v: KolSmirVecXP*)Load*( VAR M: Objects.FileMsg );
+	PROCEDURE (*v: KolSmirVecXP*){ OVERRIDE } Load*( VAR M: Objects.FileMsg );
 	VAR objsub: Objects.Object;  len, i: SIGNED32;
 	BEGIN
 		Gadgets.ReadRef( M.R, SELF.lib, objsub );
@@ -244,13 +244,13 @@ TYPE
 		SELF.Load^( M )
 	END Load;
 
-	PROCEDURE (* VAR obj: KolSmirVecXPDesc*)NewData*;
+	PROCEDURE (* VAR obj: KolSmirVecXPDesc*){ OVERRIDE } NewData*;
 	BEGIN
 		vyLongrealVec.CopyToArray( SELF.source, SELF.a^ );  vyLongreal.Sort( SELF.n, SELF.a^, 0 );
 		vyKolSmirL.KS1Id( SELF.a^, SELF.n, SELF.x.x, SELF.p.x );  vyBase.Update( SELF.x );  vyBase.Update( SELF.p )
 	END NewData;
 
-	PROCEDURE (*obj: KolSmirVecXP*)TakeNewSource*( newSource: Objects.Object;  VAR accepted: BOOLEAN );
+	PROCEDURE (*obj: KolSmirVecXP*){ OVERRIDE } TakeNewSource*( newSource: Objects.Object;  VAR accepted: BOOLEAN );
 	VAR vec: vyBase.tVector;
 	BEGIN
 		IF newSource IS vyBase.Object THEN

@@ -20,7 +20,7 @@ TYPE
 			Init(diagnostics);
 		END Init2;
 
-		PROCEDURE Instruction*(CONST mnemonic: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Instruction*(CONST mnemonic: ARRAY OF CHAR);
 		VAR i,numberOperands,mnem: SIGNED32; VAR operands: ARRAY 3 OF Operand; instruction: InstructionSet.Instruction;
 			pos: Basic.Position;
 

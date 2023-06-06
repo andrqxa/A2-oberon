@@ -123,7 +123,7 @@ TYPE
 		workQ, resultQ : WorkUnitQ;
 		recalcNeeded, alive, calculating : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR i, x: SIGNED32;
 		BEGIN
 			Init^;
@@ -202,7 +202,7 @@ TYPE
 			calculating := FALSE
 		END Recalc;
 
-		PROCEDURE PointerDown*(x,y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x,y : SIZE; keys : SET);
 		BEGIN
 			IF calculating THEN RETURN END;
 			IF (keys*{0}#{}) THEN
@@ -215,7 +215,7 @@ TYPE
 			END
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x,y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x,y : SIZE; keys : SET);
 		BEGIN
 			IF calculating THEN RETURN END;
 			x1 := x; y1 := y;
@@ -223,7 +223,7 @@ TYPE
 		END PointerMove;
 
 
-		PROCEDURE PointerUp*(x,y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x,y : SIZE; keys : SET);
 		VAR t: FLOAT64;
 		BEGIN
 			IF calculating THEN RETURN END;
@@ -256,13 +256,13 @@ TYPE
 			IF (w > 1) & (h > 1) THEN NeedRecalc END
 		END PrepareBuffer;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			Resized^;
 			PrepareBuffer;
 		END Resized;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR str, t : ARRAY 32 OF CHAR;
 		BEGIN
 			canvas.DrawImage(0, 0, backBmp, WMGraphics.ModeCopy);
@@ -283,13 +283,13 @@ TYPE
 			END;
 		END DrawBackground;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			BEGIN {EXCLUSIVE} alive := FALSE END
 		END Finalize;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			PrepareBuffer;

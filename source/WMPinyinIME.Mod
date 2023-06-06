@@ -397,7 +397,7 @@ TYPE
 			edit.text.onTextChanged.Add(TextChanged)
 		END TextChanged;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			ScheduleHide
@@ -411,7 +411,7 @@ TYPE
 			lastMatch := NIL
 		END Hide;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) THEN
 				IF (x.ext = SELF) THEN Hide
@@ -428,17 +428,17 @@ TYPE
 		w : IMEWindow;
 		table : Table;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			NEW(table); table.LoadCharacters; table.LoadPhrases;
 		END Init;
 
-		PROCEDURE GetName*() : Strings.String;
+		PROCEDURE { OVERRIDE } GetName*() : Strings.String;
 		BEGIN
 			RETURN Strings.NewString(imeName);
 		END GetName;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		VAR x, y: SIZE; pos : SIZE; str : ARRAY 8 OF CHAR;
 		BEGIN
 (*			IF text.isUTF THEN
@@ -454,7 +454,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		END Finalize;
 
 	END IME;

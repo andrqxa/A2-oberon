@@ -26,7 +26,7 @@ BEGIN
 	black:=b; white:=w;
 END set;
 
-PROCEDURE Shade*(VAR x,y,z,r,g,b,a: SREAL);
+PROCEDURE { OVERRIDE } Shade*(VAR x,y,z,r,g,b,a: SREAL);
 VAR
 	i,j,k:SIGNED16;
 BEGIN

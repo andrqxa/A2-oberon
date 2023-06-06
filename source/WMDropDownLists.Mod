@@ -103,7 +103,7 @@ TYPE
 			CSChanged;
 		END New;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32); (** override *)
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32); (** override *)
 		BEGIN
 			canvas.Fill(shadowRect, 04FH, WMGraphics.ModeSrcOverDst);
 			Draw^(canvas, w, h, q);
@@ -132,7 +132,7 @@ TYPE
 			 END;
 		END PropagateSelection;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			isClosed := TRUE;
@@ -159,7 +159,7 @@ TYPE
 			IF (srow # selectRow) THEN grid.SetSelection(0, selectRow, 0, selectRow); END;
 		END SelectEntry;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE); (* override *)
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE); (* override *)
 		VAR handled : BOOLEAN;
 		BEGIN
 			IF ~(Inputs.Release IN flags) THEN
@@ -179,7 +179,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			Close;
@@ -385,7 +385,7 @@ TYPE
 		currentMask : ARRAY 128 OF CHAR; (* protected by model.Acquire/Release *)
 		nofMatches : SIGNED32;
 
-		PROCEDURE &Init*;  (* override *)
+		PROCEDURE (* OVERRIDE *) & Init*;  (* override *)
 		BEGIN
 			Init^;
 			SetNameAsString(StrDropDownList);
@@ -427,13 +427,13 @@ TYPE
 			SetGenerator("WMDropDownLists.GenDropDownList");
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			SetMode(mode.Get());
 		END Initialize;
 
-		PROCEDURE Finalize*; (* override *)
+		PROCEDURE { OVERRIDE } Finalize*; (* override *)
 		BEGIN
 			Finalize^;
 			model.onChanged.Remove(ModelChanged);
@@ -585,7 +585,7 @@ TYPE
 			grid.Release;
 		END UpdateGrid;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY); (* override *)
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY); (* override *)
 		BEGIN
 			IF (property = textColor) THEN
 				Invalidate;

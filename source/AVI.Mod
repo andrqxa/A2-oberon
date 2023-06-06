@@ -117,7 +117,7 @@ IMPORT
 		END Init;
 
 		(* Returns TRUE if the underlying reader supports seeking.  *)
-		PROCEDURE CanSetPos*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*() : BOOLEAN;
 		BEGIN
 			RETURN r.CanSetPos();
 		END CanSetPos;
@@ -204,7 +204,7 @@ IMPORT
 		END Resynch;
 
 		(* Return Pos in Avi File, relativ to the beginning of the stream data *)
-		PROCEDURE Pos*(): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 		BEGIN
 			RETURN r.Pos()
 		END Pos;
@@ -219,7 +219,7 @@ IMPORT
 			Reset;
 		END SetAVIPos;
 
-		PROCEDURE Bytes*(VAR x: ARRAY OF CHAR; ofs, size: SIZE; VAR len: SIZE);
+		PROCEDURE { OVERRIDE } Bytes*(VAR x: ARRAY OF CHAR; ofs, size: SIZE; VAR len: SIZE);
 		VAR
 			min: SIGNED32; res: INTEGER;
 		BEGIN
@@ -228,7 +228,7 @@ IMPORT
 		END Bytes;
 
 		(* Set Byte Position *)
-		PROCEDURE SetPos*(pos : Streams.Position);
+		PROCEDURE { OVERRIDE } SetPos*(pos : Streams.Position);
 		VAR seekType, itemSize: SIGNED32; res : INTEGER;
 		BEGIN
 			IF Debug THEN KernelLog.String("DemuxStream.SetPos"); KernelLog.Ln; END;
@@ -268,7 +268,7 @@ IMPORT
 		videoFramePos: SIGNED32;
 		audioFramePos: SIGNED32;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		BEGIN
 			r := in;
 			res := Codecs.ResFailed;
@@ -900,7 +900,7 @@ IMPORT
 		END GetVideoStreamHeader;
 
 		(* Muss noch generischer werden *)
-		PROCEDURE GetStream*(streamNr: SIGNED32): Codecs.DemuxStream;
+		PROCEDURE { OVERRIDE } GetStream*(streamNr: SIGNED32): Codecs.DemuxStream;
 		VAR
 			(* reader : AVIReader; *)
 			(* reader: Codecs.FileInputStream; *)
@@ -998,13 +998,13 @@ IMPORT
 			RETURN videoFrames;
 		END GetVideoFrames;
 
-		PROCEDURE GetNumberOfStreams*(): SIGNED32;
+		PROCEDURE { OVERRIDE } GetNumberOfStreams*(): SIGNED32;
 		BEGIN
 			RETURN aviHeader.streams;
 		END GetNumberOfStreams;
 
 		(* Could be optimized, as we assume videostream beeing at index 0 and that there is only one *)
-		PROCEDURE GetStreamInfo*(streamNr: SIGNED32): Codecs.AVStreamInfo;
+		PROCEDURE { OVERRIDE } GetStreamInfo*(streamNr: SIGNED32): Codecs.AVStreamInfo;
 		VAR streamInfo : Codecs.AVStreamInfo;
 			i: SIGNED16;
 			tag : ARRAY 4 OF CHAR;
@@ -1051,7 +1051,7 @@ IMPORT
 			RETURN streamInfo
 		END GetStreamInfo;
 
-		PROCEDURE GetStreamType*(streamNr : SIGNED32): SIGNED32;
+		PROCEDURE { OVERRIDE } GetStreamType*(streamNr : SIGNED32): SIGNED32;
 		VAR type : SIGNED32;
 		BEGIN
 			IF streamNr = 0 THEN type :=  Codecs.STVideo;
@@ -1076,7 +1076,7 @@ IMPORT
 
 		END GetInfo;
 
-		PROCEDURE GetData*(streamNr: SIGNED32;  VAR buf:  ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } GetData*(streamNr: SIGNED32;  VAR buf:  ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			rres: BOOLEAN;
 		BEGIN
@@ -1133,7 +1133,7 @@ IMPORT
 			END;
 		END GetData;
 
-		PROCEDURE SetStreamPos*(streamNr: SIGNED32; seekType: SIGNED32; pos: SIGNED32; VAR itemSize: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } SetStreamPos*(streamNr: SIGNED32; seekType: SIGNED32; pos: SIGNED32; VAR itemSize: SIGNED32; VAR res: INTEGER);
 		(* PROCEDURE SetStreamPos*(streamNr, pos : SIGNED32; VAR res: INTEGER); *)
 		VAR
 			n0, n1, n, spos: SIGNED32;

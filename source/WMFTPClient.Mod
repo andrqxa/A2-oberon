@@ -25,7 +25,7 @@ TYPE
 			SELF.ftp := ftp
 		END New;
 
-		PROCEDURE OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			IF ftp = NIL THEN RETURN END;
@@ -35,7 +35,7 @@ TYPE
 			ELSE w := outw END
 		END OpenPut;
 
-		PROCEDURE ClosePut*(VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } ClosePut*(VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			KernelLog.String("ClosePut called"); KernelLog.Ln;
@@ -54,7 +54,7 @@ TYPE
 			SELF.ftp := ftp
 		END New;
 
-		PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 		VAR di : FTPDropInterface;
 		BEGIN
 			IF type = WMDropTarget.TypeFiles THEN
@@ -93,7 +93,7 @@ TYPE
 			connected := FALSE;
 		END New;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS KillerMsg) THEN Close
@@ -241,7 +241,7 @@ TYPE
 			SetBusy(FALSE)
 		END Disconnect;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			IF ftp # NIL THEN Disconnect END;
 			Close^;
@@ -350,7 +350,7 @@ TYPE
 		curList : FTPClient.FTPListing;
 		nofEntries : SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR label : WMStandardComponents.Label;
 			panel : WMStandardComponents.Panel;
 		BEGIN
@@ -550,7 +550,7 @@ TYPE
 			path.Set(Strings.NewString(str))
 		END PathChanged;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			IF data = path THEN
 				owner.ChangeDir(path.Get());

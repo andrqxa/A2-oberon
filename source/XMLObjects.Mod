@@ -49,19 +49,19 @@ TYPE
 			nofElems := 0
 		END Init;
 
-		PROCEDURE GetNumberOfElements*(): SIGNED32;
+		PROCEDURE { OVERRIDE } GetNumberOfElements*(): SIGNED32;
 		BEGIN
 			RETURN nofElems
 		END GetNumberOfElements;
 
-		PROCEDURE GetEnumerator*(): Enumerator;
+		PROCEDURE { OVERRIDE } GetEnumerator*(): Enumerator;
 		VAR le: ListEnumerator;
 		BEGIN
 			NEW(le, SELF);
 			RETURN le
 		END GetEnumerator;
 
-		PROCEDURE Add*(p: ANY);
+		PROCEDURE { OVERRIDE } Add*(p: ANY);
 		VAR newListElem: ListElem;
 		BEGIN {EXCLUSIVE}
 			IF p # NIL THEN
@@ -77,7 +77,7 @@ TYPE
 			END
 		END Add;
 
-		PROCEDURE Remove*(p: ANY);
+		PROCEDURE { OVERRIDE } Remove*(p: ANY);
 		VAR le: ListElem;
 		BEGIN {EXCLUSIVE}
 			IF (p # NIL) & (first # NIL) THEN
@@ -110,12 +110,12 @@ TYPE
 			NEW(elems, 1)
 		END Init;
 
-		PROCEDURE GetNumberOfElements*(): SIGNED32;
+		PROCEDURE { OVERRIDE } GetNumberOfElements*(): SIGNED32;
 		BEGIN
 			RETURN nofElems
 		END GetNumberOfElements;
 
-		PROCEDURE GetEnumerator*(): Enumerator;
+		PROCEDURE { OVERRIDE } GetEnumerator*(): Enumerator;
 		VAR ace: ArrayEnumerator;
 		BEGIN
 			NEW(ace, elems);
@@ -132,7 +132,7 @@ TYPE
 			END
 		END Grow;
 
-		PROCEDURE Add*(p: ANY);
+		PROCEDURE { OVERRIDE } Add*(p: ANY);
 		BEGIN {EXCLUSIVE}
 			IF p # NIL THEN
 				IF nofElems = LEN(elems) THEN Grow() END;
@@ -141,7 +141,7 @@ TYPE
 			END
 		END Add;
 
-		PROCEDURE Remove*(p: ANY);
+		PROCEDURE { OVERRIDE } Remove*(p: ANY);
 		VAR i: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			i := 0;
@@ -241,19 +241,19 @@ TYPE
 			current := list.first
 		END Init;
 
-		PROCEDURE HasMoreElements*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } HasMoreElements*(): BOOLEAN;
 		BEGIN
 			RETURN current # NIL
 		END HasMoreElements;
 
-		PROCEDURE GetNext*(): ANY;
+		PROCEDURE { OVERRIDE } GetNext*(): ANY;
 		VAR p: ANY;
 		BEGIN
 			IF HasMoreElements() THEN p := current.elem; current := current.next; ELSE p := NIL; END;
 			RETURN p
 		END GetNext;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN
 			Init(coll)
 		END Reset;
@@ -271,12 +271,12 @@ TYPE
 			current := 0
 		END Init;
 
-		PROCEDURE HasMoreElements*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } HasMoreElements*(): BOOLEAN;
 		BEGIN
 			RETURN (current < LEN(array)) & (array[current] # NIL)
 		END HasMoreElements;
 
-		PROCEDURE GetNext*(): ANY;
+		PROCEDURE { OVERRIDE } GetNext*(): ANY;
 		VAR p: ANY;
 		BEGIN
 			IF HasMoreElements() THEN
@@ -287,7 +287,7 @@ TYPE
 			RETURN p
 		END GetNext;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN
 			Init(array)
 		END Reset;
@@ -332,12 +332,12 @@ TYPE
 			NEW(elems, 16)
 		END Init;
 
-		PROCEDURE GetNumberOfElements*(): SIGNED32;
+		PROCEDURE { OVERRIDE } GetNumberOfElements*(): SIGNED32;
 		BEGIN
 			RETURN nofElems
 		END GetNumberOfElements;
 
-		PROCEDURE Get*(key: ARRAY OF CHAR): ANY;
+		PROCEDURE { OVERRIDE } Get*(key: ARRAY OF CHAR): ANY;
 		VAR i: SIGNED32;
 		BEGIN
 			i := 0;
@@ -349,7 +349,7 @@ TYPE
 			END
 		END Get;
 
-		PROCEDURE GetEnumerator*(): Enumerator;
+		PROCEDURE { OVERRIDE } GetEnumerator*(): Enumerator;
 		VAR ace: ArrayEnumerator;
 		BEGIN
 			NEW(ace, elems);
@@ -366,7 +366,7 @@ TYPE
 			END
 		END Grow;
 
-		PROCEDURE Add*(key: ARRAY OF CHAR; p: ANY);
+		PROCEDURE { OVERRIDE } Add*(key: ARRAY OF CHAR; p: ANY);
 		BEGIN {EXCLUSIVE}
 			IF Get(key) = NIL THEN
 				IF nofElems = LEN(elems) THEN Grow() END;
@@ -376,7 +376,7 @@ TYPE
 			END
 		END Add;
 
-		PROCEDURE Remove*(key: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Remove*(key: ARRAY OF CHAR);
 		VAR i: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			i := 0;

@@ -738,27 +738,27 @@ TYPE
 			Kill(errorcode);
 		END Unmount;
 
-		PROCEDURE AllocBlock*(hint: Address; VAR adr: Address);
+		PROCEDURE { OVERRIDE } AllocBlock*(hint: Address; VAR adr: Address);
 		END AllocBlock;
 
-		PROCEDURE FreeBlock*(adr: Address);
+		PROCEDURE { OVERRIDE } FreeBlock*(adr: Address);
 		END FreeBlock;
 
-		PROCEDURE MarkBlock*(adr: Address);
+		PROCEDURE { OVERRIDE } MarkBlock*(adr: Address);
 		END MarkBlock;
 
-		PROCEDURE Marked*(adr: Address): BOOLEAN;
+		PROCEDURE { OVERRIDE } Marked*(adr: Address): BOOLEAN;
 		END Marked;
 
-		PROCEDURE Available*(): SIGNED32;
+		PROCEDURE { OVERRIDE } Available*(): SIGNED32;
 		BEGIN
 			RETURN 0;
 		END Available;
 
-		PROCEDURE GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
 		END GetBlock;
 
-		PROCEDURE PutBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } PutBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
 		END PutBlock;
 
 	END Proxy;

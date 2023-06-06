@@ -9,13 +9,13 @@ CONST
 TYPE
 	IME* = OBJECT(WMInputMethods.IME)
 
-		PROCEDURE GetName*() : Strings.String;
+		PROCEDURE { OVERRIDE } GetName*() : Strings.String;
 		BEGIN
 			RETURN Strings.NewString(imeName);
 		END GetName;
 
 		(* Map characters from US-Keyboard to arabic keyboard *)
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		VAR multiChar : ARRAY 2 OF SIGNED32;
 		BEGIN
 			CASE ucs OF

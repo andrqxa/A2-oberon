@@ -42,7 +42,7 @@ END Array;
 (** Represents an array of pointer type. *)
 TYPE PointerArray* = OBJECT {DISPOSABLE,PLAIN} (Array)
 
-	PROCEDURE Trace-;
+	PROCEDURE { OVERRIDE } Trace-;
 	PROCEDURE MarkPointerArray (length: SIZE; address: ADDRESS) EXTERN "GarbageCollector.MarkPointerArray";
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		MarkPointerArray (length, data);
@@ -53,7 +53,7 @@ END PointerArray;
 (** Represents an array of record type. *)
 TYPE RecordArray* = OBJECT {DISPOSABLE,PLAIN} (Array)
 
-	PROCEDURE Trace-;
+	PROCEDURE { OVERRIDE } Trace-;
 	PROCEDURE MarkRecordArray (address: ADDRESS; length: SIZE; descriptor {UNTRACED}: Descriptor) EXTERN "GarbageCollector.MarkRecordArray" ;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		MarkRecordArray (data, length, descriptor);
@@ -63,7 +63,7 @@ END RecordArray;
 
 TYPE DelegateArray* = OBJECT {DISPOSABLE,PLAIN} (Array)
 
-	PROCEDURE Trace-;
+	PROCEDURE { OVERRIDE } Trace-;
 	PROCEDURE MarkDelegateArray (length: SIZE; address: ADDRESS) EXTERN "GarbageCollector.MarkDelegateArray" ;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		MarkDelegateArray (length, data);

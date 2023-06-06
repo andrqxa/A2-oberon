@@ -40,18 +40,18 @@ TYPE
 		
 		
 		(* disable methods not allowed in encrypted streams ------- *)
-		PROCEDURE CanSetPos*( ): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*( ): BOOLEAN;
 		BEGIN
 			RETURN FALSE
 		END CanSetPos;
 
-		PROCEDURE SetPos*( pos: Position );
+		PROCEDURE { OVERRIDE } SetPos*( pos: Position );
 		BEGIN
 			HALT( 1234 )
 		END SetPos;
 		
 		
-		PROCEDURE Pos*( ): Position;
+		PROCEDURE { OVERRIDE } Pos*( ): Position;
 		BEGIN
 			RETURN  out.Pos()
 		END Pos;
@@ -94,12 +94,12 @@ TYPE
 		
 		
 		(* disable methods that are not allowed in encrypted streams ------- *)
-		PROCEDURE CanSetPos*( ): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*( ): BOOLEAN;
 		BEGIN
 			RETURN FALSE
 		END CanSetPos;
 
-		PROCEDURE SetPos*( pos: Position );
+		PROCEDURE { OVERRIDE } SetPos*( pos: Position );
 		BEGIN
 			HALT( 1234 )
 		END SetPos;

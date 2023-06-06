@@ -347,7 +347,7 @@ TYPE
 		clTextDefault-, clTextHover-, clTextSelected- : WMProperties.ColorProperty;
 		fontHeight- : WMProperties.Int32Property;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrTreeView);
@@ -391,11 +391,11 @@ TYPE
 			hdelta := 0
 		END Init;
 
-		PROCEDURE FocusReceived*;
+		PROCEDURE { OVERRIDE } FocusReceived*;
 		BEGIN FocusReceived^
 		END FocusReceived;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN FocusLost^
 		END FocusLost;
 
@@ -416,7 +416,7 @@ TYPE
 			RETURN tree
 		END GetTree;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			Invalidate;
@@ -613,7 +613,7 @@ TYPE
 		END RenderTreeNode;
 
 		(* draw tree *)
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR y, height, i : SIZE; clip : Rect.Rectangle;
 
 			PROCEDURE RenderTree(x : TreeNode; level : SIZE);
@@ -715,7 +715,7 @@ TYPE
 			END;
 		END GetPrevVisibleNode;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; VAR keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; VAR keysym : SIZE);
 		VAR state : SET; selNode : TreeNode;
 
 			PROCEDURE Up;
@@ -755,7 +755,7 @@ TYPE
 			END
 		END KeyEvent;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			ASSERT(IsCallFromSequencer());
 			selecting := 0 IN keys;
@@ -766,7 +766,7 @@ TYPE
 			downY := y
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR new : TreeNode;
 		BEGIN
 			new := GetNodeAtPos(downX, downY);
@@ -794,7 +794,7 @@ TYPE
 			onMiddleClickNode.Call(node);
 		END MiddleClickNode;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR new : TreeNode; tn : TreeNode; w : SIZE;
 		BEGIN
 			tree.Acquire;
@@ -836,7 +836,7 @@ TYPE
 			draggedNode := NIL;
 		END PointerUp;
 
-		PROCEDURE DragOver*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragOver*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR node : TreeNode;
 		BEGIN
 			tree.Acquire;
@@ -856,7 +856,7 @@ TYPE
 			tree.Release
 		END DragOver;
 
-		PROCEDURE WheelMove*(dz: SIZE); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } WheelMove*(dz: SIZE); (** PROTECTED *)
 		BEGIN
 			SetFirstLine(MIN(MAX(firstLine + dz, 0), lines - 1), TRUE)
 		END WheelMove;
@@ -869,7 +869,7 @@ TYPE
 			END
 		END SelectNode;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			IF hoverNode # NIL THEN hoverNode := NIL; Invalidate END
 		END PointerLeave;

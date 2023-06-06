@@ -53,7 +53,7 @@ TYPE
 		interfaceType : SIGNED32;
 		deviceId : ARRAY 256 OF CHAR;
 
-		PROCEDURE Connect() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect() : BOOLEAN;
 		BEGIN
 			defaultpipe := device.GetPipe(0);
 			IF defaultpipe = NIL THEN
@@ -83,7 +83,7 @@ TYPE
 			RETURN TRUE;
 		END Connect;
 
-		PROCEDURE Disconnect;
+		PROCEDURE { OVERRIDE } Disconnect;
 		BEGIN
 			KernelLog.String("UsbPrinter: "); KernelLog.String(name); KernelLog.String(" disconnected."); KernelLog.Ln;
 		END Disconnect;

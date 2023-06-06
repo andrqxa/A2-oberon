@@ -354,7 +354,7 @@ TYPE
 			RETURN panel;
 		END CreateStatusPanel;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			state := Terminating; timer.Wakeup;
 			BEGIN {EXCLUSIVE} AWAIT(state = Terminated); END;
@@ -374,7 +374,7 @@ TYPE
 			IF events # NIL THEN events.Clear; END;
 		END ClearLog;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR panel : WMStandardComponents.Panel;
 		BEGIN
 			Init^;
@@ -495,7 +495,7 @@ TYPE
 			RETURN panel;
 		END CreateForm;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS KillerMsg) THEN Close
@@ -525,7 +525,7 @@ TYPE
 			IncCount;
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;

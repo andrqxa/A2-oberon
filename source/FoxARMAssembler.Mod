@@ -164,7 +164,7 @@ TYPE
 		BEGIN RETURN ThisSymbol(Scanner.Unequal) & GetPlainValue(immediateValue)
 		END GetImmediateValue;
 
-		PROCEDURE Instruction*(CONST mnemonic: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Instruction*(CONST mnemonic: ARRAY OF CHAR);
 		VAR
 			instruction: InstructionSet.Instruction;
 			operands: ARRAY InstructionSet.MaxOperands OF InstructionSet.Operand;

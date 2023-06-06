@@ -23,7 +23,7 @@ BEGIN
 	register;
 END new;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 (*
 BEGIN
 	cell.erase;

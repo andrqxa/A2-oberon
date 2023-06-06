@@ -198,7 +198,7 @@ TYPE
 		bevelWidth* : SIGNED32;
 		bevelColor* : WMGraphics.Color;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		BEGIN
 			IF ~visible.Get() THEN RETURN END;
 			Acquire;

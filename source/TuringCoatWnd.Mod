@@ -54,7 +54,7 @@ TYPE
 			IncCount;
 		END New;
 
-		PROCEDURE Handle*(VAR m: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m: WMMessages.Message);
 		BEGIN
 			IF (m.msgType = WMMessages.MsgExt) & (m.ext # NIL) & (m.ext IS KillerMsg) THEN
 				Close;
@@ -62,12 +62,12 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32);
 		BEGIN
 			Draw^(canvas, w, h, 0)
 		END Draw;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			alive := FALSE;
 			BEGIN {EXCLUSIVE} AWAIT(dead); END;

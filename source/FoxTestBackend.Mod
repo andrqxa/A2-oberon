@@ -17,7 +17,7 @@ TYPE
 	VAR
 		fileName : Files.FileName;
 
-		PROCEDURE ProcessSyntaxTreeModule*(module: SyntaxTree.Module): Formats.GeneratedModule;
+		PROCEDURE { OVERRIDE } ProcessSyntaxTreeModule*(module: SyntaxTree.Module): Formats.GeneratedModule;
 		VAR
 			procedure: SyntaxTree.Procedure;
 			procedureName, moduleName, moduleContext: Basic.SectionName;
@@ -85,13 +85,13 @@ TYPE
 			RETURN NIL;
 		END ProcessSyntaxTreeModule;
 
-		PROCEDURE DefineOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } DefineOptions*(options: Options.Options);
 		BEGIN
 			DefineOptions^(options);
 			options.Add(0X,"testFile",Options.String);
 		END DefineOptions;
 
-		PROCEDURE GetOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } GetOptions*(options: Options.Options);
 		VAR file: Files.File; writer: Files.Writer;
 		BEGIN
 			GetOptions^(options);

@@ -17,7 +17,7 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END New;
 		(* Overwrite draw procedure because we do not want any interpolation *)
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			Draw^(canvas, w, h, 0);
 		END Draw;

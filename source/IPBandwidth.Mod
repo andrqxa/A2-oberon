@@ -122,13 +122,13 @@ TYPE TCPLink = OBJECT (Link)
 
 	VAR service, connection: TCP.Connection;
 
-	PROCEDURE Connect;
+	PROCEDURE { OVERRIDE } Connect;
 	BEGIN
 		NEW (connection);
 		connection.Open (TCP.NilPort, address, port, result);
 	END Connect;
 
-	PROCEDURE Listen;
+	PROCEDURE { OVERRIDE } Listen;
 	BEGIN
 		NEW (service);
 		service.Open (port, IP.NilAdr, TCP.NilPort, result);
@@ -138,13 +138,13 @@ TYPE TCPLink = OBJECT (Link)
 		END;
 	END Listen;
 
-	PROCEDURE SendBytes (): SIZE;
+	PROCEDURE { OVERRIDE } SendBytes (): SIZE;
 	BEGIN
 		connection.Send (buffer, 0, LEN (buffer), FALSE, result);
 		RETURN LEN (buffer);
 	END SendBytes;
 
-	PROCEDURE ReceiveBytes (): SIZE;
+	PROCEDURE { OVERRIDE } ReceiveBytes (): SIZE;
 	VAR received: SIZE;
 	BEGIN
 		IF connection.Available () # 0 THEN
@@ -154,7 +154,7 @@ TYPE TCPLink = OBJECT (Link)
 		RETURN 0;
 	END ReceiveBytes;
 
-	PROCEDURE Close;
+	PROCEDURE { OVERRIDE } Close;
 	BEGIN
 		connection.Close;
 		IF service # NIL THEN service.Close END;
@@ -166,23 +166,23 @@ TYPE UDPLink = OBJECT (Link)
 
 	VAR socket: UDP.Socket;
 
-	PROCEDURE Connect;
+	PROCEDURE { OVERRIDE } Connect;
 	BEGIN
 		NEW (socket, UDP.NilPort, result);
 	END Connect;
 
-	PROCEDURE Listen;
+	PROCEDURE { OVERRIDE } Listen;
 	BEGIN
 		NEW (socket, port, result);
 	END Listen;
 
-	PROCEDURE SendBytes (): SIZE;
+	PROCEDURE { OVERRIDE } SendBytes (): SIZE;
 	BEGIN
 		socket.Send (address, port, buffer, 0, LEN (buffer), result);
 		RETURN LEN (buffer);
 	END SendBytes;
 
-	PROCEDURE ReceiveBytes (): SIZE;
+	PROCEDURE { OVERRIDE } ReceiveBytes (): SIZE;
 	VAR address: IP.Adr; port: INTEGER; received: SIZE;
 	BEGIN
 		socket.Receive (buffer, 0, LEN (buffer), 0, address, port, received, result);
@@ -191,7 +191,7 @@ TYPE UDPLink = OBJECT (Link)
 		RETURN 0;
 	END ReceiveBytes;
 
-	PROCEDURE Close;
+	PROCEDURE { OVERRIDE } Close;
 	BEGIN socket.Close;
 	END Close;
 

@@ -961,7 +961,7 @@ TYPE
 			RETURN status;
 		END ExecuteTransfer;
 
-		PROCEDURE Transfer*(bufferLen, offset : SIZE; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
+		PROCEDURE { OVERRIDE } Transfer*(bufferLen, offset : SIZE; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
 		VAR copy : BOOLEAN;
 		BEGIN
 			ASSERT(type # PipeControl);
@@ -1002,7 +1002,7 @@ TYPE
 		END CheckBuffer;
 
 		(** For control transfers (only for Control Pipes) *)
-		PROCEDURE Request*(bmRequestType : SET;  bRequest, wValue, wIndex : SIGNED32; wLength : SIZE; VAR buffer : Usbdi.Buffer) : Usbdi. Status;
+		PROCEDURE { OVERRIDE } Request*(bmRequestType : SET;  bRequest, wValue, wIndex : SIGNED32; wLength : SIZE; VAR buffer : Usbdi.Buffer) : Usbdi. Status;
 		VAR dir : SIGNED32; copy : BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			ASSERT(type = PipeControl);
@@ -1039,7 +1039,7 @@ TYPE
 			RETURN status;
 		END Request;
 
-		PROCEDURE ClearHalt*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } ClearHalt*(): BOOLEAN;
 		CONST FsEndpointHalt = 0; SrClearFeature = 1;
 		VAR res : BOOLEAN;
 		BEGIN
@@ -1053,7 +1053,7 @@ TYPE
 			RETURN res;
 		END ClearHalt;
 
-		PROCEDURE IsHalted*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHalted*() : BOOLEAN;
 		CONST SrGetStatus = 0; Halted = {0};
 		VAR buffer : Usbdi.BufferPtr; status : SET;
 		BEGIN
@@ -1069,23 +1069,23 @@ TYPE
 			RETURN FALSE;
 		END IsHalted;
 
-		PROCEDURE GetActLen*() : SIZE;
+		PROCEDURE { OVERRIDE } GetActLen*() : SIZE;
 		BEGIN
 			RETURN actLen;
 		END GetActLen;
 
-		PROCEDURE SetTimeout*(timeout : SIGNED32);
+		PROCEDURE { OVERRIDE } SetTimeout*(timeout : SIGNED32);
 		BEGIN
 			SELF.timeout := timeout;
 		END SetTimeout;
 
-		PROCEDURE GetStatus*(VAR len : SIZE) : Usbdi.Status;
+		PROCEDURE { OVERRIDE } GetStatus*(VAR len : SIZE) : Usbdi.Status;
 		BEGIN
 			controller.UpdatePipeStatus(SELF); len := actLen;
 			RETURN status;
 		END GetStatus;
 
-		PROCEDURE SetCompletionHandler*(handler: Usbdi.CompletionHandler);
+		PROCEDURE { OVERRIDE } SetCompletionHandler*(handler: Usbdi.CompletionHandler);
 		BEGIN
 			ioc := TRUE; (* set Interrupt On Completion Bit in TD's *)
 			mode := Usbdi.MinCpu;
@@ -1187,7 +1187,7 @@ TYPE
 			END;
 		END ShowData;
 
-		PROCEDURE Show*(detailed : BOOLEAN);
+		PROCEDURE { OVERRIDE } Show*(detailed : BOOLEAN);
 		BEGIN
 			IF Debug.Trace THEN
 			CASE type OF

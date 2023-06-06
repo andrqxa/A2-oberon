@@ -993,7 +993,7 @@ TYPE
 			NEW(buffer, bufSize);
 		END New;
 
-		PROCEDURE GetBuffer(VAR buf: Buffer): SIZE;
+		PROCEDURE { OVERRIDE } GetBuffer(VAR buf: Buffer): SIZE;
 		VAR
 			amount, rem: SIZE;
 		BEGIN
@@ -1025,7 +1025,7 @@ TYPE
 			RETURN amount;
 		END GetBuffer;
 
-		PROCEDURE ReleaseBuffer;
+		PROCEDURE { OVERRIDE } ReleaseBuffer;
 			(* nothing to do for sequential reader *)
 		END ReleaseBuffer;
 	END UnbufferedReader;
@@ -1075,7 +1075,7 @@ TYPE
 			aborted := TRUE;
 		END Abort;
 
-		PROCEDURE GetBuffer(VAR buf: Buffer): SIZE;
+		PROCEDURE { OVERRIDE } GetBuffer(VAR buf: Buffer): SIZE;
 		VAR
 			rBuffer: ReadBuffer;
 		BEGIN
@@ -1130,7 +1130,7 @@ TYPE
 
 		END ReadTrack;
 
-		PROCEDURE ReleaseBuffer;
+		PROCEDURE { OVERRIDE } ReleaseBuffer;
 		BEGIN
 			cIndex := (cIndex + 1) MOD nBuffers;
 		END ReleaseBuffer;

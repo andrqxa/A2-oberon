@@ -24,7 +24,7 @@ TYPE
 		channel : SoundDevices.MixerChannel;
 		device : SoundDevices.Driver;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(deviceName, PrototypedeviceName, NIL, NIL); properties.Add(deviceName);
@@ -57,7 +57,7 @@ TYPE
 			END
 		END MuteChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR s : String; dn, cn : ARRAY 128 OF CHAR;
 		BEGIN
 			RecacheProperties^;
@@ -112,7 +112,7 @@ TYPE
 			END
 		END FindChannel;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF device # NIL THEN device.UnregisterMixerChangeListener(MixerChangeListener) END;
@@ -166,13 +166,13 @@ TYPE
 			RETURN panel
 		END CreateForm;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			DecCount;
 			Close^;
 		END Close;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 			ELSE Handle^(x)

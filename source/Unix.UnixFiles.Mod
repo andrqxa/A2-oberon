@@ -68,7 +68,7 @@ TYPE
 				SELF.fs := realFS;
 			END Init;
 
-			PROCEDURE New0(CONST name: ARRAY OF CHAR ): Files.File;
+			PROCEDURE { OVERRIDE } New0(CONST name: ARRAY OF CHAR ): Files.File;
 			VAR f: Files.File;
 			BEGIN
 				f := fs.New0( name );
@@ -76,7 +76,7 @@ TYPE
 				RETURN f;
 			END New0;
 
-			PROCEDURE Old0(CONST name: ARRAY OF CHAR ): Files.File;
+			PROCEDURE { OVERRIDE } Old0(CONST name: ARRAY OF CHAR ): Files.File;
 			VAR f: Files.File;
 			BEGIN
 				f :=  fs.Old0( name );
@@ -84,38 +84,38 @@ TYPE
 				RETURN f;
 			END Old0;
 
-			PROCEDURE Delete0(CONST name: ARRAY OF CHAR;  VAR key: SIGNED32; VAR res: INTEGER );
+			PROCEDURE { OVERRIDE } Delete0(CONST name: ARRAY OF CHAR;  VAR key: SIGNED32; VAR res: INTEGER );
 			BEGIN
 				fs.Delete0( name, key, res );
 			END Delete0;
 
-			PROCEDURE Rename0(CONST old, new: ARRAY OF CHAR;  fold: Files.File;  VAR res: INTEGER );
+			PROCEDURE { OVERRIDE } Rename0(CONST old, new: ARRAY OF CHAR;  fold: Files.File;  VAR res: INTEGER );
 			BEGIN
 				fs.Rename0( old, new, fold, res );
 			END Rename0;
 
-			PROCEDURE Enumerate0(CONST mask: ARRAY OF CHAR;  flags: SET;  enum: Files.Enumerator );
+			PROCEDURE { OVERRIDE } Enumerate0(CONST mask: ARRAY OF CHAR;  flags: SET;  enum: Files.Enumerator );
 			BEGIN
 				fs.Enumerate0( mask, flags, enum );
 			END Enumerate0;
 
-			PROCEDURE FileKey(CONST name: ARRAY OF CHAR ): SIGNED32;
+			PROCEDURE { OVERRIDE } FileKey(CONST name: ARRAY OF CHAR ): SIGNED32;
 			VAR
 			BEGIN
 				RETURN fs.FileKey( name );
 			END FileKey;
 
-			PROCEDURE CreateDirectory0(CONST name: ARRAY OF CHAR;  VAR res: INTEGER );
+			PROCEDURE { OVERRIDE } CreateDirectory0(CONST name: ARRAY OF CHAR;  VAR res: INTEGER );
 			BEGIN
 				fs.CreateDirectory0( name, res );
 			END CreateDirectory0;
 
-			PROCEDURE RemoveDirectory0(CONST name: ARRAY OF CHAR;  force: BOOLEAN;  VAR key: SIGNED32; VAR res: INTEGER );
+			PROCEDURE { OVERRIDE } RemoveDirectory0(CONST name: ARRAY OF CHAR;  force: BOOLEAN;  VAR key: SIGNED32; VAR res: INTEGER );
 			BEGIN
 				fs.RemoveDirectory0( name, force, key, res );
 			END RemoveDirectory0;
 
-			PROCEDURE Has(CONST name: ARRAY OF CHAR; VAR fullName: ARRAY OF CHAR; VAR flags: SET): BOOLEAN;
+			PROCEDURE { OVERRIDE } Has(CONST name: ARRAY OF CHAR; VAR fullName: ARRAY OF CHAR; VAR flags: SET): BOOLEAN;
 			BEGIN
 				RETURN fs.Has(name, fullName, flags);
 			END Has;
@@ -217,7 +217,7 @@ TYPE
 				END Init;
 
 
-				PROCEDURE New0*(CONST name: ARRAY OF CHAR ): Files.File;
+				PROCEDURE { OVERRIDE } New0*(CONST name: ARRAY OF CHAR ): Files.File;
 				VAR f: File; stat: Unix.Status;
 					  res, err: SIGNED32;
 					  path, nameonly: ARRAY 512 OF CHAR;
@@ -243,7 +243,7 @@ TYPE
 
 
 
-				PROCEDURE Old0*(CONST name: ARRAY OF CHAR ): Files.File;
+				PROCEDURE { OVERRIDE } Old0*(CONST name: ARRAY OF CHAR ): Files.File;
 				VAR f: File;  stat: Unix.Status;  fd, r, pos: SIGNED32;
 					oflags: SET32;  nextdir, path: Filename;
 				BEGIN  {EXCLUSIVE}
@@ -299,7 +299,7 @@ TYPE
 				END Old0;
 
 				(** Return the unique non-zero key of the named file, if it exists. *)
-				PROCEDURE FileKey*(CONST name: ARRAY OF CHAR ): SIGNED32;
+				PROCEDURE { OVERRIDE } FileKey*(CONST name: ARRAY OF CHAR ): SIGNED32;
 				(* 	Can not be used for Unix files as SIGNED32 is too small.
 					In the Unix filesystem a file is identified by
 					- dev	(64 bit (Linux), 32 bit (Solaris, Darwin))	+
@@ -309,7 +309,7 @@ TYPE
 					RETURN 0
 				END FileKey;
 
-				PROCEDURE Delete0*(CONST name: ARRAY OF CHAR;  VAR key: SIGNED32; VAR res: INTEGER );
+				PROCEDURE { OVERRIDE } Delete0*(CONST name: ARRAY OF CHAR;  VAR key: SIGNED32; VAR res: INTEGER );
 				VAR r: SIGNED32;
 				BEGIN  {EXCLUSIVE}
 					r := Unix.unlink( ADDRESSOF( name ) );
@@ -374,13 +374,13 @@ TYPE
 					RETURN fo;
 				END TryRename;
 
-				PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR;  f: Files.File;  VAR res: INTEGER );
+				PROCEDURE { OVERRIDE } Rename0*(CONST old, new: ARRAY OF CHAR;  f: Files.File;  VAR res: INTEGER );
 				VAR of: SIGNED32;
 				BEGIN
 					of := TryRename(old, new, f, res);
 				END Rename0;
 
-				PROCEDURE CreateDirectory0*(CONST path: ARRAY OF CHAR;  VAR res: INTEGER );
+				PROCEDURE { OVERRIDE } CreateDirectory0*(CONST path: ARRAY OF CHAR;  VAR res: INTEGER );
 				VAR r: SIGNED32;
 				BEGIN {EXCLUSIVE}
 					r := Unix.mkdir( ADDRESSOF( path ), Unix.rwxrwxrwx );
@@ -389,7 +389,7 @@ TYPE
 					END
 				END CreateDirectory0;
 
-				PROCEDURE RemoveDirectory0*(CONST path: ARRAY OF CHAR;  force: BOOLEAN;  VAR key: SIGNED32; VAR res: INTEGER );
+				PROCEDURE { OVERRIDE } RemoveDirectory0*(CONST path: ARRAY OF CHAR;  force: BOOLEAN;  VAR key: SIGNED32; VAR res: INTEGER );
 				VAR r: SIGNED32;
 				BEGIN {EXCLUSIVE}
 					r := Unix.rmdir( ADDRESSOF( path ) );
@@ -398,7 +398,7 @@ TYPE
 					END
 				END RemoveDirectory0;
 
-				PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR;  flags: SET;  enum: Files.Enumerator );
+				PROCEDURE { OVERRIDE } Enumerate0*(CONST mask: ARRAY OF CHAR;  flags: SET;  enum: Files.Enumerator );
 				VAR
 					path, filemask: Filename;
 					isPath: BOOLEAN;
@@ -481,7 +481,7 @@ TYPE
 					checkSet := NIL;
 				END Enumerate0;
 				
-				PROCEDURE Has(CONST name: ARRAY OF CHAR; VAR fullName: ARRAY OF CHAR; VAR flags: SET): BOOLEAN;
+				PROCEDURE { OVERRIDE } Has(CONST name: ARRAY OF CHAR; VAR fullName: ARRAY OF CHAR; VAR flags: SET): BOOLEAN;
 				BEGIN
 					RETURN HasInternal(name,fullName,flags); (* copy name when calling HasInternal because Unix.realpath cannot deal with ADDRESSOF(name) = ADDRESSOF(fullName) *)
 				END Has;
@@ -561,7 +561,7 @@ TYPE
 				END Flush;
 
 
-				PROCEDURE Set*( VAR r: Files.Rider;  pos: Files.Position );
+				PROCEDURE { OVERRIDE } Set*( VAR r: Files.Rider;  pos: Files.Position );
 				BEGIN {EXCLUSIVE}
 					SetX( r, pos )
 				END Set;
@@ -616,13 +616,13 @@ TYPE
 				END SetX;
 
 
-				PROCEDURE Pos*( VAR r: Files.Rider ): Files.Position;
+				PROCEDURE { OVERRIDE } Pos*( VAR r: Files.Rider ): Files.Position;
 				BEGIN
 					RETURN r.apos + r.bpos
 				END Pos;
 
 
-				PROCEDURE Read*( VAR r: Files.Rider;  VAR x: CHAR );
+				PROCEDURE { OVERRIDE } Read*( VAR r: Files.Rider;  VAR x: CHAR );
 				VAR offset: SIZE;  buf: Buffer;
 				BEGIN  {EXCLUSIVE}
 					buf := r.hint(Buffer);  offset := r.bpos;
@@ -640,7 +640,7 @@ TYPE
 					END
 				END Read;
 
-				PROCEDURE ReadBytes*( VAR r: Files.Rider;  VAR x: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } ReadBytes*( VAR r: Files.Rider;  VAR x: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR xpos, offset, restInBuf, min: SIZE;  buf: Buffer;
 				BEGIN  {EXCLUSIVE}
 					x[ofs] := 0X;  xpos := ofs;
@@ -663,7 +663,7 @@ TYPE
 				END ReadBytes;
 
 
-				PROCEDURE Write*( VAR r: Files.Rider;  x: CHAR );
+				PROCEDURE { OVERRIDE } Write*( VAR r: Files.Rider;  x: CHAR );
 				VAR buf: Buffer;  offset: SIZE;
 				BEGIN  {EXCLUSIVE}
 					buf := r.hint(Buffer);  offset := r.bpos;
@@ -676,7 +676,7 @@ TYPE
 					r.bpos := offset + 1;  r.res := Files.Ok
 				END Write;
 
-				PROCEDURE WriteBytes*( VAR r: Files.Rider;  CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } WriteBytes*( VAR r: Files.Rider;  CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR xpos, min, restInBuf, offset: SIZE;  buf: Buffer;
 				BEGIN  {EXCLUSIVE}
 					xpos := ofs;  buf := r.hint(Buffer);  offset := r.bpos;
@@ -698,13 +698,13 @@ TYPE
 				END WriteBytes;
 
 
-				PROCEDURE Length*( ): Files.Size;
+				PROCEDURE { OVERRIDE } Length*( ): Files.Size;
 				BEGIN
 					RETURN fsize
 				END Length;
 
 
-				PROCEDURE GetDate*( VAR t, d: SIGNED32 );
+				PROCEDURE { OVERRIDE } GetDate*( VAR t, d: SIGNED32 );
 				VAR stat: Unix.Status;   r: SIGNED32;  time: Unix.TmPtr;
 				BEGIN {EXCLUSIVE}
 					IF fd = NoDesc THEN  CreateUnixFile  END;
@@ -715,7 +715,7 @@ TYPE
 				END GetDate;
 
 
-				PROCEDURE SetDate*( t, d: SIGNED32 );
+				PROCEDURE { OVERRIDE } SetDate*( t, d: SIGNED32 );
 				TYPE
 					Time = RECORD actime, modtime: SIGNED32 END;
 				VAR
@@ -735,18 +735,18 @@ TYPE
 				END SetDate;
 
 
-				PROCEDURE GetAttributes*( ): SET;
+				PROCEDURE { OVERRIDE } GetAttributes*( ): SET;
 				BEGIN {EXCLUSIVE}
 					RETURN flags
 				END GetAttributes;
 
-				PROCEDURE SetAttributes*( attr: SET );
+				PROCEDURE { OVERRIDE } SetAttributes*( attr: SET );
 				BEGIN {EXCLUSIVE}
 					(* flags := attr	*)
 				END SetAttributes;
 
 
-				PROCEDURE Register0*( VAR res: INTEGER );
+				PROCEDURE { OVERRIDE } Register0*( VAR res: INTEGER );
 				VAR fo, r: SIGNED32;
 				BEGIN {EXCLUSIVE}
 					IF (state = Create) & (registerName # "") THEN
@@ -772,7 +772,7 @@ TYPE
 				END Register0;
 
 
-				PROCEDURE Update*;
+				PROCEDURE { OVERRIDE } Update*;
 				BEGIN {EXCLUSIVE}
 					FlushBuffers
 				END Update;
@@ -808,14 +808,14 @@ TYPE
 					DecOpenFiles()
 				END Finalize;
 
-				PROCEDURE Close;
+				PROCEDURE { OVERRIDE } Close;
 				BEGIN
 					Finalize;
 					collection.newFiles.Remove( SELF );
 					collection.oldFiles.Remove( SELF );
 				END Close;
 
-				PROCEDURE GetName*( VAR name: ARRAY OF CHAR );
+				PROCEDURE { OVERRIDE } GetName*( VAR name: ARRAY OF CHAR );
 				BEGIN {EXCLUSIVE}
 					IF registerName = "" THEN  COPY( workName, name ) ;
 					ELSE  COPY( registerName, name )

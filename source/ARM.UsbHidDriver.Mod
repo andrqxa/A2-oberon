@@ -435,7 +435,7 @@ TYPE
 		 * This procedure is called by the USB system software after an instance of this object has been passed to it via the probe procedure.
 		 * Typically, the code here sets up the communication pipe(s) use by the driver using device.GetPipe(endpointnumber).
 		 *)
-		PROCEDURE Connect() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect() : BOOLEAN;
 		VAR
 			hidDescriptor 		: UsbHid.HidDescriptor;
 			i					: SIGNED32;
@@ -536,7 +536,7 @@ TYPE
 
 
 		(*called when detaching a usb hid device*)
-		PROCEDURE Disconnect;
+		PROCEDURE { OVERRIDE } Disconnect;
 		BEGIN
 			itemParser.Disconnect();
 			itemParser:=NIL;

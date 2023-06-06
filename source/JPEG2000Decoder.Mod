@@ -3322,7 +3322,7 @@ MODULE JPEG2000Decoder;
 
 		FilterSyn5x3Lifting = OBJECT(FilterSynInt)
 
-			PROCEDURE SynthesizeLPF (	lowCoeffs : J2KU.LongIntArrayPtr; lowOffset, lowStep : SIGNED32;
+			PROCEDURE { OVERRIDE } SynthesizeLPF (	lowCoeffs : J2KU.LongIntArrayPtr; lowOffset, lowStep : SIGNED32;
 										highCoeffs : J2KU.LongIntArrayPtr; highOffset, highStep : SIGNED32;
 										outData : J2KU.LongIntArrayPtr; outOffset, outStep, len : SIGNED32);
 				VAR
@@ -3377,7 +3377,7 @@ MODULE JPEG2000Decoder;
 
 			END SynthesizeLPF;
 
-			PROCEDURE SynthesizeHPF (	lowCoeffs : J2KU.LongIntArrayPtr; lowOffset, lowStep : SIGNED32;
+			PROCEDURE { OVERRIDE } SynthesizeHPF (	lowCoeffs : J2KU.LongIntArrayPtr; lowOffset, lowStep : SIGNED32;
 										highCoeffs : J2KU.LongIntArrayPtr; highOffset, highStep : SIGNED32;
 										outData : J2KU.LongIntArrayPtr; outOffset, outStep, len : SIGNED32);
 				VAR
@@ -3446,7 +3446,7 @@ MODULE JPEG2000Decoder;
 	TYPE
 		FilterSyn9x7Lifting = OBJECT(FilterSynReal)
 
-			PROCEDURE SynthesizeLPF(	lowCoeffs : J2KU.RealArrayPtr; lowOffset, lowStep : SIGNED32;
+			PROCEDURE { OVERRIDE } SynthesizeLPF(	lowCoeffs : J2KU.RealArrayPtr; lowOffset, lowStep : SIGNED32;
 										highCoeffs : J2KU.RealArrayPtr; highOffset, highStep : SIGNED32;
 										outData : J2KU.RealArrayPtr; outOffset, outStep, len : SIGNED32);
 				VAR
@@ -3540,7 +3540,7 @@ MODULE JPEG2000Decoder;
 
 			END SynthesizeLPF;
 
-			PROCEDURE SynthesizeHPF(	lowCoeffs : J2KU.RealArrayPtr; lowOffset, lowStep : SIGNED32;
+			PROCEDURE { OVERRIDE } SynthesizeHPF(	lowCoeffs : J2KU.RealArrayPtr; lowOffset, lowStep : SIGNED32;
 										highCoeffs : J2KU.RealArrayPtr; highOffset, highStep : SIGNED32;
 										outData : J2KU.RealArrayPtr; outOffset, outStep, len : SIGNED32);
 				VAR
@@ -5688,7 +5688,7 @@ MODULE JPEG2000Decoder;
 					imgFmt := fmt;
 			END SetFormat;
 
-			PROCEDURE SetPixels*(pixelData : J2KU.LongIntArrayPtr; xOffset, yOffset, width, height : SIGNED32);
+			PROCEDURE { OVERRIDE } SetPixels*(pixelData : J2KU.LongIntArrayPtr; xOffset, yOffset, width, height : SIGNED32);
 				VAR
 					len : SIGNED32;
 				BEGIN
@@ -5791,7 +5791,7 @@ MODULE JPEG2000Decoder;
 			(* --- Codecs.ImageDecoder methods --- *)
 
 			(* open the decoder on a file *)
-			PROCEDURE Open*(s : Streams.Reader; VAR res : INTEGER);
+			PROCEDURE { OVERRIDE } Open*(s : Streams.Reader; VAR res : INTEGER);
 				VAR
 					imgInfo : J2KCS.ImageInfo;
 					buffCr : J2KCS.BufferedCodestreamReader;
@@ -5869,7 +5869,7 @@ MODULE JPEG2000Decoder;
 					END;
 			END Open;
 
-			PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
+			PROCEDURE { OVERRIDE } GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
 				VAR
 					imgInfo : J2KCS.ImageInfo;
 				BEGIN
@@ -5891,7 +5891,7 @@ MODULE JPEG2000Decoder;
 				SetProgressionLevel, the level is assumed to be maxProgressionLevel of the image,
 				which corresponds to best image quality.
 			 *)
-			PROCEDURE SetProgressionLevel*(progressionLevel: SIGNED32);
+			PROCEDURE { OVERRIDE } SetProgressionLevel*(progressionLevel: SIGNED32);
 				VAR
 					dec : SIGNED32;
 				BEGIN
@@ -5904,7 +5904,7 @@ MODULE JPEG2000Decoder;
 			END SetProgressionLevel;
 
 			(** renders the image into the given Raster.Image at the given progressionLevel *)
-			PROCEDURE Render*(img : Raster.Image);
+			PROCEDURE { OVERRIDE } Render*(img : Raster.Image);
 				VAR
 					imgConsumerArr : ARRAY 1 OF ImageConsumer;
 					imgAdapt : RasterImageAdapter;

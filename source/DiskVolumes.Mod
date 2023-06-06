@@ -36,7 +36,7 @@ TYPE
 			startfs-: SIGNED32;	(* device block offset of file system start *)
 
 		(** Get block from adr [1..size] of volume vol *)
-		PROCEDURE GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
 		VAR res: INTEGER; block: SIGNED32; buf: Caches.Buffer; valid: BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			IF (adr < 1) OR (adr > size) THEN SYSTEM.HALT(15) END;
@@ -58,7 +58,7 @@ TYPE
 		END GetBlock;
 
 		(** Put block to adr [1..size] of volume vol *)
-		PROCEDURE PutBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } PutBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
 		VAR res: INTEGER; block: SIGNED32; buf: Caches.Buffer; valid: BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			IF (adr < 1) OR (adr > size) THEN SYSTEM.HALT(15) END;
@@ -83,7 +83,7 @@ TYPE
 		END PutBlock;
 
 		(** Finalize a volume and close its device. *)
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		VAR res: INTEGER; i, j: SIGNED32; ptable: Disks.PartitionTable;
 		BEGIN {EXCLUSIVE}
 			IF cache # NIL THEN cache.Synchronize; cache := NIL END;

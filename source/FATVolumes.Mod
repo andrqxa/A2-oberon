@@ -70,23 +70,23 @@ TYPE
 			timer: Kernel.Timer;
 			NreadSector*, NwriteSector*, NreadCluster*, NwriteCluster*, NreadFAT*, NwriteFAT*, NallocCluster*: SIGNED32;	(* stats *)
 
-		PROCEDURE Init*(flags: SET; size, reserved: SIGNED32);
+		PROCEDURE { OVERRIDE } Init*(flags: SET; size, reserved: SIGNED32);
 		BEGIN HALT(301)	(* abstract *)
 		END Init;
 
-		PROCEDURE AllocBlock*(hint: Address; VAR adr: Address);
+		PROCEDURE { OVERRIDE } AllocBlock*(hint: Address; VAR adr: Address);
 		BEGIN HALT(301) (* not available on FAT volumes *)
 		END AllocBlock;
 
-		PROCEDURE FreeBlock*(adr: Address);
+		PROCEDURE { OVERRIDE } FreeBlock*(adr: Address);
 		BEGIN HALT(301) (* not available on FAT volumes *)
 		END FreeBlock;
 
-		PROCEDURE MarkBlock*(adr: Address);
+		PROCEDURE { OVERRIDE } MarkBlock*(adr: Address);
 		BEGIN HALT(301) (* not available on FAT volumes *)
 		END MarkBlock;
 
-		PROCEDURE Marked*(adr: Address): BOOLEAN;
+		PROCEDURE { OVERRIDE } Marked*(adr: Address): BOOLEAN;
 		BEGIN HALT(301) (* not available on FAT volumes *)
 		END Marked;
 
@@ -124,7 +124,7 @@ TYPE
 			END;
 		END InitLowLevel;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		VAR i, j: SIGNED32; res: INTEGER; ptable: Disks.PartitionTable;
 		BEGIN (* must be exclusive in overridden methods *)
 			quit := TRUE;
@@ -145,7 +145,7 @@ TYPE
 			Finalize^	(* see note in Files *)
 		END Finalize;
 
-		PROCEDURE Available*(): SIGNED32;
+		PROCEDURE { OVERRIDE } Available*(): SIGNED32;
 		VAR i: Address;
 		BEGIN {EXCLUSIVE}
 			IF (freeCount = -1) THEN
@@ -429,7 +429,7 @@ TYPE
 			firstRootSector-: Address;
 			numRootSectors-: SIGNED32; (* first sector & number of sectors of root directory relative to start *)
 
-		PROCEDURE Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
+		PROCEDURE { OVERRIDE } Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
 		VAR i: SIGNED32;
 		BEGIN (* must be exclusive in overridden methods *)
 			IF Initialize^(bpb, MaxClusters) THEN
@@ -449,7 +449,7 @@ TYPE
 			END
 		END Initialize;
 
-		PROCEDURE InitRoot;
+		PROCEDURE { OVERRIDE } InitRoot;
 		VAR sec: ARRAY BS OF CHAR; i: SIGNED32; res: INTEGER;
 		BEGIN
 			FOR i := 0 TO numRootSectors-1 DO
@@ -465,17 +465,17 @@ CONST
 
 TYPE
 	FAT12Volume* = OBJECT(FAT1216Volume)
-		PROCEDURE Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
+		PROCEDURE { OVERRIDE } Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			RETURN Initialize^(bpb, MaxClusters)	(* see note in Volumes.Initialize *)
 		END Initialize;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN {EXCLUSIVE}
 			Finalize^	(* see note in Volumes.Finalize *)
 		END Finalize;
 
-		PROCEDURE ReadFATEntryX(adr: Address): Address;
+		PROCEDURE { OVERRIDE } ReadFATEntryX(adr: Address): Address;
 		VAR offset: SIGNED32; res: INTEGER;
 			entry: Address;
 			data: ARRAY 2*BS OF CHAR;
@@ -508,7 +508,7 @@ TYPE
 			RETURN entry
 		END ReadFATEntryX;
 
-		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
 		VAR offset, entry: Address; i: SIGNED32;
 			data: ARRAY 2*BS OF CHAR;
 		BEGIN
@@ -563,7 +563,7 @@ CONST
 
 TYPE
 	FAT16Volume* = OBJECT(FAT1216Volume)
-		PROCEDURE Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
+		PROCEDURE { OVERRIDE } Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
 		VAR vcf: SET32; res: INTEGER;
 		BEGIN {EXCLUSIVE}
 			IF Initialize^(bpb, MaxClusters) THEN	(* see note in Volumes.Initialize *)
@@ -586,7 +586,7 @@ TYPE
 			END
 		END Initialize;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		VAR vcf: SET32; res: INTEGER;
 		BEGIN {EXCLUSIVE}
 			IF ~(Files.ReadOnly IN flags) THEN
@@ -598,7 +598,7 @@ TYPE
 			Finalize^ (* see note in Volume.Finalize *)
 		END Finalize;
 
-		PROCEDURE ReadFATEntryX(adr: Address): Address;
+		PROCEDURE { OVERRIDE } ReadFATEntryX(adr: Address): Address;
 		VAR offset, entry: Address;
 			res: INTEGER;
 			data: ARRAY BS OF CHAR;
@@ -623,7 +623,7 @@ TYPE
 			RETURN entry
 		END ReadFATEntryX;
 
-		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
 		VAR offset: Address; i: SIGNED32;
 			data: ARRAY BS OF CHAR;
 		BEGIN
@@ -671,7 +671,7 @@ TYPE
 			rootCluster-,	(* first cluster of root directory *)
 			fsInfo-: Address; 	(* sector number of FSInfo sector (relative to 'start') *)
 
-		PROCEDURE Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
+		PROCEDURE { OVERRIDE } Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
 		VAR i: SIGNED32; res: INTEGER; result: BOOLEAN; info: ARRAY BS OF CHAR; vcf: SET32;
 		BEGIN {EXCLUSIVE}
 			result := FALSE;
@@ -730,7 +730,7 @@ TYPE
 			RETURN result
 		END Initialize;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		VAR vcf: SET32; res: INTEGER; info: ARRAY BS OF CHAR;
 		BEGIN {EXCLUSIVE}
 			IF ~(Files.ReadOnly IN flags) THEN
@@ -753,7 +753,7 @@ TYPE
 			Finalize^ (* see note in Volumes.Finalize *)
 		END Finalize;
 
-		PROCEDURE InitRoot;
+		PROCEDURE { OVERRIDE } InitRoot;
 		VAR cluster: POINTER TO ARRAY OF CHAR; res: INTEGER;
 		BEGIN
 			NEW(cluster,clusterSize);
@@ -761,7 +761,7 @@ TYPE
 			WriteClusterX(rootCluster, cluster^, res) (* ignore res *)
 		END InitRoot;
 
-		PROCEDURE ReadFATEntryX(adr: Address): Address;
+		PROCEDURE { OVERRIDE } ReadFATEntryX(adr: Address): Address;
 		VAR offset, entry: Address; res: INTEGER; data: ARRAY BS OF CHAR;
 		BEGIN
 			INC(NreadFAT);
@@ -784,7 +784,7 @@ TYPE
 			RETURN entry
 		END ReadFATEntryX;
 
-		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
 		VAR offset: Address; i: SIGNED32; data: ARRAY BS OF CHAR;
 		BEGIN
 			INC(NwriteFAT);

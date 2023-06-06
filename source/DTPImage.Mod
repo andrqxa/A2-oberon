@@ -25,13 +25,13 @@ TYPE
 		filename: ARRAY 128 OF CHAR;
 		properties: ImagePropWindow;
 
-		PROCEDURE &New*;
+		PROCEDURE (* OVERRIDE *) & New*;
 		BEGIN
 			done := FALSE;
 			NEW(properties, SELF);
 		END New;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: FLOAT32; quality, preview: BOOLEAN);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: FLOAT32; quality, preview: BOOLEAN);
 		VAR mode: INTEGER;
 		BEGIN
 			IF ~quality THEN
@@ -44,7 +44,7 @@ TYPE
 			END;
 		END Draw;
 
-		PROCEDURE Clone*(): DTPData.ContentObject;			(* clone all the current properties *)
+		PROCEDURE { OVERRIDE } Clone*(): DTPData.ContentObject;			(* clone all the current properties *)
 		VAR newObj: ImageObject;
 			done: BOOLEAN;
 		BEGIN
@@ -77,7 +77,7 @@ TYPE
 			END;
 		END LoadImg;
 
-		PROCEDURE Load*(elem: XML.Element);
+		PROCEDURE { OVERRIDE } Load*(elem: XML.Element);
 		VAR name : Strings.String;
 			cont: XMLObjects.Enumerator;
 			ptr: ANY;
@@ -97,13 +97,13 @@ TYPE
 			END;
 		END Load;
 
-		PROCEDURE Store*(VAR w: Files.Writer);
+		PROCEDURE { OVERRIDE } Store*(VAR w: Files.Writer);
 		BEGIN
 			w.String('  <node-attribute name="type" value="Image" />'); w.Ln;
 			w.String('  <node-attribute name="file" value="'); w.String(filename); w.String('" />'); w.Ln;
 		END Store;
 
-		PROCEDURE OnCreate*;
+		PROCEDURE { OVERRIDE } OnCreate*;
 		VAR filename: ARRAY 128 OF CHAR;
 		BEGIN
 			filename := "tux.bmp";
@@ -112,17 +112,17 @@ TYPE
 			END;
 		END OnCreate;
 
-		PROCEDURE Redraw*;
+		PROCEDURE { OVERRIDE } Redraw*;
 		BEGIN
 			Redraw^;
 		END Redraw;
 
-		PROCEDURE Show*(x, y: SIZE);
+		PROCEDURE { OVERRIDE } Show*(x, y: SIZE);
 		BEGIN
 			properties.Show(x, y);
 		END Show;
 
-		PROCEDURE Hide*;
+		PROCEDURE { OVERRIDE } Hide*;
 		VAR viewport: WMWindowManager.ViewPort;
 		BEGIN
 			viewport := WMWindowManager.GetDefaultView();
@@ -130,7 +130,7 @@ TYPE
 			properties.Hide;
 		END Hide;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Hide;
 		END Close;
@@ -227,7 +227,7 @@ TYPE
 
 		END SetValueHandler;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			shown := FALSE;
 			Hide;

@@ -67,7 +67,7 @@ TYPE GridWindow* = OBJECT(WMWindowManager.Window)
 			IF manager # NIL THEN manager.AddVisibleDirty(SELF, bounds) END
 		END SetCanvasGenerator;
 
-		PROCEDURE IsHit(x, y  : SIZE) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit(x, y  : SIZE) : BOOLEAN;
 		VAR w, h : SIZE; fx, fy : FLOAT32;
 		BEGIN
 			w := GetWidth(); h := GetHeight();
@@ -79,7 +79,7 @@ TYPE GridWindow* = OBJECT(WMWindowManager.Window)
 			END
 		END IsHit;
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
+		PROCEDURE { OVERRIDE } Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
 		VAR
 			mode: INTEGER;
 			isScaled: BOOLEAN;
@@ -127,7 +127,7 @@ TYPE GridWindow* = OBJECT(WMWindowManager.Window)
 			INC(timestamp);
 		END Draw;
 
-		PROCEDURE Invalidate*(rect : Rectangle);
+		PROCEDURE { OVERRIDE } Invalidate*(rect : Rectangle);
 		VAR w, h : SIZE; fx, fy : FLOAT64;
 		BEGIN
 			w := GetWidth(); h := GetHeight();
@@ -139,7 +139,7 @@ TYPE GridWindow* = OBJECT(WMWindowManager.Window)
 			Invalidate^(rect)
 		END Invalidate;
 
-		PROCEDURE Handle*(VAR m : Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m : Message);
 		VAR w, h : SIZE; fx, fy : FLOAT32;
 		BEGIN
 			w := GetWidth(); h := GetHeight();

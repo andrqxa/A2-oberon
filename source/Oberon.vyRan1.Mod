@@ -50,7 +50,7 @@ TYPE
 		r: ARRAY 98 OF FLOAT64;
 		iff: SIGNED32;
 
-		PROCEDURE  (*VAR seed: tSeedDesc*) Store*( VAR r: Files.Rider );
+		PROCEDURE  (*VAR seed: tSeedDesc*) { OVERRIDE } Store*( VAR r: Files.Rider );
 		VAR i: SIGNED16;
 		BEGIN
 			Files.WriteLInt( r, SELF.ix1 );  Files.WriteLInt( r, SELF.ix2 );  Files.WriteLInt( r, SELF.ix3 );
@@ -58,7 +58,7 @@ TYPE
 			Files.WriteLInt( r, SELF.iff )
 		END Store;
 
-		PROCEDURE  (*VAR seed: tSeedDesc*) Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
+		PROCEDURE  (*VAR seed: tSeedDesc*) { OVERRIDE } Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
 		VAR i: SIGNED16;
 		BEGIN
 			Files.ReadLInt( r, SELF.ix1 );  Files.ReadLInt( r, SELF.ix2 );  Files.ReadLInt( r, SELF.ix3 );

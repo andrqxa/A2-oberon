@@ -104,32 +104,32 @@ TYPE
 	Window = OBJECT (WMWindowManager.BufferWindow)
 		VAR sender: Sender;
 
-		PROCEDURE PointerDown*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y: SIZE; keys: SET);
 		BEGIN
 			IF sender # NIL THEN sender.Pointer(x, y, keys) END
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y: SIZE; keys: SET);
 		BEGIN
 			IF sender # NIL THEN sender.Pointer(x, y, keys) END
 		END PointerMove;
 
-		PROCEDURE WheelMove*(dz : SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 		BEGIN
 			IF sender # NIL THEN sender.Wheel(dz) END
 		END WheelMove;
 
-		PROCEDURE PointerUp*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y: SIZE; keys: SET);
 		BEGIN
 			IF sender # NIL THEN sender.Pointer(x, y, keys) END
 		END PointerUp;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags: SET; keysym: SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 			IF (keysym # Inputs.KsNil) & (sender # NIL) THEN sender.Key(keysym, flags) END
 		END KeyEvent;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			IF sender # NIL THEN CloseVNC(sender.c) END
 		END Close;

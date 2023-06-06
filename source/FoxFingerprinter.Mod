@@ -148,7 +148,7 @@ TYPE
 		PublicFP(BasicType)  = FP(basicType).
 		PrivateFP(BasicType) = sizeof(basicType).
 		*)
-		PROCEDURE VisitBasicType*(x: SyntaxTree.BasicType);
+		PROCEDURE { OVERRIDE } VisitBasicType*(x: SyntaxTree.BasicType);
 		BEGIN
 		END VisitBasicType;
 
@@ -167,52 +167,52 @@ TYPE
 			SELF.fingerprint := fingerprint;
 		END SetTypeFingerprint;
 
-		PROCEDURE VisitRangeType*(x: SyntaxTree.RangeType);
+		PROCEDURE { OVERRIDE } VisitRangeType*(x: SyntaxTree.RangeType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypeRange);
 		END VisitRangeType;
 
-		PROCEDURE VisitBooleanType*(x: SyntaxTree.BooleanType);
+		PROCEDURE { OVERRIDE } VisitBooleanType*(x: SyntaxTree.BooleanType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypeBoolean);
 		END VisitBooleanType;
 
-		PROCEDURE VisitByteType*(x: SyntaxTree.ByteType);
+		PROCEDURE { OVERRIDE } VisitByteType*(x: SyntaxTree.ByteType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypeByte)
 		END VisitByteType;
 
-		PROCEDURE VisitSetType*(x: SyntaxTree.SetType);
+		PROCEDURE { OVERRIDE } VisitSetType*(x: SyntaxTree.SetType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypeSet)
 		END VisitSetType;
 
-		PROCEDURE VisitNilType*(x: SyntaxTree.NilType);
+		PROCEDURE { OVERRIDE } VisitNilType*(x: SyntaxTree.NilType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypePointer)
 		END VisitNilType;
 
-		PROCEDURE VisitAnyType*(x: SyntaxTree.AnyType);
+		PROCEDURE { OVERRIDE } VisitAnyType*(x: SyntaxTree.AnyType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypePointer)
 		END VisitAnyType;
 
-		PROCEDURE VisitAnyRecordType*(x: SyntaxTree.AnyRecordType);
+		PROCEDURE { OVERRIDE } VisitAnyRecordType*(x: SyntaxTree.AnyRecordType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypeRecord)
 		END VisitAnyRecordType;
 
-		PROCEDURE VisitAddressType*(x: SyntaxTree.AddressType);
+		PROCEDURE { OVERRIDE } VisitAddressType*(x: SyntaxTree.AddressType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypeAddress)
 		END VisitAddressType;
 
-		PROCEDURE VisitSizeType*(x: SyntaxTree.SizeType);
+		PROCEDURE { OVERRIDE } VisitSizeType*(x: SyntaxTree.SizeType);
 		BEGIN
 			SetTypeFingerprint(x, fpTypeSize);
 		END VisitSizeType;
 
-		PROCEDURE VisitObjectType*(x: SyntaxTree.ObjectType);
+		PROCEDURE { OVERRIDE } VisitObjectType*(x: SyntaxTree.ObjectType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypePointer)
 		END VisitObjectType;
@@ -222,7 +222,7 @@ TYPE
 		PublicFP(BasicType)  = FP(basicType).
 		PrivateFP(BasicType) = sizeof(basicType).
 		*)
-		PROCEDURE VisitCharacterType*(x: SyntaxTree.CharacterType);
+		PROCEDURE { OVERRIDE } VisitCharacterType*(x: SyntaxTree.CharacterType);
 		BEGIN
 			IF x.sizeInBits = 8 THEN SetTypeFingerprint(x,fpTypeChar8)
 			ELSIF x.sizeInBits = 16 THEN SetTypeFingerprint(x,fpTypeChar16)
@@ -236,7 +236,7 @@ TYPE
 		PublicFP(BasicType)  = FP(basicType).
 		PrivateFP(BasicType) = sizeof(basicType).
 		*)
-		PROCEDURE VisitIntegerType*(x: SyntaxTree.IntegerType);
+		PROCEDURE { OVERRIDE } VisitIntegerType*(x: SyntaxTree.IntegerType);
 		BEGIN
 			IF x.sizeInBits=8 THEN SetTypeFingerprint(x,fpTypeShortint)
 			ELSIF x.sizeInBits = 16 THEN SetTypeFingerprint(x,fpTypeInteger)
@@ -251,7 +251,7 @@ TYPE
 		PublicFP(BasicType)  = FP(basicType).
 		PrivateFP(BasicType) = sizeof(basicType).
 		*)
-		PROCEDURE VisitFloatType*(x: SyntaxTree.FloatType);
+		PROCEDURE { OVERRIDE } VisitFloatType*(x: SyntaxTree.FloatType);
 		BEGIN
 			IF x.sizeInBits = 32 THEN SetTypeFingerprint(x,fpTypeReal)
 			ELSIF x.sizeInBits = 64 THEN SetTypeFingerprint(x,fpTypeLongreal)
@@ -259,7 +259,7 @@ TYPE
 			END;
 		END VisitFloatType;
 
-		PROCEDURE VisitComplexType*(x: SyntaxTree.ComplexType);
+		PROCEDURE { OVERRIDE } VisitComplexType*(x: SyntaxTree.ComplexType);
 		BEGIN
 			ASSERT(x.componentType # NIL);
 			IF x.componentType.sizeInBits = 32 THEN SetTypeFingerprint(x,fpTypeComplex)
@@ -273,7 +273,7 @@ TYPE
 		PublicFP(BasicType)  = FP(basicType).
 		PrivateFP(BasicType) = sizeof(basicType).
 		*)
-		PROCEDURE VisitStringType*(x: SyntaxTree.StringType);
+		PROCEDURE { OVERRIDE } VisitStringType*(x: SyntaxTree.StringType);
 		BEGIN
 			SetTypeFingerprint(x,fpTypeString);
 		END VisitStringType;
@@ -281,7 +281,7 @@ TYPE
 		(**
 			fp enumeration type
 		**)
-		PROCEDURE VisitEnumerationType*(x: SyntaxTree.EnumerationType);
+		PROCEDURE { OVERRIDE } VisitEnumerationType*(x: SyntaxTree.EnumerationType);
 		VAR fingerprint: SyntaxTree.Fingerprint; enumerator: SyntaxTree.Constant; fp: Basic.Fingerprint;
 		BEGIN
 			fingerprint := x.fingerprint;
@@ -324,7 +324,7 @@ TYPE
 			*)
 		END VisitEnumerationType;
 
-		PROCEDURE VisitQualifiedType*(x: SyntaxTree.QualifiedType);
+		PROCEDURE { OVERRIDE } VisitQualifiedType*(x: SyntaxTree.QualifiedType);
 		BEGIN
 			VType(x.resolvedType);
 		END VisitQualifiedType;
@@ -335,7 +335,7 @@ TYPE
 		PublicFP(ArrayType)        = FP(arrayType).
 		PrivateFP(ArrayType)       = FP(arrayType).
 		*)
-		PROCEDURE VisitArrayType*(x: SyntaxTree.ArrayType);
+		PROCEDURE { OVERRIDE } VisitArrayType*(x: SyntaxTree.ArrayType);
 		VAR fingerprint: SyntaxTree.Fingerprint; deep: BOOLEAN; fp: Basic.Fingerprint;
 		BEGIN
 			IF Trace THEN TraceEnter("ArrayType") END;
@@ -384,7 +384,7 @@ TYPE
 		PublicFP(MathArrayType)    = FP(arrayType).
 		PrivateFP(MathArrayType)   = FP(arrayType).
 		*)
-		PROCEDURE VisitMathArrayType*(x: SyntaxTree.MathArrayType);
+		PROCEDURE { OVERRIDE } VisitMathArrayType*(x: SyntaxTree.MathArrayType);
 		VAR fingerprint: SyntaxTree.Fingerprint; deep: BOOLEAN; fp: Basic.Fingerprint;
 		BEGIN
 			fingerprint := x.fingerprint;
@@ -482,7 +482,7 @@ TYPE
 		PublicFP(PointerType)      = 0.
 		PrivateFP(PointerType)     = 0.
 		*)
-		PROCEDURE VisitPointerType*(x: SyntaxTree.PointerType);
+		PROCEDURE { OVERRIDE } VisitPointerType*(x: SyntaxTree.PointerType);
 		VAR fp: Basic.Fingerprint; deep: BOOLEAN; fingerprint: SyntaxTree.Fingerprint;
 		BEGIN
 			IF Trace THEN TraceEnter("PointerType");  END;
@@ -523,7 +523,7 @@ TYPE
 		PublicFP(PortType)      = 0.
 		PrivateFP(PortType)     = 0.
 		*)
-		PROCEDURE VisitPortType*(x: SyntaxTree.PortType);
+		PROCEDURE { OVERRIDE } VisitPortType*(x: SyntaxTree.PortType);
 		VAR fingerprint: SyntaxTree.Fingerprint; fp: Basic.Fingerprint; deep: BOOLEAN;
 		BEGIN
 			IF Trace THEN TraceEnter("PortType");  END;
@@ -590,7 +590,7 @@ TYPE
 			END;
 		END FPrintMethod;
 
-		PROCEDURE VisitCellType*(x: SyntaxTree.CellType);
+		PROCEDURE { OVERRIDE } VisitCellType*(x: SyntaxTree.CellType);
 		VAR fingerprint: SyntaxTree.Fingerprint; fp: Basic.Fingerprint;
 		BEGIN
 			fingerprint := x.fingerprint;
@@ -616,7 +616,7 @@ TYPE
 		PrivateFP(RecordType)      = FP(recordType) [<*> PrivateFP(baseType)] {<*> FP(method) <*> methodNumber }
 		                            {<*> PrivateFP(fieldType) <*> offset(field) <*> FP(field)}
 		*)
-		PROCEDURE VisitRecordType*(x: SyntaxTree.RecordType);
+		PROCEDURE { OVERRIDE } VisitRecordType*(x: SyntaxTree.RecordType);
 		VAR scope: SyntaxTree.RecordScope; fp: Basic.Fingerprint; variable: SyntaxTree.Variable;
 			fingerprint,variableFingerprint,variableTypeFingerprint,baseFingerprint: SyntaxTree.Fingerprint;flags: SET;
 			symbol: SyntaxTree.Symbol; procedure: SyntaxTree.Procedure;  baseType: SyntaxTree.Type;
@@ -764,7 +764,7 @@ TYPE
 		PublicFP(ProcedureType)    = FP(arrayType) -> Signature(procedureType)
 		PrivateFP(ProcedureType)   = FP(arrayType)-> Signature(procedureType).
 		*)
-		PROCEDURE VisitProcedureType*(x: SyntaxTree.ProcedureType);
+		PROCEDURE { OVERRIDE } VisitProcedureType*(x: SyntaxTree.ProcedureType);
 		VAR fingerprint: SyntaxTree.Fingerprint; deep: BOOLEAN; fp: Basic.Fingerprint;
 		BEGIN
 			IF Trace THEN TraceEnter("ProcedureType") END;
@@ -808,35 +808,35 @@ TYPE
 		(** values - used in constant symbols - effects in fingerprint modification of (object) global variable fp *)
 
 		(* fp = fp & (fpTrue | fpFalse) *)
-		PROCEDURE VisitBooleanValue*(x: SyntaxTree.BooleanValue);
+		PROCEDURE { OVERRIDE } VisitBooleanValue*(x: SyntaxTree.BooleanValue);
 		BEGIN IF x.value THEN FPNumber(SELF.fp,fpTrue) ELSE FPNumber(SELF.fp,fpFalse) END
 		END VisitBooleanValue;
 
 		(* fp = fp & (HugeInt | Number) *)
-		PROCEDURE VisitIntegerValue*(x: SyntaxTree.IntegerValue);
+		PROCEDURE { OVERRIDE } VisitIntegerValue*(x: SyntaxTree.IntegerValue);
 		BEGIN FPNumber(SELF.fp,x.value)
 		END VisitIntegerValue;
 
 		(* fp = fp & (HugeInt | Number) *)
-		PROCEDURE VisitEnumerationValue*(x: SyntaxTree.EnumerationValue);
+		PROCEDURE { OVERRIDE } VisitEnumerationValue*(x: SyntaxTree.EnumerationValue);
 		BEGIN FPNumber(SELF.fp,x.value)
 		END VisitEnumerationValue;
 
-		PROCEDURE VisitProcedureValue*(x: SyntaxTree.ProcedureValue);
+		PROCEDURE { OVERRIDE } VisitProcedureValue*(x: SyntaxTree.ProcedureValue);
 		BEGIN VisitProcedure(x.value);
 		END VisitProcedureValue;
 
 		(* fp = fp & ORD(char) *)
-		PROCEDURE VisitCharacterValue*(x: SyntaxTree.CharacterValue);
+		PROCEDURE { OVERRIDE } VisitCharacterValue*(x: SyntaxTree.CharacterValue);
 		BEGIN FPNumber(SELF.fp,ORD(x.value))
 		END VisitCharacterValue;
 
 		(* fp = fp & Set *)
-		PROCEDURE VisitSetValue*(x: SyntaxTree.SetValue);
+		PROCEDURE { OVERRIDE } VisitSetValue*(x: SyntaxTree.SetValue);
 		BEGIN FPSet(SELF.fp,x.value)
 		END VisitSetValue;
 
-		PROCEDURE VisitMathArrayExpression*(x: SyntaxTree.MathArrayExpression);
+		PROCEDURE { OVERRIDE } VisitMathArrayExpression*(x: SyntaxTree.MathArrayExpression);
 		VAR element: SyntaxTree.Expression; i: SIZE;
 		BEGIN
 			FOR i := 0 TO x.elements.Length()-1 DO
@@ -846,28 +846,28 @@ TYPE
 		END VisitMathArrayExpression;
 
 		(* fp = fp {& Value} *)
-		PROCEDURE VisitMathArrayValue*(x: SyntaxTree.MathArrayValue);
+		PROCEDURE { OVERRIDE } VisitMathArrayValue*(x: SyntaxTree.MathArrayValue);
 		BEGIN
 			VisitMathArrayExpression(x.array); (* do not call FPValue here, recursion possible because x.array.resolved = x  *)
 		END VisitMathArrayValue;
 
 		(* fp = fp & (Real | LongReal) *)
-		PROCEDURE VisitRealValue*(x: SyntaxTree.RealValue);
+		PROCEDURE { OVERRIDE } VisitRealValue*(x: SyntaxTree.RealValue);
 		BEGIN FPReal(SELF.fp,x.value);
 		END VisitRealValue;
 
-		PROCEDURE VisitComplexValue*(x: SyntaxTree.ComplexValue);
+		PROCEDURE { OVERRIDE } VisitComplexValue*(x: SyntaxTree.ComplexValue);
 		BEGIN
 			FPReal(SELF.fp,x.realValue);
 			FPReal(SELF.fp,x.imagValue);
 		END VisitComplexValue;
 
-		PROCEDURE VisitNilValue*(x: SyntaxTree.NilValue);
+		PROCEDURE { OVERRIDE } VisitNilValue*(x: SyntaxTree.NilValue);
 		BEGIN FPNumber(SELF.fp, 0);
 		END VisitNilValue;
 
 		(* fp = fp & String *)
-		PROCEDURE VisitStringValue*(x: SyntaxTree.StringValue);
+		PROCEDURE { OVERRIDE } VisitStringValue*(x: SyntaxTree.StringValue);
 		BEGIN FPString(SELF.fp,x.value^) END VisitStringValue;
 
 		(* fp = fp & FP(x) *)
@@ -976,7 +976,7 @@ TYPE
 		(*
 			FP(TypeDeclaration)        = 0 <*> fpModeType -> Name -> Visibility <*> FP(Type).
 		*)
-		PROCEDURE VisitTypeDeclaration*(x: SyntaxTree.TypeDeclaration);
+		PROCEDURE { OVERRIDE } VisitTypeDeclaration*(x: SyntaxTree.TypeDeclaration);
 		VAR fp: Basic.Fingerprint;
 			fingerprint, typeFP: SyntaxTree.Fingerprint; deep: BOOLEAN;
 		BEGIN
@@ -1020,7 +1020,7 @@ TYPE
 		(*
 			FP(ConstantDeclaration)    = 0 <*> fpModeConstant -> Name -> Visibility <*> FP(Type) -> Basic -> Value.
 		*)
-		PROCEDURE VisitConstant*(x: SyntaxTree.Constant);
+		PROCEDURE { OVERRIDE } VisitConstant*(x: SyntaxTree.Constant);
 		VAR access: SET;
 			fingerprint: SyntaxTree.Fingerprint;
 			fp: Basic.Fingerprint;
@@ -1053,7 +1053,7 @@ TYPE
 		(*
 			FP(VariableDeclaration)    = 0 <*> fpModePar -> Name -> Visibility <*> FP(Type).
 		*)
-		PROCEDURE VisitVariable*(x: SyntaxTree.Variable);
+		PROCEDURE { OVERRIDE } VisitVariable*(x: SyntaxTree.Variable);
 		VAR fp: Basic.Fingerprint; fingerprint: SyntaxTree.Fingerprint; deep: BOOLEAN; name: SyntaxTree.IdentifierString;
 		BEGIN
 			fingerprint := x.fingerprint;
@@ -1078,7 +1078,7 @@ TYPE
 			SELF.fingerprint := fingerprint
 		END VisitVariable;
 
-		PROCEDURE VisitProperty*(x: SyntaxTree.Property);
+		PROCEDURE { OVERRIDE } VisitProperty*(x: SyntaxTree.Property);
 		BEGIN
 			VisitVariable(x);
 		END VisitProperty;
@@ -1086,7 +1086,7 @@ TYPE
 		(*
 			FP(ParameterDeclaration)    = 0 <*> fpModePar -> Name -> Visibility <*> FP(Type).
 		*)
-		PROCEDURE VisitParameter*(x: SyntaxTree.Parameter);
+		PROCEDURE { OVERRIDE } VisitParameter*(x: SyntaxTree.Parameter);
 		VAR fp: Basic.Fingerprint; fingerprint: SyntaxTree.Fingerprint; deep: BOOLEAN; name: SyntaxTree.IdentifierString;
 		BEGIN
 			fingerprint := x.fingerprint;
@@ -1115,7 +1115,7 @@ TYPE
 		FP(ProcedureDeclaration)   = 0 <*> fpModeInlineProcedure -> Name -> Visibility <*> FP(Type) -> Code.
 						| 0 <*> fpModeExportedProcedure -> Name -> Visibility <*> FP(Type)
 		*)
-		PROCEDURE VisitProcedure*(x: SyntaxTree.Procedure);
+		PROCEDURE { OVERRIDE } VisitProcedure*(x: SyntaxTree.Procedure);
 		VAR fp: Basic.Fingerprint; access: SET; fingerprint: SyntaxTree.Fingerprint; deep: BOOLEAN; code: SyntaxTree.Code;
 			i, size: SIZE; value: INTEGER; name: ARRAY 256 OF CHAR;
 		BEGIN
@@ -1167,12 +1167,12 @@ TYPE
 		END VisitProcedure;
 
 		(* cf. Procedure *)
-		PROCEDURE VisitOperator*(x: SyntaxTree.Operator);
+		PROCEDURE { OVERRIDE } VisitOperator*(x: SyntaxTree.Operator);
 		BEGIN
 			VisitProcedure(x) (* same finger print as a procedure *)
 		END VisitOperator;
 
-		PROCEDURE VisitModule*(x: SyntaxTree.Module);
+		PROCEDURE { OVERRIDE } VisitModule*(x: SyntaxTree.Module);
 		VAR fingerprint, symbolFingerprint: SyntaxTree.Fingerprint; deep: BOOLEAN; fp: Basic.Fingerprint; symbol: SyntaxTree.Symbol; scope: SyntaxTree.ModuleScope;
 		BEGIN
 			fingerprint := x.fingerprint;
@@ -1232,7 +1232,7 @@ TYPE
 
 		END VisitModule;
 
-		PROCEDURE VisitSymbol*(x: SyntaxTree.Symbol);
+		PROCEDURE { OVERRIDE } VisitSymbol*(x: SyntaxTree.Symbol);
 		BEGIN
 			fingerprint.shallow := 0;
 			fingerprint.public := fingerprint.shallow;

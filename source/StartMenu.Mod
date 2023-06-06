@@ -18,13 +18,13 @@ TYPE
 
 	Popup = OBJECT (WMComponents.FormWindow)
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN manager.Remove(SELF) END FocusLost;
 
-		PROCEDURE FocusGot*;
+		PROCEDURE { OVERRIDE } FocusGot*;
 		BEGIN manager.SetFocus(SELF) END FocusGot;
 
-		PROCEDURE Handle*(VAR msg : Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg : Message);
 		BEGIN
 			Handle^(msg);
 			IF (msg.msgType = WMMessages.MsgExt) & (msg.ext = closePopupMsg) THEN FocusLost END;
@@ -116,7 +116,7 @@ TYPE
 	VAR filename : WMProperties.StringProperty;
 		eRun* : EventListenerInfo;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(filename, NIL, Strings.NewString("Filename"), Strings.NewString("")); properties.Add(filename);
@@ -208,7 +208,7 @@ TYPE
 			END;
 		END FindMenuButtonsSMO;
 
-		PROCEDURE Open;
+		PROCEDURE { OVERRIDE } Open;
 		VAR c : XML.Content; width, height : SIZE; view : WM.ViewPort; s : String;
 		BEGIN
 			nofLayouts := CountLayouts();
@@ -234,7 +234,7 @@ TYPE
 			END
 		END Open;
 
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		BEGIN {EXCLUSIVE}
 			IF startMenu # NIL THEN startMenu.Close END
 		END Close;
@@ -250,7 +250,7 @@ TYPE
 			END;
 		END ReplaceMenuButtonsSMO;
 
-		PROCEDURE ReopenMenuItemsShifted(upwards : BOOLEAN);
+		PROCEDURE { OVERRIDE } ReopenMenuItemsShifted(upwards : BOOLEAN);
 		VAR old, i : SIGNED32; s : String; c : XML.Content;
 			newMButtons : MenuButtons;
 			newsmos : SMOArr;
@@ -286,18 +286,18 @@ TYPE
 	BlockStartMenu = OBJECT(Plugin)
 	VAR startMenu : MainMenu.Window;
 
-		PROCEDURE Open;
+		PROCEDURE { OVERRIDE } Open;
 		BEGIN
 			NEW(startMenu);
 			startMenu.SetOriginator(NIL); (* includes page loading *)
 		END Open;
 
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		BEGIN
 			IF startMenu # NIL THEN startMenu.Close END
 		END Close;
 
-		PROCEDURE ReopenMenuItemsShifted(upwards : BOOLEAN);
+		PROCEDURE { OVERRIDE } ReopenMenuItemsShifted(upwards : BOOLEAN);
 		END ReopenMenuItemsShifted;
 
 	END BlockStartMenu;

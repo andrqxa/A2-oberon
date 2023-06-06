@@ -45,7 +45,7 @@ TYPE
 		END Init;
 
 		(* adapted from LNO.V24.Mod *)
-		PROCEDURE Open*( bps, data, parity, stop: SIGNED32;  VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } Open*( bps, data, parity, stop: SIGNED32;  VAR res: INTEGER );
 		VAR
 			err, speed: SIGNED32;
 			tio: Unix.Termios;
@@ -115,7 +115,7 @@ TYPE
 			END;
 		END Open;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		VAR err: SIGNED32;
 		BEGIN
 			IF fd > 0  THEN
@@ -124,7 +124,7 @@ TYPE
 			END
 		END Close;
 
-		PROCEDURE Available*(): SIZE;
+		PROCEDURE { OVERRIDE } Available*(): SIZE;
 		VAR
 			num, err: INTEGER;
 		BEGIN
@@ -132,7 +132,7 @@ TYPE
 			RETURN num;
 		END Available;
 
-		PROCEDURE ReceiveChar*( VAR ch: CHAR;  VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } ReceiveChar*( VAR ch: CHAR;  VAR res: INTEGER );
 		VAR r: SIZE;
 		BEGIN
 			r := Unix.read( fd, ADDRESSOF(ch), 1);  res := SIGNED32(r);
@@ -145,7 +145,7 @@ TYPE
 		END ReceiveChar;
 
 		(** Send - Send a byte to the specified port.  Waits until buffer space is available.  res = 0 iff ok. *)
-		PROCEDURE SendChar*( ch: CHAR;  VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } SendChar*( ch: CHAR;  VAR res: INTEGER );
 		VAR r: SIZE;
 		BEGIN
 			r := Unix.write( fd, ADDRESSOF(ch), 1);  res := SIGNED32(r);
@@ -157,7 +157,7 @@ TYPE
 			END;
 		END SendChar;
 
-		PROCEDURE Send*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } Send*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER );
 		VAR r: SIZE;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + len );   (* array bound check not implemented in Kernel32.WriteFile *)
@@ -170,7 +170,7 @@ TYPE
 			END;
 		END Send;
 
-		PROCEDURE Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 		VAR i, l: SIZE;  read: SIZE;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + size );
@@ -198,7 +198,7 @@ TYPE
 		END Receive;
 
 		(** Get the port state: state (open, closed), speed in bps, no. of data bits, parity, stop bit length. *)
-		PROCEDURE GetPortState*( VAR openstat : BOOLEAN;  VAR bps, data, parity, stop : SIGNED32 );
+		PROCEDURE { OVERRIDE } GetPortState*( VAR openstat : BOOLEAN;  VAR bps, data, parity, stop : SIGNED32 );
 		VAR
 			err, br: SIGNED32;  t: SET;  tio: Unix.Termios;
 		BEGIN
@@ -243,7 +243,7 @@ TYPE
 		END GetPortState;
 
 		(** Clear the specified modem control lines.  s may contain DTR, RTS & Break. *)
-		PROCEDURE ClearMC*( s: SET );
+		PROCEDURE { OVERRIDE } ClearMC*( s: SET );
 		VAR
 			err : SIGNED32;  stat: SET;
 		BEGIN
@@ -254,7 +254,7 @@ TYPE
 		END ClearMC;
 
 		(** Set the specified modem control lines.  s may contain DTR, RTS & Break. *)
-		PROCEDURE SetMC*( s: SET );
+		PROCEDURE { OVERRIDE } SetMC*( s: SET );
 		VAR
 			err : SIGNED32;  stat: SET;
 		BEGIN
@@ -266,7 +266,7 @@ TYPE
 
 		(** Return the state of the specified modem control lines. s contains
 			the current state of DSR, CTS, RI, DCD & Break Interrupt. *)
-		PROCEDURE GetMC*( VAR s: SET );
+		PROCEDURE { OVERRIDE } GetMC*( VAR s: SET );
 		VAR
 			err : SIGNED32;  stat: SET;
 		BEGIN

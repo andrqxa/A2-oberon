@@ -598,7 +598,7 @@ TYPE
 			IF ~parseError & (string[0] # "#") THEN log.Ln; log.Update; END;
 		END ProcessCommand;
 
-		PROCEDURE Handle*(r: Streams.Reader; pos : Streams.Position; CONST name: ARRAY OF CHAR; testType: TestSuite.TestType): INTEGER;
+		PROCEDURE { OVERRIDE } Handle*(r: Streams.Reader; pos : Streams.Position; CONST name: ARRAY OF CHAR; testType: TestSuite.TestType): INTEGER;
 		VAR result: SIGNED16; error, parseError, finished, trapped: BOOLEAN;
 		BEGIN
 			trapped := TRUE;

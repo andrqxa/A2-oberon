@@ -503,7 +503,7 @@ TYPE
 			RETURN packet;
 		END BuildPacket;
 
-		PROCEDURE Connect() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect() : BOOLEAN;
 		CONST
 			MaxWaits = 5000; (* maximum time we wait for the TlSessionStarted packet [ms] *)
 		VAR
@@ -602,7 +602,7 @@ TYPE
 			RETURN TRUE;
 		END Connect;
 
-		PROCEDURE Disconnect;
+		PROCEDURE { OVERRIDE } Disconnect;
 		BEGIN
 			KernelLog.String("Garmin GPS 18 USB disconnected."); KernelLog.Ln;
 			KernelLog.String("GPS18: Received bytes: "); KernelLog.Int(byteCounter, 0); KernelLog.Ln;

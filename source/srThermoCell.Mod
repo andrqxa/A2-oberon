@@ -29,7 +29,7 @@ BEGIN
 		randvel(state[i].velocity);
 	END
 END bang;
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 VAR i: SIGNED32;
 BEGIN
 	NEW(space);
@@ -60,7 +60,7 @@ BEGIN
 		space.strokevoxel(state[i].position,2,v);
 	END;
 END tick;
-PROCEDURE Shade*(VAR ray: srBase.Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: srBase.Ray);
 BEGIN
 	space.Shade(ray);
 END Shade;
@@ -80,7 +80,7 @@ BEGIN
 	passable:=TRUE
 END init;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 VAR
      p: srBase.PT;
 BEGIN

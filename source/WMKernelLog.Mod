@@ -41,7 +41,7 @@ TYPE
 			END
 		END New;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS WMRestorable.Storage) THEN
@@ -52,7 +52,7 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			winstance := NIL

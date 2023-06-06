@@ -87,7 +87,7 @@ TYPE
 		END Remove;
 
 		(** Remove all occurrences of obj from collection. *)
-		PROCEDURE RemoveAll*(obj: ANY);
+		PROCEDURE { OVERRIDE } RemoveAll*(obj: ANY);
 		VAR p, n: FinalizerNode;
 		BEGIN {EXCLUSIVE}
 			p := root; n := p.nextObj;

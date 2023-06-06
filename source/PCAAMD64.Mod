@@ -117,7 +117,7 @@ TYPE
 
 	Reg8* = OBJECT (Reg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.reg8, ASM.regmem8:
@@ -138,7 +138,7 @@ TYPE
 
 	Reg16* = OBJECT (MemReg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.reg16, ASM.regmem16:
@@ -156,7 +156,7 @@ TYPE
 
 	Reg32* = OBJECT (MemReg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.reg32, ASM.regmem32:
@@ -172,7 +172,7 @@ TYPE
 
 	Reg64* = OBJECT (MemReg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.reg64, ASM.regmem64:
@@ -188,7 +188,7 @@ TYPE
 
 	RegCR* = OBJECT (Reg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.CRn:
@@ -204,7 +204,7 @@ TYPE
 
 	RegDR* = OBJECT (Reg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			RETURN type = ASM.DRn;
 		END Matches;
@@ -213,7 +213,7 @@ TYPE
 
 	SegReg* = OBJECT (Reg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.segReg:
@@ -239,7 +239,7 @@ TYPE
 
 	FPReg* = OBJECT (Reg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.sti:
@@ -255,7 +255,7 @@ TYPE
 
 	MMXReg* = OBJECT (Reg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.mmx, ASM.mmxmem32, ASM.mmxmem64:
@@ -269,7 +269,7 @@ TYPE
 
 	XMMReg* = OBJECT (Reg)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.xmm, ASM.xmmmem32, ASM.xmmmem64, ASM.xmmmem128:
@@ -292,7 +292,7 @@ TYPE
 		BEGIN size := s; displacement := 0; scale := 1
 		END New;
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			| ASM.mem:
@@ -343,7 +343,7 @@ TYPE
 		BEGIN size:= s; val := v; pc := -1
 		END New;
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			CASE type OF
 			ASM.one:
@@ -390,7 +390,7 @@ TYPE
 	VAR
 		selector, offset: SIGNED32;
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN RETURN type = ASM.pntr1616;
 		END Matches;
 
@@ -402,7 +402,7 @@ TYPE
 
 	Pntr1632 = OBJECT (Pntr1616)
 
-		PROCEDURE Matches (type: ASM.OperandType): BOOLEAN;
+		PROCEDURE { OVERRIDE } Matches (type: ASM.OperandType): BOOLEAN;
 		BEGIN
 			RETURN type = ASM.pntr1632;
 		END Matches;

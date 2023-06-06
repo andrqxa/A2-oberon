@@ -15,7 +15,7 @@ TYPE
 			data: POINTER TO ARRAY OF POINTER TO ARRAY OF CHAR;
 
 		(** Get block from adr [1..size] of volume vol *)
-		PROCEDURE GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
 		VAR i: SIGNED32;
 		BEGIN
 			IF (adr < 1) OR (adr > size) THEN SYSTEM.HALT(15) END;
@@ -28,7 +28,7 @@ TYPE
 		END GetBlock;
 
 		(** Put block to adr [1..size] of volume vol *)
-		PROCEDURE PutBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } PutBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
 		BEGIN
 			IF (adr < 1) OR (adr > size) THEN SYSTEM.HALT(15) END;
 			ASSERT(LEN(blk) >= blockSize);	(* index check *)
@@ -36,7 +36,7 @@ TYPE
 			SYSTEM.MOVE(ADDRESSOF(blk[0]), ADDRESSOF(data[adr-1]^[0]), blockSize)
 		END PutBlock;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			data := NIL;
 			Finalize^	(* see note in Files *)

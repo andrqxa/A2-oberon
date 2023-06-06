@@ -49,7 +49,7 @@ TYPE
 			AWAIT(dead);
 		END Stop;
 
-		PROCEDURE &Init*(nbrOfButtons  : SIGNED32);
+		PROCEDURE (* OVERRIDE *) & Init*(nbrOfButtons  : SIGNED32);
 		BEGIN
 			Init^(nbrOfButtons);
 			alive := TRUE; dead := FALSE;

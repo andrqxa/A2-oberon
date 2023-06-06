@@ -48,12 +48,12 @@ TYPE
 			manager.SetWindowPos(SELF, posX - movie.width, posY)
 		END Move;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			keyPressed := keyPressed + (keys * {0, 1, 2})
 		END PointerDown;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF keys={} THEN
 				IF keyPressed#{0, 1, 2} THEN
@@ -64,7 +64,7 @@ TYPE
 			END
 		END PointerUp;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			IF movie # NIL THEN
 				IF (w = GetWidth()) & (h = GetHeight()) THEN
@@ -77,16 +77,16 @@ TYPE
 			END
 		END Draw;
 
-		PROCEDURE IsHit*(x, y  : SIZE) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(x, y  : SIZE) : BOOLEAN;
 		BEGIN
 			RETURN WMGraphics.IsBitmapHit(frame * GetWidth() + x, y, 128, movie)
 		END IsHit;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN alive := FALSE
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 			ELSE Handle^(x)

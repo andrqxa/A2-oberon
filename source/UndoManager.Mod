@@ -66,7 +66,7 @@ TYPE
 			INC(nrRedoUpdates);
 		END SaveOperation;
 
-		PROCEDURE InsertText*(pos: SIZE; text: Texts.Text);
+		PROCEDURE { OVERRIDE } InsertText*(pos: SIZE; text: Texts.Text);
 		VAR i: InsertUpdateInfo; u:UpdateInfo; tr: Texts.TextReader; ucs32: Texts.Char32;
 		BEGIN
 			ResetRedo;
@@ -93,7 +93,7 @@ TYPE
 			NextOperation(i);
 		END InsertText;
 
-		PROCEDURE DeleteText*(pos: SIZE; text: Texts.Text);
+		PROCEDURE { OVERRIDE } DeleteText*(pos: SIZE; text: Texts.Text);
 		VAR d: DeleteUpdateInfo; u: UpdateInfo;
 		BEGIN
 			ResetRedo;
@@ -122,17 +122,17 @@ TYPE
 			NextOperation(d);
 		END DeleteText;
 
-		PROCEDURE BeginObjectChange*(pos: SIZE);
+		PROCEDURE { OVERRIDE } BeginObjectChange*(pos: SIZE);
 		BEGIN
 			NEW(objUpdate, pos);
 		END BeginObjectChange;
 
-		PROCEDURE ObjectChanged*(pos, len: SIZE; type: INTEGER; obj: ANY);
+		PROCEDURE { OVERRIDE } ObjectChanged*(pos, len: SIZE; type: INTEGER; obj: ANY);
 		BEGIN
 			objUpdate.Append(pos, len, obj, type)
 		END ObjectChanged;
 
-		PROCEDURE EndObjectChange*(len: SIZE; type: INTEGER; to: ANY);
+		PROCEDURE { OVERRIDE } EndObjectChange*(len: SIZE; type: INTEGER; to: ANY);
 		BEGIN
 			ResetRedo;
 			objUpdate.len := len;
@@ -142,12 +142,12 @@ TYPE
 			objUpdate := NIL
 		END EndObjectChange;
 
-		PROCEDURE SetText*(text: Texts.Text);
+		PROCEDURE { OVERRIDE } SetText*(text: Texts.Text);
 		BEGIN
 			SELF.text := text;
 		END SetText;
 
-		PROCEDURE Undo*;
+		PROCEDURE { OVERRIDE } Undo*;
 		VAR temp: Texts.Text; ui: UpdateInfo;
 		BEGIN
 			temp := SELF.text;
@@ -166,7 +166,7 @@ TYPE
 			END
 		END Undo;
 
-		PROCEDURE Redo*;
+		PROCEDURE { OVERRIDE } Redo*;
 		VAR temp: Texts.Text; ui: UpdateInfo;
 		BEGIN
 			IF ~redo THEN RETURN END;
@@ -186,7 +186,7 @@ TYPE
 			END
 		END Redo;
 
-		PROCEDURE InformListeners*;
+		PROCEDURE { OVERRIDE } InformListeners*;
 		VAR l : ListenerProc;
 		BEGIN
 			l := nrUpdatesListener;
@@ -278,14 +278,14 @@ TYPE
 			t.ReleaseRead;
 		END New;
 
-		PROCEDURE Undo(text: Texts.Text);
+		PROCEDURE { OVERRIDE } Undo(text: Texts.Text);
 		BEGIN
 			t.AcquireRead;
 			text.Delete(pos, t.GetLength());
 			t.ReleaseRead;
 		END Undo;
 
-		PROCEDURE Redo(text: Texts.Text);
+		PROCEDURE { OVERRIDE } Redo(text: Texts.Text);
 		BEGIN
 			t.AcquireRead;
 			text.CopyFromText(t, 0, t.GetLength(), pos);
@@ -308,14 +308,14 @@ TYPE
 			t.ReleaseRead;
 		END New;
 
-		PROCEDURE Undo(text: Texts.Text);
+		PROCEDURE { OVERRIDE } Undo(text: Texts.Text);
 		BEGIN
 			t.AcquireRead;
 			text.CopyFromText(t, 0, t.GetLength(), pos);
 			t.ReleaseRead;
 		END Undo;
 
-		PROCEDURE Redo(text: Texts.Text);
+		PROCEDURE { OVERRIDE } Redo(text: Texts.Text);
 		BEGIN
 			t.AcquireRead;
 			text.Delete(pos, t.GetLength());
@@ -370,7 +370,7 @@ TYPE
 		PROCEDURE SetStyle*(textpos, len: SIZE; style: ANY);
 		END SetStyle;
 
-		PROCEDURE Undo(text: Texts.Text);
+		PROCEDURE { OVERRIDE } Undo(text: Texts.Text);
 		VAR cur: StyleInfo;
 		BEGIN
 			cur := old;
@@ -399,7 +399,7 @@ TYPE
 			END;
 		END Undo;
 
-		PROCEDURE Redo(text: Texts.Text);
+		PROCEDURE { OVERRIDE } Redo(text: Texts.Text);
 		BEGIN
 			CASE type OF
 				Attribute:

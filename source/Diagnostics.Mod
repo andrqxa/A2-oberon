@@ -53,17 +53,17 @@ TYPE
 
 		nofMessages- : SIZE;
 
-		PROCEDURE Error*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Error*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN {EXCLUSIVE}
 			InsertSorted(TypeError, source, position, message, nofErrors)
 		END Error;
 
-		PROCEDURE Warning*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Warning*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN {EXCLUSIVE}
 			InsertSorted(TypeWarning, source, position, message, nofWarnings);
 		END Warning;
 
-		PROCEDURE Information*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Information*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN {EXCLUSIVE}
 			InsertSorted(TypeInformation, source, position, message, nofInformations);
 		END Information;
@@ -153,15 +153,15 @@ TYPE
 			writer := w;
 		END Init;
 
-		PROCEDURE Error* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Error* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN Print (writer, source, position, TypeError, message);
 		END Error;
 
-		PROCEDURE Warning* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Warning* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN Print (writer, source, position, TypeWarning, message);
 		END Warning;
 
-		PROCEDURE Information* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Information* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN Print (writer, source, position, TypeInformation, message);
 		END Information;
 

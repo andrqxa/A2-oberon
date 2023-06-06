@@ -67,14 +67,14 @@ TYPE
 		PROCEDURE Open* (bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
 		END Open;
 
-		PROCEDURE Close* ;
+		PROCEDURE { OVERRIDE } Close* ;
 		END Close;
 
 		PROCEDURE SendChar* (ch: CHAR; VAR res : INTEGER);
 		END SendChar;
 
 		(** Send len characters from buf to output, starting at ofs. res is non-zero on error. *)
-		PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR i : SIZE;
 		BEGIN
 			i := 0;
@@ -90,7 +90,7 @@ TYPE
 
 		(** Receive size characters into buf, starting at ofs and return the effective number of bytes read in len.
 			Wait until at least min bytes (possibly zero) are available. res is non-zero on error. *)
-		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR ch: CHAR;
 		BEGIN
 			len := 0;

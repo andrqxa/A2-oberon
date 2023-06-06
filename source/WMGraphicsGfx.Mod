@@ -11,7 +11,7 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 		gfxLineWidth: FLOAT32;
 		dashLength: FLOAT32;
 
-		PROCEDURE &New*(img : Raster.Image);
+		PROCEDURE (* OVERRIDE *) & New*(img : Raster.Image);
 		BEGIN
 			New^(img);
 			generator:=Strings.NewString("WMGraphicsGfx.GenCanvas");
@@ -36,14 +36,14 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 			SetFillColor(WMGraphics.Red);
 		END SetupDrawing;
 
-		PROCEDURE SetLineWidth*(w:FLOAT32);
+		PROCEDURE { OVERRIDE } SetLineWidth*(w:FLOAT32);
 		BEGIN
 			gfxLineWidth:=w;
 			Gfx.SetLineWidth(gfxContext,w);
 		END SetLineWidth;
 
 		(* set line color*)
-		PROCEDURE SetColor*(color:WMGraphics.Color);
+		PROCEDURE { OVERRIDE } SetColor*(color:WMGraphics.Color);
 		BEGIN
 			IF color#SELF.color THEN
 				SetColor^(color);
@@ -95,13 +95,13 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 		END SetFont;
 		*)
 
-		PROCEDURE DrawString*(x, y: SIZE; CONST text : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } DrawString*(x, y: SIZE; CONST text : ARRAY OF CHAR);
 		BEGIN
 			ASSERT(font#NIL);
 			Gfx.DrawStringAt(gfxContext, x, y, text);
 		END DrawString;
 
-		PROCEDURE Line*(x0, y0, x1, y1 : SIZE; lineColor : WMGraphics.Color; mode : INTEGER); (*this is a heavy duty procedure that can be called millions of times in time-varying or scrolled graphs - optimize*)
+		PROCEDURE { OVERRIDE } Line*(x0, y0, x1, y1 : SIZE; lineColor : WMGraphics.Color; mode : INTEGER); (*this is a heavy duty procedure that can be called millions of times in time-varying or scrolled graphs - optimize*)
 		BEGIN
 			IF lineColor # color THEN
 				SetColor(lineColor);

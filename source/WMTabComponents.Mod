@@ -53,7 +53,7 @@ TYPE
 		imgLeftSelected, imgMiddleSelected, imgRightSelected,
 		imgLeftAttention, imgMiddleAttention, imgRightAttention : WMGraphics.Image;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrTabs);
@@ -112,13 +112,13 @@ TYPE
 			NEW(lineHeight, ProtoLineHeight, NIL, NIL); properties.Add(lineHeight);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			CheckLeftRightButtons;
 		END Initialize;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF 	(property = useBgBitmaps) OR
 				(property = bgLeftDefault) OR (property = bgMiddleDefault) OR (property = bgRightDefault) OR
@@ -140,7 +140,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR s : Strings.String;
 		BEGIN
 			RecacheProperties^;
@@ -187,7 +187,7 @@ TYPE
 			RETURN NIL
 		END FindTabFromPos;
 
-		PROCEDURE PointerDown*(x, y: SIZE; keys: SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerDown*(x, y: SIZE; keys: SET); (** PROTECTED *)
 		VAR new : Tab;
 		BEGIN
 			IF 0 IN keys THEN
@@ -226,7 +226,7 @@ TYPE
 			Release;
 		END SelectByName;
 
-		PROCEDURE PointerMove*(x, y: SIZE; keys: SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerMove*(x, y: SIZE; keys: SET); (** PROTECTED *)
 		VAR  new : Tab;
 		BEGIN
 			new := FindTabFromPos(x,y);
@@ -236,7 +236,7 @@ TYPE
 			END
 		END PointerMove;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			hover := NIL;
 			Invalidate
@@ -347,7 +347,7 @@ TYPE
 			END
 		END CheckLeftRightButtons;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			Resized^;
 			CheckLeftRightButtons
@@ -422,7 +422,7 @@ TYPE
 			NEW(tab); RETURN tab
 		END NewTab;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR r : WMRectangles.Rectangle;
 			w, h, lh, dl, dr, wLeft, wRight : SIZE;
 			pos,ypos : SIZE; dx, dy, dc : SIZE;
@@ -559,7 +559,7 @@ TYPE
 
 		next : TabEntry;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = caption) THEN
 				IF (tabs # NIL) & (tab # NIL) THEN
@@ -578,7 +578,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrTab);
@@ -605,7 +605,7 @@ TYPE
 		first : BOOLEAN;
 		tabs : Tabs;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrTabPanel);
@@ -617,7 +617,7 @@ TYPE
 			entries := NIL;
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR string : Strings.String;
 		BEGIN
 			IF (property = selection) THEN
@@ -651,7 +651,7 @@ TYPE
 			END;
 		END TabSelected;
 
-		PROCEDURE AddContent*(c : XML.Content);
+		PROCEDURE { OVERRIDE } AddContent*(c : XML.Content);
 		VAR entry : TabEntry;  tab : Tab; string : Strings.String; select : BOOLEAN;
 		BEGIN
 			IF (c IS Tabs) THEN

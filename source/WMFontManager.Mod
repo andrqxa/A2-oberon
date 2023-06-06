@@ -185,7 +185,7 @@ TYPE
 			RETURN font;
 		END Load;
 
-		PROCEDURE GetFont*(CONST name : ARRAY OF CHAR; size : SIZE; style : SET) : WMGraphics.Font;
+		PROCEDURE { OVERRIDE } GetFont*(CONST name : ARRAY OF CHAR; size : SIZE; style : SET) : WMGraphics.Font;
 		VAR tf,f : WMGraphics.Font; l : LoaderInfo; fi : FontInfo; i: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			font := defaultFont;
@@ -230,7 +230,7 @@ TYPE
 			RETURN font
 		END GetFont;
 
-		PROCEDURE GetSystemFont*(CONST systemName : ARRAY OF CHAR) : WMGraphics.Font;
+		PROCEDURE { OVERRIDE } GetSystemFont*(CONST systemName : ARRAY OF CHAR) : WMGraphics.Font;
 		VAR count := 0, i: SIZE; fontInfo: FontInfo; name: ARRAY 256 OF CHAR; size: SIZE; style: SET; defined := {}: SET;
 			PROCEDURE GetAlias(CONST key: ARRAY OF CHAR; VAR value: ARRAY OF CHAR): BOOLEAN;
 			BEGIN
@@ -259,7 +259,7 @@ TYPE
 			RETURN NIL;
 		END GetSystemFont;
 
-		PROCEDURE GetSystemFontInfo*(CONST systemName : ARRAY OF CHAR; VAR name : ARRAY OF CHAR; VAR size: SIZE; VAR style: SET) : BOOLEAN;
+		PROCEDURE { OVERRIDE } GetSystemFontInfo*(CONST systemName : ARRAY OF CHAR; VAR name : ARRAY OF CHAR; VAR size: SIZE; VAR style: SET) : BOOLEAN;
 		VAR i := 0: SIZE; fontInfo: FontInfo;
 		BEGIN
 			IF nofSystemFonts > 0 THEN

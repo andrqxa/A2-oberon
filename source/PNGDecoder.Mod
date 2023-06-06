@@ -493,7 +493,7 @@ TYPE
 			RETURN result
 		END GetLongint;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR ch : ChunkHeader;
 			i : SIGNED32;
 			isPNG : BOOLEAN;
@@ -515,7 +515,7 @@ TYPE
 			END
 		END Open;
 
-		PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
+		PROCEDURE { OVERRIDE } GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
 		BEGIN
 			width := hdr.width;
 			height := hdr.height;
@@ -523,7 +523,7 @@ TYPE
 			maxProgressionLevel := 0
 		END GetImageInfo;
 
-		PROCEDURE GetNativeImage*(VAR img : Raster.Image);
+		PROCEDURE { OVERRIDE } GetNativeImage*(VAR img : Raster.Image);
 		VAR ch : ChunkHeader;
 		BEGIN
 			IF ~errors THEN
@@ -535,7 +535,7 @@ TYPE
 			img := pic
 		END GetNativeImage;
 
-		PROCEDURE Render*(img : Raster.Image);
+		PROCEDURE { OVERRIDE } Render*(img : Raster.Image);
 		VAR canvas : WMGraphics.BufferCanvas;
 		BEGIN
 			IF ~last & ~errors THEN GetNativeImage(pic) END;

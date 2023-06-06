@@ -124,16 +124,16 @@ OSCBundle b:
 		OSCParamAbsInteger = OBJECT(OSCParamObject)
 			VAR (* 32bit on IA32 *)
 				integer-: SIGNED32;
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			BEGIN
 				RETURN 4;
 			END GetSize;
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			BEGIN
 				Network.PutNet4(packet, pos, integer);
 				INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamAbsInteger{ }'); KernelLog.Ln;
 			END dump;
@@ -146,7 +146,7 @@ OSCBundle b:
 				integer := i;
 				tag := 'i';
 			END InitInteger;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamInt { ');
 				KernelLog.Int(integer, 1); KernelLog.String(' ('); KernelLog.Hex(integer, 1); KernelLog.String(') }'); KernelLog.Ln;
@@ -162,16 +162,16 @@ OSCBundle b:
 				float := f;
 				tag := 'f';
 			END InitFloat;
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			BEGIN
 				RETURN 4;
 			END GetSize;
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			BEGIN
 				Network.PutNet4(packet, pos, Reals.Int(float));
 				INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			VAR
 				l, hi, lo: SIGNED32;
 			BEGIN
@@ -188,16 +188,16 @@ OSCBundle b:
 		OSCParamAbsString = OBJECT(OSCParamObject)
 			VAR
 				string-: String;
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			BEGIN
 				RETURN(padsize(Strings.Length(string^)+1));
 			END GetSize;
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			BEGIN
 				ASSERT(string # NIL);
 				exportString(string, packet, pos);
 			END export;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamAbsString { '); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -211,7 +211,7 @@ OSCBundle b:
 				string := s;
 				tag := 's';
 			END InitString;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamString{ ');
 				KernelLog.String(string^); KernelLog.String(' }'); KernelLog.Ln;
@@ -231,11 +231,11 @@ OSCBundle b:
 				size := s;
 				tag := 'b';
 			END InitBlob;
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			BEGIN
 				RETURN(padsize(size)+4);
 			END GetSize;
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR i: SIZE;
 			BEGIN
 				Network.PutNet4(packet, pos, size(SIGNED32)); INC(pos, 4);
@@ -247,7 +247,7 @@ OSCBundle b:
 					packet[pos] := 0X; INC(pos);
 				END;
 			END export;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamBlob { '); KernelLog.Buffer(blob^, 0, size); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -276,11 +276,11 @@ OSCBundle b:
 				integer := i;
 				tag := 'h';
 			END InitInt64;
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			BEGIN
 				RETURN 8;
 			END GetSize;
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR
 				l, h: SIGNED32;
 			BEGIN
@@ -289,7 +289,7 @@ OSCBundle b:
 				SYSTEM.GET(ADDRESSOF(integer)+L, l);
 				Network.PutNet4(packet, pos, l); INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamInteger64 { '); KernelLog.HIntHex(integer, 16); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -304,15 +304,15 @@ OSCBundle b:
 				ASSERT(tt # NIL);
 				tag := 't';
 			END InitTT;
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			BEGIN
 				RETURN tt.GetSize();
 			END GetSize;
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			BEGIN
 				tt.export(packet, pos);
 			END export;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamTT { '); KernelLog.Ln;
 				tt.dump(indent+1);
@@ -329,11 +329,11 @@ OSCBundle b:
 				float := f;
 				tag := 'd';
 			END InitFloat64;
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			BEGIN
 				RETURN 8;
 			END GetSize;
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR
 				l, h: SIGNED32;
 			BEGIN
@@ -341,7 +341,7 @@ OSCBundle b:
 				Network.PutNet4(packet, pos, h); INC(pos, 4);
 				Network.PutNet4(packet, pos, l); INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamFloat64 { '); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -355,7 +355,7 @@ OSCBundle b:
 				string := s;
 				tag := 'S';
 			END InitAltString;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamAltString { '); KernelLog.String(string^); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -370,15 +370,15 @@ OSCBundle b:
 				char := c;
 				tag := 'c';
 			END InitChar;
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			BEGIN
 				RETURN 4;
 			END GetSize;
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			BEGIN
 				Network.PutNet4(packet, pos, ORD(char)); INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamChar { '); KernelLog.Char(char); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -391,7 +391,7 @@ OSCBundle b:
 				tag := 'r';
 				integer := c;
 			END InitRGBAColor;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamRGBAColor { '); KernelLog.Int(integer, 4); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -399,13 +399,13 @@ OSCBundle b:
 
 		(* This 'abstract' class contains shared code for all types without argument data *)
 		OSCParamEmpty = OBJECT(OSCParamObject)
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			BEGIN
 				RETURN 0;
 			END GetSize;
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			END export;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamEmpty { }'); KernelLog.Ln;
 			END dump;
@@ -417,7 +417,7 @@ OSCBundle b:
 			BEGIN
 				tag := 'T';
 			END InitTrue;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamTrue { }'); KernelLog.Ln;
 			END dump;
@@ -429,7 +429,7 @@ OSCBundle b:
 			BEGIN
 				tag := 'F';
 			END InitFalse;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamFalse { }'); KernelLog.Ln;
 			END dump;
@@ -441,7 +441,7 @@ OSCBundle b:
 			BEGIN
 				tag := 'N';
 			END InitNil;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamNil { }'); KernelLog.Ln;
 			END dump;
@@ -453,7 +453,7 @@ OSCBundle b:
 			BEGIN
 				tag := 'I';
 			END InitInf;
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamNil { }'); KernelLog.Ln;
 			END dump;
@@ -649,7 +649,7 @@ OSCBundle b:
 					adr: OSCString;
 					"the argument data"
 			*)
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			VAR
 				i, argsize: SIZE;
 			BEGIN
@@ -677,7 +677,7 @@ OSCBundle b:
 			END AddArgument;
 
 			(* exports the binary representation of this OSCMessage to packet[pos..pos+GetSize()-1] *)
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR
 				i: SIZE;
 			BEGIN
@@ -705,7 +705,7 @@ OSCBundle b:
 				END;
 			END export;
 
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 				VAR i: SIGNED32;
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCMessage { address: '); KernelLog.String(address^); KernelLog.String(' noTypeTagString: ');
@@ -745,7 +745,7 @@ OSCBundle b:
 				messages[messagescount] := p;
 				INC(messagescount);
 			END AddPacket;
-			PROCEDURE GetSize*(): SIZE;
+			PROCEDURE { OVERRIDE } GetSize*(): SIZE;
 			VAR
 				s, i: SIZE;
 			BEGIN (* '#bundle' 8, timetag: 8, bundle elements ( := size + packet ) *)
@@ -801,7 +801,7 @@ OSCBundle b:
 			END GetTimeout;
 
 			(* registers the returner also to all submessages or subbundles *)
-			PROCEDURE SetReturner*(s: OSCReturnProc; data: OBJECT);
+			PROCEDURE { OVERRIDE } SetReturner*(s: OSCReturnProc; data: OBJECT);
 			VAR
 				i: SIZE;
 			BEGIN
@@ -811,7 +811,7 @@ OSCBundle b:
 				END;
 			END SetReturner;
 
-			PROCEDURE dump*(indent: SIGNED32);
+			PROCEDURE { OVERRIDE } dump*(indent: SIGNED32);
 			VAR
 				i: SIZE;
 			BEGIN
@@ -823,7 +823,7 @@ OSCBundle b:
 				indentDump(indent); KernelLog.String('}'); KernelLog.Ln;
 			END dump;
 
-			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			PROCEDURE { OVERRIDE } export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR
 				i: SIZE;
 			BEGIN

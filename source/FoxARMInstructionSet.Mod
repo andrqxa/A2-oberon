@@ -2845,7 +2845,7 @@ CONST
 	TYPE
 		Disasm = OBJECT (Disassembler.Disassembler)
 
-			PROCEDURE DisassembleInstruction(bitSet: BitSets.BitSet; VAR adr: Disassembler.Unit; maxInstructionSize: Disassembler.Unit; w:Streams.Writer);
+			PROCEDURE { OVERRIDE } DisassembleInstruction(bitSet: BitSets.BitSet; VAR adr: Disassembler.Unit; maxInstructionSize: Disassembler.Unit; w:Streams.Writer);
 			VAR instruction: Instruction; value: INTEGER; mnemonic: INTEGER;
 			BEGIN
 				(* maxInstructionSize can be ignored here *)

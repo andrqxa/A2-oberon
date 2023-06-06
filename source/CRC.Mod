@@ -60,7 +60,7 @@ TYPE
 			InitWriter(Send, 256)
 		END InitStream;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN
 			Update();
 			crc := Init32

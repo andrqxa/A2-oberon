@@ -25,7 +25,7 @@ TYPE
 				subkeys: ARRAY 8 + 2*N OF SIGNED32;
 				iv: Block;
 
-				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE );
+				PROCEDURE { OVERRIDE } InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE );
 				CONST step = 02020202H;  bump = 01010101H;
 				VAR
 					i: SIZE;  A, B, m, nsub: SIGNED32;
@@ -52,14 +52,14 @@ TYPE
 					END
 				END InitKey;
 
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
+				PROCEDURE { OVERRIDE } SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
 				VAR i: SIGNED16;
 				BEGIN
 					SetIV^( src, mode );   (* set mode *)
 					FOR i := 0 TO 3 DO  iv[i] := U.SetFromBufferLE( src, 4*i )  END;
 				END SetIV;
 
-				PROCEDURE Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR i: SIZE;
 				BEGIN
 					ASSERT( isKeyInitialized & (mode IN {Ciphers.ECB, Ciphers.CBC}) );
@@ -68,7 +68,7 @@ TYPE
 					WHILE i < len DO  EncryptBlock( buf, ofs + i );  INC( i, blockSize );   END
 				END Encrypt;
 
-				PROCEDURE Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR i: SIZE;
 				BEGIN
 					ASSERT( isKeyInitialized );
@@ -129,7 +129,7 @@ TYPE
 					END;
 				END DecryptBlock;
 
-				PROCEDURE & Init*;
+				PROCEDURE (* OVERRIDE *) & Init*;
 				BEGIN
 					SetNameAndBlocksize( "twofish", 16 )
 				END Init;

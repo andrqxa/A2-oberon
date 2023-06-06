@@ -17,7 +17,7 @@ TYPE
 			size, cyls, hds, spt: SIGNED32;
 			new: BOOLEAN;
 
-		PROCEDURE Transfer*(op, lba, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Transfer*(op, lba, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		VAR pos, n: SIGNED32; r: Files.Rider;
 		BEGIN
 			ASSERT(ofs = 0);	(* implementation restriction *)
@@ -56,12 +56,12 @@ TYPE
 			END
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size, res: SIGNED32);
+		PROCEDURE { OVERRIDE } GetSize*(VAR size, res: SIGNED32);
 		BEGIN
 			size := SELF.size; res := Disks.Ok
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
 		BEGIN
 			IF (msg IS Disks.GetGeometryMsg) & (SELF.cyls > 0) THEN
 				WITH msg: Disks.GetGeometryMsg DO

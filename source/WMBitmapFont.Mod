@@ -32,7 +32,7 @@ TYPE
 		fontFile : Files.File;
 		empty : WMRectangles.Rectangle;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR mode : Raster.Mode; pix : Raster.Pixel;
 		BEGIN
 			Init^;
@@ -45,7 +45,7 @@ TYPE
 			ascent := 16; descent := 5;
 		END Init;
 
-		PROCEDURE GetGlyphMap*(code : Char32; VAR map : Graphics.Image);
+		PROCEDURE { OVERRIDE } GetGlyphMap*(code : Char32; VAR map : Graphics.Image);
 		VAR g : Glyph;
 		BEGIN
 			IF FindGlyph(code, g) THEN
@@ -55,14 +55,14 @@ TYPE
 			END
 		END GetGlyphMap;
 
-		PROCEDURE HasChar*(char : Char32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } HasChar*(char : Char32) : BOOLEAN;
 		VAR dummy : SIGNED32;
 		BEGIN
 			RETURN FindGlyphRange(char, dummy)
 		END HasChar;
 
 
-		PROCEDURE GetGlyphSpacings*(code : Char32; VAR glyphSpacings : Graphics.GlyphSpacings);
+		PROCEDURE { OVERRIDE } GetGlyphSpacings*(code : Char32; VAR glyphSpacings : Graphics.GlyphSpacings);
 		VAR g : Glyph;
 		BEGIN
 			IF FindGlyph(code, g) THEN

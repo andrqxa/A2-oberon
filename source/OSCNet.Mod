@@ -105,7 +105,7 @@ TYPE
 		END InitUDP;
 
 		(* sends an OSCMessage or an OSCBundle to fip:fport. Returns the statuscode of UDP.Socket.Send *)
-		PROCEDURE Send*(p: OSC.OSCPacket): INTEGER;
+		PROCEDURE { OVERRIDE } Send*(p: OSC.OSCPacket): INTEGER;
 		BEGIN
 			RETURN SendUDP(s, fip, fport, p);
 		END Send;
@@ -142,7 +142,7 @@ TYPE
 		END Recieve;
 
 		(* closes the clientconnection *)
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			s.Close();
 		END Close;
@@ -250,20 +250,20 @@ TYPE
 			connection.Open(lport, fip, fport, res);
 		END InitTCP;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			connection.Close;
 		END Close;
 
 		(* sends a packet to the connected OSCServer. Returns TCP.Ok if sent successfully, otherwise an TCP.* errorcode is
 			returned. *)
-		PROCEDURE Send*(p: OSC.OSCPacket): INTEGER;
+		PROCEDURE { OVERRIDE } Send*(p: OSC.OSCPacket): INTEGER;
 		BEGIN
 			RETURN SendTCP(connection, p);
 		END Send;
 
 		(* receives a packet from the OSC Server. *)
-		PROCEDURE Receive*(VAR p: OSC.OSCPacket): INTEGER;
+		PROCEDURE { OVERRIDE } Receive*(VAR p: OSC.OSCPacket): INTEGER;
 		BEGIN
 			RETURN ReceiveTCP(connection, p);
 		END Receive;

@@ -31,7 +31,7 @@ TYPE
 			sendBuffer: ARRAY BufSize OF CHAR; bufPos, sentBytes: SIZE;
 			rpac: Packet;
 
-			PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
+			PROCEDURE { OVERRIDE } Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
 			VAR 
 				i: SIZE;
 			BEGIN 
@@ -43,7 +43,7 @@ TYPE
 				res := Streams.Ok
 			END Send;
 
-			PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
+			PROCEDURE { OVERRIDE } Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 			BEGIN
 				len := 0; 
 				REPEAT
@@ -184,7 +184,7 @@ TYPE
 				END;
 			END Eof;
 
-			PROCEDURE Close*;
+			PROCEDURE { OVERRIDE } Close*;
 			VAR p: Packet;
 			BEGIN
 				FlushBuffer;

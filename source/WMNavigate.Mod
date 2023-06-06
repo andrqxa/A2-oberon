@@ -267,7 +267,7 @@ TYPE
 
 		mouseOverIdx, lastMouseOverIdx : SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrBase);
@@ -298,7 +298,7 @@ TYPE
 			mouseOverIdx := -1; lastMouseOverIdx := -1;
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			IF (data = clDefault) OR (data = clSelected) OR (data = clMouseOver) OR (data = clSelectedMouseOver) OR
 				(data = clTextDefault) OR (data = clTextSelected) OR (data = clTextMouseOver) OR (data = clTextSelectedMouseOver) OR
@@ -313,7 +313,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			IF enabled.Get() THEN
 				lock.Acquire;
@@ -331,14 +331,14 @@ TYPE
 			PointerMove^(x, y, keys)
 		END PointerMove;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			PointerLeave^;
 			mouseOverIdx := -1; lastMouseOverIdx := -1;
 			Invalidate
 		END PointerLeave;
 
-		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y:SIZE; keys:SET);
 		VAR index : SIZE; window : WMWindowManager.Window;
 		BEGIN
 			IF (keys = {}) OR ~enabled.Get()  THEN RETURN; END;
@@ -382,7 +382,7 @@ TYPE
 			WMGraphicUtilities.RectGlassShade(canvas, rect, borderWidth.Get(), hasFocus);
 		END DrawInternal;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR
 			row, column, x, y : SIZE;
 			width, height : SIZE;
@@ -446,7 +446,7 @@ TYPE
 			RETURN canvas;
 		END CreateAuxCanvas;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			PropertyChanged^(sender, data);
 			IF (data = bounds) THEN
@@ -470,7 +470,7 @@ TYPE
 			END;
 		END UpdateLayout;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrWindowOverview);
@@ -485,7 +485,7 @@ TYPE
 			NEW(timer);
 		END Init;
 
-		PROCEDURE DrawInternal(canvas : WMGraphics.Canvas; x, y, width, height : SIZE; window : WMWindowManager.Window; hasFocus, mouseOver : BOOLEAN; VAR extImage : WMGraphics.Image);
+		PROCEDURE { OVERRIDE } DrawInternal(canvas : WMGraphics.Canvas; x, y, width, height : SIZE; window : WMWindowManager.Window; hasFocus, mouseOver : BOOLEAN; VAR extImage : WMGraphics.Image);
 		VAR
 			image : Raster.Image;
 			title : Strings.String;
@@ -546,7 +546,7 @@ TYPE
 			canvas.DrawString(x + (width - sizeX) DIV 2, y + 15, title^);
 		END DrawInternal;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			state := Terminating;  timer.Wakeup;
@@ -599,7 +599,7 @@ TYPE
 
 		msg: WMMessages.Message;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrTaskList);
@@ -627,7 +627,7 @@ TYPE
 			lastWindow := NIL;
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			PropertyChanged^(sender, data);
 			IF (data = menuLocation) THEN
@@ -685,13 +685,13 @@ TYPE
 			manager.lock.ReleaseWrite;
 		END GoToWindow;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			lastKeys := {};
 		END FocusLost;
 
-		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y:SIZE; keys:SET);
 		VAR
 			m : WMMessages.Message;
 			index : SIZE; window : WMWindowManager.Window;
@@ -784,7 +784,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR window : WMWindowManager.Window; windowCloser : DoCloseWindow; index : SIZE;
 		BEGIN
 			PointerUp^(x, y, keys);
@@ -883,7 +883,7 @@ TYPE
 			canvas.DrawString(x + 4, y + height - 5, title^);
 		END DrawInternalText;
 
-		PROCEDURE DrawInternal(canvas : WMGraphics.Canvas; x, y, width, height : SIZE; window : WMWindowManager.Window; hasFocus, mouseOver : BOOLEAN; VAR extImage : WMGraphics.Image);
+		PROCEDURE { OVERRIDE } DrawInternal(canvas : WMGraphics.Canvas; x, y, width, height : SIZE; window : WMWindowManager.Window; hasFocus, mouseOver : BOOLEAN; VAR extImage : WMGraphics.Image);
 		BEGIN
 			canvas.SetClipRect(WMRectangles.MakeRect(x, y, x + width, y + height));
 			DrawInternal^(canvas, x, y, width, height, window, hasFocus, mouseOver, extImage);
@@ -894,7 +894,7 @@ TYPE
 			END;
 		END DrawInternal;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			state := Terminating;
@@ -1060,7 +1060,7 @@ TYPE
 			Invalidate;
 		END SetInfo;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			IF enabled.Get() THEN
 				xt := x; yt := y;
@@ -1071,14 +1071,14 @@ TYPE
 			PointerMove^(x, y, keys)
 		END PointerMove;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			PointerLeave^;
 			xt := -1; yt := -1;
 			Invalidate
 		END PointerLeave;
 
-		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y:SIZE; keys:SET);
 		BEGIN
 			IF enabled.Get() THEN
 				SELF.keys := keys;
@@ -1110,7 +1110,7 @@ TYPE
 			owner.Close;
 		END PointerDown;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas);
 		VAR y : SIZE;
 
 			PROCEDURE IsHighlighted(y : SIZE) : BOOLEAN;
@@ -1300,7 +1300,7 @@ TYPE
 			manager.SetFocus(SELF);
 		END New;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER); (** override *)
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER); (** override *)
 		BEGIN
 			Draw^(canvas, w, h, q);
 			canvas.Fill(shadowRectB, 04FH, WMGraphics.ModeSrcOverDst);
@@ -1313,13 +1313,13 @@ TYPE
 			BEGIN {EXCLUSIVE} close := TRUE; END;
 		END SetClosed;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			SetClosed;
 			Close^;
 		END Close;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE); (* override *)
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE); (* override *)
 		BEGIN
 			IF ~(Inputs.Release IN flags) THEN
 				IF keysym = 0FF54H THEN (* Cursor Down *)
@@ -1333,7 +1333,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			Close;
@@ -1368,7 +1368,7 @@ TYPE
 			pointerThreshold := 1;
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			windows[myId] := NIL;

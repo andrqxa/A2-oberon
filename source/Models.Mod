@@ -31,7 +31,7 @@ TYPE
 		notificationMode : SIGNED8;
 		lock : Locks.RWLock;
 
-		PROCEDURE &Init*; (** protected *)
+		PROCEDURE (* OVERRIDE *) & Init*; (** protected *)
 		BEGIN
 			Init^;
 			notificationMode := OnChanged;
@@ -128,7 +128,7 @@ TYPE
 
 	(** Internalization and externalization *)
 
-		PROCEDURE AddContent*(content : XML.Content); (** overwrite, protected *)
+		PROCEDURE { OVERRIDE } AddContent*(content : XML.Content); (** overwrite, protected *)
 		VAR string : Types.String; res : INTEGER;
 		BEGIN
 			IF (content # NIL) & (content IS XML.Element) & (content(XML.Element).GetName()^="VALUE") THEN
@@ -157,7 +157,7 @@ TYPE
 		END WriteValue;
 
 		(** Externalize model to stream <w> at indention level <level> *)
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32); (** overwrite *)
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32); (** overwrite *)
 		VAR name : Strings.String; enum: XMLObjects.Enumerator; c: ANY;
 		BEGIN
 			IF (SELF IS Container) THEN
@@ -191,7 +191,7 @@ TYPE
 	VAR
 		value : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrBoolean);
@@ -218,21 +218,21 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : BOOLEAN;
 		BEGIN
 			Types.GetBoolean(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : BOOLEAN;
 		BEGIN
 			currentValue := Get();
 			Types.SetBoolean(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			IF value THEN w.String("TRUE"); ELSE w.String("FALSE"); END;
@@ -246,7 +246,7 @@ TYPE
 	VAR
 		value : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrInteger);
@@ -283,21 +283,21 @@ TYPE
 			END;
 		END Add;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : SIGNED32;
 		BEGIN
 			Types.GetInteger(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : SIGNED32;
 		BEGIN
 			currentValue := Get();
 			Types.SetInteger(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Int(value, 0);
@@ -309,7 +309,7 @@ TYPE
 	VAR
 		value : SIGNED64;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrHugeint);
@@ -346,21 +346,21 @@ TYPE
 			END;
 		END Add;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : SIGNED64;
 		BEGIN
 			Types.GetHugeint(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : SIGNED64;
 		BEGIN
 			currentValue := Get();
 			Types.SetHugeint(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Int(value, 0);
@@ -372,7 +372,7 @@ TYPE
 	VAR
 		value : SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrSize);
@@ -409,21 +409,21 @@ TYPE
 			END;
 		END Add;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : SIZE;
 		BEGIN
 			Types.GetSize(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : SIZE;
 		BEGIN
 			currentValue := Get();
 			Types.SetSize(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Int(value, 0);
@@ -437,7 +437,7 @@ TYPE
 	VAR
 		value : FLOAT32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrReal);
@@ -464,21 +464,21 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : FLOAT32;
 		BEGIN
 			Types.GetReal(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : FLOAT32;
 		BEGIN
 			currentValue := Get();
 			Types.SetReal(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Float(value, 15); (*8 decimal, 'E-', 2 expo, decimal point, leading space*)
@@ -492,7 +492,7 @@ TYPE
 	VAR
 		value : FLOAT64;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrLongreal);
@@ -519,21 +519,21 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : FLOAT64;
 		BEGIN
 			Types.GetLongreal(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : FLOAT64;
 		BEGIN
 			currentValue := Get();
 			Types.SetLongreal(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Float(value, 24); (* leading space, decimal point, 16 digits, 5 expo *)
@@ -547,7 +547,7 @@ TYPE
 	VAR
 		value : CHAR;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrChar);
@@ -574,21 +574,21 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : CHAR;
 		BEGIN
 			Types.GetChar(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : CHAR;
 		BEGIN
 			currentValue := Get();
 			Types.SetChar(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			IF IsPrintableCharacter(value) THEN
@@ -607,7 +607,7 @@ TYPE
 	VAR
 		value : Strings.String; (* {value # NIL} *)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(value, InitialStringSize);
@@ -660,21 +660,21 @@ TYPE
 			ReleaseRead;
 		END GetAOC;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : Strings.String;
 		BEGIN
 			Types.GetString(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : Strings.String;
 		BEGIN
 			currentValue := Get();
 			Types.SetString(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		VAR res : INTEGER;
 		BEGIN
 			WriteValue^(w, level);
@@ -689,7 +689,7 @@ TYPE
 	VAR
 		value : SET;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrSet);
@@ -745,21 +745,21 @@ TYPE
 			RETURN result;
 		END Contains;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : SET;
 		BEGIN
 			Types.GetSet(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : SET;
 		BEGIN
 			currentValue := Get();
 			Types.SetSet(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Set(value);
@@ -774,7 +774,7 @@ TYPE
 	VAR
 		value : Texts.Text; (* {value # NIL} *)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrText);
@@ -782,33 +782,33 @@ TYPE
 			SetGenerator("Models.GenText");
 		END Init;
 
-		PROCEDURE AcquireRead*;
+		PROCEDURE { OVERRIDE } AcquireRead*;
 		BEGIN
 			value.AcquireRead;
 		END AcquireRead;
 
-		PROCEDURE ReleaseRead*;
+		PROCEDURE { OVERRIDE } ReleaseRead*;
 		BEGIN
 			value.ReleaseRead;
 		END ReleaseRead;
 
-		PROCEDURE HasReadLock*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } HasReadLock*() : BOOLEAN;
 		BEGIN
 			RETURN value.HasReadLock();
 		END HasReadLock;
 
-		PROCEDURE AcquireWrite*;
+		PROCEDURE { OVERRIDE } AcquireWrite*;
 		BEGIN
 			value.AcquireWrite;
 		END AcquireWrite;
 
-		PROCEDURE ReleaseWrite*;
+		PROCEDURE { OVERRIDE } ReleaseWrite*;
 		BEGIN
 			value.ReleaseWrite;
 			onChanged.Call(SELF); (*? TBD only call when text has changed *)
 		END ReleaseWrite;
 
-		PROCEDURE HasWriteLock*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } HasWriteLock*() : BOOLEAN;
 		BEGIN
 			RETURN value.HasWriteLock();
 		END HasWriteLock;
@@ -864,21 +864,21 @@ TYPE
 			ReleaseRead;
 		END GetAsString;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : Texts.Text;
 		BEGIN
 			Types.GetText(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : Texts.Text;
 		BEGIN
 			currentValue := Get();
 			Types.SetText(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		PROCEDURE { OVERRIDE } WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			(* TBD *)
@@ -890,7 +890,7 @@ TYPE
 
 	Container* = OBJECT(Model)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrContainer);

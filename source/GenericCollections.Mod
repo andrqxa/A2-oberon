@@ -104,22 +104,22 @@ TYPE
 	VAR
 		m_iPos: SIZE;
 
-		PROCEDURE Reset*();
+		PROCEDURE { OVERRIDE } Reset*();
 		BEGIN
 			m_iPos := 0
 		END Reset;
 
-		PROCEDURE Count*(): SIZE;
+		PROCEDURE { OVERRIDE } Count*(): SIZE;
 		BEGIN
 			RETURN m_iPos
 		END Count;
 
-		PROCEDURE Empty*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } Empty*(): BOOLEAN;
 		BEGIN
 			RETURN m_iPos = 0
 		END Empty;
 
-		PROCEDURE Pop*(VAR t: T): BOOLEAN;
+		PROCEDURE { OVERRIDE } Pop*(VAR t: T): BOOLEAN;
 		VAR
 			bOk: BOOLEAN;
 		BEGIN
@@ -130,14 +130,14 @@ TYPE
 			RETURN bOk
 		END Pop;
 
-		PROCEDURE Push*(CONST t: T);
+		PROCEDURE { OVERRIDE } Push*(CONST t: T);
 		BEGIN
 			IF m_iPos = m_iSize THEN Grow END;
 			m_pArray[m_iPos] := t;
 			INC(m_iPos)
 		END Push;
 
-		PROCEDURE Top*(VAR t: T): BOOLEAN;
+		PROCEDURE { OVERRIDE } Top*(VAR t: T): BOOLEAN;
 		VAR
 			bOk: BOOLEAN;
 		BEGIN
@@ -153,23 +153,23 @@ TYPE
 	VAR
 		m_iHead, m_iTail: SIZE;
 
-		PROCEDURE Reset*();
+		PROCEDURE { OVERRIDE } Reset*();
 		BEGIN
 			m_iHead := 0;
 			m_iTail := 0
 		END Reset;
 
-		PROCEDURE Count*(): SIZE;
+		PROCEDURE { OVERRIDE } Count*(): SIZE;
 		BEGIN
 			RETURN m_iTail - m_iHead
 		END Count;
 
-		PROCEDURE Empty*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } Empty*(): BOOLEAN;
 		BEGIN
 			RETURN m_iTail - m_iHead = 0
 		END Empty;
 
-		PROCEDURE Grow();
+		PROCEDURE { OVERRIDE } Grow();
 		VAR
 			iCount, i: SIZE;
 		BEGIN
@@ -190,7 +190,7 @@ TYPE
 			END
 		END Grow;
 
-		PROCEDURE Pop*(VAR t: T): BOOLEAN;
+		PROCEDURE { OVERRIDE } Pop*(VAR t: T): BOOLEAN;
 		VAR
 			bOk: BOOLEAN;
 		BEGIN
@@ -201,14 +201,14 @@ TYPE
 			RETURN bOk
 		END Pop;
 
-		PROCEDURE Push*(CONST t: T);
+		PROCEDURE { OVERRIDE } Push*(CONST t: T);
 		BEGIN
 			IF m_iTail = m_iSize THEN Grow END;
 			m_pArray[m_iTail] := t;
 			INC(m_iTail)
 		END Push;
 
-		PROCEDURE Top*(VAR t: T): BOOLEAN;
+		PROCEDURE { OVERRIDE } Top*(VAR t: T): BOOLEAN;
 		VAR
 			bOk: BOOLEAN;
 		BEGIN
@@ -237,18 +237,18 @@ TYPE
 			RETURN pos
 		END Add;
 
-		PROCEDURE Reset*();
+		PROCEDURE { OVERRIDE } Reset*();
 		BEGIN
 			f_bSorted := FALSE;
 			m_iPos := 0
 		END Reset;
 
-		PROCEDURE Count*(): SIZE;
+		PROCEDURE { OVERRIDE } Count*(): SIZE;
 		BEGIN
 			RETURN m_iPos
 		END Count;
 
-		PROCEDURE Empty*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } Empty*(): BOOLEAN;
 		BEGIN
 			RETURN m_iPos = 0
 		END Empty;

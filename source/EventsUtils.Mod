@@ -72,7 +72,7 @@ TYPE
 			RETURN maxNofWrappers * eventsPerWrapper;
 		END GetSize;
 
-		PROCEDURE Handle*(event : Events.Event);
+		PROCEDURE { OVERRIDE } Handle*(event : Events.Event);
 		VAR wrapper : EventWrapper;
 		BEGIN {EXCLUSIVE}
 			IF nofEvents = maxNofWrappers * eventsPerWrapper THEN RETURN; END;

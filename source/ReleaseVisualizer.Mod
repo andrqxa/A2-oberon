@@ -455,7 +455,7 @@ TYPE
 			INC(nofObj)
 		END Add;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
+		PROCEDURE { OVERRIDE } Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		VAR i : SIZE;
 		BEGIN
 			FOR i := 0 TO nofObj - 1 DO
@@ -467,7 +467,7 @@ TYPE
 
 	Rectangle = OBJECT(Object)
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
+		PROCEDURE { OVERRIDE } Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		BEGIN
 			WMGraphicUtilities.DrawRect(canvas,
 				WMRectangles.MakeRect(ENTIER(dx + fx * aabb.l), ENTIER(dy + fy * aabb.t),
@@ -479,7 +479,7 @@ TYPE
 
 	Line = OBJECT(Object)
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
+		PROCEDURE { OVERRIDE } Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		BEGIN
 			canvas.Line(ENTIER(dx + fx * aabb.l), ENTIER(dy + fy * aabb.t), ENTIER(dx + fx * aabb.r), ENTIER(dy + fy * aabb.b),
 				0FFH, WMGraphics.ModeCopy);
@@ -490,7 +490,7 @@ TYPE
 	Title  = OBJECT(Object)
 	VAR title : ARRAY 100 OF CHAR;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
+		PROCEDURE { OVERRIDE } Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		BEGIN
 			canvas.SetFont(WMGraphics.GetFont("Vera", ENTIER(75 * fy + 0.5),  {}));
 			IF canvas IS PDF.PDFCanvas THEN canvas(PDF.PDFCanvas).PDFSetFont("Courier", ENTIER(75 * SHORT(fy)), {}) END;
@@ -644,7 +644,7 @@ TYPE
 			way[nofPoints] := b; INC(nofPoints);
 		END CalcPath;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
+		PROCEDURE { OVERRIDE } Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		VAR i : SIGNED32;
 		BEGIN
 			FOR i := 1 TO nofPoints - 1 DO
@@ -661,7 +661,7 @@ TYPE
 		m : ModuleInfo;
 		rellayerpos : FLOAT64;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
+		PROCEDURE { OVERRIDE } Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		VAR
 			r, rect : WMRectangles.Rectangle;
 			ty : FLOAT64;
@@ -711,7 +711,7 @@ TYPE
 		g : Graphic;
 		dx, dy : FLOAT64;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(g);
@@ -723,7 +723,7 @@ TYPE
 			Invalidate;
 		END XSetPos;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas);
 		BEGIN
 			g.Draw(canvas, -dx, -dy, 0.5, 0.5);
 		END Draw;
@@ -1173,13 +1173,13 @@ TYPE
 			viewer.Invalidate
 		END Populate;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			DecCount;
 			Close^;
 		END Close;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 			ELSE Handle^(x)

@@ -231,7 +231,7 @@ TYPE
 			NEW(timer)
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		VAR i : SIZE; o : ANY; info : Info;
 		BEGIN {EXCLUSIVE}
 			infoList.Lock;
@@ -254,7 +254,7 @@ TYPE
 			Invalidate(Rect.MakeRect(0,0,img.width, img.height))
 		END Render;
 
-		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y:SIZE; keys:SET);
 		BEGIN
 			mouseKeys := (keys * {0, 1, 2});
 			oldX := x; oldY := y;
@@ -263,7 +263,7 @@ TYPE
 			END
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y: SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y: SIZE; keys : SET);
 		BEGIN
 			IF mouseKeys * {0} # {} THEN
 				IF mouseKeys * {2} # {} THEN
@@ -277,7 +277,7 @@ TYPE
 			oldX := x; oldY := y
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y:SIZE; keys:SET);
 		BEGIN
 			mouseKeys := (keys * {0, 1, 2});
 		END PointerUp;

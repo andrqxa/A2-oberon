@@ -134,7 +134,7 @@ TYPE
 			leginr: Strings.String;
 			grades: IntList;
 
-		PROCEDURE Internalize*(input: XML.Content);
+		PROCEDURE { OVERRIDE } Internalize*(input: XML.Content);
 		VAR container: XML.Container; elem, subElem: XML.Element; p: ANY; enum: XMLObjects.Enumerator;
 			str: Strings.String; number: SIGNED32;
 		BEGIN
@@ -162,7 +162,7 @@ TYPE
 			END
 		END Internalize;
 
-		PROCEDURE Externalize*() : XML.Content;
+		PROCEDURE { OVERRIDE } Externalize*() : XML.Content;
 		VAR container: XML.Container; elem, subElem: XML.Element; str: ARRAY 14 OF CHAR; i: SIZE; number: SIGNED32;
 		BEGIN
 			NEW(container);
@@ -186,7 +186,7 @@ TYPE
 			RETURN container
 		END Externalize;
 
-		PROCEDURE TableView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : WebComplex.TableRow;
+		PROCEDURE { OVERRIDE } TableView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : WebComplex.TableRow;
 		VAR row: WebComplex.TableRow;
 		BEGIN
 			NEW(row, 6);
@@ -204,7 +204,7 @@ TYPE
 			RETURN row
 		END TableView;
 
-		PROCEDURE DetailView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } DetailView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR container: XML.Container; pTag: XML.Element;
 		BEGIN
 			NEW(container);
@@ -257,7 +257,7 @@ TYPE
 			RETURN table
 		END GetGradesDetailView;
 
-		PROCEDURE EditView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } EditView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR table: XML.Element;
 		BEGIN
 			NEW(table); table.SetName("table");
@@ -302,7 +302,7 @@ TYPE
 			searchText: Strings.String;
 			maxEntries: SIZE;
 
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR maxEntriesStr: Strings.String; elem: XML.Element;
 		BEGIN
 			elem := WebStd.GetXMLSubElement(input, "MaxEntries");
@@ -316,7 +316,7 @@ TYPE
 			RETURN Transform^(input, request);
 		END Transform;
 
-		PROCEDURE GetHeaderXMLContent*(persContainer: WebStd.PersistentDataContainer; input: XML.Element;
+		PROCEDURE { OVERRIDE } GetHeaderXMLContent*(persContainer: WebStd.PersistentDataContainer; input: XML.Element;
 			request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR dynStr: DynamicStrings.DynamicString; list: WebStd.PersistentDataObjectList; i: SIZE;
 			str, encStr: Strings.String; person: Person; pTag, aTag: XML.Element; tempStr: ARRAY 10 OF CHAR;
@@ -348,7 +348,7 @@ TYPE
 			RETURN NIL
 		END GetHeaderXMLContent;
 
-		PROCEDURE InsertObject*(container: WebStd.PersistentDataContainer; superEntry: WebComplex.WebForumEntry;
+		PROCEDURE { OVERRIDE } InsertObject*(container: WebStd.PersistentDataContainer; superEntry: WebComplex.WebForumEntry;
 			request: HTTPSupport.HTTPRequest; params: DynamicWebpage.ParameterList; VAR statusMsg: XML.Content) : BOOLEAN;
 			(* parameters "firstname", "lastname", "email", "leginr"*)
 		VAR firstname, lastname, email, leginr: Strings.String; obj: Person;
@@ -380,7 +380,7 @@ TYPE
 			END
 		END InsertObject;
 
-		PROCEDURE UpdateObject*(obj: WebComplex.WebForumEntry; request: HTTPSupport.HTTPRequest;
+		PROCEDURE { OVERRIDE } UpdateObject*(obj: WebComplex.WebForumEntry; request: HTTPSupport.HTTPRequest;
 			params: DynamicWebpage.ParameterList; VAR statusMsg: XML.Content) : BOOLEAN;
 		VAR firstname, lastname, email, leginr: Strings.String;  person: Person;
 		BEGIN (* obj # NIL *)
@@ -417,12 +417,12 @@ TYPE
 			END
 		END UpdateObject;
 
-		PROCEDURE ThisObjectName*() : Strings.String;
+		PROCEDURE { OVERRIDE } ThisObjectName*() : Strings.String;
 		BEGIN
 			RETURN WebStd.GetString(SingleGroupDatagridName)
 		END ThisObjectName;
 
-		PROCEDURE ThisModuleName*() : Strings.String;
+		PROCEDURE { OVERRIDE } ThisModuleName*() : Strings.String;
 		BEGIN
 			RETURN WebStd.GetString(ThisModuleNameStr)
 		END ThisModuleName;
@@ -430,7 +430,7 @@ TYPE
 		(** returns the insert view for the initialization of a new web forum entry, without submit/back-input fields
 		 * and without hidden parameter for super entry in hierarchy.
 		 * superEntry is the parent web forum entry in a hierachical web forum, superEntry is NIL iff it is a root entry *)
-		PROCEDURE GetInsertView*(superEntry: WebComplex.WebForumEntry; request: HTTPSupport.HTTPRequest): XML.Content;
+		PROCEDURE { OVERRIDE } GetInsertView*(superEntry: WebComplex.WebForumEntry; request: HTTPSupport.HTTPRequest): XML.Content;
 		VAR table: XML.Element;
 		BEGIN
 			NEW(table); table.SetName("table");
@@ -441,7 +441,7 @@ TYPE
 			RETURN table
 		END GetInsertView;
 
-		PROCEDURE GetTableHeader*(request: HTTPSupport.HTTPRequest): WebComplex.HeaderRow;
+		PROCEDURE { OVERRIDE } GetTableHeader*(request: HTTPSupport.HTTPRequest): WebComplex.HeaderRow;
 		VAR row: WebComplex.HeaderRow;
 		BEGIN
 			NEW(row, 6);
@@ -459,7 +459,7 @@ TYPE
 			RETURN row
 		END GetTableHeader;
 
-		PROCEDURE GetSearchFilter*(text: Strings.String) : WebStd.PersistentDataFilter;
+		PROCEDURE { OVERRIDE } GetSearchFilter*(text: Strings.String) : WebStd.PersistentDataFilter;
 		BEGIN
 			IF (text # NIL) THEN
 				NEW(searchText, Strings.Length(text^)+3);
@@ -501,32 +501,32 @@ TYPE
 			RETURN FALSE
 		END SearchFilter;
 
-		PROCEDURE GetDefaultOrdering*() : WebStd.PersistentDataCompare;
+		PROCEDURE { OVERRIDE } GetDefaultOrdering*() : WebStd.PersistentDataCompare;
 		BEGIN RETURN CompareLastName
 		END GetDefaultOrdering;
 
-		PROCEDURE GetEmptyListMessage*(request: HTTPSupport.HTTPRequest) : XML.Container;
+		PROCEDURE { OVERRIDE } GetEmptyListMessage*(request: HTTPSupport.HTTPRequest) : XML.Container;
 		BEGIN
 			RETURN WebStd.CreateXMLText(EmptyListText);
 		END GetEmptyListMessage;
 
-		PROCEDURE GetBackButtonLabel*(request: HTTPSupport.HTTPRequest) : Strings.String;
+		PROCEDURE { OVERRIDE } GetBackButtonLabel*(request: HTTPSupport.HTTPRequest) : Strings.String;
 		BEGIN RETURN WebStd.GetString(BackButtonLabel)
 		END GetBackButtonLabel;
 
-		PROCEDURE GetInsertLinkLabel*(request: HTTPSupport.HTTPRequest) : Strings.String;
+		PROCEDURE { OVERRIDE } GetInsertLinkLabel*(request: HTTPSupport.HTTPRequest) : Strings.String;
 		BEGIN RETURN WebStd.GetString(InsertToGroupLabel);
 		END GetInsertLinkLabel;
 
-		PROCEDURE GetSubmitButtonLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
+		PROCEDURE { OVERRIDE } GetSubmitButtonLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
 		BEGIN RETURN WebStd.GetString(SubmitButtonLabel)
 		END GetSubmitButtonLabel;
 
-		PROCEDURE GetUnapplySortLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
+		PROCEDURE { OVERRIDE } GetUnapplySortLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
 		BEGIN RETURN WebStd.GetString(UnapplySortLabel)
 		END GetUnapplySortLabel;
 
-		PROCEDURE GetUnapplyFilterLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
+		PROCEDURE { OVERRIDE } GetUnapplyFilterLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
 		BEGIN RETURN WebStd.GetString(UnapplyFilterLabel)
 		END GetUnapplyFilterLabel;
 
@@ -603,7 +603,7 @@ TYPE
 			toggleBlockId := DynamicWebpage.CreateNewObjectId() (* toggleBlockId # NIL *)
 		END Initialize;
 
-		PROCEDURE Internalize*(input: XML.Content);
+		PROCEDURE { OVERRIDE } Internalize*(input: XML.Content);
 		VAR container: XML.Container; elem: XML.Element; oidStr: Strings.String;
 			persObj: PrevalenceSystem.PersistentObject; oidNr: SIGNED32;
 		BEGIN
@@ -634,7 +634,7 @@ TYPE
 			maxPeople := WebStd.InternalizeInteger(container, "MaxPeople");
 		END Internalize;
 
-		PROCEDURE Externalize*() : XML.Content;
+		PROCEDURE { OVERRIDE } Externalize*() : XML.Content;
 		VAR container: XML.Container; elem: XML.Element; oidStr: ARRAY 14 OF CHAR;
 		BEGIN
 			NEW(container);
@@ -658,7 +658,7 @@ TYPE
 			RETURN container
 		END Externalize;
 
-		PROCEDURE GetReferrencedObjects*() : PrevalenceSystem.PersistentObjectList;
+		PROCEDURE { OVERRIDE } GetReferrencedObjects*() : PrevalenceSystem.PersistentObjectList;
 		VAR list: PrevalenceSystem.PersistentObjectList;
 		BEGIN
 			NEW(list, 1);
@@ -702,7 +702,7 @@ TYPE
 			RETURN maxPeopleStr
 		END GetFreePlaces;
 
-		PROCEDURE TableView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : WebComplex.TableRow;
+		PROCEDURE { OVERRIDE } TableView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : WebComplex.TableRow;
 		VAR row: WebComplex.TableRow;
 		BEGIN
 			NEW(row, 8);
@@ -717,7 +717,7 @@ TYPE
 			RETURN row
 		END TableView;
 
-		PROCEDURE DetailView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } DetailView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR container: XML.Container; toggleBlock, show, hide: XML.Element;
 		BEGIN
 			NEW(container);
@@ -853,7 +853,7 @@ TYPE
 			END
 		END GetSingleGroupDatagridView;
 
-		PROCEDURE EditView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } EditView*(forum: WebComplex.WebForum; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR table, tr, td, select, option: XML.Element; maxPeopleStr: Strings.String;
 		BEGIN
 			NEW(table); table.SetName("table");
@@ -932,18 +932,18 @@ TYPE
 			reInitializeSubContainer: BOOLEAN; (* true if the subcontainer has to be reinitialized*)
 			(* user could use the back button in browser's navigation bar *)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN Init^; reInitializeSubContainer := FALSE
 		END Init;
 
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		BEGIN
 			(* get the access constraint for later propagation to the nested SingleGroupDatagrid *)
 			accessConstraint := WebStd.GetXMLSubElement(input, "AccessConstraint");
 			RETURN Transform^(input, request)
 		END Transform;
 
-		PROCEDURE InsertObject*(container: WebStd.PersistentDataContainer; superEntry: WebComplex.WebForumEntry;
+		PROCEDURE { OVERRIDE } InsertObject*(container: WebStd.PersistentDataContainer; superEntry: WebComplex.WebForumEntry;
 			request: HTTPSupport.HTTPRequest; params: DynamicWebpage.ParameterList; VAR statusMsg: XML.Content) : BOOLEAN;
 			(* parameters "name", "info", "assistant", "date", "place", "maxpeople", "opentojoin" *)
 		VAR name, info, assistant, date, place, maxpeople, opentojoin, containername: Strings.String; obj: Group;
@@ -990,7 +990,7 @@ TYPE
 			END
 		END InsertObject;
 
-		PROCEDURE UpdateObject*(obj: WebComplex.WebForumEntry; request: HTTPSupport.HTTPRequest;
+		PROCEDURE { OVERRIDE } UpdateObject*(obj: WebComplex.WebForumEntry; request: HTTPSupport.HTTPRequest;
 			params: DynamicWebpage.ParameterList; VAR statusMsg: XML.Content) : BOOLEAN;
 			(* parameters "name", "info", "assistant", "date", "place", "maxpeople", "opentojoin" *)
 		VAR name, info, assistant, date, place, maxpeople, opentojoin: Strings.String; group: Group;
@@ -1030,12 +1030,12 @@ TYPE
 			END
 		END UpdateObject;
 
-		PROCEDURE ThisObjectName*() : Strings.String;
+		PROCEDURE { OVERRIDE } ThisObjectName*() : Strings.String;
 		BEGIN
 			RETURN WebStd.GetString(AllGroupsDatagridName)
 		END ThisObjectName;
 
-		PROCEDURE ThisModuleName*() : Strings.String;
+		PROCEDURE { OVERRIDE } ThisModuleName*() : Strings.String;
 		BEGIN
 			RETURN WebStd.GetString(ThisModuleNameStr)
 		END ThisModuleName;
@@ -1043,7 +1043,7 @@ TYPE
 		(** abstract, returns the insert view for the initialization of a new web forum entry, without submit/back-input fields
 		 * and without hidden parameter for super entry in hierarchy.
 		 * superEntry is the parent web forum entry in a hierachical web forum, superEntry is NIL iff it is a root entry *)
-		PROCEDURE GetInsertView*(superEntry: WebComplex.WebForumEntry; request: HTTPSupport.HTTPRequest): XML.Content;
+		PROCEDURE { OVERRIDE } GetInsertView*(superEntry: WebComplex.WebForumEntry; request: HTTPSupport.HTTPRequest): XML.Content;
 		VAR table, tr, td, select, option: XML.Element;
 		BEGIN
 			NEW(table); table.SetName("table");
@@ -1074,11 +1074,11 @@ TYPE
 			RETURN table
 		END GetInsertView;
 
-		PROCEDURE OnDetailViewActivated*(entryOid: SIGNED32; request: HTTPSupport.HTTPRequest);
+		PROCEDURE { OVERRIDE } OnDetailViewActivated*(entryOid: SIGNED32; request: HTTPSupport.HTTPRequest);
 		BEGIN reInitializeSubContainer := TRUE (* the sub container has to showed in the default mode *)
 		END OnDetailViewActivated;
 
-		PROCEDURE GetTableHeader*(request: HTTPSupport.HTTPRequest): WebComplex.HeaderRow;
+		PROCEDURE { OVERRIDE } GetTableHeader*(request: HTTPSupport.HTTPRequest): WebComplex.HeaderRow;
 		VAR row: WebComplex.HeaderRow;
 		BEGIN
 			NEW(row, 8);
@@ -1093,32 +1093,32 @@ TYPE
 			RETURN row
 		END GetTableHeader;
 
-		PROCEDURE GetEmptyListMessage*(request: HTTPSupport.HTTPRequest) : XML.Container;
+		PROCEDURE { OVERRIDE } GetEmptyListMessage*(request: HTTPSupport.HTTPRequest) : XML.Container;
 		BEGIN
 			RETURN WebStd.CreateXMLText(EmptyListText);
 		END GetEmptyListMessage;
 
-		PROCEDURE GetBackButtonLabel*(request: HTTPSupport.HTTPRequest) : Strings.String;
+		PROCEDURE { OVERRIDE } GetBackButtonLabel*(request: HTTPSupport.HTTPRequest) : Strings.String;
 		BEGIN RETURN WebStd.GetString(BackButtonLabel)
 		END GetBackButtonLabel;
 
-		PROCEDURE GetInsertLinkLabel*(request: HTTPSupport.HTTPRequest) : Strings.String;
+		PROCEDURE { OVERRIDE } GetInsertLinkLabel*(request: HTTPSupport.HTTPRequest) : Strings.String;
 		BEGIN RETURN WebStd.GetString(InsertGroupText)
 		END GetInsertLinkLabel;
 
-		PROCEDURE GetSubmitButtonLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
+		PROCEDURE { OVERRIDE } GetSubmitButtonLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
 		BEGIN RETURN WebStd.GetString(SubmitButtonLabel)
 		END GetSubmitButtonLabel;
 
-		PROCEDURE GetUnapplySortLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
+		PROCEDURE { OVERRIDE } GetUnapplySortLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
 		BEGIN RETURN WebStd.GetString(UnapplySortLabel)
 		END GetUnapplySortLabel;
 
-		PROCEDURE GetUnapplyFilterLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
+		PROCEDURE { OVERRIDE } GetUnapplyFilterLabel*(request: HTTPSupport.HTTPRequest): Strings.String;
 		BEGIN RETURN WebStd.GetString(UnapplyFilterLabel)
 		END GetUnapplyFilterLabel;
 
-		PROCEDURE GetSearchFilter*(text: Strings.String) : WebStd.PersistentDataFilter;
+		PROCEDURE { OVERRIDE } GetSearchFilter*(text: Strings.String) : WebStd.PersistentDataFilter;
 		BEGIN
 			IF (text # NIL) THEN
 				NEW(searchText, Strings.Length(text^)+3);
@@ -1260,7 +1260,7 @@ TYPE
 		BEGIN group := NIL
 		END Init;
 
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR groupOid: SIGNED32; groupOidStr, prevSysName: Strings.String; persObj: PrevalenceSystem.PersistentObject;
 			prevSys: PrevalenceSystem.PrevalenceSystem;
 		BEGIN
@@ -1563,7 +1563,7 @@ TYPE
 			END
 		END DeleteExercise;
 
-		PROCEDURE GetEventHandlers*() : DynamicWebpage.EventHandlerList;
+		PROCEDURE { OVERRIDE } GetEventHandlers*() : DynamicWebpage.EventHandlerList;
 		VAR list: DynamicWebpage.EventHandlerList;
 		BEGIN
 			NEW(list, 3);
@@ -1578,7 +1578,7 @@ TYPE
 	 * <ExerciseGroups:SummaryList containername=".." prevalencesystem=".."/>
 	 *)
 	SummaryList* = OBJECT(DynamicWebpage.StateLessActiveElement);
-		PROCEDURE Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
+		PROCEDURE { OVERRIDE } Transform*(input: XML.Element; request: HTTPSupport.HTTPRequest) : XML.Content;
 		VAR containerName, prevSysName: Strings.String; persCont: WebStd.PersistentDataContainer;
 			persList: WebStd.PersistentDataObjectList; i: SIZE; outputCont: XML.Container;
 			entry: WebComplex.WebForumEntry; prevSys: PrevalenceSystem.PrevalenceSystem;

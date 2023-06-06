@@ -83,11 +83,11 @@ TYPE
 			useFPU := fpu
 		END InitPhysicalRegisters;
 
-		PROCEDURE AllocationHint*(index: SIGNED32);
+		PROCEDURE { OVERRIDE } AllocationHint*(index: SIGNED32);
 		BEGIN hint := index
 		END AllocationHint;
 
-		PROCEDURE NumberRegisters*(): SIGNED32;
+		PROCEDURE { OVERRIDE } NumberRegisters*(): SIGNED32;
 		BEGIN
 			RETURN LEN(toVirtual)
 		END NumberRegisters;
@@ -117,7 +117,7 @@ TYPE
 			FOR i := 0 TO LEN(reserved)-1 DO reserved[i] := FALSE END;
 		END InitPhysicalRegisters32;
 
-		PROCEDURE Allocate*(index: SIGNED32; virtualRegister: Ticket);
+		PROCEDURE { OVERRIDE } Allocate*(index: SIGNED32; virtualRegister: Ticket);
 		BEGIN
 			(*
 			D.String("allocate register x : index="); D.Int(index,1); D.Ln;
@@ -153,7 +153,7 @@ TYPE
 			END;
 		END Allocate;
 
-		PROCEDURE SetReserved*(index: SIGNED32; res: BOOLEAN);
+		PROCEDURE { OVERRIDE } SetReserved*(index: SIGNED32; res: BOOLEAN);
 		BEGIN
 			IF index DIV 32 <=2 THEN
 				index := index MOD 16;
@@ -166,12 +166,12 @@ TYPE
 			END;
 		END SetReserved;
 
-		PROCEDURE Reserved*(index: SIGNED32): BOOLEAN;
+		PROCEDURE { OVERRIDE } Reserved*(index: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN (index>0) & reserved[index]
 		END Reserved;
 
-		PROCEDURE Free*(index: SIGNED32);
+		PROCEDURE { OVERRIDE } Free*(index: SIGNED32);
 		VAR x: Ticket;
 		BEGIN
 			(*
@@ -211,7 +211,7 @@ TYPE
 			END;
 		END Free;
 
-		PROCEDURE NextFree*(CONST type: IntermediateCode.Type):SIGNED32;
+		PROCEDURE { OVERRIDE } NextFree*(CONST type: IntermediateCode.Type):SIGNED32;
 		VAR i,sizeInBits,length, form: SIGNED32;
 
 			PROCEDURE GetGPHint(offset: SIGNED32): SIGNED32;
@@ -286,7 +286,7 @@ TYPE
 			RETURN i
 		END NextFree;
 
-		PROCEDURE Mapped*(physical: SIGNED32): Ticket;
+		PROCEDURE { OVERRIDE } Mapped*(physical: SIGNED32): Ticket;
 		VAR virtual: Ticket;
 		BEGIN
 			virtual := toVirtual[physical];
@@ -301,7 +301,7 @@ TYPE
 			RETURN virtual
 		END Mapped;
 
-		PROCEDURE Dump*(w: Streams.Writer);
+		PROCEDURE { OVERRIDE } Dump*(w: Streams.Writer);
 		VAR i: SIGNED32; virtual: Ticket;
 		BEGIN
 			w.String("; ---- registers ----"); w.Ln;
@@ -329,7 +329,7 @@ TYPE
 			InitPhysicalRegisters(fpu,cooperative);
 		END InitPhysicalRegisters64;
 
-		PROCEDURE SetReserved*(index: SIGNED32; res: BOOLEAN);
+		PROCEDURE { OVERRIDE } SetReserved*(index: SIGNED32; res: BOOLEAN);
 		BEGIN
 			(*
 			IF res THEN D.String("reserve ") ELSE D.String("unreserve ") END;
@@ -347,12 +347,12 @@ TYPE
 			END;
 		END SetReserved;
 
-		PROCEDURE Reserved*(index: SIGNED32): BOOLEAN;
+		PROCEDURE { OVERRIDE } Reserved*(index: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN reserved[index]
 		END Reserved;
 
-		PROCEDURE Allocate*(index: SIGNED32; virtualRegister: Ticket);
+		PROCEDURE { OVERRIDE } Allocate*(index: SIGNED32; virtualRegister: Ticket);
 		BEGIN
 			(*
 			D.String("allocate register x : index="); D.Int(index,1); D.Ln;
@@ -383,7 +383,7 @@ TYPE
 			END;
 		END Allocate;
 
-		PROCEDURE Free*(index: SIGNED32);
+		PROCEDURE { OVERRIDE } Free*(index: SIGNED32);
 		BEGIN
 			(*
 			D.String("release register x : index="); D.Int(index,1); D.Ln;
@@ -422,7 +422,7 @@ TYPE
 			END;
 		END Free;
 
-		PROCEDURE NextFree*(CONST type: IntermediateCode.Type): SIGNED32;
+		PROCEDURE { OVERRIDE } NextFree*(CONST type: IntermediateCode.Type): SIGNED32;
 		VAR i: SIGNED32;
 
 			PROCEDURE GetGPHint(offset: SIGNED32): SIGNED32;
@@ -499,7 +499,7 @@ TYPE
 			RETURN i;
 		END NextFree;
 
-		PROCEDURE Mapped*(physical: SIGNED32): Ticket;
+		PROCEDURE { OVERRIDE } Mapped*(physical: SIGNED32): Ticket;
 		VAR virtual: Ticket;
 		BEGIN
 			virtual := toVirtual[physical];
@@ -580,7 +580,7 @@ TYPE
 		END InitGeneratorAMD64;
 
 		(*------------------- overwritten methods ----------------------*)
-		PROCEDURE Section*(in: IntermediateCode.Section; out: BinaryCode.Section);
+		PROCEDURE { OVERRIDE } Section*(in: IntermediateCode.Section; out: BinaryCode.Section);
 		VAR oldSpillStackSize: SIGNED32;
 
 			PROCEDURE CheckEmptySpillStack;
@@ -615,7 +615,7 @@ TYPE
 			error := error OR emitter.error;
 		END Section;
 
-		PROCEDURE Supported*(CONST instruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
+		PROCEDURE { OVERRIDE } Supported*(CONST instruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
 		BEGIN
 			COPY(builtinsModuleName, moduleName);
 			IF (cpuBits=32) & (instruction.op2.type.sizeInBits = IntermediateCode.Bits64) & (instruction.op2.type.form IN IntermediateCode.Integer) THEN
@@ -660,7 +660,7 @@ TYPE
 		END Supported;
 
 		(* input: type (such as that of an intermediate operand), output: low and high type (such as in low and high type of an operand) *)
-		PROCEDURE GetPartType*(CONST type: IntermediateCode.Type; part: SIGNED32; VAR typePart: IntermediateCode.Type);
+		PROCEDURE { OVERRIDE } GetPartType*(CONST type: IntermediateCode.Type; part: SIGNED32; VAR typePart: IntermediateCode.Type);
 		BEGIN
 			ASSERT(type.sizeInBits >0);
 			IF (type.sizeInBits > cpuBits) & (type.form IN IntermediateCode.Integer) THEN
@@ -714,7 +714,7 @@ TYPE
 			END;
 		END Move;
 
-		PROCEDURE ToSpillStack*(ticket: Ticket);
+		PROCEDURE { OVERRIDE } ToSpillStack*(ticket: Ticket);
 		VAR op: Assembler.Operand;
 		BEGIN
 			IF (ticket.type.form = IntermediateCode.Float) & backend.forceFPU THEN
@@ -729,21 +729,21 @@ TYPE
 			END;
 		END ToSpillStack;
 
-		PROCEDURE AllocateSpillStack*(size: SIGNED32);
+		PROCEDURE { OVERRIDE } AllocateSpillStack*(size: SIGNED32);
 		BEGIN
 			IF ~FrameSpillStack THEN
 				ModifyStackPointer(cpuBits DIV 8*size)
 			END;
 		END AllocateSpillStack;
 
-		PROCEDURE ToRegister*(ticket: Ticket);
+		PROCEDURE { OVERRIDE } ToRegister*(ticket: Ticket);
 		VAR op: Assembler.Operand;
 		BEGIN
 			GetSpillOperand(ticket,op);
 			emitter.Emit2(InstructionSet.opMOV,registerOperands[ticket.register],op);
 		END ToRegister;
 
-		PROCEDURE ExchangeTickets*(ticket1,ticket2: Ticket);
+		PROCEDURE { OVERRIDE } ExchangeTickets*(ticket1,ticket2: Ticket);
 		VAR op1,op2: Assembler.Operand;
 		BEGIN
 			TicketToOperand(ticket1, op1);
@@ -1119,7 +1119,7 @@ TYPE
 		BEGIN RETURN (operand.type.form IN IntermediateCode.Integer) & (operand.type.sizeInBits > cpuBits)
 		END IsComplex;
 
-		PROCEDURE Generate*(VAR instruction: IntermediateCode.Instruction);
+		PROCEDURE { OVERRIDE } Generate*(VAR instruction: IntermediateCode.Instruction);
 		VAR opcode: SIGNED8; ticket: Ticket; hwreg, lastUse, i, part: SIGNED32;
 		BEGIN
 			ReserveOperandRegisters(instruction.op1,TRUE); ReserveOperandRegisters(instruction.op2,TRUE);ReserveOperandRegisters(instruction.op3,TRUE);
@@ -1267,7 +1267,7 @@ TYPE
 
 		END Generate;
 
-		PROCEDURE PostGenerate*(CONST instruction: IntermediateCode.Instruction);
+		PROCEDURE { OVERRIDE } PostGenerate*(CONST instruction: IntermediateCode.Instruction);
 		VAR ticket: Ticket;
 		BEGIN
 			TryUnmap(instruction.op3); TryUnmap(instruction.op2); TryUnmap(instruction.op1);
@@ -3200,7 +3200,7 @@ TYPE
 						SELF.cg := cg; SELF.scope := scope;
 					END InitMapper;
 
-					PROCEDURE Find(CONST name: ARRAY OF CHAR): SIGNED32;
+					PROCEDURE { OVERRIDE } Find(CONST name: ARRAY OF CHAR): SIGNED32;
 					VAR register: SIGNED32; symbol: SyntaxTree.Symbol; ticket: Ticket;
 					BEGIN
 						register := InstructionSet.none;
@@ -3289,12 +3289,12 @@ TYPE
 			SetName("AMD");
 		END InitBackendAMD64;
 
-		PROCEDURE Initialize*(diagnostics: Diagnostics.Diagnostics; log: Streams.Writer; flags: SET; checker: SemanticChecker.Checker; system: Global.System);
+		PROCEDURE { OVERRIDE } Initialize*(diagnostics: Diagnostics.Diagnostics; log: Streams.Writer; flags: SET; checker: SemanticChecker.Checker; system: Global.System);
 		BEGIN
 			Initialize^(diagnostics,log, flags,checker,system); NEW(cg, builtinsModuleName, diagnostics, SELF);
 		END Initialize;
 
-		PROCEDURE GetSystem*(): Global.System;
+		PROCEDURE { OVERRIDE } GetSystem*(): Global.System;
 		VAR system: Global.System; variableOffset: INTEGER;
 
 			PROCEDURE AddRegister(CONST name: Scanner.IdentifierString; val: SIGNED32);
@@ -3390,13 +3390,13 @@ TYPE
 			RETURN XMM0 + index;
 		END HardwareFloatRegister;
 
-		PROCEDURE ResetParameterRegisters*;
+		PROCEDURE { OVERRIDE } ResetParameterRegisters*;
 		BEGIN
 			intParameterIndex := 0;
 			floatParameterIndex := 0;
 		END ResetParameterRegisters;
 
-		PROCEDURE GetParameterRegister*(callingConvention: SyntaxTree.CallingConvention;  type: IntermediateCode.Type; VAR register: INTEGER): BOOLEAN;
+		PROCEDURE { OVERRIDE } GetParameterRegister*(callingConvention: SyntaxTree.CallingConvention;  type: IntermediateCode.Type; VAR register: INTEGER): BOOLEAN;
 		VAR index: INTEGER;
 		BEGIN
 			IF bits = 32 THEN register := -1; RETURN FALSE END;
@@ -3435,7 +3435,7 @@ TYPE
 			END;
 		END GetParameterRegister;
 
-		PROCEDURE SupportedInstruction*(CONST instruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
+		PROCEDURE { OVERRIDE } SupportedInstruction*(CONST instruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
 		BEGIN
 			RETURN cg.Supported(instruction,moduleName,procedureName);
 		END SupportedInstruction;
@@ -3544,7 +3544,7 @@ TYPE
 		END GenerateBinary;
 
 		(* genasm *)
-		PROCEDURE ProcessIntermediateCodeModule*(intermediateCodeModule: Formats.GeneratedModule): Formats.GeneratedModule;
+		PROCEDURE { OVERRIDE } ProcessIntermediateCodeModule*(intermediateCodeModule: Formats.GeneratedModule): Formats.GeneratedModule;
 		VAR
 			result: Formats.GeneratedModule;
 		BEGIN
@@ -3582,7 +3582,7 @@ TYPE
 			RETURN result
 		END ProcessIntermediateCodeModule;
 
-		PROCEDURE FindPC*(x: SyntaxTree.Module; CONST sectionName: ARRAY OF CHAR; sectionOffset: SIGNED32);
+		PROCEDURE { OVERRIDE } FindPC*(x: SyntaxTree.Module; CONST sectionName: ARRAY OF CHAR; sectionOffset: SIGNED32);
 		VAR
 			section: Sections.Section; binarySection: BinaryCode.Section; label: BinaryCode.LabelList; module: Formats.GeneratedModule;
 			i: SIGNED32; pooledName: Basic.SegmentedName;
@@ -3613,7 +3613,7 @@ TYPE
 			END;
 		END FindPC;
 
-		PROCEDURE CanPassInRegister*(type: SyntaxTree.Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanPassInRegister*(type: SyntaxTree.Type): BOOLEAN;
 		VAR length: SIGNED32; baseType: SyntaxTree.Type; b: BOOLEAN;
 		BEGIN
 			b := SemanticChecker.IsStaticMathArray(type, length, baseType) & (baseType IS SyntaxTree.FloatType) &
@@ -3625,11 +3625,11 @@ TYPE
 			RETURN b
 		END CanPassInRegister;
 
-		PROCEDURE GetDescription*(VAR instructionSet: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetDescription*(VAR instructionSet: ARRAY OF CHAR);
 		BEGIN instructionSet := "AMD";
 		END GetDescription;
 
-		PROCEDURE DefineOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } DefineOptions*(options: Options.Options);
 		BEGIN
 			options.Add(0X,"bits",Options.Integer);
 			options.Add(0X,"traceable", Options.Flag);
@@ -3637,7 +3637,7 @@ TYPE
 			DefineOptions^(options);
 		END DefineOptions;
 
-		PROCEDURE GetOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } GetOptions*(options: Options.Options);
 		BEGIN
 			IF ~options.GetInteger("bits",bits) THEN bits := SIZE OF ADDRESS * 8 END;
 			traceable := options.GetFlag("traceable");
@@ -3645,11 +3645,11 @@ TYPE
 			GetOptions^(options);
 		END GetOptions;
 
-		PROCEDURE DefaultObjectFileFormat*(): Formats.ObjectFileFormat;
+		PROCEDURE { OVERRIDE } DefaultObjectFileFormat*(): Formats.ObjectFileFormat;
 		BEGIN RETURN ObjectFileFormat.Get();
 		END DefaultObjectFileFormat;
 
-		PROCEDURE DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
+		PROCEDURE { OVERRIDE } DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
 		BEGIN
 			RETURN NIL
 		END DefaultSymbolFileFormat;

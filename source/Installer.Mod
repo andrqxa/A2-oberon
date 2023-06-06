@@ -417,7 +417,7 @@ TYPE
 			SELF.config := config;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF (config = NIL) THEN
 				ReportError("No install configuration set");
@@ -455,7 +455,7 @@ TYPE
 			SetCurrentProgress(progress);
 		END PackagesProgress;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR i : SIZE; res : INTEGER;
 		BEGIN
 			ASSERT((config.disk.device = disk.device) & (config.partition = partition));
@@ -734,7 +734,7 @@ TYPE
 			installLog.String("Installation aborted by user."); installLog.Ln; installLog.Update;
 		END ReportAbort;
 
-		PROCEDURE &Init*(disk :PartitionsLib.Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk :PartitionsLib.Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "Installer"; desc := "Install A2 on partition"; locktype := PartitionsLib.WriterLock;

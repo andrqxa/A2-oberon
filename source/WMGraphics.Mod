@@ -543,7 +543,7 @@ TYPE
 			RETURN img;
 		END GetImage;
 
-		PROCEDURE SetLimits*(r : Rectangle);
+		PROCEDURE { OVERRIDE } SetLimits*(r : Rectangle);
 		BEGIN
 			r.r := MAX(r.r, r.l); r.b := MAX(r.t, r.b);
 			Rectangles.ClipRect(r, bounds); SetLimits^(r)
@@ -553,7 +553,7 @@ TYPE
 		BEGIN
 		END Line; *)
 
-		PROCEDURE Fill*(rect : Rectangle; color : Color; mode : INTEGER);
+		PROCEDURE { OVERRIDE } Fill*(rect : Rectangle; color : Color; mode : INTEGER);
 		VAR rm : Raster.Mode; pix : Raster.Pixel;
 		BEGIN
 			(* convert to super coordinates *)
@@ -572,7 +572,7 @@ TYPE
 
 		(* Polygon filling *)
 		(** fill a polygon given by points *)
-		PROCEDURE FillPolygonFlat*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; color : Color; mode : INTEGER);
+		PROCEDURE { OVERRIDE } FillPolygonFlat*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; color : Color; mode : INTEGER);
 		VAR i : SIZE;
 		BEGIN
 			IF nofPoints < 3 THEN RETURN END;
@@ -584,7 +584,7 @@ TYPE
 		END FillPolygonFlat;
 
 		(** fill a polygon given by points *)
-		PROCEDURE FillPolygonCB*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; callBack : FillLineCallBack);
+		PROCEDURE { OVERRIDE } FillPolygonCB*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; callBack : FillLineCallBack);
 		VAR i : SIZE;
 		BEGIN
 			IF nofPoints < 3 THEN RETURN END;
@@ -685,7 +685,7 @@ TYPE
 			END
 		END FillCB;
 
-		PROCEDURE DrawImage*(x, y: SIZE; img: Raster.Image; mode : INTEGER);
+		PROCEDURE { OVERRIDE } DrawImage*(x, y: SIZE; img: Raster.Image; mode : INTEGER);
 		VAR imgBounds : Rectangle;
 			rm : Raster.Mode;
 			dx, dy: SIZE;
@@ -722,7 +722,7 @@ TYPE
 			END;
 		END DrawImage;
 
-		PROCEDURE ScaleImage*(src : Raster.Image; sr , dr : Rectangle; copyMode, scaleMode : INTEGER);
+		PROCEDURE { OVERRIDE } ScaleImage*(src : Raster.Image; sr , dr : Rectangle; copyMode, scaleMode : INTEGER);
 		BEGIN
 			Rectangles.MoveRel(dr, dx, dy);
 			RasterScale.Scale(src, sr, img, dr, clipRect, copyMode, scaleMode);

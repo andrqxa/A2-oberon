@@ -897,7 +897,7 @@ TYPE
 		 END ParseHubDescriptor;
 
 		(* Load and parse the hub descriptor, power on all ports *)
-		PROCEDURE Connect() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect() : BOOLEAN;
 		VAR buffer : Usbdi.BufferPtr; len : SIGNED32;
 		BEGIN
 			hub := device (Usb.UsbDevice);
@@ -975,7 +975,7 @@ TYPE
 			RETURN TRUE;
 		END EnoughPower;
 
-		PROCEDURE Disconnect;
+		PROCEDURE { OVERRIDE } Disconnect;
 		BEGIN
 			IF Debug.Verbose THEN Show(" disconnected."); KernelLog.Ln;END;
 		END Disconnect;
@@ -1057,7 +1057,7 @@ TYPE
 		statusPipeRetries : SIGNED32;
 
 		(* This hub class specific request returns the hub descriptor. *)
-		PROCEDURE GetHubDescriptor(type, index, length : SIGNED32; VAR buffer : Usbdi.Buffer) : BOOLEAN;
+		PROCEDURE { OVERRIDE } GetHubDescriptor(type, index, length : SIGNED32; VAR buffer : Usbdi.Buffer) : BOOLEAN;
 		BEGIN
 			ASSERT(length >= 2);
 			RETURN (hub.defaultpipe.Request(ToHost + Class + Device, GetDescriptor, index + type*100H, 0, length, buffer) = Usbdi.Ok) &
@@ -1065,14 +1065,14 @@ TYPE
 		END GetHubDescriptor;
 
 		(* This hub class specific request overrides the hub descriptor. *)
-		 PROCEDURE SetHubDescriptor(type, index : SIGNED32; buffer : Usbdi.Buffer) : BOOLEAN;
+		 PROCEDURE { OVERRIDE } SetHubDescriptor(type, index : SIGNED32; buffer : Usbdi.Buffer) : BOOLEAN;
 		 BEGIN
 			ASSERT((LEN(buffer) >= 2) & (ORD(buffer[0]) = LEN(buffer)) & (ORD(buffer[1]) = type));
 		 	RETURN hub.defaultpipe.Request(ToDevice + Class + Device, SetDescriptor, index + type*100H, 0, LEN(buffer), buffer) = Usbdi.Ok;
 		 END SetHubDescriptor;
 
 		(* This hub class request resets a value reported in the hub status. *)
-		PROCEDURE ClearHubFeature(feature : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ClearHubFeature(feature : SIGNED32) : BOOLEAN;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT((feature = HubLocalPowerChange) OR (feature = HubOverCurrentChange)); END; (* Valid feature selector *)
 			IF Debug.Trace & Debug.traceHubRequests THEN Show("Clear hub feature "); KernelLog.Int(feature, 0); KernelLog.Ln; END;
@@ -1080,7 +1080,7 @@ TYPE
 		END ClearHubFeature;
 
 		(* This hub class request sets a value reported in the hub status. *)
-		PROCEDURE SetHubFeature(feature : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } SetHubFeature(feature : SIGNED32) : BOOLEAN;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT((feature = HubLocalPowerChange) OR (feature = HubOverCurrentChange)); END; (* Valid feature selector *)
 			IF Debug.Trace & Debug.traceHubRequests THEN Show("Set hub feature "); KernelLog.Int(feature, 0); KernelLog.Ln; END;
@@ -1088,7 +1088,7 @@ TYPE
 		END SetHubFeature;
 
 		(* This hub class request resets a value reported in the port status. *)
-		PROCEDURE ClearPortFeature(feature, port,  selector : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ClearPortFeature(feature, port,  selector : SIGNED32) : BOOLEAN;
 		BEGIN
 			IF Debug.StrongChecks THEN
 				ASSERT(((feature # PortTest) & (feature # PortIndicator)) OR (selector = 0));
@@ -1099,7 +1099,7 @@ TYPE
 		END ClearPortFeature;
 
 		(* This hub class request sets a value reported in the hub status. *)
-		PROCEDURE SetPortFeature(feature, port, selector : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } SetPortFeature(feature, port, selector : SIGNED32) : BOOLEAN;
 		BEGIN
 			IF Debug.StrongChecks THEN
 				ASSERT(((feature = PortTest) OR (feature = PortIndicator)) OR (selector = 0));
@@ -1110,7 +1110,7 @@ TYPE
 		END SetPortFeature;
 
 		(* This hub class request returns the current hub status and the states that have change since the previous acknowledgment. *)
-		PROCEDURE GetHubStatus(VAR hubstatus : SET) : BOOLEAN;
+		PROCEDURE { OVERRIDE } GetHubStatus(VAR hubstatus : SET) : BOOLEAN;
 		VAR buffer : Usbdi.BufferPtr;
 		BEGIN
 			IF Debug.Trace & Debug.traceHubRequests THEN Show("Get Hub Status."); KernelLog.Ln; END;
@@ -1123,7 +1123,7 @@ TYPE
 		END GetHubStatus;
 
 		(* This hub class request returns the current port status and the current value of the port status change bits.  *)
-		PROCEDURE GetPortStatus(port : SIGNED32; ack : BOOLEAN) : SET;
+		PROCEDURE { OVERRIDE } GetPortStatus(port : SIGNED32; ack : BOOLEAN) : SET;
 		VAR buffer : Usbdi.BufferPtr; s, portstatus : SET;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT(port >= 0); END;
@@ -1242,7 +1242,7 @@ TYPE
 		END HandleStatusChange;
 
 		(* USB hub device specific initialization *)
-		PROCEDURE Initialize() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Initialize() : BOOLEAN;
 		VAR endpoint : Usbdi.EndpointDescriptor; ignore : Usbdi.Status;
 		BEGIN
 			(* Look for the hub's interrupt endpoint which is used to communicate status changes *)
@@ -1266,7 +1266,7 @@ TYPE
 		 * This hub class specific request clears the state of the Transaction Translator (TT) bulk/control transfer after
 		 * it has been left in a busy state due to high-speed errors. This request is only defined for non-periodic endpoints.
 		 *)
-		PROCEDURE ClearTTBuffer(dev : Usb.UsbDevice; endpoint, port : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ClearTTBuffer(dev : Usb.UsbDevice; endpoint, port : SIGNED32) : BOOLEAN;
 		VAR intf : Usb.InterfaceDescriptor; endp : Usb.EndpointDescriptor; wValue : SET; i, e : SIGNED32;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT((dev.speed # Usb.HighSpeed) & (dev.parent.speed = Usb.HighSpeed)); END;
@@ -1297,7 +1297,7 @@ TYPE
 		 * This hub class specific request returns the internal state of the Transaction Translator (TT) in a vendor specific format.
 		 * A TT receiving this request must have first been stopped using the StopTTRequest.
 		 *)
-		PROCEDURE GetTTState(flags, port, len : SIGNED32; VAR buffer : Usbdi.Buffer) : BOOLEAN;
+		PROCEDURE { OVERRIDE } GetTTState(flags, port, len : SIGNED32; VAR buffer : Usbdi.Buffer) : BOOLEAN;
 		BEGIN
 			RETURN hub.defaultpipe.Request(ToDevice + Class + Other, GetTtState, flags, (port + 1), len, buffer) = Usbdi.Ok;
 		END GetTTState;
@@ -1306,7 +1306,7 @@ TYPE
 		 * This hub class specific request returns the Transaction Translator (TT) in a hub to a known state.
 		 * After the reset is completed, the TT can resume its normal operation.
 		 *)
-		 PROCEDURE ResetTT(port : SIGNED32) : BOOLEAN;
+		 PROCEDURE { OVERRIDE } ResetTT(port : SIGNED32) : BOOLEAN;
 		 BEGIN
 		 	RETURN hub.defaultpipe.Request(ToDevice + Class + Other, ResetTt, 0, (port + 1), 0, Usbdi.NoData) = Usbdi.Ok;
 		 END ResetTT;
@@ -1315,7 +1315,7 @@ TYPE
 		 * This hub class specific request stops the normal execution of the Transaction Translator (TT) so that the internal
 		 * state can be retrieved via GetTTState. This request is provided for debugging purposes.
 		 *)
-		PROCEDURE StopTT(port : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } StopTT(port : SIGNED32) : BOOLEAN;
 		BEGIN
 			RETURN hub.defaultpipe.Request(ToDevice + Class + Other, StopTt, 0, (port + 1), 0, Usbdi.NoData) = Usbdi.Ok;
 		END StopTT;
@@ -1339,7 +1339,7 @@ TYPE
 		initialized : BOOLEAN;
 
 		(* Get the emulated hub descriptor. Ignore type and index parameters. *)
-		PROCEDURE GetHubDescriptor(type, index, length : SIGNED32;  VAR buffer : Usbdi.Buffer) : BOOLEAN;
+		PROCEDURE { OVERRIDE } GetHubDescriptor(type, index, length : SIGNED32;  VAR buffer : Usbdi.Buffer) : BOOLEAN;
 		VAR i : SIGNED32; hd : UsbHcdi.HubDescriptor;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT(LEN(buffer) <= length); END;
@@ -1351,7 +1351,7 @@ TYPE
 		END GetHubDescriptor;
 
 		(* Overwrites the emulated hub descriptor. Ignore type and index paramters. *)
-		 PROCEDURE SetHubDescriptor(type, index : SIGNED32; buffer : Usbdi.Buffer) : BOOLEAN;
+		 PROCEDURE { OVERRIDE } SetHubDescriptor(type, index : SIGNED32; buffer : Usbdi.Buffer) : BOOLEAN;
 		 VAR i : SIGNED32; hd : UsbHcdi.HubDescriptor;
 		 BEGIN
 		 	IF Debug.StrongChecks THEN ASSERT((LEN(buffer)>=8) & (ORD(buffer[0])=LEN(buffer)) & (ORD(buffer[1])=type)); END;
@@ -1362,7 +1362,7 @@ TYPE
 		 END SetHubDescriptor;
 
 		(* Clear a root hub feature. *)
-		PROCEDURE ClearHubFeature(feature : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ClearHubFeature(feature : SIGNED32) : BOOLEAN;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT((feature = HubLocalPowerChange) OR (feature = HubOverCurrentChange)); END; (* Valid feature selector *)
 			(* TODO: Do nothing? *)
@@ -1370,7 +1370,7 @@ TYPE
 		END ClearHubFeature;
 
 		(* Set a root hub feature *)
-		PROCEDURE SetHubFeature(feature : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } SetHubFeature(feature : SIGNED32) : BOOLEAN;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT((feature = HubLocalPowerChange) OR (feature = HubOverCurrentChange)); END; (* Valid feature selector *)
 			(* TODO: Do nothing? *)
@@ -1378,7 +1378,7 @@ TYPE
 		END SetHubFeature;
 
 		(* Clear a root hub port feature. *)
-		PROCEDURE ClearPortFeature(feature, port, selector : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ClearPortFeature(feature, port, selector : SIGNED32) : BOOLEAN;
 		VAR res : BOOLEAN;
 		BEGIN
 			IF Debug.StrongChecks THEN
@@ -1404,7 +1404,7 @@ TYPE
 		END ClearPortFeature;
 
 		(* Set a root hub port feature *)
-		PROCEDURE SetPortFeature(feature, port, selector : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } SetPortFeature(feature, port, selector : SIGNED32) : BOOLEAN;
 		VAR res : BOOLEAN;
 		BEGIN
 			IF Debug.StrongChecks THEN
@@ -1432,7 +1432,7 @@ TYPE
 		END SetPortFeature;
 
 		(* Return the root hubs status. Reported: Local power supply good & Overcurrent *)
-		PROCEDURE GetHubStatus(VAR hubstatus : SET) : BOOLEAN;
+		PROCEDURE { OVERRIDE } GetHubStatus(VAR hubstatus : SET) : BOOLEAN;
 		BEGIN
 			(* HsLocalPowerLost and HsLocalPowerSourceChange are never set since root hubs cannot not loose power *)
 			hubstatus := {};
@@ -1441,7 +1441,7 @@ TYPE
 		END GetHubStatus;
 
 		(* Get the status of the specifed root hub port. Note that the HCD is responsible for acknowledging changes. *)
-		PROCEDURE GetPortStatus(port : SIGNED32; ack : BOOLEAN) : SET;
+		PROCEDURE { OVERRIDE } GetPortStatus(port : SIGNED32; ack : BOOLEAN) : SET;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT((port >= 0) & (port < nbrOfPorts)); END;
 			RETURN hub.controller.GetPortStatus(port, ack);
@@ -1455,7 +1455,7 @@ TYPE
 		END HandleStatusChange;
 
 		(* How much current (mA) is available for this hub? *)
-		PROCEDURE AvailableCurrent() : SIGNED32;
+		PROCEDURE { OVERRIDE } AvailableCurrent() : SIGNED32;
 		BEGIN
 			RETURN 500; (* High power port delivers 500mA *)
 		END AvailableCurrent;
@@ -1466,7 +1466,7 @@ TYPE
 		PROCEDURE AwaitDead;	BEGIN {EXCLUSIVE} AWAIT(dead); END AwaitDead;
 
 		(* Root hub specific initialization *)
-		PROCEDURE Initialize() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Initialize() : BOOLEAN;
 		BEGIN
 			IF hub.controller.SetStatusChangeHandler(HandleStatusChange) THEN
 				(* Root hub driver will be wake up via interrupt notification *)
@@ -1477,18 +1477,18 @@ TYPE
 		END Initialize;
 
 		(* Displays message containing a description of this hub and the specified text to kernel log *)
-		PROCEDURE Show(CONST text : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Show(CONST text : ARRAY OF CHAR);
 		BEGIN
 			KernelLog.String("UsbHubDriver: Root Hub "); hub.ShowName; KernelLog.String(": "); KernelLog.String(text);
 		END Show;
 
-		PROCEDURE Disconnect;
+		PROCEDURE { OVERRIDE } Disconnect;
 		BEGIN
 			Terminate; AwaitDead;
 			IF Debug.Verbose THEN Show("Disconnected."); KernelLog.Ln; END;
 		END Disconnect;
 
-		PROCEDURE &New*;
+		PROCEDURE (* OVERRIDE *) & New*;
 		BEGIN
 			New^; NEW(timerRH);
 			alive := TRUE; dead := FALSE; initialized := FALSE;

@@ -967,7 +967,7 @@ TYPE
 		cmdLBA: CommandLBA;
 		cmdLBA48: CommandLBA48;
 
-		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		VAR
 			num1, try: SIGNED32; ignore: INTEGER; bufAdr: ADDRESS;
 			dma: BOOLEAN;
@@ -1021,13 +1021,13 @@ TYPE
 			END;
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			size := SELF.size;
 			res := Disks.Ok;
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
 		BEGIN
 			res := Disks.Unsupported;
 			IF msg IS Disks.GetGeometryMsg THEN
@@ -1422,7 +1422,7 @@ TYPE
 			size := cap;
 		END SetCapacity;
 
-		PROCEDURE GetSize*(VAR asize: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } GetSize*(VAR asize: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			res := Res_OK;
 			IF RemovableBit IN id.type THEN
@@ -1439,7 +1439,7 @@ TYPE
 			END;
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
 		BEGIN
 			res := Disks.Unsupported;
 			IF msg IS Disks.GetGeometryMsg THEN
@@ -1506,7 +1506,7 @@ TYPE
 			END;
 		END ProcessSense;
 
-		PROCEDURE TransferEx*(op: SIGNED32; lba: SIGNED64; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): INTEGER;
+		PROCEDURE { OVERRIDE } TransferEx*(op: SIGNED32; lba: SIGNED64; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): INTEGER;
 		VAR
 			command: Command;
 			res: INTEGER; timeout: SIGNED32;
@@ -1548,7 +1548,7 @@ TYPE
 
 	(* ATAPI funtions *)
 
-		PROCEDURE Reset(): INTEGER;
+		PROCEDURE { OVERRIDE } Reset(): INTEGER;
 		VAR
 			i: SIGNED32; res: INTEGER;
 			status: SET;
@@ -1634,12 +1634,12 @@ TYPE
 			RETURN res;
 		END TestUnitReady;
 
-		PROCEDURE Flush(): INTEGER;
+		PROCEDURE { OVERRIDE } Flush(): INTEGER;
 		BEGIN
 			RETURN Flush^();
 		END Flush;
 
-		PROCEDURE MediaEject*(immediate, load: BOOLEAN): INTEGER;
+		PROCEDURE { OVERRIDE } MediaEject*(immediate, load: BOOLEAN): INTEGER;
 		VAR
 			command: CommandPacket;
 			res: INTEGER; timeout: SIGNED32;
@@ -1667,7 +1667,7 @@ TYPE
 			RETURN res;
 		END MediaEject;
 
-		PROCEDURE MediaLock*(lock: BOOLEAN): INTEGER;
+		PROCEDURE { OVERRIDE } MediaLock*(lock: BOOLEAN): INTEGER;
 		VAR
 			command: CommandPacket;
 			res: INTEGER;
@@ -1684,7 +1684,7 @@ TYPE
 			RETURN res;
 		END MediaLock;
 
-		PROCEDURE Powersave(): INTEGER;
+		PROCEDURE { OVERRIDE } Powersave(): INTEGER;
 		VAR
 			command: CommandPacket;
 			res: INTEGER;
@@ -1798,7 +1798,7 @@ TYPE
 			RETURN command;
 		END NewCommandPacket;
 
-		PROCEDURE IdentifyDevice(buf: ARRAY OF SIGNED16): INTEGER;
+		PROCEDURE { OVERRIDE } IdentifyDevice(buf: ARRAY OF SIGNED16): INTEGER;
 		VAR res : INTEGER;
 		BEGIN
 			maxTransfer := 65535;
@@ -1840,7 +1840,7 @@ TYPE
 			RETURN res
 		END IdentifyDevice;
 
-		PROCEDURE ShowDevice;
+		PROCEDURE { OVERRIDE } ShowDevice;
 		VAR i: SIGNED32;
 		BEGIN
 			KernelLog.String(name); KernelLog.String(": ");
@@ -1877,7 +1877,7 @@ TYPE
 			KernelLog.Ln;
 		END ShowDevice;
 
-		PROCEDURE &Create*(acontroller: Controller; adev: SIGNED32; identifyDevice: ARRAY OF SIGNED16);
+		PROCEDURE (* OVERRIDE *) & Create*(acontroller: Controller; adev: SIGNED32; identifyDevice: ARRAY OF SIGNED16);
 		VAR res: INTEGER;
 		BEGIN
 			INCL(id.type, AtapiBit);
@@ -1889,7 +1889,7 @@ TYPE
 			init := TRUE;
 		END Create;
 
-		PROCEDURE Finalize;
+		PROCEDURE { OVERRIDE } Finalize;
 		BEGIN
 			Finalize^();
 		END Finalize;

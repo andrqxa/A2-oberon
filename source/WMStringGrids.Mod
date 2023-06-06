@@ -338,7 +338,7 @@ TYPE
 		clCell-, clFixed-, clHover-, clSelected-, clTextDefault-, clTextHover-, clTextSelected- : WMProperties.ColorProperty;
 		showImgOnlyCells-: WMProperties.BooleanProperty; 
 		
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrStringGrid);
@@ -369,7 +369,7 @@ TYPE
 			Release
 		END ModelChanged;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		BEGIN
 			cellColor := clCell.Get();
 			hoverColor := clHover.Get();
@@ -383,7 +383,7 @@ TYPE
 			model.Release
 		END DrawBackground;
 
-		PROCEDURE GetCellData*(col, row : SIZE) : ANY;
+		PROCEDURE { OVERRIDE } GetCellData*(col, row : SIZE) : ANY;
 		VAR data : ANY;
 		BEGIN
 			model.Acquire;

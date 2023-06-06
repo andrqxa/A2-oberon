@@ -61,7 +61,7 @@ TYPE
 
 	Int = OBJECT(PDFObject)
 	VAR val : SIGNED32;
-		PROCEDURE Write(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Write(w : Streams.Writer);
 		BEGIN
 			w.Int(val, 0)
 		END Write;
@@ -69,7 +69,7 @@ TYPE
 
 	Real = OBJECT(PDFObject)
 	VAR val : FLOAT32;
-		PROCEDURE Write(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Write(w : Streams.Writer);
 		BEGIN
 			WriteReal(w, val);
 		END Write;
@@ -78,7 +78,7 @@ TYPE
 	String = OBJECT(PDFObject)
 	VAR data : Strings.String;
 
-		PROCEDURE Write(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Write(w : Streams.Writer);
 		BEGIN
 			WritePDFString(w, data^)
 		END Write;
@@ -89,7 +89,7 @@ TYPE
 	VAR length : SIGNED32;
 		data : Strings.String;
 
-		PROCEDURE &Init*(context : Document);
+		PROCEDURE (* OVERRIDE *) & Init*(context : Document);
 		BEGIN
 			SELF.context := context; NEW(data, 4 *  4096); length := 0;
 		END Init;
@@ -115,7 +115,7 @@ TYPE
 		END GetWriter;
 
 
-		PROCEDURE Write(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Write(w : Streams.Writer);
 		VAR i : SIGNED32;
 		BEGIN
 			w.String("<< /Length "); w.Int(length, 0); w.String(" >>"); w.Ln;
@@ -130,7 +130,7 @@ TYPE
 	Name = OBJECT(PDFObject)
 	VAR s : Strings.String;
 
-		PROCEDURE Write(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Write(w : Streams.Writer);
 		BEGIN
 			w.String(s^)
 		END Write;
@@ -148,7 +148,7 @@ TYPE
 	VAR data : DictionaryList;
 		nofData : SIGNED32;
 
-		PROCEDURE &Init*(context : Document);
+		PROCEDURE (* OVERRIDE *) & Init*(context : Document);
 		BEGIN
 			Init^(context);
 			NEW(data, 4); nofData := 0
@@ -180,7 +180,7 @@ TYPE
 			END
 		END GetObject;
 
-		PROCEDURE Write(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Write(w : Streams.Writer);
 		VAR i : SIGNED32;
 		BEGIN
 			w.String("<<"); w.Ln;
@@ -195,7 +195,7 @@ TYPE
 	Array = OBJECT(PDFObject)
 	VAR content : PDFObjList;
 
-		PROCEDURE &Init*(context : Document);
+		PROCEDURE (* OVERRIDE *) & Init*(context : Document);
 		BEGIN
 			Init^(context);
 			NEW(content)
@@ -206,7 +206,7 @@ TYPE
 			SELF.content.Add(content)
 		END Add;
 
-		PROCEDURE Write(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Write(w : Streams.Writer);
 		VAR i : SIGNED32;
 		BEGIN
 			w.Char("[");
@@ -230,7 +230,7 @@ TYPE
 		content : PDFObjList;
 		next : Object;
 
-		PROCEDURE &Init*(context : Document);
+		PROCEDURE (* OVERRIDE *) & Init*(context : Document);
 		BEGIN
 			Init^(context);
 			context.RegisterObj(SELF);
@@ -253,7 +253,7 @@ TYPE
 			w.String("endobj"); w.Ln; w.Ln
 		END WriteContent;
 
-		PROCEDURE Write(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } Write(w : Streams.Writer);
 		BEGIN
 			w.Int(id, 0); w.Char(" "); w.Int(generation, 0); w.String(" R")
 		END Write;
@@ -265,7 +265,7 @@ TYPE
 		kids : Array;
 		count : Int;
 
-		PROCEDURE &Init*(context : Document);
+		PROCEDURE (* OVERRIDE *) & Init*(context : Document);
 		BEGIN
 			Init^(context);
 			dict := context.NewDictionary();
@@ -367,7 +367,7 @@ TYPE
 		procSet : Array;
 		resources, fonts : Dictionary;
 
-		PROCEDURE &Init*(context : Document);
+		PROCEDURE (* OVERRIDE *) & Init*(context : Document);
 		BEGIN
 			Init^(context);
 			dict := context.NewDictionary();
@@ -704,7 +704,7 @@ TYPE
 			WriteReal(w, rx); w.Char(" "); WriteReal(w, ry)
 		END WriteTrafoCoord;
 
-		PROCEDURE SetColor*(col : WMGraphics.Color);
+		PROCEDURE { OVERRIDE } SetColor*(col : WMGraphics.Color);
 		BEGIN
 			IF col # color THEN
 				SetColor^(col);
@@ -732,7 +732,7 @@ TYPE
 			END
 		END SetColRG;
 
-		PROCEDURE Fill*(r : WMRectangles.Rectangle; col : WMGraphics.Color; mode : SIGNED32);
+		PROCEDURE { OVERRIDE } Fill*(r : WMRectangles.Rectangle; col : WMGraphics.Color; mode : SIGNED32);
 		VAR ax, ay, bx ,by : FLOAT32;
 		BEGIN
 			SetColrg(col);
@@ -771,7 +771,7 @@ TYPE
 		END PDFSetFont;
 
 
-		PROCEDURE DrawString*(x, y: SIZE; CONST text : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } DrawString*(x, y: SIZE; CONST text : ARRAY OF CHAR);
 		BEGIN
 			font := GetPDFFont(GetFont());
 			SetColrg(color);
@@ -955,7 +955,7 @@ TYPE
 			w.String(str); w.String(" j");
 		END PDFSetLineJoin;
 
-		PROCEDURE PolyLine*(CONST points : ARRAY OF WMGraphics.Point2d; nofPoints : SIZE; closed : BOOLEAN;  color : WMGraphics.Color; mode : INTEGER);
+		PROCEDURE { OVERRIDE } PolyLine*(CONST points : ARRAY OF WMGraphics.Point2d; nofPoints : SIZE; closed : BOOLEAN;  color : WMGraphics.Color; mode : INTEGER);
 		VAR i : SIZE;
 		BEGIN
 			IF nofPoints < 2 THEN RETURN END;
@@ -982,7 +982,7 @@ TYPE
 			w.String("f*"); w.Ln
 		END FillPoly;
 
-		PROCEDURE Line*(x0, y0, x1, y1 : SIZE; color : WMGraphics.Color; mode : SIGNED32);
+		PROCEDURE { OVERRIDE } Line*(x0, y0, x1, y1 : SIZE; color : WMGraphics.Color; mode : SIGNED32);
 		BEGIN
 			SetColRG(color);
 			WriteTrafoCoord(x0, y0); w.String(" m ");

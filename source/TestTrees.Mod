@@ -129,7 +129,7 @@ TYPE
 			t.Release
 		END FillTree;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			winstance := NIL

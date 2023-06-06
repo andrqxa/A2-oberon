@@ -201,7 +201,7 @@ TYPE
 		BEGIN InitData(code); InitData(data);
 		END InitArrangement;
 
-		PROCEDURE Preallocate*(CONST section: ObjectFile.Section);
+		PROCEDURE { OVERRIDE } Preallocate*(CONST section: ObjectFile.Section);
 		BEGIN
 			ASSERT(section.unit = 8);
 			ASSERT(section.bits.GetSize() MOD 8 = 0);
@@ -213,7 +213,7 @@ TYPE
 			END;
 		END Preallocate;
 
-		PROCEDURE Allocate* (CONST section: ObjectFile.Section): GenericLinker.Address;
+		PROCEDURE { OVERRIDE } Allocate* (CONST section: ObjectFile.Section): GenericLinker.Address;
 		VAR adr: GenericLinker.Address;
 		BEGIN
 			IF section.type IN {ObjectFile.Code, ObjectFile.BodyCode} THEN
@@ -225,7 +225,7 @@ TYPE
 			RETURN adr;
 		END Allocate;
 
-		PROCEDURE Patch* (pos, value: GenericLinker.Address; offset, bits, unit: ObjectFile.Bits);
+		PROCEDURE { OVERRIDE } Patch* (pos, value: GenericLinker.Address; offset, bits, unit: ObjectFile.Bits);
 		VAR char: CHAR;
 		BEGIN
 			ASSERT(bits MOD 8 = 0);
@@ -300,7 +300,7 @@ TYPE
 		END InitLinkerX;
 
 		(* oerwritten functionality of generic linker *)
-		PROCEDURE FindBlock*(CONST identifier: ObjectFile.Identifier): GenericLinker.Block;
+		PROCEDURE { OVERRIDE } FindBlock*(CONST identifier: ObjectFile.Identifier): GenericLinker.Block;
 		VAR block: GenericLinker.Block; any: ANY;
 		BEGIN
 			IF identifier.fingerprint = 0 THEN (* not identifiable via fingerprint *)
@@ -315,7 +315,7 @@ TYPE
 			RETURN block;
 		END FindBlock;
 
-		PROCEDURE ExportBlock*(block: GenericLinker.Block);
+		PROCEDURE { OVERRIDE } ExportBlock*(block: GenericLinker.Block);
 		BEGIN
 			IF block.identifier.fingerprint # 0 THEN
 				hash.Put(SIZE(block.identifier.fingerprint), block)
@@ -329,7 +329,7 @@ TYPE
 			END;
 		END ExportBlock;
 
-		PROCEDURE ImportBlock*(CONST fixup: ObjectFile.Fixup): GenericLinker.Block;
+		PROCEDURE { OVERRIDE } ImportBlock*(CONST fixup: ObjectFile.Fixup): GenericLinker.Block;
 		VAR name: Modules.Name; res: INTEGER;
 			msg: ARRAY 128 OF CHAR; module: Modules.Module; adr: ADDRESS; m: HashTableInt;
 			s: ObjectFile.SectionName; isModule: BOOLEAN; identifier: ObjectFile.Identifier;

@@ -132,7 +132,7 @@ TYPE
 
 
 
-				PROCEDURE Dot*( col, x, y: SIGNED32 );
+				PROCEDURE { OVERRIDE } Dot*( col, x, y: SIGNED32 );
 				BEGIN
 					IF currwin = secondary THEN  DEC( y, height )  END;
 					Machine.Acquire( Machine.X11 );
@@ -141,7 +141,7 @@ TYPE
 					Machine.Release( Machine.X11 )
 				END Dot;
 
-				PROCEDURE Fill*( col, x, y, w, h: SIGNED32 );
+				PROCEDURE { OVERRIDE } Fill*( col, x, y, w, h: SIGNED32 );
 				BEGIN
 					IF (h > 0) & (w > 0) THEN
 						IF currwin = secondary THEN  DEC( y, height )  END;
@@ -157,7 +157,7 @@ TYPE
 					are transferred to or from "buf", starting at "ofs".  The line byte increment is "stride", which may
 					be positive, negative or zero. *)
 
-				PROCEDURE Transfer*( VAR buf: ARRAY OF CHAR;  ofs, stride, left, top, width, height : SIZE; op: INTEGER );
+				PROCEDURE { OVERRIDE } Transfer*( VAR buf: ARRAY OF CHAR;  ofs, stride, left, top, width, height : SIZE; op: INTEGER );
 				CONST  Get = 0;  Set = 1;
 				VAR image: X11.Image;
 					imp: X11.ImagePtr;
@@ -221,7 +221,7 @@ TYPE
 					transferred from left to right and top to bottom.  The pixels are transferred from "buf", starting
 					at bit offset "bitofs".  The line byte increment is "stride", which may be positive, negative or zero.
 					"fg" and "bg" specify the colors for value 1 and 0 pixels respectively. *)
-				PROCEDURE Mask*( VAR buf: ARRAY OF CHAR;  bitofs, stride, fg, bg, x, y, w, h: SIGNED32 );
+				PROCEDURE { OVERRIDE } Mask*( VAR buf: ARRAY OF CHAR;  bitofs, stride, fg, bg, x, y, w, h: SIGNED32 );
 				VAR p: ADDRESS; i: SIGNED32;  s: SET;
 					image: X11.Image;
 					fgpixel, bgpixel, xret: SIGNED32;
@@ -270,7 +270,7 @@ TYPE
 				END Mask;
 
 				(** Copy source block sx, sy, w, h to destination dx, dy.  Overlap is allowed. *)
-				PROCEDURE Copy*( sx, sy, w, h, dx, dy: SIGNED32 );
+				PROCEDURE { OVERRIDE } Copy*( sx, sy, w, h, dx, dy: SIGNED32 );
 				VAR src: X11.DisplayPtr;
 				BEGIN
 					IF (w > 0) & (h > 0) THEN
@@ -285,7 +285,7 @@ TYPE
 
 
 				(** Update the visible display (if caching is used). *)
-				PROCEDURE Update*;
+				PROCEDURE { OVERRIDE } Update*;
 				BEGIN
 					Machine.Acquire( Machine.X11 );
 					X11.Sync( xdisp, X11.False );
@@ -293,13 +293,13 @@ TYPE
 				END Update;
 
 				(** Map a color value to an 8-bit CLUT index.  Only used if xformat = index8. *)
-				PROCEDURE ColorToIndex*( col: SIGNED32 ): SIGNED32;
+				PROCEDURE { OVERRIDE } ColorToIndex*( col: SIGNED32 ): SIGNED32;
 				BEGIN
 					RETURN ColorToIndex0( SELF, col )
 				END ColorToIndex;
 
 				(** Map an 8-bit CLUT index to a color value.  Only used if xformat = index8. *)
-				PROCEDURE IndexToColor*( n: SIGNED32 ): SIGNED32;
+				PROCEDURE { OVERRIDE } IndexToColor*( n: SIGNED32 ): SIGNED32;
 				VAR r, g, b: SIGNED32;
 				BEGIN
 					IF n >= 0 THEN
@@ -439,7 +439,7 @@ TYPE
 
 
 				(** Finalize the display.  Further calls to display methods are not allowed, and may cause exceptions. *)
-				PROCEDURE Finalize*;
+				PROCEDURE { OVERRIDE } Finalize*;
 				(*
 				BEGIN  (* should really be exclusive with Transfer, but we assume the caller keeps to the rules above *)
 					fbadr := 0;  fbsize := 0

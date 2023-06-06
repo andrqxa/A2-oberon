@@ -98,7 +98,7 @@ END BaselineControlReq;
 
 (* Baseline URL is given in request header. *)
 BaselineReportReq* =OBJECT(XML.Document);
-	PROCEDURE &Init*;
+	PROCEDURE (* OVERRIDE *) & Init*;
 	VAR br: XML.Element;
 	BEGIN Init^();
 		SELF.AddContent(xmlDecl);
@@ -490,7 +490,7 @@ END PropfindCollectionRes;
 
 	(** Scanner and Parser which have my error procedure which doesn't HALT(99) *)
 	Scanner * = OBJECT (XMLScanner.Scanner)
-		PROCEDURE &Init*(fr: Streams.Reader);
+		PROCEDURE (* OVERRIDE *) & Init*(fr: Streams.Reader);
 		BEGIN
 			Init^(fr);
 			reportError := XMLReportError;
@@ -498,7 +498,7 @@ END PropfindCollectionRes;
 	END Scanner;
 
 	Parser * = OBJECT (XMLParser.Parser)
-		PROCEDURE &Init*(s: XMLScanner.Scanner);
+		PROCEDURE (* OVERRIDE *) & Init*(s: XMLScanner.Scanner);
 		BEGIN
 			Init^(s);
 			reportError := XMLReportError;

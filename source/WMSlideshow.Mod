@@ -577,7 +577,7 @@ TYPE  SlideshowNavigation = OBJECT(WMComponents.FormWindow);
 		app.Last();
 	END ButtonHandlerLast;
 
-	PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+	PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 	BEGIN
 		IF Inputs.Release IN flags THEN RETURN; END;
 		IF ucs = ORD("f") THEN
@@ -620,7 +620,7 @@ TYPE  SlideshowNavigation = OBJECT(WMComponents.FormWindow);
 	END KeyEvent;
 
 	(** Dropped is called via the message handler to indicate an item has been dropped. *)
-	PROCEDURE DragDropped*(x, y: SIZE; dragInfo : WMWindowManager.DragInfo);
+	PROCEDURE { OVERRIDE } DragDropped*(x, y: SIZE; dragInfo : WMWindowManager.DragInfo);
 	VAR
 		dropTarget : URLDropTarget;
 	BEGIN
@@ -638,7 +638,7 @@ END SlideshowNavigation;
  *
  ****)
 TYPE URLDropTarget* = OBJECT(WMDropTarget.DropTarget);
-	PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
+	PROCEDURE { OVERRIDE } GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 	VAR di : DropURL;
 	BEGIN
 		IF (type = WMDropTarget.TypeURL) THEN
@@ -651,7 +651,7 @@ TYPE URLDropTarget* = OBJECT(WMDropTarget.DropTarget);
 END URLDropTarget;
 
 TYPE DropURL* = OBJECT(WMDropTarget.DropURLs)
-	PROCEDURE URL*(CONST url : ARRAY OF CHAR; VAR res : INTEGER);
+	PROCEDURE { OVERRIDE } URL*(CONST url : ARRAY OF CHAR; VAR res : INTEGER);
 	BEGIN
 		(* handle dropped files -> build up SlideshowData on-the-fly (not via XML file) *)
 		KernelLog.String("Dropped new URL: "); KernelLog.String(url); KernelLog.Ln;
@@ -691,7 +691,7 @@ TYPE  SlideshowWindow = OBJECT(WMWindowManager.DoubleBufferWindow);
 	END New;
 
 
-	PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+	PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 	BEGIN
 		IF (0 IN keys) THEN
 			(* Go to next Slide  *)
@@ -699,7 +699,7 @@ TYPE  SlideshowWindow = OBJECT(WMWindowManager.DoubleBufferWindow);
 		END;
 	END PointerDown;
 
-	PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+	PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 	BEGIN
 		IF Inputs.Release IN flags THEN RETURN; END;
 		IF ucs = ORD("f") THEN

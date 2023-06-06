@@ -327,7 +327,7 @@ TYPE
 			styleI := style.Get();
 		END CacheProperties;
 
-		PROCEDURE PropertyChanged*(property, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(property, data : ANY);
 		BEGIN
 			IF (property = min) THEN minI := min.Get(); Invalidate;
 			ELSIF (property = max) THEN maxI := max.Get(); Invalidate;
@@ -345,13 +345,13 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			CacheProperties;
 		END Initialize;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			CacheProperties;
@@ -550,7 +550,7 @@ TYPE
 			model.Release;
 		END DrawAreas;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR
 			w, h, yborder, t, virtp : SIZE; color: WMGraphics.Color;
 			mode : SIGNED32;
@@ -615,7 +615,7 @@ TYPE
 			END;
 		END DrawBackground;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			IF model # NIL THEN model.onChanged.Remove(Update); END;
 			Finalize^;
@@ -748,7 +748,7 @@ TYPE
 		c: CoordinateSystem;
 		vertical: BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(barColor, NIL, NIL, NIL); properties.Add(barColor);
@@ -839,14 +839,14 @@ TYPE
 			Invalidate;
 		END SetVertical;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = textColor) OR (property = barColor) OR (property = lineColor) OR (property = backgroundColor) THEN Invalidate
 			ELSE PropertyChanged^(sender, property)
 			END;
 		END PropertyChanged;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR boundary,rect: WMRectangles.Rectangle; i: SIGNED32;
 
 			PROCEDURE Point2dToPoint(xr,yr: FLOAT64; VAR x,y: SIZE);

@@ -172,17 +172,17 @@ TYPE
 		tdlistbase : Machine.Address32; (* first 16byte aligned TD in tdlist *)
 
 		(** Enable power for the specified port *)
-		PROCEDURE EnablePortPower*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } EnablePortPower*(port : SIGNED32);
 			(* Do nothing: Port power is always provided by UHCI host controllers *)
 		END EnablePortPower;
 
 		(** Disable power of the specified port *)
-		PROCEDURE DisablePortPower*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } DisablePortPower*(port : SIGNED32);
 			(* Do nothing: Port power is always provided by UHCI host controllers *)
 		END DisablePortPower;
 
 		(** Reset and enable the specified port *)
-		PROCEDURE ResetAndEnablePort*(port : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ResetAndEnablePort*(port : SIGNED32) : BOOLEAN;
 		VAR status : SIGNED16; mtimer : Kernel.MilliTimer;
 		BEGIN
 			(* reset port *)
@@ -207,7 +207,7 @@ TYPE
 		END ResetAndEnablePort;
 
 		(** Disables port number <port> on this root hub *)
-		PROCEDURE DisablePort*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } DisablePort*(port : SIGNED32);
 		VAR status : SIGNED16; mtimer : Kernel.MilliTimer;
 		BEGIN
 			Machine.Portin16(ports[port], SYSTEM.VAL(SIGNED16, status));
@@ -225,7 +225,7 @@ TYPE
 		 * Get the status of the port <port> of this root hub.
 		 * Registers which indicate changes are reset by GetPortStatus if ack = TRUE;
 		 *)
-		PROCEDURE GetPortStatus*(port : SIGNED32; ack : BOOLEAN):SET;
+		PROCEDURE { OVERRIDE } GetPortStatus*(port : SIGNED32; ack : BOOLEAN):SET;
 		VAR status, s : SET;
 		BEGIN
 			Machine.Portin16(ports[port], SYSTEM.VAL(SIGNED16, s));
@@ -249,7 +249,7 @@ TYPE
 		END GetPortStatus;
 
 		(* Since UHCI host controllers do not support port change notification via interrupts, they must be polled *)
-		PROCEDURE SetStatusChangeHandler*(handler : UsbHcdi.StatusChangeHandler) : BOOLEAN;
+		PROCEDURE { OVERRIDE } SetStatusChangeHandler*(handler : UsbHcdi.StatusChangeHandler) : BOOLEAN;
 		BEGIN
 			RETURN FALSE;
 		END SetStatusChangeHandler;
@@ -274,7 +274,7 @@ TYPE
 		END GetFrameNumber;
 
 		(** Removes the USB transfer request <req> from the host controller schedule *)
-		PROCEDURE UnlinkTDs*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } UnlinkTDs*(pipe : UsbHcdi.Pipe);
 		BEGIN  {EXCLUSIVE}
 			UnlinkTDsInternal(pipe);
 		END UnlinkTDs;
@@ -297,7 +297,7 @@ TYPE
 		END UnlinkTDsInternal;
 
 		(* Set the QhTerminate bit in the Queue Head Element Link Pointer to unchain TDs *)
-		PROCEDURE ClearHalt*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } ClearHalt*(pipe : UsbHcdi.Pipe);
 		VAR dword : SET;
 		BEGIN
 			ASSERT((pipe # NIL) & (pipe.qh # 0));
@@ -308,7 +308,7 @@ TYPE
 		END ClearHalt;
 
 		(* Insert the queue head qh into the appropriate queue *)
-		PROCEDURE InsertQH*(pipe : UsbHcdi.Pipe) : BOOLEAN;
+		PROCEDURE { OVERRIDE } InsertQH*(pipe : UsbHcdi.Pipe) : BOOLEAN;
 		VAR qhtmp, slots, index, queueslots : SIGNED32;
 		BEGIN (* only call from exclusive regions *)
 			(* build qh. Both link and queue head link pointer are invalid *)
@@ -340,7 +340,7 @@ TYPE
 		END InsertQH;
 
 		(* Delete the queue head <qh> in the queue <queue> *)
-		PROCEDURE RemoveQH*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } RemoveQH*(pipe : UsbHcdi.Pipe);
 		VAR qhtmp, queue, delthis : Machine.Address32; timer : Kernel.Timer;
 		BEGIN (* caller must hold obj lock *)
 			UnlinkTDsInternal(pipe);
@@ -365,19 +365,19 @@ TYPE
 		END RemoveQH;
 
 		(** Checks whether TDs may be linked to the pipe's QH *)
-		PROCEDURE LinkTDsAllowed*(pipe : UsbHcdi.Pipe) : BOOLEAN;
+		PROCEDURE { OVERRIDE } LinkTDsAllowed*(pipe : UsbHcdi.Pipe) : BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			RETURN TRUE;
 		END LinkTDsAllowed;
 
 		(* Insert the TD list <td> into the queue <queue> *)
-		PROCEDURE LinkTDs*(pipe : UsbHcdi.Pipe; td : Machine.Address32);
+		PROCEDURE { OVERRIDE } LinkTDs*(pipe : UsbHcdi.Pipe; td : Machine.Address32);
 		BEGIN {EXCLUSIVE}
 			ASSERT(SYSTEM.VAL(SET, td) * {0..3} = {}); (* 16byte alignment of TDs *)
 			SYSTEM.PUT32(pipe.qh + QhElementLinkPointer, td(Machine.Address32)); (* queue element link pointer ::= pointer to td *)
 		END LinkTDs;
 
-		PROCEDURE ScheduleControl*(pipe : UsbHcdi.Pipe; direction : SIGNED32; msg : UsbHcdi.ControlMessage;  bufferLen : SIZE;  VAR buffer : Usbdi.Buffer);
+		PROCEDURE { OVERRIDE } ScheduleControl*(pipe : UsbHcdi.Pipe; direction : SIGNED32; msg : UsbHcdi.ControlMessage;  bufferLen : SIZE;  VAR buffer : Usbdi.Buffer);
 		VAR td : Machine.Address32; pid, restlen, databufferAdr, curlen : SIGNED32; tdStatus : SET;
 		BEGIN
 		 	(* Control transfers use a three stage protocol:	*)
@@ -451,7 +451,7 @@ TYPE
 			pipe.lastTD := td;
 		END ScheduleControl;
 
-		PROCEDURE Schedule*(pipe : UsbHcdi.Pipe; bufferLen, offset: SIZE; VAR buffer: Usbdi.Buffer);
+		PROCEDURE { OVERRIDE } Schedule*(pipe : UsbHcdi.Pipe; bufferLen, offset: SIZE; VAR buffer: Usbdi.Buffer);
 		VAR td : Machine.Address32; pid, restlen, curlen, databuffer : SIGNED32; tdStatus : SET;
 		BEGIN
 			pipe.firstTD :=  pipe.tdBase;
@@ -557,7 +557,7 @@ TYPE
 			pipe.actLen := actlen;
 		END GetTransferredLen;
 
-		PROCEDURE UpdatePipeStatus*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } UpdatePipeStatus*(pipe : UsbHcdi.Pipe);
 		VAR
 			val, pid : SIGNED32;
 			td, addr : Machine.Address32;
@@ -804,20 +804,20 @@ TYPE
 			RETURN TRUE;
 		END Start;
 
-		PROCEDURE Cleanup;
+		PROCEDURE { OVERRIDE } Cleanup;
 		BEGIN
 			IF state >= UsbHcdi.Initialized THEN Objects.RemoveHandler(InterruptHandler, Machine.IRQ0 + irq); END;
 			Cleanup^;
 			Reset;
 		END Cleanup;
 
-		PROCEDURE ShowPipe*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } ShowPipe*(pipe : UsbHcdi.Pipe);
 		BEGIN
 			HumanTD(pipe.firstTD);
 		END ShowPipe;
 
 		(** Displays the host controller's data struture on KernelLog *)
-		PROCEDURE ShowSchedule*;
+		PROCEDURE { OVERRIDE } ShowSchedule*;
 		BEGIN
 			IF Debug.Trace THEN
 			KernelLog.String("Host Controller Data Structures of ");
@@ -845,7 +845,7 @@ TYPE
 		END DoStrongChecks;
 
 		(* for debugging: display diagnostics of this host controller to KernelLog *)
-		PROCEDURE Diag;
+		PROCEDURE { OVERRIDE } Diag;
 		VAR s : SET; 	framenum : SIGNED32;
 		BEGIN
 			IF Debug.Trace THEN

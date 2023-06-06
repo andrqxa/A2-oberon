@@ -24,7 +24,7 @@ TYPE
 		timer: Kernel.Timer;
 		internalEnabled : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^();
 			SetGenerator("WMStandardComponents.GenTimer");
@@ -39,7 +39,7 @@ TYPE
 			SetNameAsString(StrTimer)
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF property = enabled THEN
 				IF internalEnabled # enabled.Get() THEN
@@ -59,7 +59,7 @@ TYPE
 			enabled.Set(FALSE); BEGIN {EXCLUSIVE} internalEnabled := FALSE; END;
 		END Stop;
 
-		PROCEDURE Finalize*; (** PROTECTED *)
+		PROCEDURE { OVERRIDE } Finalize*; (** PROTECTED *)
 		BEGIN
 			timer.Wakeup; internalEnabled := FALSE; BEGIN {EXCLUSIVE} alive := FALSE END; Finalize^
 		END Finalize;
@@ -193,7 +193,7 @@ TYPE
 		commandString- : WMProperties.StringProperty;
 		eRun- : EventListenerInfo;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenSystemCommand");
@@ -225,7 +225,7 @@ TYPE
 		commandString- : WMProperties.StringProperty;
 		eRun- : EventListenerInfo;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenEvent");
@@ -258,7 +258,7 @@ TYPE
 		blink: BOOLEAN;
 		show-: BOOLEAN; (* state for blinking *)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			show := TRUE;
@@ -268,7 +268,7 @@ TYPE
 			blink := blinking.Get();
 		END Init;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			PropertyChanged(SELF,blinking)
@@ -289,7 +289,7 @@ TYPE
 		could be done with the 'visible' property, too.
 		*)
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR b: BOOLEAN; element : XML.Element;
 		BEGIN
 			IF property = blinking THEN
@@ -317,7 +317,7 @@ TYPE
 		END Draw;
 *)
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			blinker.events.Remove(SetBlinker);
@@ -383,7 +383,7 @@ TYPE
 		alignH- : WMProperties.Int32Property;
 		alignV- : WMProperties.Int32Property;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 
@@ -397,14 +397,14 @@ TYPE
 		END Init;
 
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			SetFont(font.Get());
 		END RecacheProperties;
 
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR element : XML.Element;
 		BEGIN
 			IF (property = caption) OR (property = textColor) OR (property = alignH) OR (property = alignV) THEN
@@ -424,7 +424,7 @@ TYPE
 			caption.SetAOC(x)
 		END SetCaption;
 
-		PROCEDURE LinkChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, data : ANY);
 		VAR string : Types.String256; res : INTEGER; m: Models.Model;
 		BEGIN
 			IF (sender = model) & WMProperties.GetModel(model,m) THEN
@@ -435,7 +435,7 @@ TYPE
 			END;
 		END LinkChanged;
 
-		PROCEDURE DrawBackground*(canvas : Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : Canvas);
 		VAR str : String;
 		BEGIN
 			DrawBackground^(canvas); str := caption.Get();
@@ -510,7 +510,7 @@ TYPE
 		horizontalFit: WMProperties.BooleanProperty;
 		textBorder: WMProperties.Int32Property;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrButton);
@@ -598,7 +598,7 @@ TYPE
 			END;
 		END ExecuteClickHandler;
 
-		PROCEDURE ScaleFont*(height: SIZE; percent: INTEGER);
+		PROCEDURE { OVERRIDE } ScaleFont*(height: SIZE; percent: INTEGER);
 		VAR fh,hfh,ntw,newSize,width: SIZE; f,hf: WMGraphics.Font; str: String; tw, th: SIZE; oldFontSize: SIZE;
 		BEGIN
 			height := height - 2*textBorder.Get();
@@ -655,7 +655,7 @@ TYPE
 			Release;
 		END ScaleFont;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR element : XML.Element; s : String;
 		BEGIN
 			RecacheProperties^;
@@ -704,7 +704,7 @@ TYPE
 			CheckClickHandler;
 		END RecacheProperties;
 
-		PROCEDURE LinkChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, data : ANY);
 		VAR boolean : Types.Boolean; res : INTEGER; m: Models.Model;
 		BEGIN
 			IF (sender = model) & WMProperties.GetModel(model,m) THEN
@@ -725,7 +725,7 @@ TYPE
 			END;
 		END ChangeModel;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		VAR element : XML.Element;
 		BEGIN
 			IF (data = caption)  THEN
@@ -792,13 +792,13 @@ TYPE
 			RETURN pressed;
 		END GetPressed;
 
-		PROCEDURE FocusReceived*;
+		PROCEDURE { OVERRIDE } FocusReceived*;
 		BEGIN
 			FocusReceived^;
 			Invalidate
 		END FocusReceived;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			Invalidate
@@ -830,13 +830,13 @@ TYPE
 			ChangeModel(pressed);
 		END Up;
 
-		PROCEDURE PointerDown*(x, y: SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerDown*(x, y: SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			IF enabled.Get() THEN Down END;
 			PointerDown^(x, y, keys)
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			IF enabled.Get() THEN
 				IF IsHit(x, y) THEN
@@ -849,13 +849,13 @@ TYPE
 			PointerMove^(x, y, keys)
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			Up;
 			PointerUp^(x, y, keys)
 		END PointerUp;
 
-		PROCEDURE PointerLeave*; (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerLeave*; (** PROTECTED *)
 		BEGIN
 			 mouseOver := FALSE; Invalidate
 		END PointerLeave;
@@ -865,7 +865,7 @@ TYPE
 			caption.Set(Strings.NewString(x))
 		END SetCaption;
 
-		PROCEDURE IsHit*(x, y: SIZE) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(x, y: SIZE) : BOOLEAN;
 		VAR t : BOOLEAN;
 		BEGIN
 			IF ~visible.Get() THEN RETURN FALSE END;
@@ -1033,7 +1033,7 @@ TYPE
 			END
 		END GetThisDecoration;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR mode, borderWidth : SIGNED32; mid: WMGraphics.Color;
 			 tc : WMGraphics.Color; r, rect : WMGraphics.Rectangle; down : BOOLEAN;
 			 str : String;
@@ -1246,7 +1246,7 @@ TYPE
 			END
 		END DrawVerticalBackground;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; VAR keyCode : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; VAR keyCode : SIZE);
 		BEGIN
 			IF ~ (Inputs.Release IN flags) THEN
 				IF keyCode = 20H THEN keyboardPressed := TRUE; Down
@@ -1355,7 +1355,7 @@ TYPE
 
 		ts, tp, tDownX, tDownY : SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenScrollbar");
@@ -1455,14 +1455,14 @@ TYPE
 			RecacheImages;
 		END Init;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			Resized^;
 			UpdateLayout;
 			Invalidate;
 		END Resized;
 
-		PROCEDURE LinkChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, data : ANY);
 		VAR integer : Types.Integer; res : INTEGER; m: Models.Model;
 		BEGIN
 			IF (sender = model) & WMProperties.GetModel(model,m) THEN
@@ -1511,7 +1511,7 @@ TYPE
 			END;
 		END Down;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			PointerDown^(x, y, keys);
 			IF (0 IN keys) THEN
@@ -1531,7 +1531,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR oldHover, oldPressed, area : SIGNED8;
 		BEGIN
 			PointerMove^(x, y, keys);
@@ -1557,7 +1557,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR oldPressed : SIGNED8;
 		BEGIN
 			PointerUp^(x, y, keys);
@@ -1572,7 +1572,7 @@ TYPE
 			END;
 		END PointerUp;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		VAR oldHover : SIGNED8;
 		BEGIN
 			PointerLeave^;
@@ -1680,7 +1680,7 @@ TYPE
 			arrowDownPressed := GetImage( arrowDownPressedName);
 		END RecacheImages;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR element : XML.Element;
 		BEGIN
 			RecacheProperties^;
@@ -1694,7 +1694,7 @@ TYPE
 			Resized; (*?implies Invalidate -> redundant*)
 		END RecacheProperties;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = pos) THEN
 				UpdateLayout; ChangeModel(pos.Get()); Invalidate;
@@ -1959,7 +1959,7 @@ TYPE
 			END;
 		END DrawImage;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR image, a, b, c : WMGraphics.Image; vertical : BOOLEAN;
 		BEGIN
 			IF ~visible.Get() THEN RETURN END;
@@ -2021,7 +2021,7 @@ TYPE
 		minusPage, plusPage, tracker : Button;
 		ts, tp, lx, ly : SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenSlider");
@@ -2096,7 +2096,7 @@ TYPE
 			takesFocus.Set(FALSE)
 		END Init;
 
-		PROCEDURE LinkChanged*(sender, link: ANY);
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, link: ANY);
 		VAR m: Models.Model; integer: SIGNED32;
 		BEGIN
 			IF sender = model THEN
@@ -2111,7 +2111,7 @@ TYPE
 		END LinkChanged;
 
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		CONST BarWidth = 8;
 		VAR rect : WMRectangles.Rectangle; width, height : SIZE;
 		BEGIN
@@ -2183,7 +2183,7 @@ TYPE
 			handled := FALSE
 		END TrackerPointerMove;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			tracker.useBgBitmaps.Set(useTrackerImages.Get());
@@ -2202,7 +2202,7 @@ TYPE
 			AlignSubComponents;
 		END RecacheProperties;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = pos) THEN
 				AlignSubComponents; Invalidate;
@@ -2248,7 +2248,7 @@ TYPE
 			END
 		END PageDown;
 
-		PROCEDURE AlignSubComponents*;
+		PROCEDURE { OVERRIDE } AlignSubComponents*;
 		VAR h, w, ps, tmin, tmax : SIZE;
 		BEGIN
 			Acquire; DisableUpdate;
@@ -2343,7 +2343,7 @@ TYPE
 		isFlat- : WMProperties.BooleanProperty;
 		dnx, dny : SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenResizer");
@@ -2353,7 +2353,7 @@ TYPE
 			bounds.SetPrototype(PrototypeRBounds)
 		END Init;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR align: SIGNED32;
 		BEGIN
 			RecacheProperties^;
@@ -2365,7 +2365,7 @@ TYPE
 			END;
 		END RecacheProperties;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			IF (data = properties) OR (data = alignment) THEN RecacheProperties; (*? PH added *) Invalidate;
 			ELSIF (data = clDefault) OR (data = isFlat) THEN Invalidate;
@@ -2373,12 +2373,12 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE PointerDown*(x, y: SIZE; keys: SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerDown*(x, y: SIZE; keys: SET); (** PROTECTED *)
 		BEGIN
 			dnx := x; dny := y
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y: SIZE; keys: SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerMove*(x, y: SIZE; keys: SET); (** PROTECTED *)
 		VAR dx, dy, align, myWidth, myHeight, newL, newR, newT, newB: SIZE;
 			p, pp : WMComponents.VisualComponent;
 			parent : XML.Element;
@@ -2437,7 +2437,7 @@ TYPE
 			END
 		END PointerMove;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		BEGIN
 			DrawBackground^(canvas);
 			canvas.Fill(GetClientRect(), SELF.clDefault.Get(), WMGraphics.ModeSrcOverDst);
@@ -2455,7 +2455,7 @@ TYPE
 		border : WMRectangles.Rectangle;
 		captionFont : WMGraphics.Font;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenGroupPanel");
@@ -2466,14 +2466,14 @@ TYPE
 			captionFont := WMGraphics.GetFont("Oberon", 8, {});
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = caption) OR (property = textColor) THEN Invalidate
 			ELSE PropertyChanged^(sender, property)
 			END;
 		END PropertyChanged;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR rect: WMRectangles.Rectangle;
 			highlight, shadow : SIGNED32; w, h : SIZE;
 			tempString : Strings.String;
@@ -2508,7 +2508,7 @@ TYPE
 			END;
 		END DrawBackground;
 
-		PROCEDURE AlignSubComponents*; (** override *)
+		PROCEDURE { OVERRIDE } AlignSubComponents*; (** override *)
 		VAR c : XML.Content; vc : WMComponents.VisualComponent;
 			r, b : WMRectangles.Rectangle;
 		BEGIN
@@ -2565,7 +2565,7 @@ TYPE
 		onClick- : EventSource;
 		handler : WMEvents.EventListener;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenCheckbox");
@@ -2609,7 +2609,7 @@ TYPE
 			END
 		END CheckClickHandler;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			IF (data = caption) THEN Invalidate
 			ELSIF (data = onClickHandler) THEN CheckClickHandler;
@@ -2624,7 +2624,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR s : String;
 		BEGIN
 			RecacheProperties^;
@@ -2644,19 +2644,19 @@ TYPE
 			CheckClickHandler;
 		END RecacheProperties;
 
-		PROCEDURE FocusReceived*;
+		PROCEDURE { OVERRIDE } FocusReceived*;
 		BEGIN
 			FocusReceived^;
 			Invalidate
 		END FocusReceived;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			Invalidate
 		END FocusLost;
 
-		PROCEDURE PointerDown*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y: SIZE; keys: SET);
 		VAR value : SIGNED32;
 		BEGIN
 			IF enabled.Get() THEN
@@ -2676,7 +2676,7 @@ TYPE
 			PointerDown^(x, y, keys)
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			IF IsHit(x, y) THEN
 				IF ~mouseOver THEN mouseOver := TRUE; Invalidate END
@@ -2686,7 +2686,7 @@ TYPE
 			PointerMove^(x, y, keys)
 		END PointerMove;
 
-		PROCEDURE PointerLeave*; (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerLeave*; (** PROTECTED *)
 		BEGIN
 			 mouseOver := FALSE; Invalidate
 		END PointerLeave;
@@ -2701,7 +2701,7 @@ TYPE
 			END
 		END Click;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR
 			rect: WMRectangles.Rectangle;
 			string : Strings.String;
@@ -2789,7 +2789,7 @@ TYPE
 		scaleImage- : WMProperties.BooleanProperty;
 		scaleImageI : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenImage");
@@ -2800,7 +2800,7 @@ TYPE
 			scaleImageI := scaleImage.Get();
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = imageName) THEN
 				RecacheProperties; (*? PH*) Invalidate;
@@ -2812,7 +2812,7 @@ TYPE
 			END
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR s : String;
 		BEGIN
 			RecacheProperties^;
@@ -2837,7 +2837,7 @@ TYPE
 			Invalidate
 		END SetImage;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR width, height : SIZE;
 		BEGIN
 			DrawBackground^(canvas);
@@ -2871,7 +2871,7 @@ TYPE
 		vScrollbar, hScrollbar : Scrollbar;
 		dx, dy : SIZE;
 
-		PROCEDURE &  Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenImagePanel");
@@ -2889,7 +2889,7 @@ TYPE
 			dx := 0;  dy := 0
 		END Init;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			Resized^;
 			IF img=NIL THEN
@@ -2917,7 +2917,7 @@ TYPE
 			y :=-(dy * vScrollbar.pos.Get() DIV 100);
 		END GetOffsets;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF property = imgName THEN
 				RecacheProperties; Invalidate;(*? invalidate also called in RecacheProperties->SetImage()*)
@@ -2926,7 +2926,7 @@ TYPE
 			END
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR s : String;
 		BEGIN
 			s := imgName.Get();
@@ -2965,7 +2965,7 @@ TYPE
 			END
 		END SetImage;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR x, y : SIZE;
 		BEGIN
 			IF show THEN

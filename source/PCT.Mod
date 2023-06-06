@@ -275,7 +275,7 @@ TYPE
 		withGuard*, withSym*: Symbol;
 
 		(* ug *)
-		PROCEDURE CreateVar*(name: StringIndex;  vis, flags: SET;  type: Struct; pos: SIGNED32; (*fof*)  info: ANY; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateVar*(name: StringIndex;  vis, flags: SET;  type: Struct; pos: SIGNED32; (*fof*)  info: ANY; VAR res: INTEGER);
 		VAR s: Scope;
 		BEGIN
 			s := parent;
@@ -305,7 +305,7 @@ TYPE
 			SELF.cc := cc
 		END SetCC;
 
-		PROCEDURE CreateVar*(name: StringIndex;  vis, flags: SET;  type: Struct; pos: SIGNED32; (*fof*) info: ANY; (*ug*) VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateVar*(name: StringIndex;  vis, flags: SET;  type: Struct; pos: SIGNED32; (*fof*) info: ANY; (*ug*) VAR res: INTEGER);
 			VAR v: LocalVar;
 		BEGIN
 			NEW(v); v.pos := pos; (*fof*)
@@ -385,7 +385,7 @@ TYPE
 		END CreateReturnPar;
 		(** << fof  *)
 
-		PROCEDURE CreateProc*(name: StringIndex;  vis, flags: SET;  scope: (*Proc*)Scope;  return: Struct; pos: SIGNED32; (*fof*) VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateProc*(name: StringIndex;  vis, flags: SET;  scope: (*Proc*)Scope;  return: Struct; pos: SIGNED32; (*fof*) VAR res: INTEGER);
 			VAR p: Proc;
 		BEGIN
 			p := NewProc(vis, name, flags, scope(ProcScope), return, res);
@@ -407,7 +407,7 @@ TYPE
 			firstMeth-, lastMeth-: Method;
 			totalVarCount-, totalProcCount-: SIGNED32;	(**var/proc count including base type (overwritten method are counted only once)*)
 
-		PROCEDURE CreateVar*(name: StringIndex;  vis, flags: SET;  type: Struct; pos: SIGNED32; (*fof*) info : ANY; (*ug*) VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateVar*(name: StringIndex;  vis, flags: SET;  type: Struct; pos: SIGNED32; (*fof*) info : ANY; (*ug*) VAR res: INTEGER);
 			VAR f: Field; obj: Symbol;
 		BEGIN
 			ASSERT(vis # Hidden);
@@ -429,7 +429,7 @@ TYPE
 			END
 		END CreateVar;
 
-		PROCEDURE CreateProc*(name: StringIndex;  vis, flags: SET;  scope: (*Proc*)Scope;  return: Struct; pos: SIGNED32; (*fof*) VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateProc*(name: StringIndex;  vis, flags: SET;  scope: (*Proc*)Scope;  return: Struct; pos: SIGNED32; (*fof*) VAR res: INTEGER);
 			VAR m: Method;
 		BEGIN
 			m := NewMethod(vis, name, flags, scope(ProcScope), return, owner, pos, res);
@@ -469,7 +469,7 @@ TYPE
 			records-: Record;
 			nofRecs-: SIGNED16;
 
-		PROCEDURE CreateVar*(name: StringIndex;  vis, flags: SET;  type: Struct; pos: SIGNED32; (*fof*) info: ANY; (*ug*) VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateVar*(name: StringIndex;  vis, flags: SET;  type: Struct; pos: SIGNED32; (*fof*) info: ANY; (*ug*) VAR res: INTEGER);
 			VAR v: GlobalVar;
 		BEGIN
 			NEW(v); v.pos := pos; (*fof*) InitSymbol(v, name, vis, type); v.flags := flags; CheckVar(v, {static}, {static, open} (* fof *) ,res);
@@ -488,7 +488,7 @@ TYPE
 			END
 		END CreateVar;
 
-		PROCEDURE CreateProc*(name: StringIndex;  vis, flags: SET;  scope: (*Proc*)Scope;  return: Struct; pos: SIGNED32; (*fof*) VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateProc*(name: StringIndex;  vis, flags: SET;  scope: (*Proc*)Scope;  return: Struct; pos: SIGNED32; (*fof*) VAR res: INTEGER);
 			VAR p: Proc;
 		BEGIN
 			p := NewProc(vis, name, flags, scope(ProcScope), return, res);
@@ -652,7 +652,7 @@ TYPE
 		VAR
 			nextType-: Type;
 
-		PROCEDURE Use;
+		PROCEDURE { OVERRIDE } Use;
 		BEGIN
 			Use^;
 			IF (type.owner # SELF) &			(* aliased *)
@@ -692,7 +692,7 @@ TYPE
 			directImps[i] := m
 		END AddDirectImp;
 
-		PROCEDURE Use;
+		PROCEDURE { OVERRIDE } Use;
 		BEGIN
 			INCL(flags, used);
 			IF SELF # scope.owner THEN INCL(scope.owner.flags, used) END

@@ -16,19 +16,19 @@ TYPE
 			format := Displays.color565; unit := 10000
 		END Init;
 
-		PROCEDURE Transfer*(VAR buf: ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op: INTEGER);
+		PROCEDURE { OVERRIDE } Transfer*(VAR buf: ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op: INTEGER);
 		END Transfer;
 
-		PROCEDURE Fill*(col, x, y, w, h: SIGNED32);
+		PROCEDURE { OVERRIDE } Fill*(col, x, y, w, h: SIGNED32);
 		END Fill;
 
-		PROCEDURE Dot*(col, x, y: SIGNED32);
+		PROCEDURE { OVERRIDE } Dot*(col, x, y: SIGNED32);
 		END Dot;
 
-		PROCEDURE Mask*(VAR buf: ARRAY OF CHAR; bitofs, stride, fg, bg, x, y, w, h: SIGNED32);
+		PROCEDURE { OVERRIDE } Mask*(VAR buf: ARRAY OF CHAR; bitofs, stride, fg, bg, x, y, w, h: SIGNED32);
 		END Mask;
 
-		PROCEDURE Copy*(sx, sy, w, h, dx, dy: SIGNED32);
+		PROCEDURE { OVERRIDE } Copy*(sx, sy, w, h, dx, dy: SIGNED32);
 		END Copy;
 
 	END Display;

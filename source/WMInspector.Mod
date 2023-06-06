@@ -24,7 +24,7 @@ TYPE
 		selected: WMTrees.TreeNode;
 		dragged: WMTrees.TreeNode;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("InspectionTree"));
@@ -209,7 +209,7 @@ TYPE
 		refreshBtn, splitBtn : WMStandardComponents.Button;
 		dragger: DragCommand;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR panel: WMStandardComponents.Panel;
 		BEGIN
 			Init^;
@@ -291,7 +291,7 @@ TYPE
 			tree.ExpandToRoot(node);
 		END AddNonFormWindow;
 
-		PROCEDURE Refresh(sender, data : ANY);
+		PROCEDURE { OVERRIDE } Refresh(sender, data : ANY);
 		VAR root : WMTrees.TreeNode; nofWindows, i : SIGNED32;
 
 		BEGIN
@@ -321,7 +321,7 @@ TYPE
 
 	TextComponentsTree = OBJECT(InspectionTree)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("TextComponentsTree"));
@@ -329,7 +329,7 @@ TYPE
 			Texts.onLastTextChanged.Add(Refresh);
 		END Init;
 
-		PROCEDURE Refresh(sender, data : ANY);
+		PROCEDURE { OVERRIDE } Refresh(sender, data : ANY);
 		VAR
 			root : WMTrees.TreeNode;
 			text : Texts.Text; reader : Texts.TextReader;
@@ -363,7 +363,7 @@ TYPE
 			END;
 		END Refresh;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			Texts.onLastTextChanged.Remove(Refresh);
@@ -375,7 +375,7 @@ TYPE
 
 	SelectedTextTree = OBJECT(InspectionTree)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("SelectedTextTree"));
@@ -383,7 +383,7 @@ TYPE
 			Texts.onLastSelectionChanged.Add(Refresh);
 		END Init;
 
-		PROCEDURE Refresh(sender, data : ANY);
+		PROCEDURE { OVERRIDE } Refresh(sender, data : ANY);
 		VAR
 			root : WMTrees.TreeNode;
 			text : Texts.Text; from, to : Texts.TextPosition; reader : Texts.TextReader;
@@ -416,7 +416,7 @@ TYPE
 			END;
 		END Refresh;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			Texts.onLastSelectionChanged.Remove(Refresh);
@@ -427,7 +427,7 @@ TYPE
 
 	SelectedComponentsTree = OBJECT(InspectionTree)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("SelectedComponentsTree"));
@@ -436,7 +436,7 @@ TYPE
 			Refresh(SELF, WMComponents.selection);
 		END Init;
 
-		PROCEDURE Refresh(sender, data : ANY);
+		PROCEDURE { OVERRIDE } Refresh(sender, data : ANY);
 		VAR
 			root , node: WMTrees.TreeNode;
 			array: WMComponents.SelectionArray;
@@ -464,7 +464,7 @@ TYPE
 			END;
 		END Refresh;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			WMComponents.selection.onChanged.Remove(Refresh)
@@ -886,7 +886,7 @@ TYPE
 		*)
 
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS KillerMsg) THEN Close
@@ -898,7 +898,7 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;
@@ -910,14 +910,14 @@ TYPE
 	DragCommand*= OBJECT(WMStandardComponents.Label)
 	VAR caption: XML.Attribute; inspector: InspectorComponent;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^; SELF.inspector:= NIL;
 			NEW(caption); caption.SetName("Caption"); caption.SetValue("Drag to Inspect"); AddAttribute(caption);
 			SetGenerator("WMInspector.NewCommandDragger");
 		END Init;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR r: WMRectangles.Rectangle; name: XML.String;
 		BEGIN
 			r := GetClientRect();
@@ -983,7 +983,7 @@ TYPE
 			END;
 		END Accept;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR
 			img,icon: WMGraphics.Image; canvas, iconCanvas: WMGraphics.BufferCanvas; color: SIGNED32;
 			r: WMRectangles.Rectangle; data: WMComponents.FindComponentMode;

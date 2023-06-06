@@ -52,7 +52,7 @@ TYPE
 		END New;
 
 		(**  Return the modifier keys that are pressed in the view *)
-		PROCEDURE GetKeyState*(VAR state : SET);
+		PROCEDURE { OVERRIDE } GetKeyState*(VAR state : SET);
 		BEGIN
 			state := modifierKeys
 		END GetKeyState;
@@ -205,7 +205,7 @@ TYPE
 		END SetInitialWindowBounds;
 
 		(** Set the observed range. *)
-		PROCEDURE SetRange*(x, y, w, h : FLOAT32; showTransition : BOOLEAN);
+		PROCEDURE { OVERRIDE } SetRange*(x, y, w, h : FLOAT32; showTransition : BOOLEAN);
 		VAR
 			sx, sy, sx2, sy2, dx, dy, dx2, dy2, x2, y2  : FLOAT32;
 			i, steps : SIGNED32;
@@ -250,13 +250,13 @@ TYPE
 		END SetRange;
 
 		(** r in wm coordinates *)
-		PROCEDURE Update*(r : Rectangle; top : Window);
+		PROCEDURE { OVERRIDE } Update*(r : Rectangle; top : Window);
 		BEGIN
 			ASSERT(manager.lock.HasWriteLock());
 			Draw(r (*fof: was Rect.ResizeRect(r, 1)*), top.prev) (* assuming the src -domain is only 1 *) (*?fof: what does this mean? For me this makes no sense *)
 		END Update;
 
-		PROCEDURE Refresh*(top : Window);
+		PROCEDURE { OVERRIDE } Refresh*(top : Window);
 		BEGIN
 			ASSERT(manager.lock.HasWriteLock());
 			Update(Rect.MakeRect(ENTIER(range.l)-1, ENTIER(range.t)-1, ENTIER(range.r) + 1, ENTIER(range.b) + 1), top)
@@ -406,7 +406,7 @@ TYPE
 	END DirtyQ;
 
 	UnhitableWindow = OBJECT(WM.BufferWindow);
-		PROCEDURE IsHit*(x, y : SIZE) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(x, y : SIZE) : BOOLEAN;
 		BEGIN
 			RETURN FALSE
 		END IsHit;
@@ -456,7 +456,7 @@ TYPE
 			decorate := DefaultDecorator;
 		END New;
 
-		PROCEDURE ShutDown*;
+		PROCEDURE { OVERRIDE } ShutDown*;
 		VAR rect: Rectangle;
 		BEGIN
 			lock.AcquireWrite;
@@ -537,7 +537,7 @@ TYPE
 			RETURN cur;
 		END FindBottomWindow;
 
-		PROCEDURE Broadcast*(VAR m : Messages.Message);
+		PROCEDURE { OVERRIDE } Broadcast*(VAR m : Messages.Message);
 		VAR cur : Window; discard : BOOLEAN;
 		BEGIN
 			lock.AcquireWrite;
@@ -552,7 +552,7 @@ TYPE
 			lock.ReleaseWrite
 		END Broadcast;
 
-		PROCEDURE Add*(left, top : SIZE; w : Window; flags : SET);
+		PROCEDURE { OVERRIDE } Add*(left, top : SIZE; w : Window; flags : SET);
 		VAR plugin : Plugins.Plugin; oldPointerOwner: Window; m: Messages.Message;
 		BEGIN
 			ASSERT((w.next = NIL) & (w.prev = NIL)); (* window can not be inserted twice *)
@@ -596,7 +596,7 @@ TYPE
 			END;
 		END InternalRemove;
 
-		PROCEDURE Remove*(w : Window);
+		PROCEDURE { OVERRIDE } Remove*(w : Window);
 		VAR dl : WM.DecorList; p : Window;
 		BEGIN
 			lock.AcquireWrite;
@@ -616,7 +616,7 @@ TYPE
 			WM.IncWTimestamp;
 		END Remove;
 
-		PROCEDURE ToFront*(x : Window);
+		PROCEDURE { OVERRIDE } ToFront*(x : Window);
 		VAR dl : WM.DecorList;
 		BEGIN
 			IF x = bottom THEN RETURN END;
@@ -632,7 +632,7 @@ TYPE
 			lock.ReleaseWrite
 		END ToFront;
 
-		PROCEDURE ToBack*(x : Window);
+		PROCEDURE { OVERRIDE } ToBack*(x : Window);
 		VAR dl : WM.DecorList; t : Window;
 		BEGIN
 			lock.AcquireWrite;
@@ -651,7 +651,7 @@ TYPE
 			lock.ReleaseWrite
 		END ToBack;
 
-		PROCEDURE SetWindowFlag*(w : Window; flag : SIGNED32; include :  BOOLEAN);
+		PROCEDURE { OVERRIDE } SetWindowFlag*(w : Window; flag : SIGNED32; include :  BOOLEAN);
 		VAR flagChanged, isAdded : BOOLEAN;
 
 			PROCEDURE SetFlagInternal(w : Window; flag : SIGNED32; include : BOOLEAN);
@@ -734,7 +734,7 @@ TYPE
 			IF flagChanged THEN WM.IncOTimestamp; END;
 		END SetWindowFlag;
 
-		PROCEDURE SetWindowPos*(w : Window; x, y : SIZE);
+		PROCEDURE { OVERRIDE } SetWindowPos*(w : Window; x, y : SIZE);
 		VAR rect : Rectangle; dx, dy : SIZE; cur : WM.DecorList;
 		BEGIN
 			IF w = NIL THEN RETURN END;
@@ -758,7 +758,7 @@ TYPE
 			WM.ResetNextPosition;
 		END SetWindowPos;
 
-		PROCEDURE SetWindowSize*(w : Window; VAR width, height : SIZE);
+		PROCEDURE { OVERRIDE } SetWindowSize*(w : Window; VAR width, height : SIZE);
 		VAR
 			rect : Rectangle; mw : Window;
 			cw, ch, t, nw : SIZE;
@@ -828,7 +828,7 @@ TYPE
 
 	(** View management *)
 		(** Add a view *)
-		PROCEDURE AddView*(v : WM.ViewPort);
+		PROCEDURE { OVERRIDE } AddView*(v : WM.ViewPort);
 		VAR res : INTEGER;
 		BEGIN
 			lock.AcquireWrite;
@@ -839,7 +839,7 @@ TYPE
 		END AddView;
 
 		(** Add the whole View.range as dirty and cause a redraw *)
-		PROCEDURE RefreshView*(v : WM.ViewPort);
+		PROCEDURE { OVERRIDE } RefreshView*(v : WM.ViewPort);
 		BEGIN
 			lock.AcquireWrite;
 			v.Refresh(top);
@@ -857,7 +857,7 @@ TYPE
 		END RefreshViews;
 
 		(** RemoveView from windowmanager *)
-		PROCEDURE RemoveView*(v : WM.ViewPort);
+		PROCEDURE { OVERRIDE } RemoveView*(v : WM.ViewPort);
 		VAR cur : WM.ViewPort;
 		BEGIN
 			IF v = NIL THEN RETURN END;
@@ -873,7 +873,7 @@ TYPE
 			lock.ReleaseWrite
 		END RemoveView;
 
-		PROCEDURE ReplaceBackground*(w : Window) : Window;
+		PROCEDURE { OVERRIDE } ReplaceBackground*(w : Window) : Window;
 		VAR old : Window;
 		BEGIN
 			lock.AcquireWrite;
@@ -885,7 +885,7 @@ TYPE
 		END ReplaceBackground;
 
 		(** Return the area that is actually occupied *)
-		PROCEDURE GetPopulatedArea*(VAR r : Rectangle);
+		PROCEDURE { OVERRIDE } GetPopulatedArea*(VAR r : Rectangle);
 		VAR first: BOOLEAN; cur : Window;
 		BEGIN
 			lock.AcquireWrite;
@@ -903,7 +903,7 @@ TYPE
 	(** Enumeration *)
 		(** Get the first "user" window --> May return NIL if only background and pointer window are installed *)
 		(** Must hold lock *)
-		PROCEDURE GetFirst*() : Window;
+		PROCEDURE { OVERRIDE } GetFirst*() : Window;
 		VAR cur : Window;
 		BEGIN
 			ASSERT(lock.HasWriteLock());
@@ -912,7 +912,7 @@ TYPE
 		END GetFirst;
 
 		(** Get the window next "user" window on top of cur *)
-		PROCEDURE GetNext*(cur : Window) : Window;
+		PROCEDURE { OVERRIDE } GetNext*(cur : Window) : Window;
 		BEGIN
 			ASSERT(lock.HasWriteLock());
 			IF cur # NIL THEN cur := cur.next END;
@@ -921,7 +921,7 @@ TYPE
 		END GetNext;
 
 		(** Get the "user" window below cur *)
-		PROCEDURE GetPrev*(cur : Window) : Window;
+		PROCEDURE { OVERRIDE } GetPrev*(cur : Window) : Window;
 		BEGIN
 			ASSERT(lock.HasWriteLock());
 			IF cur # NIL THEN cur := cur.prev END;
@@ -930,7 +930,7 @@ TYPE
 		END GetPrev;
 
 		(** Set the keyboard focus to the window w *)
-		PROCEDURE SetFocus*(w : Window);
+		PROCEDURE { OVERRIDE } SetFocus*(w : Window);
 		VAR dl : WM.DecorList;
 
 			PROCEDURE SendFocusMessage(dst : Window; has : BOOLEAN);
@@ -993,14 +993,14 @@ TYPE
 			RETURN NIL
 		END GetPositionOwnerIntern;
 
-		PROCEDURE GetPositionOwner*(x, y : SIZE) : Window;
+		PROCEDURE { OVERRIDE } GetPositionOwner*(x, y : SIZE) : Window;
 		BEGIN
 			RETURN GetPositionOwnerIntern(x, y, NIL);
 		END GetPositionOwner;
 
 		(** Adjust pointer to new position / check picture *)
 		(** MUST hold wm lock *)
-		PROCEDURE CheckPointerImage*;
+		PROCEDURE { OVERRIDE } CheckPointerImage*;
 		VAR rect : Rectangle; pi : WM.PointerInfo;
 		BEGIN
 			lock.AcquireWrite;
@@ -1039,7 +1039,7 @@ TYPE
 			lock.ReleaseWrite
 		END CheckPointerImage;
 
-		PROCEDURE GetFocusOwner*() : Window;
+		PROCEDURE { OVERRIDE } GetFocusOwner*() : Window;
 		BEGIN
 			RETURN focusOwner;
 		END GetFocusOwner;
@@ -1161,7 +1161,7 @@ TYPE
 		 	END
 		END KeyEvent;
 
-		PROCEDURE HandleInternal*(VAR msg : Messages.Message);
+		PROCEDURE { OVERRIDE } HandleInternal*(VAR msg : Messages.Message);
 		VAR w: ANY POINTER;
 			PROCEDURE Minimize(w: Window);
 			BEGIN
@@ -1262,7 +1262,7 @@ TYPE
 			END
 		END HandleInternal;
 
-		PROCEDURE StartDrag*(w : Window; sender, data : ANY; img : Graphics.Image; offsetX, offsetY: SIZE; onAccept, onReject : Messages.CompCommand) : BOOLEAN;
+		PROCEDURE { OVERRIDE } StartDrag*(w : Window; sender, data : ANY; img : Graphics.Image; offsetX, offsetY: SIZE; onAccept, onReject : Messages.CompCommand) : BOOLEAN;
 		VAR result : BOOLEAN;
 
 			PROCEDURE AddDragCursor;
@@ -1294,7 +1294,7 @@ TYPE
 		END StartDrag;
 
 		(** a pointer button must be pressed *)
-		PROCEDURE TransferPointer*(to : Window) : BOOLEAN;
+		PROCEDURE { OVERRIDE } TransferPointer*(to : Window) : BOOLEAN;
 		VAR ok : BOOLEAN;
 		BEGIN
 			lock.AcquireWrite;
@@ -1308,13 +1308,13 @@ TYPE
 		END TransferPointer;
 
 		(** Add a region to be refreshed *)
-		PROCEDURE AddDirty*(VAR rect:Rectangle);
+		PROCEDURE { OVERRIDE } AddDirty*(VAR rect:Rectangle);
 		BEGIN
 			dirtyQ.Add(rect)
 		END AddDirty;
 
 		(** Add a region to be refreshed, if visible through windows w and above *)
-		PROCEDURE AddVisibleDirty*(w : Window; rect : Rectangle);
+		PROCEDURE { OVERRIDE } AddVisibleDirty*(w : Window; rect : Rectangle);
 		VAR temp : Rect.Rectangle;
 
 			(* Subtract hidden regions --> i.e. pass on non hidden parts *)
@@ -1512,7 +1512,7 @@ TYPE
 			inDoubleClick := FALSE;
 		END Init;
 
-		PROCEDURE Handle*(VAR msg: Inputs.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg: Inputs.Message);
 		VAR dx, dy, dz, nx, ny, nz: SIZE; modifierFlags : SET; time: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF (msg IS Inputs.MouseMsg) THEN
@@ -1593,7 +1593,7 @@ TYPE
 	VAR
 		view : ViewPort; ch : SIGNED32;
 
-		PROCEDURE Handle*(VAR msg: Inputs.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg: Inputs.Message);
 		BEGIN {EXCLUSIVE}
 			IF view = NIL THEN RETURN END;
 			ch := ORD(msg(Inputs.KeyboardMsg).ch);

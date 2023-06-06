@@ -1192,7 +1192,7 @@ TYPE
 			module.code := bytes
 		END New;
 
-		PROCEDURE Outline (panel : WMStandardComponents.Panel);
+		PROCEDURE { OVERRIDE } Outline (panel : WMStandardComponents.Panel);
 		BEGIN
 			ext := lastExt; (* allows to decode with the decoder the last file was decoded *)
 			OutlineProcedure(procedures[0], panel)
@@ -1432,7 +1432,7 @@ TYPE
 			ASSERT(ch = 0X)
 		END SkipUse;
 
-		PROCEDURE DecodeTypes;
+		PROCEDURE { OVERRIDE } DecodeTypes;
 		VAR
 			i: SIZE; j, size, entry, ptrOfs, tdaddr, moduleBase, nofMethods, nofInhMethods, nofNewMethods, nofPointers, tdSize (* ug *), methNr, entryNr : SIGNED32;
 			name : ARRAY 256 OF CHAR; ch : CHAR;
@@ -1685,7 +1685,7 @@ TYPE
 			IF refs[offset] = Reflection.sfScopeBegin THEN DecodeScope END;
 		END DecodeThis;
 
-		PROCEDURE DecodeTypes;
+		PROCEDURE { OVERRIDE } DecodeTypes;
 		VAR
 			i, j : SIZE;
 			type : TypeInfo;
@@ -1864,7 +1864,7 @@ TYPE
 			END
 		END DecodeBytesHandler;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 			ELSE Handle^(x)
@@ -1885,7 +1885,7 @@ TYPE
 			END
 		END OutlinePC;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			BEGIN {EXCLUSIVE}

@@ -41,12 +41,12 @@ CONST
 TYPE
 
 	NoWheelGrid* = OBJECT(WMStringGrids.StringGrid);
-		PROCEDURE WheelMove*(dz : SIZE); (* do nothing *) END WheelMove;
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE); (* do nothing *) END WheelMove;
 	END NoWheelGrid;
 
 	BevelPanel* = OBJECT(WMStandardComponents.Panel);
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		BEGIN
 			IF ~visible.Get() THEN RETURN END;
 			Acquire;
@@ -170,7 +170,7 @@ TYPE
 
 		firstAlign : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR vc : WMComponents.VisualComponent;
 		BEGIN
 			Init^;
@@ -212,7 +212,7 @@ TYPE
 			DiskEventHandler(NIL, NIL);
 		END Synchronize;
 
-		PROCEDURE AlignSubComponents*;
+		PROCEDURE { OVERRIDE } AlignSubComponents*;
 		BEGIN
 			AlignSubComponents^;
 			IF firstAlign THEN
@@ -226,7 +226,7 @@ TYPE
 			END;
 		END AlignSubComponents;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			model.Acquire;
 			UpdateLayout(bounds.GetWidth(), bounds.GetHeight(), FALSE);
@@ -294,13 +294,13 @@ TYPE
 			diskOverviewPanel.bounds.SetLeft(-scrollX);
 		END ScrollX;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			PartitionsLib.diskModel.onChanged.Remove(DiskEventHandler);
 		END Finalize;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = showDetails) OR (property = showDiskGeometry) OR
 				(property = clSelected) OR (property = clBackground) THEN
@@ -1156,7 +1156,7 @@ TYPE
 			onSelection.Call(wrapper);
 		END UpdateSelection;
 
-		PROCEDURE WheelMove*(dz : SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 		VAR pos : SIZE;
 		BEGIN
 			IF scrollbarY.visible.Get() THEN
@@ -1200,7 +1200,7 @@ TYPE
 		state : SIGNED32;
 		timer : Kernel.Timer;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrOperationSelector);
@@ -1262,7 +1262,7 @@ TYPE
 			scrollPanel.AddInternalComponent(grid);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			ASSERT(PartitionsLib.operations # NIL);
@@ -1308,7 +1308,7 @@ TYPE
 			onSelection.Call(wrapper);
 		END GridClicked;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			Resized^;
 			UpdateGrid(FALSE);
@@ -1453,7 +1453,7 @@ TYPE
 			UpdateGrid(TRUE);
 		END OperationEventHandler;
 
-		PROCEDURE WheelMove*(dz : SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 		VAR pos : SIZE;
 		BEGIN
 			IF scrollbarY.visible.Get() THEN
@@ -1465,7 +1465,7 @@ TYPE
 			END;
 		END WheelMove;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			ASSERT(PartitionsLib.operations # NIL);

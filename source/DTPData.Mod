@@ -1079,7 +1079,7 @@ TYPE
 		mpageName* : Strings.String;
 		next*, prev* : MasterPageObject;
 
-	PROCEDURE &New*;
+	PROCEDURE (* OVERRIDE *) & New*;
 	BEGIN
 		New^;
 		mpageName := Strings.NewString("Master");

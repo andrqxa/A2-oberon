@@ -19,7 +19,7 @@ TYPE
 		arrowAtStart-, arrowAtEnd-:WMProperties.BooleanProperty;
 		arrowAtStartI, arrowAtEndI: BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMShapes.GenLine");
@@ -39,7 +39,7 @@ TYPE
 			PropertyChanged(SELF, start); (* recompute bounding box *)
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR dx, dy :SIZE; rect, rect0: WMRectangles.Rectangle;
 		BEGIN
 			IF (property = color) THEN colorI := color.Get(); Invalidate;
@@ -76,7 +76,7 @@ TYPE
 		END Set;
 
 		(** Return if the line is hit at (x, y) in parent coordinates *)
-		PROCEDURE IsHit*(x, y: SIZE): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(x, y: SIZE): BOOLEAN;
 		VAR r: WMRectangles.Rectangle; X0,Y0, X1,Y1: SIZE; hit:BOOLEAN;
 		BEGIN
 			IF ~visible.Get() THEN hit:= FALSE
@@ -98,7 +98,7 @@ TYPE
 			IF (1 IN arrows)#arrowAtEndI THEN arrowAtEnd.Set(1 IN arrows); PropertyChanged(SELF, arrowAtEnd); END;
 		END SetArrowheads;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		CONST pi=3.1516; headscale= 0.25;
 		VAR  alpha: FLOAT32;
 			dx,dy: SIZE;
@@ -131,7 +131,7 @@ TYPE
 		clBorder- : WMProperties.ColorProperty;
 		clBorderI : WMGraphics.Color;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMShapes.GenRectangle");
@@ -140,7 +140,7 @@ TYPE
 			clBorder.Set(WMGraphics.Black); clBorderI := clBorder.Get();
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = clBorder) THEN
 				clBorderI := clBorder.Get();
@@ -150,7 +150,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR rect : WMRectangles.Rectangle;
 		BEGIN
 			DrawBackground^(canvas);
@@ -169,7 +169,7 @@ TYPE
 		color : WMProperties.ColorProperty;
 		colorI : WMGraphics.Color;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMShapes.GenCircle");
@@ -178,7 +178,7 @@ TYPE
 			color.Set(WMGraphics.Black); colorI := color.Get();
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = color) THEN
 				colorI := color.Get();
@@ -188,7 +188,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR rect : WMRectangles.Rectangle; radius : SIZE;
 		BEGIN
 			DrawBackground^(canvas);
@@ -209,7 +209,7 @@ TYPE
 		color : WMProperties.ColorProperty;
 		colorI : WMGraphics.Color;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMShapes.GenEllipse");
@@ -218,7 +218,7 @@ TYPE
 			color.Set(WMGraphics.Black); colorI := color.Get();
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = color) THEN
 				colorI := color.Get();
@@ -228,7 +228,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR rect : WMRectangles.Rectangle;
 		BEGIN
 			DrawBackground^(canvas);

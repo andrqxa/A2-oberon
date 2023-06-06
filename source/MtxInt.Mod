@@ -28,26 +28,26 @@ TYPE
 		Get-: PROCEDURE {DELEGATE} ( x, y: Index ): Value;
 
 		(* override *)
-		PROCEDURE AlikeX*( ): ArrayXdBytes.Array;
+		PROCEDURE { OVERRIDE } AlikeX*( ): ArrayXdBytes.Array;
 		VAR copy: Matrix;
 		BEGIN
 			NEW( copy, origin[0], len[0], origin[1], len[1] );  RETURN copy;
 		END AlikeX;
 
-		PROCEDURE NewRangeX*( neworigin, newlen: ArrayXdBytes.IndexArray;  copydata: BOOLEAN );
+		PROCEDURE { OVERRIDE } NewRangeX*( neworigin, newlen: ArrayXdBytes.IndexArray;  copydata: BOOLEAN );
 		BEGIN
 			IF LEN( newlen ) # 2 THEN HALT( 1001 ) END;
 			NewRangeX^( neworigin, newlen, copydata );
 		END NewRangeX;
 
-		PROCEDURE ValidateCache*;
+		PROCEDURE { OVERRIDE } ValidateCache*;
 		BEGIN
 			ValidateCache^;
 			IF dim # 2 THEN HALT( 100 ) END;
 			lenx := len[0];  leny := len[1];  ox := origin[0];  oy := origin[1];  rows := lenx;  cols := leny;
 		END ValidateCache;
 
-		PROCEDURE SetBoundaryCondition*( c: SIGNED8 );   (* called by new, load and directly *)
+		PROCEDURE { OVERRIDE } SetBoundaryCondition*( c: SIGNED8 );   (* called by new, load and directly *)
 		BEGIN
 			SetBoundaryCondition^( c );
 			CASE c OF

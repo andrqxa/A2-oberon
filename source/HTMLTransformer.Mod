@@ -1533,7 +1533,7 @@ TYPE
 			IF ~isSubtable THEN AlignCells(); END;
 		END New;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR
 			h, w, i: SIZE; color : SIGNED32;
 		BEGIN
@@ -2249,12 +2249,12 @@ TYPE
 			button.onClick.Add(Click);
 		END Init;
 
-		PROCEDURE IsSuccessful() : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsSuccessful() : BOOLEAN;
 		BEGIN
 			RETURN active & (name # NIL);
 		END IsSuccessful;
 
-		PROCEDURE GetValue() : String;
+		PROCEDURE { OVERRIDE } GetValue() : String;
 		BEGIN
 			IF name # NIL THEN
 				RETURN value;
@@ -2292,12 +2292,12 @@ TYPE
 			END;
 		END Init;
 
-		PROCEDURE IsSuccessful() : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsSuccessful() : BOOLEAN;
 		BEGIN
 			RETURN (checkbox.state.Get() = 1) & (name # NIL);
 		END IsSuccessful;
 
-		PROCEDURE GetValue() : String;
+		PROCEDURE { OVERRIDE } GetValue() : String;
 		BEGIN
 			IF name # NIL THEN
 				RETURN value;
@@ -2306,7 +2306,7 @@ TYPE
 			END;
 		END GetValue;
 
-		PROCEDURE Reset;
+		PROCEDURE { OVERRIDE } Reset;
 		BEGIN
 			IF init THEN
 				checkbox.state.Set(1);
@@ -2338,12 +2338,12 @@ TYPE
 			editor.bounds.SetExtents(8 * size, 22);
 		END Init;
 
-		PROCEDURE IsSuccessful() : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsSuccessful() : BOOLEAN;
 		BEGIN
 			RETURN name # NIL;
 		END IsSuccessful;
 
-		PROCEDURE GetValue() : String;
+		PROCEDURE { OVERRIDE } GetValue() : String;
 		VAR
 			aoc : ARRAY 1024 OF CHAR;
 		BEGIN
@@ -2355,7 +2355,7 @@ TYPE
 			END;
 		END GetValue;
 
-		PROCEDURE Reset;
+		PROCEDURE { OVERRIDE } Reset;
 		BEGIN
 			editor.SetAsString(init^);
 		END Reset;
@@ -2406,12 +2406,12 @@ TYPE
 			SELF.name := name;
 		END Init;
 
-		PROCEDURE IsSuccessful() : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsSuccessful() : BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END IsSuccessful;
 
-		PROCEDURE GetValue() : String;
+		PROCEDURE { OVERRIDE } GetValue() : String;
 		VAR
 			curr : FormRadioButton;
 		BEGIN
@@ -2424,7 +2424,7 @@ TYPE
 			RETURN curr.value;
 		END GetValue;
 
-		PROCEDURE Reset;
+		PROCEDURE { OVERRIDE } Reset;
 		VAR
 			curr : FormRadioButton;
 		BEGIN
@@ -2528,12 +2528,12 @@ TYPE
 			popup.AddParButton(s^, MenuPopupHandler, item);
 		END NewItem;
 
-		PROCEDURE IsSuccessful() : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsSuccessful() : BOOLEAN;
 		BEGIN
 			RETURN current # NIL;
 		END IsSuccessful;
 
-		PROCEDURE GetValue() : String;
+		PROCEDURE { OVERRIDE } GetValue() : String;
 		BEGIN
 			IF name # NIL THEN
 				RETURN current.value;
@@ -2542,7 +2542,7 @@ TYPE
 			END;
 		END GetValue;
 
-		PROCEDURE Reset;
+		PROCEDURE { OVERRIDE } Reset;
 		BEGIN
 			IF init = NIL THEN
 				current := NIL;
@@ -2565,12 +2565,12 @@ TYPE
 			SELF.value := value;
 		END Init;
 
-		PROCEDURE IsSuccessful() : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsSuccessful() : BOOLEAN;
 		BEGIN
 			RETURN name # NIL;
 		END IsSuccessful;
 
-		PROCEDURE GetValue() : String;
+		PROCEDURE { OVERRIDE } GetValue() : String;
 		BEGIN
 			IF name # NIL THEN
 				RETURN value;

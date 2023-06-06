@@ -10,7 +10,7 @@ TYPE
 	TYPE
 	Assembler*= OBJECT (FoxAssembler.Assembler)
 
-		PROCEDURE Instruction*(CONST mnemonic: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Instruction*(CONST mnemonic: ARRAY OF CHAR);
 		VAR i,numberOperands,mnem: SIGNED32; pos: Basic.Position; VAR operands: ARRAY 3 OF Operand; instruction: IntermediateCode.Instruction;
 
 			PROCEDURE ParseOperand;

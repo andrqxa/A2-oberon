@@ -51,7 +51,7 @@ TYPE
 	LoadMonitor = OBJECT (Monitor)	(* singleton *)
 		VAR exp: ARRAY 3 OF FLOAT32;
 
-		PROCEDURE &Init*(period: SIGNED32; randomized: BOOLEAN);
+		PROCEDURE (* OVERRIDE *) & Init*(period: SIGNED32; randomized: BOOLEAN);
 		BEGIN
 			Init^(period, randomized);
 			load[0] := 0; load[1] := 0; load[2] := 0;
@@ -60,7 +60,7 @@ TYPE
 			exp[2] := 1/Math.exp(period/(Time2*60))
 		END Init;
 
-		PROCEDURE Compute(loops: SIGNED32);
+		PROCEDURE { OVERRIDE } Compute(loops: SIGNED32);
 		VAR n: SIGNED32;
 		BEGIN
 			n := Objects.NumReady() - 1;	(* subtract one for fridge light *)
@@ -80,7 +80,7 @@ TYPE
 	IdleMonitor = OBJECT (Monitor)	(* singleton *)
 		VAR milliTimer: Kernel.MilliTimer; idlecount: ARRAY Machine.MaxCPU OF SIGNED32;
 
-		PROCEDURE &Init*(period: SIGNED32; randomized: BOOLEAN);
+		PROCEDURE (* OVERRIDE *) & Init*(period: SIGNED32; randomized: BOOLEAN);
 		VAR i: SIGNED32;
 		BEGIN
 			Init^(period, randomized);
@@ -90,7 +90,7 @@ TYPE
 			Kernel.SetTimer(milliTimer, 0);
 		END Init;
 
-		PROCEDURE Compute(loops: SIGNED32);
+		PROCEDURE { OVERRIDE } Compute(loops: SIGNED32);
 		VAR i, ic, id, td: SIGNED32;
 		BEGIN
 			td := Kernel.Elapsed(milliTimer); Kernel.SetTimer(milliTimer, 0);

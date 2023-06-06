@@ -13,13 +13,13 @@ TYPE
 			X: Buffer;
 			cb: ARRAY 4 OF SIGNED32;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			SetNameAndSize( "md5", 16 );
 			initialized := FALSE
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			N := 0;
 			(* Initialize chaining values *)
@@ -42,7 +42,7 @@ TYPE
 		END Write;
 
 		(** data: value to be hashed *)
-		PROCEDURE Update*( CONST data: ARRAY OF CHAR;  pos, len: SIZE );
+		PROCEDURE { OVERRIDE } Update*( CONST data: ARRAY OF CHAR;  pos, len: SIZE );
 		VAR i: SIZE;
 		BEGIN
 			ASSERT( initialized );
@@ -58,7 +58,7 @@ TYPE
 		END Update;
 
 		(** get the hashvalue of length SELF.size *)
-		PROCEDURE GetHash*( VAR buf: ARRAY OF CHAR;  pos: SIZE );
+		PROCEDURE { OVERRIDE } GetHash*( VAR buf: ARRAY OF CHAR;  pos: SIZE );
 		VAR n: SIGNED32;
 		BEGIN
 			(* Append padding *)

@@ -121,12 +121,12 @@ TYPE
 			Close;
 		END Clicked;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			Close
 		END FocusLost;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			BEGIN {EXCLUSIVE}
 				IF isClosed THEN RETURN; END;
@@ -136,7 +136,7 @@ TYPE
 			Close^;
 		END Close;
 
-		PROCEDURE FocusGot*;
+		PROCEDURE { OVERRIDE } FocusGot*;
 		BEGIN
 			manager.SetFocus(SELF)
 		END FocusGot;
@@ -233,12 +233,12 @@ TYPE
 			manager.Remove(SELF)
 		END Clicked;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			manager.Remove(SELF)
 		END FocusLost;
 
-		PROCEDURE FocusGot*;
+		PROCEDURE { OVERRIDE } FocusGot*;
 		BEGIN
 			manager.SetFocus(SELF)
 		END FocusGot;
@@ -258,14 +258,14 @@ TYPE
 		ChosenColorProc* : PROCEDURE {DELEGATE} (color: WMGraphics.Color);
 		(* CloseProc : PROCEDURE {DELEGATE}; *)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			bounds.SetExtents(190, 70);
 			BuildPalette;
 		END Init;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR r, g, b, a: INTEGER; i, j: SIZE; cColor: WMGraphics.Color;
 		BEGIN
 			i := y DIV 10; j := x DIV 10;
@@ -287,7 +287,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR r, g, b, a: INTEGER; i, j: SIZE; color: WMGraphics.Color;
 		BEGIN
 			DrawBackground^(canvas);

@@ -271,7 +271,7 @@ TYPE
 			uptimeLabel.SetCaption(caption);
 		END UpdateTime;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			alive := FALSE;
 			timer.Wakeup;
@@ -279,7 +279,7 @@ TYPE
 			Finalize^;
 		END Finalize;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrSystemTab);

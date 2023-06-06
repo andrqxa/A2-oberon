@@ -390,7 +390,7 @@ TYPE
 			END;
 		END ScmSetShuttleFeatures;
 
-		PROCEDURE Initialization*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Initialization*() : BOOLEAN;
 		VAR status : CHAR; res : SIGNED32;
 		BEGIN
 			IF Debug.Trace & Debug.traceScInit THEN KernelLog.String("UsbStorage: Initializing SCM USB-ATAPI Shuttle... "); KernelLog.Ln; END;
@@ -491,7 +491,7 @@ TYPE
 			RETURN TRUE;
 		END Initialization;
 
-		PROCEDURE Transport*(cmd : ARRAY OF CHAR; cmdlen : SIGNED32; dir : SET;
+		PROCEDURE { OVERRIDE } Transport*(cmd : ARRAY OF CHAR; cmdlen : SIGNED32; dir : SET;
 			VAR buffer : ARRAY OF CHAR; ofs, bufferlen : SIGNED32; VAR tlen : SIGNED32; timeout : SIGNED32) : SIGNED32;
 		VAR
 			registers, data : ARRAY 32 OF CHAR;
@@ -664,7 +664,7 @@ TYPE
 			timer.Sleep(ms);
 		END Wait;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^; NEW(command, 16); NEW(buffer, 64); NEW(timer);
 		END Init;

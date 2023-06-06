@@ -25,20 +25,20 @@ TYPE
 			VAR keys: Keys;
 				iv: Block;
 
-				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR;  keybits: SIZE );
+				PROCEDURE { OVERRIDE } InitKey*( CONST src: ARRAY OF CHAR;  keybits: SIZE );
 				BEGIN
 					ASSERT( keybits MOD 8 = 0 );
 					InitKey^( src, keybits );
 					InitKeys( keys, src, SIGNED32( keybits DIV 8 ) )
 				END InitKey;
 
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR;  mode: SIGNED8 );
+				PROCEDURE { OVERRIDE } SetIV*( CONST src: ARRAY OF CHAR;  mode: SIGNED8 );
 				BEGIN
 					SetIV^( src, mode );   (* set mode *)
 					iv[0] := U.SetFromBufferBE( src, 0 );  iv[1] := U.SetFromBufferBE( src, 4 );
 				END SetIV;
 
-				PROCEDURE Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR i: SIZE;
 				BEGIN
 					ASSERT( isKeyInitialized &(mode IN {Ciphers.ECB, Ciphers.CBC}) );
@@ -47,7 +47,7 @@ TYPE
 					WHILE i < len DO  EncryptBlock( buf, ofs + i );  INC( i, blockSize )   END
 				END Encrypt;
 
-				PROCEDURE Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR i: SIZE;
 				BEGIN
 					ASSERT( isKeyInitialized );
@@ -76,7 +76,7 @@ TYPE
 					U.SetToBufferBE( b[0], buf, p );  U.SetToBufferBE( b[1], buf, p + 4 )
 				END DecryptBlock;
 
-				PROCEDURE & Init*;
+				PROCEDURE (* OVERRIDE *) & Init*;
 				BEGIN
 					SetNameAndBlocksize( "cast", 8 );
 				END Init;

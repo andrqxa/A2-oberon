@@ -9,13 +9,13 @@ CONST
 TYPE
 	IME* = OBJECT(WMInputMethods.IME)
 
-		PROCEDURE GetName*() : Strings.String;
+		PROCEDURE { OVERRIDE } GetName*() : Strings.String;
 		BEGIN
 			RETURN Strings.NewString(imeName);
 		END GetName;
 
 		(* Map characters from US-Keyboard to  cyrillic keyboard *)
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		BEGIN
 			CASE ucs OF
 			(* unshifted *)

@@ -832,7 +832,7 @@ TYPE
 			SELF.physicalRegisters := physicalRegisters;
 		END InitTicketGenerator;
 
-		PROCEDURE Section*(in: IntermediateCode.Section; out: BinaryCode.Section);
+		PROCEDURE { OVERRIDE } Section*(in: IntermediateCode.Section; out: BinaryCode.Section);
 		BEGIN
 			virtualRegisters.Init(virtualRegisters.parts);
 			Section^(in,out);

@@ -402,7 +402,7 @@ TYPE JPEGDecoder*= OBJECT(Codecs.ImageDecoder)
 		wsptrF: DCTTable; (*PH 2021*)
 
 	(* open the decoder on an InputStream *)
-	PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+	PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 	VAR trap: BOOLEAN;
 	BEGIN
 		Streams.OpenWriter(logger, KernelLog.Send); (*default logger, can be overwritten with NIL or alternative writer *)
@@ -425,7 +425,7 @@ TYPE JPEGDecoder*= OBJECT(Codecs.ImageDecoder)
 		END;
 	END Open;
 
-	PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
+	PROCEDURE { OVERRIDE } GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
 	BEGIN
 		width := SELF.cInfo.imageWidth; height := SELF.cInfo.imageHeight;
 		IF (cInfo.err = 0) THEN res := Codecs.ResOk ELSE res:=cInfo.err END;
@@ -437,11 +437,11 @@ TYPE JPEGDecoder*= OBJECT(Codecs.ImageDecoder)
 		SetProgressionLevel, the level is assumed to be maxProgressionLevel of the image,
 		which corresponds to best image quality.
 	 *)
-	PROCEDURE SetProgressionLevel*(progressionLevel: SIGNED32);
+	PROCEDURE { OVERRIDE } SetProgressionLevel*(progressionLevel: SIGNED32);
 	END SetProgressionLevel;
 
 	(* return the image in Raster format that best matches the format *)
-	PROCEDURE GetNativeImage*(VAR img : Raster.Image);
+	PROCEDURE { OVERRIDE } GetNativeImage*(VAR img : Raster.Image);
 	VAR
 		numScanlines: SIGNED32;
 		zaehler: SIGNED32;
@@ -518,7 +518,7 @@ TYPE JPEGDecoder*= OBJECT(Codecs.ImageDecoder)
 	END GetNativeImage;
 
 	(* renders the image into the given Raster.Image at the given progressionLevel *)
-	PROCEDURE Render*(img : Raster.Image);
+	PROCEDURE { OVERRIDE } Render*(img : Raster.Image);
 	VAR canvas : WMGraphics.BufferCanvas;
 	BEGIN
 		GetNativeImage(SELF.img);

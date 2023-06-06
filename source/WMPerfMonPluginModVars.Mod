@@ -45,7 +45,7 @@ TYPE
 	VAR
 		vd : VariableDescriptors;
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		BEGIN
 			ASSERT((p # NIL) & (p IS ModVarParameter) & (p(ModVarParameter).vd # NIL));
 			vd := p(ModVarParameter).vd;
@@ -55,7 +55,7 @@ TYPE
 			p.datasetDescriptor := GetDatasetDescriptor(vd);
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		VAR module : Modules.Module; variable : Reflection.Variable; i : SIZE; value : FLOAT64;
 		BEGIN
 			FOR i := 0 TO LEN(vd)-1 DO

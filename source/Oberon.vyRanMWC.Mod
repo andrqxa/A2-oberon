@@ -53,12 +53,12 @@ TYPE
 		a: SIGNED32;
 		checkPeriod: BOOLEAN;
 
-		PROCEDURE  (*VAR seed: tSeedDesc*) Store*( VAR r: Files.Rider );
+		PROCEDURE  (*VAR seed: tSeedDesc*) { OVERRIDE } Store*( VAR r: Files.Rider );
 		BEGIN
 			Files.WriteLInt( r, SELF.x );  Files.WriteLInt( r, SELF.c );  Files.WriteLInt( r, SELF.a )
 		END Store;
 
-		PROCEDURE  (*VAR seed: tSeedDesc*) Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
+		PROCEDURE  (*VAR seed: tSeedDesc*) { OVERRIDE } Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
 		BEGIN
 			IF seedVersion # cSeedVersion THEN HALT( 100 ) END;
 			Files.ReadLInt( r, SELF.x );  Files.ReadLInt( r, SELF.c );  Files.ReadLInt( r, SELF.a )

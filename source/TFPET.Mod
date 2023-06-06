@@ -424,7 +424,7 @@ TYPE
 		editor : WMEditors.Editor;
 		label : WMStandardComponents.Label;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrScratchPanel);
@@ -455,7 +455,7 @@ TYPE
 			SELF.win := win
 		END New;
 
-		PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 		VAR di : DropURL;
 		BEGIN
 			IF type = WMDropTarget.TypeURL THEN
@@ -474,7 +474,7 @@ TYPE
 			SELF.win := win;
 		END New;
 
-		PROCEDURE URL*(CONST url : ARRAY OF CHAR; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } URL*(CONST url : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			win.Load(url, "AUTO");
 			res := 0
@@ -485,7 +485,7 @@ TYPE
 	TextWriter= OBJECT (TextUtilities.TextWriter)
 	VAR update: PROCEDURE {DELEGATE};
 
-		PROCEDURE Update*;
+		PROCEDURE { OVERRIDE } Update*;
 		BEGIN
 			IF update # NIL THEN update END;
 			Update^
@@ -1055,7 +1055,7 @@ TYPE
 			RETURN TRUE;
 		END HandleShortcut;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF (editor # NIL) & (editor.text # NIL) THEN
@@ -1871,7 +1871,7 @@ TYPE
 			END
 		END SetModified;
 
-		PROCEDURE SetIcon*(icon : WMGraphics.Image);
+		PROCEDURE { OVERRIDE } SetIcon*(icon : WMGraphics.Image);
 		BEGIN
 			IF (icon # NIL) & (icon # currentIcon) THEN
 				currentIcon := icon;
@@ -2390,7 +2390,7 @@ TYPE
 			IF currentPage.logEdit.visible.Get() = FALSE THEN currentPage.logEdit.visible.Set(TRUE); END;
 		END UnloadModule;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		VAR page : SIGNED32;
 		BEGIN
 			Close^;
@@ -2691,7 +2691,7 @@ TYPE
 			RETURN TRUE;
 		END HandleShortcut;
 
-		PROCEDURE Handle*(VAR m: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m: WMMessages.Message);
 		VAR data : WMRestorable.XmlElement;
 		BEGIN
 			IF m.msgType = WMMessages.MsgKey THEN

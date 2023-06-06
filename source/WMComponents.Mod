@@ -126,7 +126,7 @@ TYPE
 			SELF.y := y;
 		END Init;
 
-		PROCEDURE GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
 		VAR sdi : DropString;
 		BEGIN
 			IF (type = WMDropTarget.TypeString) THEN
@@ -152,7 +152,7 @@ TYPE
 			SELF.x := x; SELF.y := y;
 		END Init;
 
-		PROCEDURE Set*(CONST string : ARRAY OF CHAR; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Set*(CONST string : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			setString(string, x,y, res);
 		END Set;
@@ -234,7 +234,7 @@ TYPE
 		internal- : BOOLEAN;
 
 		(* after Init() , calling Reset() implicitely by insertion into FormWindow or explicitely, thereby triggering Initialize() is required to render component responsive to messages *)
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrComponent);
@@ -253,7 +253,7 @@ TYPE
 		END Init;
 
 
-		PROCEDURE Write*(w : Streams.Writer;context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w : Streams.Writer;context: ANY; level : SIGNED32);
 		VAR enum: XMLObjects.Enumerator; c: ANY; name : Strings.String; nextLevel : SIGNED32;
 		BEGIN
 			IF IsLocked() THEN (* D.String("Component.Write: islocked"); D.Ln; *) RETURN; END;
@@ -317,7 +317,7 @@ TYPE
 		END ToRepository;
 		*)
 
-		PROCEDURE FromXML*(xml: XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml: XML.Element);
 		VAR component: Component; enum: XMLObjects.Enumerator; c: ANY; element: XML.Element;
 		BEGIN
 			element := GetElementByName(xml,"Properties");
@@ -397,7 +397,7 @@ TYPE
 		END CheckReadLock;
 
 		(** AddContent adds a content (element or subtree) to the element	*)
-		PROCEDURE AddContent*(c : XML.Content);
+		PROCEDURE { OVERRIDE } AddContent*(c : XML.Content);
 		VAR m:Messages.Message;  rect:Rectangles.Rectangle;
 		BEGIN
 			ASSERT(c # NIL);
@@ -424,7 +424,7 @@ TYPE
 			Release;
 		END AddContent;
 
-		PROCEDURE RemoveContent*(c : XML.Content);
+		PROCEDURE { OVERRIDE } RemoveContent*(c : XML.Content);
 		BEGIN
 			(*ASSERT(c # NIL);*)
 			IF c = NIL THEN RETURN END;
@@ -768,7 +768,7 @@ TYPE
 		oldPointerInfo : WM.PointerInfo;
 
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMComponents.NewVisualComponent");
@@ -900,14 +900,14 @@ TYPE
 
 		(* LinkChanged can be called to inform about changes of the state of links (i.e. objects in reference properties)
 			Unlike PropertyChanged which informs about an actual replacement of the link *)
-		PROCEDURE LinkChanged*(sender, link: ANY);
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, link: ANY);
 		BEGIN
 			IF sender = model THEN
 				Invalidate
 			END;
 		END LinkChanged;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF property = bounds THEN
 				(*ScaleFont(bounds.GetHeight(), scaleFont.Get());*)
@@ -930,7 +930,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			IF scaleFont.Get() # 0 THEN ScaleFont(bounds.GetHeight(), scaleFont.Get()) END;
@@ -1048,7 +1048,7 @@ TYPE
 			Release;
 		END AlignSubComponents;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			AlignSubComponents;
@@ -1118,7 +1118,7 @@ TYPE
 		END EditDragOver;
 		*)
 
-		PROCEDURE FromXML*(xml: XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml: XML.Element);
 		BEGIN
 			FromXML^(xml);
 		END FromXML;
@@ -1973,7 +1973,7 @@ TYPE
 			END;
 		END EditMoved;
 
-		PROCEDURE HandleInternal*(VAR msg : Messages.Message); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } HandleInternal*(VAR msg : Messages.Message); (** PROTECTED *)
 		VAR
 			po : VisualComponent; nm : Messages.Message; handled : BOOLEAN; b : Rectangles.Rectangle;
 			r, v : VisualComponent;
@@ -2286,7 +2286,7 @@ TYPE
 			ASSERT(disableUpdate # -1);	(* underflow *)
 		END EnableUpdate;
 
-		PROCEDURE Resized*( width, height: SIZE);
+		PROCEDURE { OVERRIDE } Resized*( width, height: SIZE);
 		BEGIN
 			IF ~scaling THEN
 				DisableUpdate;
@@ -2327,7 +2327,7 @@ TYPE
 			Invalidate(rect)
 		END Update;
 
-		PROCEDURE Handle*(VAR m : Messages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m : Messages.Message);
 		VAR pendingM: Messages.Message;
 		BEGIN
 			Handle^(m);
@@ -2381,7 +2381,7 @@ TYPE
 			IF (form.sequencer = NIL) OR ~form.sequencer.Add(m) THEN form.Handle(m) END;
 		END CSChanged;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^; (* remove the form to avoid further messages *)
 			IF form # NIL THEN
@@ -2417,31 +2417,31 @@ TYPE
 			END;
 		END SetWindow;
 
-		PROCEDURE GetPointerInfo*() : WM.PointerInfo;
+		PROCEDURE { OVERRIDE } GetPointerInfo*() : WM.PointerInfo;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
 			IF window # NIL THEN RETURN window.pointerInfo ELSE RETURN NIL END
 		END GetPointerInfo;
 
-		PROCEDURE SetPointerInfo*(pi : WM.PointerInfo);
+		PROCEDURE { OVERRIDE } SetPointerInfo*(pi : WM.PointerInfo);
 		BEGIN
 			ASSERT(IsCallFromSequencer());
 			IF window # NIL THEN window.SetPointerInfo(pi) END;
 		END SetPointerInfo;
 
-		PROCEDURE DisableUpdate*;
+		PROCEDURE { OVERRIDE } DisableUpdate*;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
 			IF window # NIL THEN window.DisableUpdate END
 		END DisableUpdate;
 
-		PROCEDURE EnableUpdate*;
+		PROCEDURE { OVERRIDE } EnableUpdate*;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
 			IF window # NIL THEN window.EnableUpdate END
 		END EnableUpdate;
 
-		PROCEDURE InvalidateRect*(rect : Rectangles.Rectangle);
+		PROCEDURE { OVERRIDE } InvalidateRect*(rect : Rectangles.Rectangle);
 		BEGIN
 			IF window # NIL THEN
 				BEGIN{EXCLUSIVE} AWAIT(initialized) END;
@@ -2449,7 +2449,7 @@ TYPE
 			END;
 		END InvalidateRect;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR w,h: SIZE;
 		BEGIN
 			IF property = bounds THEN

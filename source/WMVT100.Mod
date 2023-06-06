@@ -17,7 +17,7 @@ MODULE WMVT100; (* ejz,  ph *)
 		Connection = OBJECT (Telnet.Connection)
 			VAR frame: Frame; mode: SET;
 
-			PROCEDURE Do*(option: CHAR);
+			PROCEDURE { OVERRIDE } Do*(option: CHAR);
 			BEGIN
 				IF option = Telnet.OptTerminalType THEN
 					W.Char(Telnet.CmdIAC); W.Char(Telnet.CmdWILL); W.Char(Telnet.OptTerminalType)
@@ -36,7 +36,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				END
 			END Do;
 
-			PROCEDURE SB*(option: CHAR);
+			PROCEDURE { OVERRIDE } SB*(option: CHAR);
 				VAR ch: CHAR;
 			BEGIN
 				IF (option = Telnet.OptTerminalType) & (R.Peek() = 01X) THEN (* SEND *)
@@ -142,7 +142,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				END
 			END ESC;
 
-			PROCEDURE Consume*(ch: CHAR);
+			PROCEDURE { OVERRIDE } Consume*(ch: CHAR);
 				VAR buf: ARRAY 128 OF SIGNED32; i, n: SIZE;
 			BEGIN
 				CASE ch OF
@@ -173,7 +173,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				END
 			END Consume;
 
-			PROCEDURE &Init*(C: Streams.Connection);
+			PROCEDURE (* OVERRIDE *) & Init*(C: Streams.Connection);
 			BEGIN
 				Init^(C); INCL(flags, Telnet.Telnet);
 				mode := {}; frame := NIL
@@ -184,7 +184,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				SELF.frame := frame
 			END SetFrame;
 
-			PROCEDURE Setup*;
+			PROCEDURE { OVERRIDE } Setup*;
 			BEGIN {EXCLUSIVE}
 				AWAIT(frame # NIL);
 				IF Telnet.Telnet IN flags THEN
@@ -485,7 +485,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				END
 			END SetAttributes;
 
-			PROCEDURE Draw*(canvas: WMGraphics.Canvas);
+			PROCEDURE { OVERRIDE } Draw*(canvas: WMGraphics.Canvas);
 				VAR l: Line; i, j, dy, bottom: SIZE; attr: Attribute; char: Char; box: WMGraphics.Rectangle;
 			BEGIN {EXCLUSIVE}
 				canvas.Fill(canvas.clipRect, bg, WMGraphics.ModeCopy);
@@ -555,13 +555,13 @@ MODULE WMVT100; (* ejz,  ph *)
 				END
 			END Draw;
 
-			PROCEDURE FocusReceived*;
+			PROCEDURE { OVERRIDE } FocusReceived*;
 			BEGIN
 				FocusReceived^();
 				UpdateBox(cursor.line, cursor.ofs)
 			END FocusReceived;
 
-			PROCEDURE FocusLost*;
+			PROCEDURE { OVERRIDE } FocusLost*;
 			BEGIN
 				FocusLost^();
 				UpdateBox(cursor.line, cursor.ofs)
@@ -672,7 +672,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				END
 			END ClickHandler;
 
-			PROCEDURE PointerDown*(x, y: SIZE; keys: SET);
+			PROCEDURE { OVERRIDE } PointerDown*(x, y: SIZE; keys: SET);
 			BEGIN
 				IF (Left IN keys) & hasFocus THEN
 					LocateBox(x, y, sel.beg); sel.end := sel.beg
@@ -686,7 +686,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				UpdateAll()
 			END PointerDown;
 
-			PROCEDURE PointerMove*(x, y: SIZE; keys: SET);
+			PROCEDURE { OVERRIDE } PointerMove*(x, y: SIZE; keys: SET);
 				VAR pos: Position;
 			BEGIN
 				IF (Left IN keys) & (sel.beg.line # NIL) THEN
@@ -702,7 +702,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				END
 			END PointerMove;
 
-			PROCEDURE WheelMove*(dz: SIZE);
+			PROCEDURE { OVERRIDE } WheelMove*(dz: SIZE);
 				VAR l: Line;
 			BEGIN
 				IF (dz > 0) & (top.next # NIL) THEN
@@ -716,7 +716,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				END
 			END WheelMove;
 
-			PROCEDURE PointerUp*(x, y: SIZE; keys: SET);
+			PROCEDURE { OVERRIDE } PointerUp*(x, y: SIZE; keys: SET);
 			END PointerUp;
 
 			PROCEDURE CursorKey(keySym: SIZE);
@@ -736,7 +736,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				C.W.Update()
 			END CursorKey;
 
-			PROCEDURE KeyEvent*(ucs: SIZE; flags: SET; VAR keySym: SIZE);
+			PROCEDURE { OVERRIDE } KeyEvent*(ucs: SIZE; flags: SET; VAR keySym: SIZE);
 			VAR echo: ARRAY 1 OF SIGNED32; col: WMGraphics.Color;
 			BEGIN
 				IF ~(Inputs.Release IN flags) & hasFocus THEN
@@ -822,13 +822,13 @@ MODULE WMVT100; (* ejz,  ph *)
 				END
 			END resized;
 
-			PROCEDURE Resized*;
+			PROCEDURE { OVERRIDE } Resized*;
 			BEGIN
 				Resized^();
 				resized()
 			END Resized;
 
-			PROCEDURE Initialize*;
+			PROCEDURE { OVERRIDE } Initialize*;
 			BEGIN
 				Initialize^();
 				takesFocus.Set(TRUE);
@@ -881,14 +881,14 @@ MODULE WMVT100; (* ejz,  ph *)
 				manager.Add(100, 100, SELF, {WMWindowManager.FlagFrame, WMWindowManager.FlagClose})
 			END New;
 
-			PROCEDURE Handle*(VAR x: WMMessages.Message);
+			PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 			BEGIN
 				IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 				ELSE Handle^(x)
 				END;
 			END Handle;
 
-			PROCEDURE Close*;
+			PROCEDURE { OVERRIDE } Close*;
 			BEGIN
 				frame.C.Close();
 				Close^();

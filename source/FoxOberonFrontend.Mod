@@ -10,7 +10,7 @@ TYPE
 		scanner: Scanner.Scanner;
 		parser: Parser.Parser;
 
-		PROCEDURE Initialize*(diagnostics: Diagnostics.Diagnostics; flags: SET; reader: Streams.Reader; CONST fileName, definitions: ARRAY OF CHAR; pos: SIGNED32);
+		PROCEDURE { OVERRIDE } Initialize*(diagnostics: Diagnostics.Diagnostics; flags: SET; reader: Streams.Reader; CONST fileName, definitions: ARRAY OF CHAR; pos: SIGNED32);
 		BEGIN
 			Initialize^(diagnostics, flags, reader, fileName, definitions, pos);
 			scanner := Scanner.NewScanner(fileName, reader, pos, diagnostics);
@@ -18,17 +18,17 @@ TYPE
 			parser := Parser.NewParser( scanner, diagnostics, definitions );
 		END Initialize;
 
-		PROCEDURE Parse*(): SyntaxTree.Module;
+		PROCEDURE { OVERRIDE } Parse*(): SyntaxTree.Module;
 		BEGIN
 			RETURN parser.Module();
 		END Parse;
 
-		PROCEDURE Error*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } Error*(): BOOLEAN;
 		BEGIN
 			RETURN parser.error;
 		END Error;
 
-		PROCEDURE Done*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } Done*(): BOOLEAN;
 		BEGIN
 			RETURN ~parser.NextModule()
 		END Done;

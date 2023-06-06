@@ -26,7 +26,7 @@ TYPE
 	VAR
 		controller : UsbHcdi.Hcd;
 
-		PROCEDURE Init(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := PluginName; p.description := "Amount of transfered data";
@@ -47,7 +47,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset;
+		PROCEDURE { OVERRIDE } UpdateDataset;
 		BEGIN
 			dataset[0] := controller.NbytesTransfered;
 			dataset[1] := controller.NnofTransfers;

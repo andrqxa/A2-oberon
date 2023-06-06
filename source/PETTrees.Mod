@@ -58,7 +58,7 @@ TYPE
 		font* : WMGraphics.Font;
 		external* : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			pos := NIL;
@@ -89,7 +89,7 @@ TYPE
 		refreshBtn, sortBtn: WMStandardComponents.Button;
 		highlight- : WMTextView.Highlight;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 

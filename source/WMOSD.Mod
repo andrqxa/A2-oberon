@@ -50,7 +50,7 @@ TYPE
 			alive := FALSE; timer.Wakeup;
 		END Stop;
 
-		PROCEDURE IsHit*(x, y : SIZE) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(x, y : SIZE) : BOOLEAN;
 		BEGIN
 			RETURN FALSE;
 		END IsHit;

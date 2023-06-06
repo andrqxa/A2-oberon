@@ -326,7 +326,7 @@ TYPE
 		available, nbHash, nbNodes: INTEGER;
 		hash2: SET32;
 		
-		PROCEDURE &Initialize( archive: Streams.Writer );
+		PROCEDURE (* OVERRIDE *) & Initialize( archive: Streams.Writer );
 		BEGIN
 			Initialize^( archive );
 			NEW( buf, BufSize )

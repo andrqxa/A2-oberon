@@ -64,7 +64,7 @@ TYPE
 			SELF.content := content;
 		END SetContent;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			Resized^;
 			IF (content # NIL) THEN
@@ -94,7 +94,7 @@ TYPE
 			IF (content # NIL) THEN content.bounds.SetTop(-scrollbar.pos.Get()); END;
 		END ScrollbarChanged;
 
-		PROCEDURE WheelMove*(dz : SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 		BEGIN
 			IF (scrollbar.visible.Get()) THEN
 				scrollbar.pos.Set(scrollbar.pos.Get() + dz * MouseWheelMultiplier);
@@ -102,7 +102,7 @@ TYPE
 			END;
 		END WheelMove;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 
@@ -482,7 +482,7 @@ TYPE
 			editor.tv.showBorder.Set(TRUE);
 		END NewEditor;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrConfigurationSettings);
@@ -497,7 +497,7 @@ TYPE
 
 	InstallerBgPanel = OBJECT(WMComponents.VisualComponent)
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR color : SIGNED32; rect : WMRectangles.Rectangle;
 		BEGIN
 			DrawBackground^(canvas); (* fills background with fillColor *)
@@ -510,7 +510,7 @@ TYPE
 			IF color # 0 THEN canvas.Fill(rect, color, WMGraphics.ModeSrcOverDst) END;
 		END DrawBackground;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrInstallerBgPanel);
@@ -520,13 +520,13 @@ TYPE
 
 	BorderPanel = OBJECT(WMStandardComponents.Panel)
 
-		PROCEDURE DrawForeground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawForeground*(canvas : WMGraphics.Canvas);
 		BEGIN
 			DrawForeground^(canvas);
 			WMGraphicUtilities.DrawBevel(canvas, GetClientRect(), 1, TRUE, SIGNED32(0808080FFH), WMGraphics.ModeCopy);
 		END DrawForeground;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrBorderPanel);
@@ -570,7 +570,7 @@ TYPE
 		selection, lockedSelection : WMPartitionsComponents.Selection;
 		opened : BOOLEAN;
 
-		PROCEDURE Resizing*(VAR width, height : SIZE);
+		PROCEDURE { OVERRIDE } Resizing*(VAR width, height : SIZE);
 		BEGIN
 			IF width < WindowMinWidth THEN width := WindowMinWidth; END;
 			IF height < WindowMinHeight THEN height := WindowMinHeight; END;
@@ -1119,7 +1119,7 @@ TYPE
 			RETURN button;
 		END NewButton;
 
-		PROCEDURE WheelMove*(dz: SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz: SIZE);
 		BEGIN
 			CASE currentPage OF
 				|PageSelectPartition:
@@ -1134,7 +1134,7 @@ TYPE
 			END;
 		END WheelMove;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			WindowClosed;
@@ -1170,7 +1170,7 @@ TYPE
 
 	HelpWindow = OBJECT(WMComponents.FormWindow)
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			helpWindow := NIL;

@@ -346,7 +346,7 @@ TYPE
 		END Init;
 
 		(** Create a new file with the specified name.  End users use Files.New instead. *)
-		PROCEDURE New0*(CONST name: ARRAY OF CHAR): Files.File;
+		PROCEDURE { OVERRIDE } New0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR
 			file : File; filename : Files.FileName; fileExists : BOOLEAN;
 			inodeAdr, index, i, res : SIGNED32; dateTime : Dates.DateTime;
@@ -406,7 +406,7 @@ TYPE
 		END New0;
 
 		(** Open an existing file. The same file descriptor is returned if a file is opened multiple times.  End users use Files.Old instead. *)
-		PROCEDURE Old0*(CONST name: ARRAY OF CHAR): Files.File;
+		PROCEDURE { OVERRIDE } Old0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR file : File; filename : Files.FileName; block : Block; inode : Inode;  index, res : SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF Trace THEN KernelLog.String("Old: "); KernelLog.String(name); KernelLog.Ln; END;
@@ -471,7 +471,7 @@ TYPE
 		END FindEntry;
 
 		(** Delete a file. res = 0 indicates success.  End users use Files.Delete instead. *)
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key, res: SIGNED32);
+		PROCEDURE { OVERRIDE } Delete0*(CONST name: ARRAY OF CHAR; VAR key, res: SIGNED32);
 		VAR filename : Files.FileName; index : SIGNED32; block : Block;
 		BEGIN {EXCLUSIVE}
 			IF Trace THEN KernelLog.String("Delete: "); KernelLog.String(name); KernelLog.Ln; END;
@@ -523,13 +523,13 @@ TYPE
 		END DeleteDnodes;
 
 		(** Rename a file. res = 0 indicates success.  End users use Files.Rename instead. *)
-		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
 		BEGIN  {EXCLUSIVE}
 			res := -1; (* not supported *)
 		END Rename0;
 
 		(** Enumerate canonical file names. mask may contain * wildcards.  For internal use only.  End users use Enumerator instead. *)
-		PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
+		PROCEDURE { OVERRIDE } Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
 		VAR i : SIGNED32; block : Block; inode : Inode; name : Files.FileName; attributes : SET; time, date, size, res : SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF( mask # "") THEN
@@ -560,7 +560,7 @@ TYPE
 		END Enumerate0;
 
 		(** Return the unique non-zero key of the named file, if it exists. *)
-		PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
+		PROCEDURE { OVERRIDE } FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
 		VAR key, index : SIGNED32;
 		BEGIN {EXCLUSIVE}
 			key := 0;
@@ -575,14 +575,14 @@ TYPE
 
 		(** Create a new directory structure. May not be supported by the actual implementation.
 			End users use Files.CreateDirectory instead.*)
-		PROCEDURE CreateDirectory0*(CONST name: ARRAY OF CHAR; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateDirectory0*(CONST name: ARRAY OF CHAR; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			res := -1; (* not supported *)
 		END CreateDirectory0;
 
 		(** Remove a directory. If force=TRUE, any subdirectories and files should be automatically deleted.
 			End users use Files.RemoveDirectory instead. *)
-		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key, res: SIGNED32);
+		PROCEDURE { OVERRIDE } RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key, res: SIGNED32);
 		BEGIN {EXCLUSIVE}
 			res := -1; (* not supported *)
 		END RemoveDirectory0;
@@ -628,7 +628,7 @@ TYPE
 		END Format;
 
 		(* finalizer: called when the filesystem goes down, could be used to close all open files and flush cashes. We do not use any caches in this silly file system  *)
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			volume.Finalize;
@@ -658,7 +658,7 @@ TYPE
 
 		(** Position a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file.
 		A Rider cannot be positioned beyond the end of a file. *)
-		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
+		PROCEDURE { OVERRIDE } Set*(VAR r: Files.Rider; pos: Files.Position);
 		BEGIN {EXCLUSIVE}
 			r.res := Ok; r.eof := FALSE; r.fs := fs; r.file := SELF;
 			IF (pos < 0) THEN
@@ -672,14 +672,14 @@ TYPE
 
 		(** Return the offset of a Rider positioned on a file. *)
 
-		PROCEDURE Pos*(VAR r:  Files.Rider): Files.Position;
+		PROCEDURE { OVERRIDE } Pos*(VAR r:  Files.Rider): Files.Position;
 		BEGIN {EXCLUSIVE}
 			ASSERT(r.file = SELF);
 			RETURN r.apos + BlockSize * r.bpos;
 		END Pos;	(* abstract *)
 
 		(** Read a byte from a file, advancing the Rider one byte further.  R.eof indicates if the end of the file has been passed. *)
-		PROCEDURE Read*(VAR r: Files.Rider; VAR x: CHAR);
+		PROCEDURE { OVERRIDE } Read*(VAR r: Files.Rider; VAR x: CHAR);
 		VAR a: ARRAY 1 OF CHAR;
 		BEGIN
 			ReadBytes(r, a, 0, 1); x := a[0];
@@ -688,7 +688,7 @@ TYPE
 		(** Read a sequence of len bytes into the buffer x at offset ofs, advancing the Rider.
 		Less bytes will be read when reading over the end of the file.
 		r.res indicates the number of unread bytes. x must be big enough to hold all the bytes. *)
-		PROCEDURE ReadBytes*(VAR r:  Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE { OVERRIDE } ReadBytes*(VAR r:  Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR dnode : Dnode; dataLeft, nofBytes, pos, res : SIGNED32; eof : BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			ASSERT(r.file = SELF);
@@ -741,14 +741,14 @@ TYPE
 		END ReadBytes;
 
 		(** Write a byte into the file at the Rider position, advancing the Rider by one. *)
-		PROCEDURE Write*(VAR r:  Files.Rider; x: CHAR);
+		PROCEDURE { OVERRIDE } Write*(VAR r:  Files.Rider; x: CHAR);
 		VAR a: ARRAY 1 OF CHAR;
 		BEGIN
 			a[0] := x; WriteBytes(r, a, 0, 1);
 		END Write;
 
 		(** Write the buffer x containing len bytes (starting at offset ofs) into a file at the Rider position. *)
-		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE { OVERRIDE } WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR dnode : Dnode; blockNumber, spaceLeft, nofBytes, pos, res : SIGNED32;
 		BEGIN {EXCLUSIVE}
 			ASSERT(r.file = SELF);
@@ -819,39 +819,39 @@ TYPE
 		END WriteBytes;
 
 		(** Return the current length of a file. *)
-		PROCEDURE Length*(): Files.Size;
+		PROCEDURE { OVERRIDE } Length*(): Files.Size;
 		BEGIN {EXCLUSIVE}
 			RETURN inode.size;
 		END Length;
 
 		(** Return the time (t) and date (d) when a file was last modified. *)
-		PROCEDURE GetDate*(VAR t, d: SIGNED32);
+		PROCEDURE { OVERRIDE } GetDate*(VAR t, d: SIGNED32);
 		BEGIN {EXCLUSIVE}
 			t := inode.time; d := inode.date;
 		END GetDate;
 
 		(** Set the modification time (t) and date (d) of a file. *)
-		PROCEDURE SetDate*(t, d: SIGNED32);
+		PROCEDURE { OVERRIDE } SetDate*(t, d: SIGNED32);
 		BEGIN {EXCLUSIVE}
 			inode.time := t; inode.date := d;
 			inodeModified := TRUE;
 		END SetDate;
 
 		(** Return the canonical name of a file. *)
-		PROCEDURE GetName*(VAR name: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetName*(VAR name: ARRAY OF CHAR);
 		BEGIN {EXCLUSIVE}
 			Files.JoinName(fileSystem.prefix, SELF.name, name)
 		END GetName;
 
 		(** Register a file created with New in the directory, replacing the previous file in the directory with the same name.
 		The file is automatically updated.  End users use Files.Register instead. *)
-		PROCEDURE Register0*(VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Register0*(VAR res: INTEGER);
 		BEGIN
 			Update;
 		END Register0;
 
 		(** Flush the changes made to a file from its buffers. Register0 will automatically update a file. *)
-		PROCEDURE Update*;
+		PROCEDURE { OVERRIDE } Update*;
 		BEGIN {EXCLUSIVE}
 			IF inodeModified THEN
 				ASSERT(key >= fileSystem.superBlock.firstDataBlock);

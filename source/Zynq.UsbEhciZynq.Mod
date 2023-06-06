@@ -38,7 +38,7 @@ TYPE
 	VAR
 		phyResetGpio: SIGNED32;
 
-		PROCEDURE GetPortStatus * (port : SIGNED32; ack : BOOLEAN) : SET;
+		PROCEDURE { OVERRIDE } GetPortStatus * (port : SIGNED32; ack : BOOLEAN) : SET;
 		VAR
 			status, dword: SET;
 		BEGIN
@@ -56,12 +56,12 @@ TYPE
 			RETURN status
 		END GetPortStatus;
 
-		PROCEDURE HasCompanion * (): BOOLEAN;
+		PROCEDURE { OVERRIDE } HasCompanion * (): BOOLEAN;
 		BEGIN
 			RETURN FALSE
 		END HasCompanion;
 
-		PROCEDURE ResetAndEnablePort (port: SIGNED32): BOOLEAN;
+		PROCEDURE { OVERRIDE } ResetAndEnablePort (port: SIGNED32): BOOLEAN;
 		VAR
 			dword: SET;
 			res: BOOLEAN;
@@ -76,7 +76,7 @@ TYPE
 		END ResetAndEnablePort;
 
 		(* Reset the host controller. Note: This will NOT assert reset on the USB downstream ports. *)
-		PROCEDURE HardwareReset() : BOOLEAN;
+		PROCEDURE { OVERRIDE } HardwareReset() : BOOLEAN;
 		VAR
 			viewportInit: ARRAY 32 OF CHAR;
 			viewport: SIGNED32;
@@ -122,7 +122,7 @@ TYPE
 		 * - route all ports to the EHCI controller
 		 * - power on all ports of the root hub
 	  	 *)
-		PROCEDURE Start():BOOLEAN;
+		PROCEDURE { OVERRIDE } Start():BOOLEAN;
 		VAR dword : SET;
 			res: BOOLEAN;
 		BEGIN
@@ -143,7 +143,7 @@ TYPE
 			RETURN TRUE
 		END Start;
 
-		PROCEDURE Schedule * (transfer: UsbHcdi.TransferToken);
+		PROCEDURE { OVERRIDE } Schedule * (transfer: UsbHcdi.TransferToken);
 		VAR
 			address: SIGNED32;
 		BEGIN

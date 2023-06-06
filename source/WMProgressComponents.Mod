@@ -21,7 +21,7 @@ TYPE
 
 		showPercents- : WMProperties.BooleanProperty; (* Default: TRUE *)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			takesFocus.Set(FALSE);
@@ -79,7 +79,7 @@ TYPE
 			Invalidate;
 		END IncPos;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR any : ANY;
 		BEGIN
 			RecacheProperties^;
@@ -117,7 +117,7 @@ TYPE
 			Release;
 		END ModelChanged;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = min) OR (property = max) THEN
 				Invalidate;
@@ -130,7 +130,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR
 			rect: WMRectangles.Rectangle;
 			width: SIGNED32;

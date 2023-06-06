@@ -937,7 +937,7 @@ TYPE
 			END;
 		END PrintNegatedExpression;
 
-		PROCEDURE VisitAssignment* (statement: SyntaxTree.Assignment);
+		PROCEDURE { OVERRIDE } VisitAssignment* (statement: SyntaxTree.Assignment);
 		BEGIN
 			PrintIndent;
 			IF IsEmptyString (statement.right.type) THEN
@@ -959,7 +959,7 @@ TYPE
 			END;
 		END VisitAssignment;
 
-		PROCEDURE VisitIfStatement* (statement: SyntaxTree.IfStatement);
+		PROCEDURE { OVERRIDE } VisitIfStatement* (statement: SyntaxTree.IfStatement);
 		VAR i: SIZE;
 		BEGIN
 			PrintIndent; PrintIfPart (statement.ifPart);
@@ -972,7 +972,7 @@ TYPE
 			END;
 		END VisitIfStatement;
 
-		PROCEDURE VisitWithStatement* (statement: SyntaxTree.WithStatement);
+		PROCEDURE { OVERRIDE } VisitWithStatement* (statement: SyntaxTree.WithStatement);
 		VAR withPart: SyntaxTree.WithPart; i: SIZE;
 		BEGIN
 			FOR i := 0 TO statement.WithParts () - 1 DO
@@ -990,30 +990,30 @@ TYPE
 			END;
 		END VisitWithStatement;
 
-		PROCEDURE VisitWhileStatement* (statement: SyntaxTree.WhileStatement);
+		PROCEDURE { OVERRIDE } VisitWhileStatement* (statement: SyntaxTree.WhileStatement);
 		BEGIN
 			PrintIndent; writer.String ("while ("); PrintExpression (statement.condition); writer.Char (')'); writer.Ln;
 			BeginBlock; PrintStatements (statement.statements); EndBlock;
 		END VisitWhileStatement;
 
-		PROCEDURE VisitRepeatStatement* (statement: SyntaxTree.RepeatStatement);
+		PROCEDURE { OVERRIDE } VisitRepeatStatement* (statement: SyntaxTree.RepeatStatement);
 		BEGIN
 			PrintIndent; writer.String ("do"); writer.Ln;
 			BeginBlock; PrintStatements (statement.statements); EndBlock;
 			PrintIndent; writer.String ("while ("); PrintNegatedExpression (statement.condition); writer.String (");"); writer.Ln;
 		END VisitRepeatStatement;
 
-		PROCEDURE VisitLoopStatement* (statement: SyntaxTree.LoopStatement);
+		PROCEDURE { OVERRIDE } VisitLoopStatement* (statement: SyntaxTree.LoopStatement);
 		BEGIN
 			PrintIndent; writer.String ("for (;;)"); writer.Ln;
 			BeginBlock; PrintStatements (statement.statements); EndBlock;
 		END VisitLoopStatement;
 
-		PROCEDURE VisitExitStatement* (statement: SyntaxTree.ExitStatement);
+		PROCEDURE { OVERRIDE } VisitExitStatement* (statement: SyntaxTree.ExitStatement);
 		BEGIN PrintIndent; writer.String ("break;"); writer.Ln;
 		END VisitExitStatement;
 
-		PROCEDURE VisitReturnStatement* (statement: SyntaxTree.ReturnStatement);
+		PROCEDURE { OVERRIDE } VisitReturnStatement* (statement: SyntaxTree.ReturnStatement);
 		CONST ResultVariable = "_result";
 		VAR scope: SyntaxTree.ProcedureScope; locked: BOOLEAN;
 		BEGIN
@@ -1034,7 +1034,7 @@ TYPE
 			END;
 		END VisitReturnStatement;
 
-		PROCEDURE VisitStatementBlock* (statement: SyntaxTree.StatementBlock);
+		PROCEDURE { OVERRIDE } VisitStatementBlock* (statement: SyntaxTree.StatementBlock);
 		VAR procedureScope: SyntaxTree.ProcedureScope;
 		BEGIN
 			procedureScope := GetStatementProcedure (statement);
@@ -1045,7 +1045,7 @@ TYPE
 			IF statement.outer # NIL THEN EndBlock END;
 		END VisitStatementBlock;
 
-		PROCEDURE VisitAwaitStatement* (statement: SyntaxTree.AwaitStatement);
+		PROCEDURE { OVERRIDE } VisitAwaitStatement* (statement: SyntaxTree.AwaitStatement);
 		VAR procedureScope: SyntaxTree.ProcedureScope; name: Identifier;
 		BEGIN
 			procedureScope := GetStatementProcedure (statement);
@@ -1061,7 +1061,7 @@ TYPE
 			writer.Char (')'); writer.Char (Semicolon); writer.Ln;
 		END VisitAwaitStatement;
 
-		PROCEDURE VisitCaseStatement* (statement: SyntaxTree.CaseStatement);
+		PROCEDURE { OVERRIDE } VisitCaseStatement* (statement: SyntaxTree.CaseStatement);
 		VAR i: SIZE; value: Basic.Integer; casePart: SyntaxTree.CasePart; caseConstant: SyntaxTree.CaseConstant;
 		BEGIN
 			PrintIndent; writer.String ("switch ("); PrintExpression (statement.variable); writer.Char (')'); writer.Ln;
@@ -1090,7 +1090,7 @@ TYPE
 			EndBlock;
 		END VisitCaseStatement;
 
-		PROCEDURE VisitForStatement* (statement: SyntaxTree.ForStatement);
+		PROCEDURE { OVERRIDE } VisitForStatement* (statement: SyntaxTree.ForStatement);
 		BEGIN
 			PrintIndent; writer.String ("for (");
 			PrintExpression (statement.variable); writer.String (" = "); PrintExpression (statement.from); writer.String ("; "); PrintExpression (statement.variable);
@@ -1100,11 +1100,11 @@ TYPE
 			writer.Char (')'); writer.Ln; BeginBlock; PrintStatements (statement.statements); EndBlock;
 		END VisitForStatement;
 
-		PROCEDURE VisitProcedureCallStatement* (statement: SyntaxTree.ProcedureCallStatement);
+		PROCEDURE { OVERRIDE } VisitProcedureCallStatement* (statement: SyntaxTree.ProcedureCallStatement);
 		BEGIN PrintIndent; PrintExpression (statement.call); writer.Char (Semicolon); writer.Ln;
 		END VisitProcedureCallStatement;
 
-		PROCEDURE VisitSymbolDesignator* (expression: SyntaxTree.SymbolDesignator);
+		PROCEDURE { OVERRIDE } VisitSymbolDesignator* (expression: SyntaxTree.SymbolDesignator);
 		VAR name: Identifier; recordType: SyntaxTree.RecordType;
 		BEGIN
 			recordType := NIL;
@@ -1136,7 +1136,7 @@ TYPE
 			END;
 		END VisitSymbolDesignator;
 
-		PROCEDURE VisitBuiltinCallDesignator* (expression: SyntaxTree.BuiltinCallDesignator);
+		PROCEDURE { OVERRIDE } VisitBuiltinCallDesignator* (expression: SyntaxTree.BuiltinCallDesignator);
 		VAR argument: ARRAY 3 OF SyntaxTree.Expression; i: SIZE; name: Identifier;
 			position: Streams.Position; typeDeclaration: SyntaxTree.TypeDeclaration;
 		BEGIN
@@ -1194,7 +1194,7 @@ TYPE
 			END;
 		END VisitBuiltinCallDesignator;
 
-		PROCEDURE VisitProcedureCallDesignator* (expression: SyntaxTree.ProcedureCallDesignator);
+		PROCEDURE { OVERRIDE } VisitProcedureCallDesignator* (expression: SyntaxTree.ProcedureCallDesignator);
 		VAR procedureType: SyntaxTree.ProcedureType; first: BOOLEAN;
 		VAR symbolDesignator: SyntaxTree.SymbolDesignator; scope: SyntaxTree.Scope;
 		BEGIN
@@ -1225,19 +1225,19 @@ TYPE
 			writer.Char (')');
 		END VisitProcedureCallDesignator;
 
-		PROCEDURE VisitBooleanValue* (expression: SyntaxTree.BooleanValue);
+		PROCEDURE { OVERRIDE } VisitBooleanValue* (expression: SyntaxTree.BooleanValue);
 		BEGIN IF expression.value THEN writer.Char ('1'); ELSE writer.Char ('0'); END;
 		END VisitBooleanValue;
 
-		PROCEDURE VisitIntegerValue* (expression: SyntaxTree.IntegerValue);
+		PROCEDURE { OVERRIDE } VisitIntegerValue* (expression: SyntaxTree.IntegerValue);
 		BEGIN writer.Int (expression.value, 0);
 		END VisitIntegerValue;
 
-		PROCEDURE VisitCharacterValue* (expression: SyntaxTree.CharacterValue);
+		PROCEDURE { OVERRIDE } VisitCharacterValue* (expression: SyntaxTree.CharacterValue);
 		BEGIN PrintCharacter (expression.value);
 		END VisitCharacterValue;
 
-		PROCEDURE VisitSetValue* (expression: SyntaxTree.SetValue);
+		PROCEDURE { OVERRIDE } VisitSetValue* (expression: SyntaxTree.SetValue);
 		VAR i: SIGNED16; mask, value: SIGNED64;
 		BEGIN
 			mask := 1; value := 0;
@@ -1245,11 +1245,11 @@ TYPE
 			writer.String ("0x"); writer.Hex (value, 0);
 		END VisitSetValue;
 
-		PROCEDURE VisitRealValue* (expression: SyntaxTree.RealValue);
+		PROCEDURE { OVERRIDE } VisitRealValue* (expression: SyntaxTree.RealValue);
 		BEGIN writer.FloatFix (expression.value, 0, 5, 0);
 		END VisitRealValue;
 
-		PROCEDURE VisitStringValue* (expression: SyntaxTree.StringValue);
+		PROCEDURE { OVERRIDE } VisitStringValue* (expression: SyntaxTree.StringValue);
 		VAR char: CHAR; i: SIZE;
 		BEGIN
 			writer.Char ('"'); i := 0;
@@ -1262,15 +1262,15 @@ TYPE
 			writer.Char ('"');
 		END VisitStringValue;
 
-		PROCEDURE VisitNilValue* (expression: SyntaxTree.NilValue);
+		PROCEDURE { OVERRIDE } VisitNilValue* (expression: SyntaxTree.NilValue);
 		BEGIN writer.Char ('0');
 		END VisitNilValue;
 
-		PROCEDURE VisitEnumerationValue* (expression: SyntaxTree.EnumerationValue);
+		PROCEDURE { OVERRIDE } VisitEnumerationValue* (expression: SyntaxTree.EnumerationValue);
 		BEGIN writer.Int (expression.value, 0);
 		END VisitEnumerationValue;
 
-		PROCEDURE VisitUnaryExpression* (expression: SyntaxTree.UnaryExpression);
+		PROCEDURE { OVERRIDE } VisitUnaryExpression* (expression: SyntaxTree.UnaryExpression);
 		BEGIN
 			CASE expression.operator OF
 			| Scanner.Plus:
@@ -1280,7 +1280,7 @@ TYPE
 			PrintExpression (expression.left);
 		END VisitUnaryExpression;
 
-		PROCEDURE VisitTypeGuardDesignator* (expression: SyntaxTree.TypeGuardDesignator);
+		PROCEDURE { OVERRIDE } VisitTypeGuardDesignator* (expression: SyntaxTree.TypeGuardDesignator);
 		VAR isRecord: BOOLEAN;
 		BEGIN
 			isRecord := expression.type.resolvedType IS SyntaxTree.RecordType;
@@ -1292,14 +1292,14 @@ TYPE
 			IF isRecord THEN writer.Char (')') END;
 		END VisitTypeGuardDesignator;
 
-		PROCEDURE VisitSupercallDesignator*(expression: SyntaxTree.SupercallDesignator);
+		PROCEDURE { OVERRIDE } VisitSupercallDesignator*(expression: SyntaxTree.SupercallDesignator);
 		VAR name: Identifier; procedure: SyntaxTree.Procedure;
 		BEGIN
 			procedure := expression.left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Procedure);
 			GetSymbolName (procedure.super, name, backend.style); writer.String (name);
 		END VisitSupercallDesignator;
 
-		PROCEDURE VisitBinaryExpression* (expression: SyntaxTree.BinaryExpression);
+		PROCEDURE { OVERRIDE } VisitBinaryExpression* (expression: SyntaxTree.BinaryExpression);
 		BEGIN
 			IF expression.operator = Scanner.In THEN
 				writer.String ("(("); PrintExpression (expression.right); writer.String (" >> ");
@@ -1334,11 +1334,11 @@ TYPE
 			IF IsString (expression.left.type) THEN writer.Char ('0'); ELSE PrintExpression (expression.right); END; writer.Char (')');
 		END VisitBinaryExpression;
 
-		PROCEDURE VisitSelfDesignator* (expression: SyntaxTree.SelfDesignator);
+		PROCEDURE { OVERRIDE } VisitSelfDesignator* (expression: SyntaxTree.SelfDesignator);
 		BEGIN PrintSelf;
 		END VisitSelfDesignator;
 
-		PROCEDURE VisitIndexDesignator* (expression: SyntaxTree.IndexDesignator);
+		PROCEDURE { OVERRIDE } VisitIndexDesignator* (expression: SyntaxTree.IndexDesignator);
 		VAR i: SIZE;
 		BEGIN
 			PrintExpression (expression.left);
@@ -1349,7 +1349,7 @@ TYPE
 			END;
 		END VisitIndexDesignator;
 
-		PROCEDURE VisitConversion* (expression: SyntaxTree.Conversion);
+		PROCEDURE { OVERRIDE } VisitConversion* (expression: SyntaxTree.Conversion);
 		VAR e: SyntaxTree.Expression;
 		BEGIN
 			IF (expression.type IS SyntaxTree.CharacterType) & (expression.expression.type IS SyntaxTree.StringType) THEN
@@ -1359,7 +1359,7 @@ TYPE
 			END;
 		END VisitConversion;
 
-		PROCEDURE VisitDereferenceDesignator* (expression: SyntaxTree.DereferenceDesignator);
+		PROCEDURE { OVERRIDE } VisitDereferenceDesignator* (expression: SyntaxTree.DereferenceDesignator);
 		BEGIN
 			IF expression.type IS SyntaxTree.ArrayType THEN
 				writer.String ("(*("); PrintType (TRUE, expression.type, ""); writer.String (") &");
@@ -1369,7 +1369,7 @@ TYPE
 			END;
 		END VisitDereferenceDesignator;
 
-		PROCEDURE VisitSet* (expression: SyntaxTree.Set);
+		PROCEDURE { OVERRIDE } VisitSet* (expression: SyntaxTree.Set);
 		VAR i: SIZE; element: SyntaxTree.Expression;
 		BEGIN
 			IF expression.elements.Length () = 0 THEN
@@ -1402,7 +1402,7 @@ TYPE
 		BEGIN InitBackend;
 		END InitTranspilerBackend;
 
-		PROCEDURE ProcessSyntaxTreeModule* (module: SyntaxTree.Module): Formats.GeneratedModule;
+		PROCEDURE { OVERRIDE } ProcessSyntaxTreeModule* (module: SyntaxTree.Module): Formats.GeneratedModule;
 		VAR filename, pathname, fullname: Files.FileName; file: Files.File; writer: Files.Writer; transpiler: Transpiler;
 		BEGIN
 			Files.SplitPath (module.sourceName, pathname, filename); GetHeaderName (module, filename, style);
@@ -1422,7 +1422,7 @@ TYPE
 			RETURN NIL;
 		END ProcessSyntaxTreeModule;
 
-		PROCEDURE DefineOptions* (options: Options.Options);
+		PROCEDURE { OVERRIDE } DefineOptions* (options: Options.Options);
 		BEGIN DefineOptions^(options);
 			options.Add(0X,"defineMain", Options.Flag);
 			options.Add(0X,"declarations", Options.Flag);
@@ -1432,7 +1432,7 @@ TYPE
 			options.Add(0X,"noLocalInit", Options.Flag);
 		END DefineOptions;
 
-		PROCEDURE GetOptions* (options: Options.Options);
+		PROCEDURE { OVERRIDE } GetOptions* (options: Options.Options);
 		VAR styleName: ARRAY 32 OF CHAR;
 		BEGIN GetOptions^(options);
 			defineMain := options.GetFlag ("defineMain");
@@ -1443,11 +1443,11 @@ TYPE
 			initLocalData := ~options.GetFlag("noLocalInit");
 		END GetOptions;
 
-		PROCEDURE DefaultSymbolFileFormat* (): Formats.SymbolFileFormat;
+		PROCEDURE { OVERRIDE } DefaultSymbolFileFormat* (): Formats.SymbolFileFormat;
 		BEGIN RETURN SymbolFileFormat.Get ();
 		END DefaultSymbolFileFormat;
 
-		PROCEDURE GetSystem*(): Global.System;
+		PROCEDURE { OVERRIDE } GetSystem*(): Global.System;
 		VAR system: Global.System;
 		BEGIN
 			NEW(system, 8, 8, addressSize, 8, 32, 32, 32, 64, 0, FALSE);

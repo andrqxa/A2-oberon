@@ -434,7 +434,7 @@ TYPE
 				END
 			END SetAttributes;
 
-			PROCEDURE Draw*( canvas: WMG.Canvas );
+			PROCEDURE { OVERRIDE } Draw*( canvas: WMG.Canvas );
 			VAR
 				l: Line; i, j, dy, bottom: SIZE; attr: Attribute; char: Char;
 				box: WMG.Rectangle;
@@ -672,13 +672,13 @@ Log.Ln;
 			END Consume;
 
 
-			PROCEDURE FocusReceived*;
+			PROCEDURE { OVERRIDE } FocusReceived*;
 			BEGIN
 				FocusReceived^();
 				UpdateBox( cursor.line, cursor.ofs )
 			END FocusReceived;
 
-			PROCEDURE FocusLost*;
+			PROCEDURE { OVERRIDE } FocusLost*;
 			BEGIN
 				FocusLost^();
 				UpdateBox( cursor.line, cursor.ofs )
@@ -707,7 +707,7 @@ Log.Ln;
 
 
 
-			PROCEDURE PointerDown*( x, y: SIZE; keys: SET );
+			PROCEDURE { OVERRIDE } PointerDown*( x, y: SIZE; keys: SET );
 			BEGIN
 				IF (Left IN keys) & hasFocus THEN
 					LocateBox( x, y, sel.beg );  sel.end := sel.beg
@@ -720,7 +720,7 @@ Log.Ln;
 				UpdateAll()
 			END PointerDown;
 
-			PROCEDURE PointerMove*( x, y: SIZE; keys: SET );
+			PROCEDURE { OVERRIDE } PointerMove*( x, y: SIZE; keys: SET );
 			VAR pos: Position;
 			BEGIN
 				IF (Left IN keys) & (sel.beg.line # NIL) THEN
@@ -737,7 +737,7 @@ Log.Ln;
 			END PointerMove;
 
 
-			PROCEDURE PointerUp*( x, y: SIZE; keys: SET );
+			PROCEDURE { OVERRIDE } PointerUp*( x, y: SIZE; keys: SET );
 			END PointerUp;
 
 			PROCEDURE CursorKey( keySym: SIZE );
@@ -766,7 +766,7 @@ Log.Ln;
 				END;
 			END WriteUcs;
 
-			PROCEDURE KeyEvent*( ucs: SIZE; flags: SET; VAR keySym: SIZE );
+			PROCEDURE { OVERRIDE } KeyEvent*( ucs: SIZE; flags: SET; VAR keySym: SIZE );
 			BEGIN
 				IF chan = NIL THEN  RETURN  END;
 				IF ~(Inputs.Release IN flags) & hasFocus THEN		
@@ -797,7 +797,7 @@ Log.Ln;
 				END
 			END KeyEvent;
 
-			PROCEDURE Handle*( VAR m : WMMessages.Message );
+			PROCEDURE { OVERRIDE } Handle*( VAR m : WMMessages.Message );
 			BEGIN
 				IF m.msgType = WMMessages.MsgKey THEN
 					IF m.y MOD 256 = 9 THEN  KeyEvent( m.x, m.flags, m.y )
@@ -844,14 +844,14 @@ Log.Ln;
 				END;
 			END resized;
 
-			PROCEDURE Resized*;
+			PROCEDURE { OVERRIDE } Resized*;
 			BEGIN
 				Resized^();
 				resized();
 				IF chan # NIL THEN  chan.WindowChange( cols, rows )  END
 			END Resized;
 
-			PROCEDURE Initialize*;
+			PROCEDURE { OVERRIDE } Initialize*;
 			BEGIN
 				Initialize^();
 				Resized;
@@ -1057,7 +1057,7 @@ Log.Ln;
 			END HelpHandler;
 
 
-			PROCEDURE Close*;
+			PROCEDURE { OVERRIDE } Close*;
 			VAR timer: Kernel.Timer;
 			BEGIN
 				IF sshConn # NIL THEN  

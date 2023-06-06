@@ -38,7 +38,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				jolietLevel: SIGNED32;
 
 			(** Open an existing file. The same file descriptor is returned if a file is opened multiple times.  End users use Files.Old instead. *)
-			PROCEDURE Old0*(CONST name: ARRAY OF CHAR): Files.File;
+			PROCEDURE { OVERRIDE } Old0*(CONST name: ARRAY OF CHAR): Files.File;
 			VAR f: File; namebuf: Filename; dircl, dirpos, time, date, filecl, len: SIGNED32; attr: SET; res: SIGNED16;
 			BEGIN {EXCLUSIVE}
 				res := 0; f := NIL;
@@ -57,7 +57,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 			END Old0;
 
 			(** Enumerate canonical file names. mask may contain * wildcards.  For internal use only.  End users use Enumerator instead. *)
-			PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
+			PROCEDURE { OVERRIDE } Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
 			VAR
 				fname, name, mmask, pname, fullname: Filename;
 				f: Files.File; R: Files.Rider;
@@ -100,7 +100,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 			END Enumerate0;
 
 			(** Return the unique non-zero key of the named file, if it exists. *)
-			PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
+			PROCEDURE { OVERRIDE } FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
 			VAR res: SIGNED16; namebuf: Filename; t, key, filecl: SIGNED32; attr: SET;
 			BEGIN {EXCLUSIVE}
 				IF nameDebug THEN LogString("OFSFATFiles.FileKey: "); LogString(name); LogLn END;
@@ -114,7 +114,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 			END FileKey;
 
 			(** Finalize the file system. *)
-			PROCEDURE Finalize*;
+			PROCEDURE { OVERRIDE } Finalize*;
 			BEGIN {EXCLUSIVE}
 				vol.Finalize;
 				Finalize^
@@ -134,7 +134,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 			nofbufs: SIGNED16;
 			firstbuf: Buffer;
 
-			PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
+			PROCEDURE { OVERRIDE } Set*(VAR r: Files.Rider; pos: Files.Position);
 			BEGIN {EXCLUSIVE}
 				r.eof := FALSE; r.res := 0; r.file := SELF; r.fs := fs;
 				IF (pos < 0) THEN r.apos := 0
@@ -144,7 +144,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				r.hint := firstbuf
 			END Set;
 
-			PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
+			PROCEDURE { OVERRIDE } Pos*(VAR r: Files.Rider): Files.Position;
 			BEGIN {EXCLUSIVE}
 				RETURN r.apos
 			END Pos;
@@ -190,7 +190,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				RETURN buf
 			END GetBuf;
 
-			PROCEDURE Read*(VAR r: Files.Rider; VAR x: CHAR);
+			PROCEDURE { OVERRIDE } Read*(VAR r: Files.Rider; VAR x: CHAR);
 			VAR buf: Buffer;
 			BEGIN {EXCLUSIVE}
 				r.res := 0;
@@ -203,7 +203,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				END
 			END Read;
 
-			PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+			PROCEDURE { OVERRIDE } ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 			VAR m: SIZE; pos: SIGNED32; src: ADDRESS; buf: Buffer;
 			BEGIN {EXCLUSIVE}
 				IF LEN(x) < len THEN SYSTEM.HALT(19) END;
@@ -222,19 +222,19 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				r.hint := buf
 			END ReadBytes;
 
-			PROCEDURE Length*(): Files.Size;
+			PROCEDURE { OVERRIDE } Length*(): Files.Size;
 			BEGIN RETURN len
 			END Length;
 
-			PROCEDURE GetDate*(VAR t, d: SIGNED32);
+			PROCEDURE { OVERRIDE } GetDate*(VAR t, d: SIGNED32);
 			BEGIN t := time; d := date
 			END GetDate;
 
-			PROCEDURE GetName*(VAR name: ARRAY OF CHAR);
+			PROCEDURE { OVERRIDE } GetName*(VAR name: ARRAY OF CHAR);
 			BEGIN COPY(SELF.name, name)
 			END GetName;
 
-			PROCEDURE Update*;
+			PROCEDURE { OVERRIDE } Update*;
 			END Update; (* nothing *)
 		END File;
 

@@ -79,7 +79,7 @@ TYPE
 			END
 		END Init;
 
-		PROCEDURE Open*(bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Open*(bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF open THEN
 				IF Verbose THEN KernelLog.String(ModuleName); KernelLog.String(": "); KernelLog.String(name); KernelLog.String(" already open"); KernelLog.Ln; END;
@@ -99,7 +99,7 @@ TYPE
 		END Open;
 
 		(** Send a single character to the UART. *)
-		PROCEDURE SendChar*(ch: CHAR; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SendChar*(ch: CHAR; VAR res : INTEGER);
 		VAR s: SET;
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN res := Serials.Closed; RETURN; END;
@@ -112,7 +112,7 @@ TYPE
 		END SendChar;
 
 		(** Wait for the next character is received in the input buffer. The buffer is fed by HandleInterrupt *)
-		PROCEDURE ReceiveChar*(VAR ch: CHAR; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } ReceiveChar*(VAR ch: CHAR; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN res := Serials.Closed; RETURN END;
 			AWAIT(tail # head);
@@ -147,7 +147,7 @@ TYPE
 			END;
 		END HandleInterrupt;
 
-		PROCEDURE Available*(): SIZE;
+		PROCEDURE { OVERRIDE } Available*(): SIZE;
 		BEGIN {EXCLUSIVE}
 			RETURN (tail - head) MOD BufSize
 		END Available;
@@ -221,7 +221,7 @@ TYPE
 		END SetPortState;
 
 		(** Get the port state: state (open/closed), speed in bps, no. of data bits, parity, top bit length. *)
-		PROCEDURE GetPortState*(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : SIGNED32);
+		PROCEDURE { OVERRIDE } GetPortState*(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : SIGNED32);
 		CONST TCR = 2;
 		VAR savset, set: SET; ch: CHAR;
 		BEGIN {EXCLUSIVE}
@@ -265,7 +265,7 @@ TYPE
 		END GetPortState;
 
 		(** Clear the specified modem control lines.  s may contain DTR, RTS & Break. *)
-		PROCEDURE ClearMC*(s: SET);
+		PROCEDURE { OVERRIDE } ClearMC*(s: SET);
 		VAR t: SET;
 		BEGIN {EXCLUSIVE}
 			IF s * {DTR, RTS} # {} THEN
@@ -281,7 +281,7 @@ TYPE
 		END ClearMC;
 
 		(** Set the specified modem control lines.  s may contain DTR, RTS & Break. *)
-		PROCEDURE SetMC*(s: SET);
+		PROCEDURE { OVERRIDE } SetMC*(s: SET);
 		VAR t: SET;
 		BEGIN {EXCLUSIVE}
 			IF s * {DTR, RTS} # {} THEN
@@ -297,7 +297,7 @@ TYPE
 		END SetMC;
 
 		(** Return the state of the specified modem control lines.  s contains the current state of DSR, CTS, RI, DCD & Break Interrupt. *)
-		PROCEDURE GetMC*(VAR s: SET);
+		PROCEDURE { OVERRIDE } GetMC*(VAR s: SET);
 		VAR t: SET;
 		BEGIN {EXCLUSIVE}
 			s := {};
@@ -310,7 +310,7 @@ TYPE
 			IF 4 IN t THEN INCL(s, Break) END
 		END GetMC;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		VAR s: SET;
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN

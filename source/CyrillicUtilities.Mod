@@ -66,7 +66,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIZE;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ch : CHAR;
@@ -90,7 +90,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text
 		END GetText;
@@ -100,14 +100,14 @@ TYPE
 	CP1250Encoder = OBJECT(Codecs.TextEncoder)
 	VAR out: Streams.Writer;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("CP1250 Encoder Error: output stream is NIL");
 			ELSE SELF.out := out
 			END
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 			c: CHAR;
 		BEGIN
@@ -143,7 +143,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIZE;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ch, last : CHAR;
@@ -173,7 +173,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text
 		END GetText;
@@ -183,14 +183,14 @@ TYPE
 	CP1251Encoder = OBJECT(Codecs.TextEncoder)
 	VAR out: Streams.Writer;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("CP1251 Encoder Error: output stream is NIL");
 			ELSE SELF.out := out
 			END
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 			c: CHAR;
 		BEGIN
@@ -226,7 +226,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIZE;
 			(*r : Files.Reader;*)
 			tempUCS32 : ARRAY 1024 OF Char32;
@@ -257,7 +257,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text;
 		END GetText;
@@ -267,14 +267,14 @@ TYPE
 	KOI8REncoder = OBJECT(Codecs.TextEncoder)
 	VAR out: Streams.Writer;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("KOI8-R Encoder Error: output stream is NIL")
 			ELSE SELF.out := out
 			END;
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 			c: CHAR;
 		BEGIN
@@ -310,7 +310,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIZE;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ch, last : CHAR;
@@ -340,7 +340,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text
 		END GetText;
@@ -350,14 +350,14 @@ TYPE
 	KOI8UEncoder = OBJECT(Codecs.TextEncoder)
 	VAR out: Streams.Writer;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("KOI8-U Encoder Error: output stream is NIL")
 			ELSE SELF.out := out
 			END
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 			c: CHAR;
 		BEGIN
@@ -393,7 +393,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIZE;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ch, last : CHAR;
@@ -423,7 +423,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text
 		END GetText;
@@ -433,14 +433,14 @@ TYPE
 	CP866Encoder = OBJECT(Codecs.TextEncoder)
 	VAR out: Streams.Writer;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("CP-866 Encoder Error: output stream is NIL")
 			ELSE SELF.out := out
 			END;
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 			c: CHAR;
 		BEGIN
@@ -476,7 +476,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIZE;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ch, last : CHAR;
@@ -506,7 +506,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text
 		END GetText;
@@ -516,14 +516,14 @@ TYPE
 	ISO88595Encoder = OBJECT(Codecs.TextEncoder)
 	VAR out: Streams.Writer;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("ISO-8859-5 Encoder Error: output stream is NIL")
 			ELSE SELF.out := out
 			END
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 			c: CHAR;
 		BEGIN

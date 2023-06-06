@@ -30,7 +30,7 @@ TYPE
 		VAR cons,vow: SIGNED32; (* count the consonants and vowels to detect specific keycodes*)
 			ucs0: SIZE; geez:SIGNED32;
 
-		PROCEDURE GetName*() : Strings.String;
+		PROCEDURE { OVERRIDE } GetName*() : Strings.String;
 		BEGIN
 			RETURN Strings.NewString(imeName);
 		END GetName;
@@ -55,7 +55,7 @@ TYPE
 		END Remap;
 
 		(* Map characters from US-Keyboard to ethiopic keyboard *)
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		BEGIN
 			IF ((ucs>=65) & (ucs<=90)) OR  ((ucs>=97)&(ucs<=122)) THEN
 				CASE ucs OF

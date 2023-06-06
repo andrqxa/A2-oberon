@@ -320,7 +320,7 @@ TYPE
 			END;
 		END PaintCharacter;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			winstance := NIL

@@ -39,7 +39,7 @@ TYPE
 		fixMM : BOOLEAN;	(* Value TRUE denotes the presence of a 2-button mouse, Ctrl-key acts then as middle button. *)
 		lastCtrl : BOOLEAN;	(* Value TRUE denotes Ctrl-key pressed. *)
 
-		PROCEDURE IsHit*(x, y  : SIZE) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(x, y  : SIZE) : BOOLEAN;
 		BEGIN RETURN TRUE;
 		END IsHit;
 
@@ -55,14 +55,14 @@ TYPE
 			y := SIGNED16(curY)
 		END Mouse;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys :SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys :SET);
 		BEGIN {EXCLUSIVE}
 			curX := x; curY := y; curKeys := curKeys * {30, 31} + keys;
 			IF fixMM &lastCtrl THEN INCL(curKeys, 1) END;
 			IF input # NIL THEN input.timer.Wakeup END	(* have to check, because upcalls to us can start immediately *)
 		END PointerMove;
 
-		PROCEDURE WheelMove*(dz : SIZE); (*fof*)
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE); (*fof*)
 		BEGIN
 			IF dz > 0 THEN
 				INCL(curKeys, 30);
@@ -72,7 +72,7 @@ TYPE
 			IF input # NIL THEN input.timer.Wakeup END	(* have to check, because upcalls to us can start immediately *)
 		END WheelMove;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN {EXCLUSIVE}
 			curX := x; curY := y; curKeys := keys;
 			IF input # NIL THEN input.timer.Wakeup END
@@ -98,12 +98,12 @@ TYPE
 			END
 		END InsertKey;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN {EXCLUSIVE}
 			InsertKey(0FFX, 0, {})
 		END Close;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		BEGIN {EXCLUSIVE}
 			IF fixMM & ((flags * Inputs.Ctrl # {}) # lastCtrl)  THEN
 				lastCtrl := flags * Inputs.Ctrl # {};
@@ -139,22 +139,22 @@ TYPE
 	OberonInput = OBJECT (Inputs.OberonInput)
 		VAR window : OberonWindow;
 
-		PROCEDURE Mouse*(VAR x, y : SIGNED16; VAR keys : SET);
+		PROCEDURE { OVERRIDE } Mouse*(VAR x, y : SIGNED16; VAR keys : SET);
 		BEGIN
 			window.Mouse(x, y, keys)
 		END Mouse;
 
-		PROCEDURE Read*(VAR ch : CHAR; VAR b : BOOLEAN);
+		PROCEDURE { OVERRIDE } Read*(VAR ch : CHAR; VAR b : BOOLEAN);
 		BEGIN
 			window.Read(ch, b)
 		END Read;
 
-		PROCEDURE Available*(VAR num : SIGNED16; VAR b : BOOLEAN);
+		PROCEDURE { OVERRIDE } Available*(VAR num : SIGNED16; VAR b : BOOLEAN);
 		BEGIN
 			window.Available(num, b)
 		END Available;
 
-		PROCEDURE KeyState*(VAR k : SET);
+		PROCEDURE { OVERRIDE } KeyState*(VAR k : SET);
 		BEGIN
 			window.KeyState(k)
 		END KeyState;
@@ -187,7 +187,7 @@ TYPE
 			END
 		END LocalAddDirty;
 
-		PROCEDURE Update*;
+		PROCEDURE { OVERRIDE } Update*;
 		BEGIN
 			IF Cache & (ml # MAX(SIGNED32)) THEN
 				disp.Invalidate(WMRectangles.MakeRect(ml, mt, mr, mb));	(* updated dirty rectangle *)
@@ -195,7 +195,7 @@ TYPE
 			END
 		END Update;
 
-		PROCEDURE Transfer*(VAR buf : ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op : INTEGER);
+		PROCEDURE { OVERRIDE } Transfer*(VAR buf : ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op : INTEGER);
 		BEGIN
 			Raster.InitMode(mode, Raster.srcCopy);
 			IF Flip THEN
@@ -219,7 +219,7 @@ TYPE
 			END
 		END Transfer;
 
-		PROCEDURE Fill*(col, x, y, w, h : SIGNED32);
+		PROCEDURE { OVERRIDE } Fill*(col, x, y, w, h : SIGNED32);
 		VAR pixel: Raster.Pixel;
 		BEGIN
 			IF Flip THEN
@@ -238,7 +238,7 @@ TYPE
 			END
 		END Fill;
 
-		PROCEDURE Dot*(col, x, y : SIGNED32);
+		PROCEDURE { OVERRIDE } Dot*(col, x, y : SIGNED32);
 		VAR pixel: Raster.Pixel;
 		BEGIN
 			IF Flip THEN
@@ -256,7 +256,7 @@ TYPE
 			END
 		END Dot;
 
-		PROCEDURE Mask*(VAR buf : ARRAY OF CHAR; bitofs, stride, fg, bg, x, y, w, h : SIGNED32);
+		PROCEDURE { OVERRIDE } Mask*(VAR buf : ARRAY OF CHAR; bitofs, stride, fg, bg, x, y, w, h : SIGNED32);
 		VAR p: ADDRESS; i, y0, h0 : SIGNED32; s : SET; pixel, fgp, bgp : Raster.Pixel;
 		BEGIN
 			IF Flip THEN
@@ -304,7 +304,7 @@ TYPE
 			END
 		END Mask;
 
-		PROCEDURE Copy*(sx, sy, w, h, dx, dy : SIGNED32);
+		PROCEDURE { OVERRIDE } Copy*(sx, sy, w, h, dx, dy : SIGNED32);
 		BEGIN
 			IF Flip THEN
 				Copy^(sx, sy, w, h, dx, dy)	(* supermethod not exclusive *)
@@ -363,7 +363,7 @@ TYPE
 			ASSERT(res = 0)
 		END Init;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			IF disp = NIL THEN RETURN END;
 			Inputs.oberonInput.Remove(inp);	(* Unregister virtual input driver *)

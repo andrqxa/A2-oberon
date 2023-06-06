@@ -20,12 +20,12 @@ TYPE
 			ASSERT(uart # NIL);
 		END Init;
 
-		PROCEDURE Open (bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Open (bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
 		BEGIN{EXCLUSIVE}
 			PsUart.Open(uart, bps, data, parity, stop, res);
 		END Open;
 
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		BEGIN{EXCLUSIVE}
 			PsUart.Close(uart);
 		END Close;
@@ -52,14 +52,14 @@ TYPE
 		END BusyLoopCallback0;
 
 		(* This method can be safely used for trace output *)
-		PROCEDURE SendChar(char: CHAR; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } SendChar(char: CHAR; VAR res: INTEGER);
 		BEGIN
 			(*! use BusyLoopCallback0 method to make sure no low-level lock is acquired here - required when used as trace output *)
 			PsUart.SendChar(uart, char, TRUE, BusyLoopCallback0, res);
 		END SendChar;
 
 		(*! This method must not be used for trace output - danger of a dead lock! *)
-		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		BEGIN
 			Machine.AcquireObject(sendLocked);
 			PsUart.Send(uart, buf, ofs, len, propagate, BusyLoopCallback, res);
@@ -67,7 +67,7 @@ TYPE
 			Machine.ReleaseObject(sendLocked);
 		END Send;
 
-		PROCEDURE ReceiveChar(VAR char: CHAR; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } ReceiveChar(VAR char: CHAR; VAR res: INTEGER);
 		BEGIN
 			Machine.AcquireObject(recvLocked);
 			char := PsUart.ReceiveChar(uart, BusyLoopCallback, res);
@@ -75,7 +75,7 @@ TYPE
 			Machine.ReleaseObject(recvLocked);
 		END ReceiveChar;
 
-		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		BEGIN
 			Machine.AcquireObject(recvLocked);
 			PsUart.Receive(uart, buf, ofs, size, min, len, BusyLoopCallback, res);
@@ -83,12 +83,12 @@ TYPE
 			Machine.ReleaseObject(recvLocked);
 		END Receive;
 
-		PROCEDURE Available(): SIZE;
+		PROCEDURE { OVERRIDE } Available(): SIZE;
 		BEGIN
 			RETURN PsUart.Available(uart);
 		END Available;
 
-		PROCEDURE GetPortState(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : SIGNED32);
+		PROCEDURE { OVERRIDE } GetPortState(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : SIGNED32);
 		BEGIN{EXCLUSIVE}
 			openstat := uart.open;
 			bps := uart.bps;

@@ -116,7 +116,7 @@ BEGIN
 
 END color;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
@@ -252,7 +252,7 @@ BEGIN
 	END
 END Shade;
 
-PROCEDURE probe*(x,y,z: SREAL):Voxel;
+PROCEDURE { OVERRIDE } probe*(x,y,z: SREAL):Voxel;
 VAR
 	X,Y,Z: SREAL;
 	i,j,k: SIGNED32;
@@ -268,7 +268,7 @@ BEGIN
 	RETURN(NIL);
 END probe;
 
-PROCEDURE probeShade*(VAR ray: Ray; VAR dx,dy,dz: SREAL);
+PROCEDURE { OVERRIDE } probeShade*(VAR ray: Ray; VAR dx,dy,dz: SREAL);
 VAR
 	ijk: srBase.IPT;
 	out: BOOLEAN;
@@ -290,7 +290,7 @@ BEGIN
 	END
 END probeShade;
 
-PROCEDURE deathray*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } deathray*(VAR ray: Ray);
 VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
@@ -405,7 +405,7 @@ BEGIN
 	Out.Ln;
 END deathray;
 
-PROCEDURE stroke*(p:PT; level: SIGNED32; normal:PT; color: COLOR; mirror:BOOLEAN);
+PROCEDURE { OVERRIDE } stroke*(p:PT; level: SIGNED32; normal:PT; color: COLOR; mirror:BOOLEAN);
 VAR
 	i,j,k: SIGNED32;
 BEGIN
@@ -429,7 +429,7 @@ BEGIN
 	END
 END stroke;
 
-PROCEDURE strokevoxel*(p:PT; level: SIGNED32; voxel:Voxel);
+PROCEDURE { OVERRIDE } strokevoxel*(p:PT; level: SIGNED32; voxel:Voxel);
 VAR
 	i,j,k: SIGNED32;
 BEGIN

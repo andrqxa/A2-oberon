@@ -1135,7 +1135,7 @@ TYPE
 			nameIndex := 0;
 		END Init;
 
-		PROCEDURE Clear*;
+		PROCEDURE { OVERRIDE } Clear*;
 		VAR i: SIGNED32;
 		BEGIN
 			Clear^;
@@ -14267,11 +14267,11 @@ TYPE
 		BEGIN RETURN TRUE
 		END SupportedImmediate;
 
-		PROCEDURE ProcessSyntaxTreeModule*(syntaxTreeModule: SyntaxTree.Module): Formats.GeneratedModule;
+		PROCEDURE { OVERRIDE } ProcessSyntaxTreeModule*(syntaxTreeModule: SyntaxTree.Module): Formats.GeneratedModule;
 		BEGIN RETURN ProcessIntermediateCodeModule(GenerateIntermediate(syntaxTreeModule, SupportedInstruction, SupportedImmediate))
 		END ProcessSyntaxTreeModule;
 
-		PROCEDURE ProcessIntermediateCodeModule*(intermediateCodeModule: Formats.GeneratedModule): Formats.GeneratedModule;
+		PROCEDURE { OVERRIDE } ProcessIntermediateCodeModule*(intermediateCodeModule: Formats.GeneratedModule): Formats.GeneratedModule;
 		VAR
 			result: Sections.Module;
 			traceName: Basic.MessageString;
@@ -14293,7 +14293,7 @@ TYPE
 			RETURN result
 		END ProcessIntermediateCodeModule;
 
-		PROCEDURE GetDescription*(VAR instructionSet: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetDescription*(VAR instructionSet: ARRAY OF CHAR);
 		BEGIN instructionSet := "Intermediate";
 		END GetDescription;
 
@@ -14306,7 +14306,7 @@ TYPE
 		BEGIN COPY(name, traceModuleName)
 		END SetTraceModuleName;
 
-		PROCEDURE DefineOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } DefineOptions*(options: Options.Options);
 		BEGIN
 			DefineOptions^(options);
 			options.Add(0X,"trace",Options.String);
@@ -14325,7 +14325,7 @@ TYPE
 			options.Add(0X,"experiment", Options.Flag);
 		END DefineOptions;
 
-		PROCEDURE GetOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } GetOptions*(options: Options.Options);
 		VAR name,string: SyntaxTree.IdentifierString;
 		BEGIN
 			GetOptions^(options);
@@ -14354,7 +14354,7 @@ TYPE
 			IF simpleMetaData THEN preciseGC := FALSE END;
 		END GetOptions;
 
-		PROCEDURE DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
+		PROCEDURE { OVERRIDE } DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
 		BEGIN RETURN SymbolFileFormat.Get()
 		END DefaultSymbolFileFormat;
 

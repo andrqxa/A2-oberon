@@ -53,14 +53,14 @@ TYPE
 			ascent := size; descent := 0
 		END New;
 
-		PROCEDURE HasChar*(code : WMGraphics.Char32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } HasChar*(code : WMGraphics.Char32) : BOOLEAN;
 		BEGIN
 			RETURN gf.GetGlyph(code, 0) # NIL
 		END HasChar;
 
 
 		(** Render character char to canvas at x, y (baseline) *)
-		PROCEDURE RenderChar*(canvas : WMGraphics. Canvas ; x, y : FLOAT32; char : WMGraphics.Char32);
+		PROCEDURE { OVERRIDE } RenderChar*(canvas : WMGraphics. Canvas ; x, y : FLOAT32; char : WMGraphics.Char32);
 		VAR glyph : Glyph;
 			points : ARRAY 2560 OF WMGraphics.Point2d;
 		BEGIN
@@ -71,7 +71,7 @@ TYPE
 		END RenderChar;
 
 		(** return spacing of character code *)
-		PROCEDURE GetGlyphSpacings*(code : WMGraphics.Char32; VAR glyphSpacings : WMGraphics.GlyphSpacings);
+		PROCEDURE { OVERRIDE } GetGlyphSpacings*(code : WMGraphics.Char32; VAR glyphSpacings : WMGraphics.GlyphSpacings);
 		BEGIN
 			glyphSpacings.width := size;
 			glyphSpacings.height := size;

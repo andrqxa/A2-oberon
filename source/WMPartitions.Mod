@@ -119,7 +119,7 @@ TYPE
 
 		prefixUsed : ARRAY 128 OF BOOLEAN; (* used by GenPrefix() *)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR label : WMStandardComponents.Label; spacer : WMStandardComponents.Panel;
 		BEGIN
 			Init^;
@@ -233,21 +233,21 @@ TYPE
 			AddInternalComponent(info);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			mountPanel.bounds.SetExtents(bounds.GetWidth(), ButtonHeight);
 			info.bounds.SetExtents(bounds.GetWidth(), ButtonHeight);
 		END Initialize;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			Resized^;
 			mountPanel.bounds.SetExtents(bounds.GetWidth(), ButtonHeight);
 			info.bounds.SetExtents(bounds.GetWidth(), ButtonHeight);
 		END Resized;
 
-		PROCEDURE SelectionUpdated(selection:  WMPartitionsComponents.Selection): SIGNED32;
+		PROCEDURE { OVERRIDE } SelectionUpdated(selection:  WMPartitionsComponents.Selection): SIGNED32;
 		VAR
 			caption, temp : ARRAY 128 OF CHAR;
 			fs : Files.FileSystem;
@@ -706,7 +706,7 @@ TYPE
 			RETURN res = Disks.Ok;
 		END SetSelection;
 
-		PROCEDURE WheelMove*(dz : SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 		CONST	Multiplier = 30;
 		VAR pos : SIZE;
 		BEGIN
@@ -883,18 +883,18 @@ TYPE
 			CSChanged;
 		END UpdateLayout;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^; IF popup # NIL THEN popup.Close; END;
 		END Close;
 
-		PROCEDURE Resized*(width, height : SIZE);
+		PROCEDURE { OVERRIDE } Resized*(width, height : SIZE);
 		BEGIN
 			Resized^(width, height);
 			UpdateLayout(width, height);
 		END Resized;
 
-		PROCEDURE &Init*(width, height : SIZE; alpha : BOOLEAN);
+		PROCEDURE (* OVERRIDE *) & Init*(width, height : SIZE; alpha : BOOLEAN);
 		VAR
 			left, ignore : SIZE;
 			spacings : WMGrids.Spacings;
@@ -1086,7 +1086,7 @@ TYPE
 		show, eject, checkPartition, activeBit, format, changeType,
 		delete, create, partitionToFile, fileToPartition, writeMBR, editPBR : WMStandardComponents.Button;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR left : SIGNED32;
 		BEGIN
 			Init^;
@@ -1156,7 +1156,7 @@ TYPE
 
 		(** This procedure is called everytime when the selection has been updated *)
 		(** Return value: SelectionValid, SelectionInvalid, SelectionMaybe *)
-		PROCEDURE SelectionUpdated(selection : WMPartitionsComponents.Selection) : SIGNED32;
+		PROCEDURE { OVERRIDE } SelectionUpdated(selection : WMPartitionsComponents.Selection) : SIGNED32;
 		VAR result : SIGNED32;
 		BEGIN
 			SELF.selection := selection;
@@ -1742,13 +1742,13 @@ TYPE
 			END;
 		END Install;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF popup # NIL THEN popup.Close; popup := NIL END;
 		END Finalize;
 
-		PROCEDURE SelectionUpdated(selection : WMPartitionsComponents.Selection) : SIGNED32;
+		PROCEDURE { OVERRIDE } SelectionUpdated(selection : WMPartitionsComponents.Selection) : SIGNED32;
 		VAR result : SIGNED32;
 		BEGIN
 			SELF.selection := selection;
@@ -1760,7 +1760,7 @@ TYPE
 			RETURN result;
 		END SelectionUpdated;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR  left : SIGNED32;
 		BEGIN
 			Init^;
@@ -1809,7 +1809,7 @@ TYPE
 		(* object polls scavenger status *)
 		surfaceScan, compareFats, lostClusters, write : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR label : WMStandardComponents.Label; left : SIGNED32;
 		BEGIN
 			Init^;
@@ -1870,7 +1870,7 @@ TYPE
 			AddInternalComponent(label);
 		END Init;
 
-		PROCEDURE SelectionUpdated(selection : WMPartitionsComponents.Selection) : SIGNED32;
+		PROCEDURE { OVERRIDE } SelectionUpdated(selection : WMPartitionsComponents.Selection) : SIGNED32;
 		VAR result : SIGNED32;
 		BEGIN
 			SELF.selection := selection;
@@ -1927,7 +1927,7 @@ TYPE
 	VAR
 		writeDataBtn, testPartitionBtn, verifyDataBtn, writeZerosBtn, benchmarkBtn  : WMStandardComponents.Button;
 
-		PROCEDURE SelectionUpdated(selection : WMPartitionsComponents.Selection) : SIGNED32;
+		PROCEDURE { OVERRIDE } SelectionUpdated(selection : WMPartitionsComponents.Selection) : SIGNED32;
 		VAR result : SIGNED32;
 		BEGIN
 			SELF.selection := selection;
@@ -2104,7 +2104,7 @@ TYPE
 			END;
 		END BenchPartition;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR left : SIGNED32;
 		BEGIN
 			Init^;
@@ -2211,7 +2211,7 @@ TYPE
 
 		width, height : SIZE; (* of this popup window *)
 
-		PROCEDURE &Init*(width, height : SIZE; alpha : BOOLEAN);
+		PROCEDURE (* OVERRIDE *) & Init*(width, height : SIZE; alpha : BOOLEAN);
 		VAR panel, line : WMStandardComponents.Panel;
 		BEGIN
 			SELF.width := width; SELF.height := height; scaling := FALSE;
@@ -2494,7 +2494,7 @@ TYPE
 			Close^; BEGIN {EXCLUSIVE} result := ResCancel; END;
 		END Cancel;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^; BEGIN {EXCLUSIVE} result := ResCancel; END;
 		END Close;
@@ -2684,7 +2684,7 @@ TYPE
 			RETURN panel;
 		END CreateForm;
 
-		PROCEDURE Resized*(width, height : SIZE);
+		PROCEDURE { OVERRIDE } Resized*(width, height : SIZE);
 		BEGIN
 			IF (width >= WindowMinWidth) & (height >= WindowMinHeight) THEN
 				scaling := FALSE;
@@ -2742,7 +2742,7 @@ TYPE
 			PartitionsLib.diskModel.Update;
 		END Refresh;
 
-		PROCEDURE WheelMove*(dz : SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 		BEGIN
 			partitionSelector.WheelMove(dz);
 		END WheelMove;
@@ -2778,14 +2778,14 @@ TYPE
 			END;
 		END UpdateSelection;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			PartitionsLib.infobus.RemoveListener(CompletionHandler);
 			window := NIL;
 		END Close;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		VAR configuration : WMRestorable.XmlElement;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
@@ -2817,7 +2817,7 @@ TYPE
 
 		selector : WMPartitionsComponents.OperationSelector;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR left : SIGNED32; label : WMStandardComponents.Label;
 		BEGIN
 			Init^;
@@ -2949,14 +2949,14 @@ TYPE
 			END;
 		END CheckBoxes;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			Resized^;
 			info.bounds.SetExtents(bounds.GetWidth(), ButtonHeight);
 		END Resized;
 
 		(* we don't care about which disk is currently selected *)
-		PROCEDURE SelectionUpdated(selection : WMPartitionsComponents.Selection): SIGNED32;
+		PROCEDURE { OVERRIDE } SelectionUpdated(selection : WMPartitionsComponents.Selection): SIGNED32;
 		VAR selector : WMPartitionsComponents.OperationSelector; operation : WMPartitionsComponents.Operation;
 		BEGIN
 			selector := SELF.selector;
@@ -3043,7 +3043,7 @@ TYPE
 			owner.UpdateStatusLabel(Strings.NewString(result));
 		END Showerrors;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			Acquire;

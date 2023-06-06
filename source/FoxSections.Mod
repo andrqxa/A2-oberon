@@ -220,13 +220,13 @@ TYPE
 			lastComment.Append(buf,ofs,len)
 		END AppendToLine;
 
-		PROCEDURE Ln*;
+		PROCEDURE { OVERRIDE } Ln*;
 		BEGIN
 			Ln^;
 			(*Update;*)
 		END Ln;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN
 			firstComment := NIL; lastComment := NIL; comments := 0;
 			Reset^;
@@ -404,7 +404,7 @@ TYPE
 		imports-: NameList;
 		exports-: NameList;
 
-		PROCEDURE & Init*(module: SyntaxTree.Module; system: Global.System);
+		PROCEDURE (* OVERRIDE *) & Init*(module: SyntaxTree.Module; system: Global.System);
 		BEGIN
 			Init^(module,system);
 			NEW(allSections);
@@ -427,7 +427,7 @@ TYPE
 		BEGIN COPY(platformName, SELF.platformName)
 		END SetPlatformName;
 
-		PROCEDURE Dump*(w: Streams.Writer);
+		PROCEDURE { OVERRIDE } Dump*(w: Streams.Writer);
 		VAR
 			dump: Basic.Writer;
 			name: SyntaxTree.IdentifierString;

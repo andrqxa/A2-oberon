@@ -35,12 +35,12 @@ TYPE
 		w : Files.Writer;
 $END *)
 
-		PROCEDURE &Init*(logName : ARRAY OF CHAR);
+		PROCEDURE (* OVERRIDE *) & Init*(logName : ARRAY OF CHAR);
 		BEGIN
 			COPY(logName, appName)
 		END Init;
 
-		PROCEDURE SetLogFile*(fn : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } SetLogFile*(fn : ARRAY OF CHAR);
 		BEGIN {EXCLUSIVE}
 			IF f # NIL THEN Files.Register(f) END;
 			IF fn = "" THEN f := NIL
@@ -63,7 +63,7 @@ $END *)
 			mode := ModeWriter;
 		END SetLogWriter;
 
-		PROCEDURE SetLogToOut*(enabled : BOOLEAN);
+		PROCEDURE { OVERRIDE } SetLogToOut*(enabled : BOOLEAN);
 		BEGIN {EXCLUSIVE}
 			disableLogToOut := ~enabled
 		END SetLogToOut;
@@ -93,17 +93,17 @@ ELSE (*
 *) END;
 		END InternalLn;
 
-		PROCEDURE Ln*;
+		PROCEDURE { OVERRIDE } Ln*;
 		BEGIN {EXCLUSIVE}
 			InternalLn
 		END Ln;
 
-		PROCEDURE Enter*;
+		PROCEDURE { OVERRIDE } Enter*;
 		BEGIN {EXCLUSIVE}
 			AWAIT(~locked); locked := TRUE
 		END Enter;
 
-		PROCEDURE Exit*;
+		PROCEDURE { OVERRIDE } Exit*;
 		BEGIN {EXCLUSIVE}
 			InternalLn;
 			locked := FALSE
@@ -121,23 +121,23 @@ ELSE (*
 *) END
 		END InternalChar;
 
-		PROCEDURE Char*(x: CHAR);
+		PROCEDURE { OVERRIDE } Char*(x: CHAR);
 		BEGIN {EXCLUSIVE}
 			InternalChar(x)
 		END Char;
 
-		PROCEDURE InternalString*(VAR x: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } InternalString*(VAR x: ARRAY OF CHAR);
 		VAR i : SIGNED32;
 		BEGIN
 			WHILE (i < LEN(x)) & (x[i] # 0X) DO InternalChar(x[i]); INC(i) END
 		END InternalString;
 
-		PROCEDURE String*(x: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } String*(x: ARRAY OF CHAR);
 		BEGIN {EXCLUSIVE}
 			InternalString(x)
 		END String;
 
-		PROCEDURE Hex*(x, w: SIGNED32);
+		PROCEDURE { OVERRIDE } Hex*(x, w: SIGNED32);
 		VAR i, j: SIGNED32; buf: ARRAY 10 OF CHAR;
 		BEGIN {EXCLUSIVE}
 			IF w >= 0 THEN j := 8 ELSE j := 2; w := -w END;
@@ -153,7 +153,7 @@ ELSE (*
 			InternalString(buf)
 		END Hex;
 
-		PROCEDURE Int*(x: SIGNED64; w: SIGNED32);
+		PROCEDURE { OVERRIDE } Int*(x: SIGNED64; w: SIGNED32);
 		VAR i: SIGNED32; x0: SIGNED64; a: ARRAY 21 OF CHAR;
 		BEGIN {EXCLUSIVE}
 			IF x < 0 THEN
@@ -177,7 +177,7 @@ ELSE (*
 			REPEAT DEC(i); InternalChar(a[i]) UNTIL i = 0
 		END Int;
 
-		PROCEDURE TimeStamp*;
+		PROCEDURE { OVERRIDE } TimeStamp*;
 		TYPE TimeDate = RECORD h, m, s, day,month,year: SIGNED32 END;
 			VAR s : ARRAY 32 OF CHAR;
 				now : TimeDate;
@@ -217,7 +217,7 @@ ELSE (*
 			InternalString(s); InternalChar(" ")
 		END TimeStamp;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			IF f # NIL THEN Files.Register(f)
 			END

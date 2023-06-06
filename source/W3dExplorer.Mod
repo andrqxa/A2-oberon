@@ -64,7 +64,7 @@ TYPE
 			x := world.CreateObject(); ObjectGenerator.Sphere(Matrix.Translation4x4(100, 50, 0), 10, 10, x, 0FAFH); world.AddObject(x);
 		END FillIn;
 
-		PROCEDURE &Init*(w, h : SIZE; alpha : BOOLEAN);
+		PROCEDURE (* OVERRIDE *) & Init*(w, h : SIZE; alpha : BOOLEAN);
 		VAR mc : WMGraphics.BufferCanvas;
 		BEGIN
 			Init^(w, h, FALSE);
@@ -118,13 +118,13 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0,0,img.width, img.height))
 		END Render;
 
-		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y:SIZE; keys:SET);
 		BEGIN
 			mouseKeys := (keys * {0, 1, 2});
 			oldX := x; oldY := y;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y: SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y: SIZE; keys : SET);
 		BEGIN
 			IF mouseKeys * {0} # {} THEN
 				IF mouseKeys * {2} # {} THEN
@@ -138,12 +138,12 @@ TYPE
 			oldX := x; oldY := y
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y:SIZE; keys:SET);
 		BEGIN
 			mouseKeys := (keys * {0, 1, 2})
 		END PointerUp;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		BEGIN
 			IF ucs = ORD("0") THEN world.quality := 0; Render END;
 			IF ucs = ORD("1") THEN world.quality := 1; Render END;
@@ -152,7 +152,7 @@ TYPE
 			IF ucs = ORD("s") THEN SpeedCheck END
 		END KeyEvent;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			manager.Remove(SELF)
 		END Close;

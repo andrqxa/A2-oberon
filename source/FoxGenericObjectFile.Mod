@@ -26,7 +26,7 @@ TYPE
 			Init; SetExtension(ObjectFile.DefaultExtension);
 		END InitObjectFileFormat;
 
-		PROCEDURE Export* (module: Formats.GeneratedModule; symbolFileFormat: Formats.SymbolFileFormat): BOOLEAN;
+		PROCEDURE { OVERRIDE } Export* (module: Formats.GeneratedModule; symbolFileFormat: Formats.SymbolFileFormat): BOOLEAN;
 		VAR fileName: Files.FileName; file: Files.File; writer: Files.Writer; fingerprinter: Fingerprinter.Fingerprinter; poolMap: ObjectFile.PoolMap;
 
 			PROCEDURE ExportSection (section: IntermediateCode.Section): BOOLEAN;
@@ -295,14 +295,14 @@ TYPE
 			END
 		END Export;
 
-		PROCEDURE DefineOptions* (options: Options.Options);
+		PROCEDURE { OVERRIDE } DefineOptions* (options: Options.Options);
 		BEGIN
 			options.Add(0X,"objectFileExtension",Options.String);
 			options.Add(0X,"textualObjectFile",Options.Flag);
 			options.Add(0X,"mergeSections",Options.Flag);
 		END DefineOptions;
 
-		PROCEDURE GetOptions* (options: Options.Options);
+		PROCEDURE { OVERRIDE } GetOptions* (options: Options.Options);
 		VAR extension: Files.FileName;
 		BEGIN
 			IF options.GetString("objectFileExtension",extension) THEN
@@ -312,7 +312,7 @@ TYPE
 			mergeSections := options.GetFlag("mergeSections");
 		END GetOptions;
 
-		PROCEDURE DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
+		PROCEDURE { OVERRIDE } DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
 		BEGIN RETURN SymbolFileFormat.Get();
 		END DefaultSymbolFileFormat;
 

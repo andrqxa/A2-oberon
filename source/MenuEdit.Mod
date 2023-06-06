@@ -64,7 +64,7 @@ TYPE
 			SetTitle(Strings.NewString("Menu Edit"));
 		END New;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR button : WMStandardComponents.Button;
 		BEGIN
 			IF 1 IN keys THEN
@@ -214,13 +214,13 @@ TYPE
 		END HandlePointerMove;
 
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 			ELSE Handle^(x)

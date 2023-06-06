@@ -125,7 +125,7 @@ TYPE
 			SELF.Cols := Cols;  SELF.add := add;
 		END InitR;
 
-		PROCEDURE Compute;
+		PROCEDURE { OVERRIDE } Compute;
 		BEGIN
 			MatMulHBlockR( MatrixA, MatrixB, MatrixC, Stride, IncC,
 									StrideC, RowsA, RowsB, Cols, add );
@@ -147,7 +147,7 @@ TYPE
 			SELF.Cols := Cols;  SELF.add := add;
 		END InitX;
 
-		PROCEDURE Compute;
+		PROCEDURE { OVERRIDE } Compute;
 		BEGIN
 			MatMulHBlockX( MatrixA, MatrixB, MatrixC, Stride, IncC,
 									StrideC, RowsA, RowsB, Cols, add );
@@ -170,7 +170,7 @@ TYPE
 			SELF.L2BlockK := L2BlockK;
 		END InitR;
 
-		PROCEDURE Compute;
+		PROCEDURE { OVERRIDE } Compute;
 		BEGIN
 			L3BlockR( adrA, adrB, C, M, N, K, IncC, StrideC, L2BlockM,
 							L2BlockN, L2BlockK );
@@ -193,7 +193,7 @@ TYPE
 			SELF.L2BlockK := L2BlockK;
 		END InitX;
 
-		PROCEDURE Compute;
+		PROCEDURE { OVERRIDE } Compute;
 		BEGIN
 			L3BlockX( adrA, adrB, C, M, N, K, IncC, StrideC, L2BlockM,
 						L2BlockN, L2BlockK );

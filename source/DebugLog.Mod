@@ -51,7 +51,7 @@ TYPE
 			open := TRUE
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			open := FALSE;
 			Close^

@@ -669,7 +669,7 @@ TYPE
 		editSend*, editChat*: WMEditors.Editor;
 		buttonSend: WMStandardComponents.Button;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			IF instance.onLine THEN
@@ -678,7 +678,7 @@ TYPE
 			END;
 		END Close;
 
-		PROCEDURE KeyEvent*(ucs: SIZE; flags: SET; keysym: SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 			IF Inputs.Release IN flags THEN RETURN END;
 			IF (keysym = 0FF0DH) & (flags * Inputs.Ctrl # {})  THEN (* Ctrl + Enter *)

@@ -55,27 +55,27 @@ TYPE
 				ignore := AL.alcCloseDevice( dev );
 			END DestroyALContext;
 
-			PROCEDURE Enable*;
+			PROCEDURE { OVERRIDE } Enable*;
 			BEGIN
 				enabled := TRUE;
 				IF playChannel # NIL THEN  playChannel.Start  END;
 			END Enable;
 
-			PROCEDURE Disable*;
+			PROCEDURE { OVERRIDE } Disable*;
 			BEGIN
 				IF playChannel # NIL THEN  playChannel.Pause  END;
 				enabled := FALSE
 			END Disable;
 
 
-			PROCEDURE GetNativeFrequency*(nr : SIGNED32) : SIGNED32;
+			PROCEDURE { OVERRIDE } GetNativeFrequency*(nr : SIGNED32) : SIGNED32;
 			BEGIN
 				RETURN 48000;
 			END GetNativeFrequency;
 
 
 
-			PROCEDURE OpenPlayChannel*(	VAR channel: SoundDevices.Channel;
+			PROCEDURE { OVERRIDE } OpenPlayChannel*(	VAR channel: SoundDevices.Channel;
 												samplingRate, samplingResolution: SIGNED32;
 												nofSubChannels, format : SIGNED32;
 											VAR res : INTEGER );
@@ -143,7 +143,7 @@ TYPE
 
 
 
-			PROCEDURE OpenRecordChannel*(	VAR channel: SoundDevices.Channel;
+			PROCEDURE { OVERRIDE } OpenRecordChannel*(	VAR channel: SoundDevices.Channel;
 													samplingRate, samplingResolution: SIGNED32;
 													 nofSubChannels, format : SIGNED32;
 												VAR res : INTEGER );
@@ -155,20 +155,20 @@ TYPE
 
 
 
-			PROCEDURE RegisterMixerChangeListener*(mixChangedProc : SoundDevices.MixerChangedProc);
+			PROCEDURE { OVERRIDE } RegisterMixerChangeListener*(mixChangedProc : SoundDevices.MixerChangedProc);
 			BEGIN {EXCLUSIVE}
 			END RegisterMixerChangeListener;
 
-			PROCEDURE UnregisterMixerChangeListener*(mixChangeProc : SoundDevices.MixerChangedProc);
+			PROCEDURE { OVERRIDE } UnregisterMixerChangeListener*(mixChangeProc : SoundDevices.MixerChangedProc);
 			BEGIN {EXCLUSIVE}
 			END UnregisterMixerChangeListener;
 
-			PROCEDURE GetMixerChannel*(channelNr : SIGNED32; VAR channel : SoundDevices.MixerChannel);
+			PROCEDURE { OVERRIDE } GetMixerChannel*(channelNr : SIGNED32; VAR channel : SoundDevices.MixerChannel);
 			BEGIN
 				channel := NIL
 			END GetMixerChannel;
 
-			PROCEDURE GetNofMixerChannels*() : SIGNED32;
+			PROCEDURE { OVERRIDE } GetNofMixerChannels*() : SIGNED32;
 			BEGIN
 				RETURN 0
 			END GetNofMixerChannels;
@@ -237,13 +237,13 @@ TYPE
 
 
 
-			PROCEDURE RegisterBufferListener*( bufferListener : SoundDevices.BufferListener );
+			PROCEDURE { OVERRIDE } RegisterBufferListener*( bufferListener : SoundDevices.BufferListener );
 			BEGIN
 				SELF.bufferListener := bufferListener
 			END RegisterBufferListener;
 
 
-			PROCEDURE QueueBuffer*( x : SoundDevices.Buffer );
+			PROCEDURE { OVERRIDE } QueueBuffer*( x : SoundDevices.Buffer );
 			VAR buffer: AL.ALuint;  alstate: AL.ALint;
 			BEGIN {EXCLUSIVE}
 				AWAIT( state = StatePlaying );
@@ -285,7 +285,7 @@ TYPE
 			END QueueBuffer;
 
 
-			PROCEDURE SetVolume*( vol : SIGNED32 );
+			PROCEDURE { OVERRIDE } SetVolume*( vol : SIGNED32 );
 			VAR gain: AL.ALfloat;
 			BEGIN
 				IF vol < 0 THEN  vol := 0
@@ -297,35 +297,35 @@ TYPE
 			END SetVolume;
 
 
-			PROCEDURE GetVolume*() : SIGNED32;
+			PROCEDURE { OVERRIDE } GetVolume*() : SIGNED32;
 			BEGIN
 				RETURN SELF.volume
 			END GetVolume;
 
-			PROCEDURE GetPosition*() : SIGNED32;
+			PROCEDURE { OVERRIDE } GetPosition*() : SIGNED32;
 			BEGIN
 				RETURN 0
 			END GetPosition;
 
-			PROCEDURE Start*;
+			PROCEDURE { OVERRIDE } Start*;
 			BEGIN {EXCLUSIVE}
 				ASSERT(state # StateClosed);
 				state := StatePlaying
 			END Start;
 
 
-			PROCEDURE Pause*;
+			PROCEDURE { OVERRIDE } Pause*;
 			BEGIN
 				state := StatePaused
 			END Pause;
 
-			PROCEDURE Stop*;
+			PROCEDURE { OVERRIDE } Stop*;
 			BEGIN
 				state := StateStoped;
 			END Stop;
 
 
-			PROCEDURE Close*;
+			PROCEDURE { OVERRIDE } Close*;
 			BEGIN
 				Stop;
 				AL.alDeleteSources( 1, ADDRESSOF( source ));

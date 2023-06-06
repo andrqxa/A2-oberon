@@ -16,7 +16,7 @@ TYPE
 
 	EventStats* = OBJECT(WMPerfMonPlugins.Plugin)
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "Events"; p.description := "Event log statistics";
@@ -39,7 +39,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		BEGIN
 			dataset[0] := Events.NnofEvents;
 			dataset[1] := Events.NnofDiscarded;

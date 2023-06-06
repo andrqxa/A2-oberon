@@ -38,7 +38,7 @@ TYPE
 		eventHandler, aclHandler : Handler;
 		status : Usbdi.Status;
 
-		PROCEDURE Connect*():BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect*():BOOLEAN;
 		VAR interruptInAdr, bulkInAdr, bulkOutAdr : SIGNED32;
 		BEGIN
 			(* get the USB pipes *)
@@ -78,7 +78,7 @@ TYPE
 			RETURN TRUE;
 		END Connect;
 
-		PROCEDURE Disconnect*;
+		PROCEDURE { OVERRIDE } Disconnect*;
 		BEGIN
 			KernelLog.String("USB Blueetooth dongle "); KernelLog.String(name); KernelLog.String(" disconnected."); KernelLog.Ln;
 		END Disconnect;

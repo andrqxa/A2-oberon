@@ -16,7 +16,7 @@ TYPE
 			filterEdit : WMEditors.Editor;
 			list* : WMSystemComponents.FileList;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrFileListPanel);
@@ -43,7 +43,7 @@ TYPE
 			filterProp.Set(Strings.NewString(str))
 		END TextChanged;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			IF data = pathProp THEN
 				list.StartNewPath(pathProp.Get())
@@ -170,7 +170,7 @@ TYPE
 			END;
 		END UpdateStatus;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;
@@ -186,7 +186,7 @@ TYPE
 			flistPanel.list.ToggleProps;
 		END TogglePropsHandler;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 			ELSIF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS WMRestorable.Storage) THEN

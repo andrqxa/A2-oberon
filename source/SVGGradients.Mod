@@ -139,7 +139,7 @@ TYPE
 		END CopyLinear;
 
 		(* Get the color at some offset *)
-		PROCEDURE GetFromPoint*(p: SVG.Coordinate): Raster.Pixel;
+		PROCEDURE { OVERRIDE } GetFromPoint*(p: SVG.Coordinate): Raster.Pixel;
 		VAR offset, len: SVG.Length;
 			u, v, n: SVG.Coordinate;
 		BEGIN
@@ -169,7 +169,7 @@ TYPE
 		END CopyRadial;
 
 		(* Get the color at some offset *)
-		PROCEDURE GetFromPoint*(p: SVG.Coordinate): Raster.Pixel;
+		PROCEDURE { OVERRIDE } GetFromPoint*(p: SVG.Coordinate): Raster.Pixel;
 		VAR offset, ul2, discr, t1, t2: SVG.Length;
 			u, v, u2 : SVG.Coordinate;
 		BEGIN

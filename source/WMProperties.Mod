@@ -312,7 +312,7 @@ TYPE
 	VAR
 		value : BOOLEAN;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR token : ARRAY 5 OF CHAR; v : BOOLEAN;
 		BEGIN
 			AcquireWrite;
@@ -322,14 +322,14 @@ TYPE
 			ReleaseWrite
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			IF Get() THEN w.String("true") ELSE w.String("false") END;
 			ReleaseRead
 		END ToStream;
 
-		PROCEDURE UpdateProperty;
+		PROCEDURE { OVERRIDE } UpdateProperty;
 		VAR boolean: Types.Boolean; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
@@ -338,7 +338,7 @@ TYPE
 			END;
 		END UpdateProperty;
 
-		PROCEDURE UpdateModel;
+		PROCEDURE { OVERRIDE } UpdateModel;
 		VAR type: Types.Boolean; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
@@ -380,7 +380,7 @@ TYPE
 			ReleaseWrite
 		END SetPassive;
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR en : XMLObjects.Enumerator; p : ANY; s : String;
 		BEGIN
 			en := xml.GetContents();
@@ -396,7 +396,7 @@ TYPE
 			END;
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR chars: XML.ArrayChars; s: String;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -408,7 +408,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -455,7 +455,7 @@ TYPE
 			RETURN int
 		END SetToInt;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR token : ARRAY 10 OF CHAR; v : SET; i:SIGNED32; res: INTEGER;
 		BEGIN
 			AcquireWrite;
@@ -470,7 +470,7 @@ TYPE
 
 
 (*! to discuss: should a SET be written explicitely ? readability  vs overhead*)
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		VAR s:ARRAY 10 OF CHAR;
 		BEGIN
 			AcquireRead;
@@ -480,7 +480,7 @@ TYPE
 			ReleaseRead
 		END ToStream;
 
-		PROCEDURE UpdateProperty;
+		PROCEDURE { OVERRIDE } UpdateProperty;
 		VAR boolean: Types.Set; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
@@ -489,7 +489,7 @@ TYPE
 			END;
 		END UpdateProperty;
 
-		PROCEDURE UpdateModel;
+		PROCEDURE { OVERRIDE } UpdateModel;
 		VAR type: Types.Set; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
@@ -535,7 +535,7 @@ TYPE
 
 
 (*! to discuss: should a SET be written explicitely - readability at cost of overhead*)
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR en : XMLObjects.Enumerator; p : ANY; s : String; i:SIGNED32;
 		BEGIN
 			en := xml.GetContents();
@@ -552,7 +552,7 @@ TYPE
 			END
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR chars: XML.ArrayChars;s: ARRAY 10 OF CHAR;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -565,7 +565,7 @@ TYPE
 		END ToXML;
 
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; s: ARRAY 10 OF CHAR;
 		BEGIN
 			name := GetName();
@@ -592,7 +592,7 @@ TYPE
 		min, max : SIGNED32;
 		bounded : BOOLEAN;
 
-		PROCEDURE UpdateProperty;
+		PROCEDURE { OVERRIDE } UpdateProperty;
 		VAR integer: Types.Integer; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
@@ -601,7 +601,7 @@ TYPE
 			END;
 		END UpdateProperty;
 
-		PROCEDURE UpdateModel;
+		PROCEDURE { OVERRIDE } UpdateModel;
 		VAR type: Types.Integer; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
@@ -656,7 +656,7 @@ TYPE
 			END
 		END Validate;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR v : SIGNED32;
 		BEGIN
 			AcquireWrite;
@@ -665,7 +665,7 @@ TYPE
 			ReleaseWrite
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			w.Int(value, 0);
@@ -713,7 +713,7 @@ TYPE
 		END SetPassive;
 
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR
 			en : XMLObjects.Enumerator;
 			p : ANY;
@@ -738,7 +738,7 @@ TYPE
 			ReleaseWrite
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR chars: XML.ArrayChars;s: ARRAY 20 OF CHAR;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -748,7 +748,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -773,7 +773,7 @@ TYPE
 		min, max : SIGNED64;
 		bounded : BOOLEAN;
 
-		PROCEDURE UpdateProperty;
+		PROCEDURE { OVERRIDE } UpdateProperty;
 		VAR integer: Types.Hugeint; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
@@ -782,7 +782,7 @@ TYPE
 			END;
 		END UpdateProperty;
 
-		PROCEDURE UpdateModel;
+		PROCEDURE { OVERRIDE } UpdateModel;
 		VAR type: Types.Hugeint; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
@@ -837,7 +837,7 @@ TYPE
 			END
 		END Validate;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR v : SIGNED64;
 		BEGIN
 			AcquireWrite;
@@ -846,7 +846,7 @@ TYPE
 			ReleaseWrite
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			w.Int(value, 0);
@@ -894,7 +894,7 @@ TYPE
 		END SetPassive;
 
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR
 			en : XMLObjects.Enumerator;
 			p : ANY;
@@ -919,7 +919,7 @@ TYPE
 			ReleaseWrite
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR chars: XML.ArrayChars;s: ARRAY 20 OF CHAR;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -929,7 +929,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -953,7 +953,7 @@ TYPE
 		min, max : SIZE;
 		bounded : BOOLEAN;
 
-		PROCEDURE UpdateProperty;
+		PROCEDURE { OVERRIDE } UpdateProperty;
 		VAR integer: Types.Size; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
@@ -962,7 +962,7 @@ TYPE
 			END;
 		END UpdateProperty;
 
-		PROCEDURE UpdateModel;
+		PROCEDURE { OVERRIDE } UpdateModel;
 		VAR type: Types.Size; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
@@ -1017,7 +1017,7 @@ TYPE
 			END
 		END Validate;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR v : SIGNED64;
 		BEGIN
 			AcquireWrite;
@@ -1026,7 +1026,7 @@ TYPE
 			ReleaseWrite
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			w.Int(value, 0);
@@ -1074,7 +1074,7 @@ TYPE
 		END SetPassive;
 
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR
 			en : XMLObjects.Enumerator;
 			p : ANY;
@@ -1099,7 +1099,7 @@ TYPE
 			ReleaseWrite
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR chars: XML.ArrayChars;s: ARRAY 20 OF CHAR;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -1109,7 +1109,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -1183,7 +1183,7 @@ TYPE
 			RETURN result;
 		END Validate;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR temp : ARRAY 64 OF CHAR; value : FLOAT64;
 		BEGIN
 			r.String(temp);
@@ -1192,14 +1192,14 @@ TYPE
 			Set(value);
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			w.Float(value, 24);
 			ReleaseRead
 		END ToStream;
 
-		PROCEDURE UpdateProperty;
+		PROCEDURE { OVERRIDE } UpdateProperty;
 		VAR longreal: Types.Longreal; model: Models.Model; res: INTEGER; silent: BOOLEAN;
 		BEGIN
 			IF GetModel(object, model) THEN
@@ -1208,7 +1208,7 @@ TYPE
 			END;
 		END UpdateProperty;
 
-		PROCEDURE UpdateModel;
+		PROCEDURE { OVERRIDE } UpdateModel;
 		VAR type: Types.Longreal; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
@@ -1257,7 +1257,7 @@ TYPE
 			ReleaseWrite
 		END SetPassive;
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR
 			en : XMLObjects.Enumerator;
 			p : ANY;
@@ -1282,7 +1282,7 @@ TYPE
 			ReleaseWrite
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR chars: XML.ArrayChars;s: ARRAY 20 OF CHAR; w: Streams.StringWriter;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -1294,7 +1294,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -1320,7 +1320,7 @@ TYPE
 		languages : Localization.Languages;
 		translate : BOOLEAN;
 
-		PROCEDURE &New*(prototype : Property; name, info : String);
+		PROCEDURE (* OVERRIDE *) & New*(prototype : Property; name, info : String);
 		BEGIN
 			New^(prototype, name, info);
 			value := NIL; word := NIL;
@@ -1371,7 +1371,7 @@ TYPE
 			ReleaseWrite;
 		END SetLanguage;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR buffer : ARRAY 1024 OF CHAR; res : INTEGER;
 		BEGIN
 			AcquireWrite;
@@ -1380,7 +1380,7 @@ TYPE
 			ReleaseWrite
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			IF (dictionary # NIL) & (word # NIL) THEN
@@ -1402,7 +1402,7 @@ TYPE
 			RETURN r
 		END Get;
 
-		PROCEDURE UpdateModel;
+		PROCEDURE { OVERRIDE } UpdateModel;
 		VAR type: Types.String; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
@@ -1438,7 +1438,7 @@ TYPE
 			ReleaseWrite
 		END SetPassive;
 
-		PROCEDURE UpdateProperty;
+		PROCEDURE { OVERRIDE } UpdateProperty;
 		VAR type: Types.String; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
@@ -1466,7 +1466,7 @@ TYPE
 			ReleaseWrite;
 		END SetAOC;
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR en : XMLObjects.Enumerator; p : ANY;
 		BEGIN
 			en := xml.GetContents();
@@ -1481,7 +1481,7 @@ TYPE
 			END
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR chars: XML.ArrayChars;s: String; w: Streams.StringWriter; res: INTEGER; len: SIZE;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -1508,7 +1508,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; res : INTEGER;
 		BEGIN
 			name := GetName();
@@ -1546,7 +1546,7 @@ TYPE
 		value : WMGraphics.Color;
 
 		(* TODO: read hex from CCG FontConverter *)
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR v : SIGNED32;
 		BEGIN
 			AcquireWrite;
@@ -1555,14 +1555,14 @@ TYPE
 			ReleaseWrite
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			w.Hex(value, -8);
 			ReleaseRead
 		END ToStream;
 
-		PROCEDURE UpdateProperty;
+		PROCEDURE { OVERRIDE } UpdateProperty;
 		VAR boolean: Types.Integer; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
@@ -1571,7 +1571,7 @@ TYPE
 			END;
 		END UpdateProperty;
 
-		PROCEDURE UpdateModel;
+		PROCEDURE { OVERRIDE } UpdateModel;
 		VAR type: Types.Integer; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
@@ -1615,7 +1615,7 @@ TYPE
 		END SetPassive;
 
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR
 			en : XMLObjects.Enumerator;
 			p : ANY;
@@ -1635,7 +1635,7 @@ TYPE
 			ReleaseWrite
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR chars: XML.ArrayChars;s: String; w: Streams.StringWriter; res: INTEGER;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -1649,7 +1649,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -1672,13 +1672,13 @@ TYPE
 	VAR
 		font : WMGraphics.Font; (* { font # NIL } *)
 
-		PROCEDURE &New*(prototype : Property; name, info : String);
+		PROCEDURE (* OVERRIDE *) & New*(prototype : Property; name, info : String);
 		BEGIN
 			New^(prototype, name, info);
 			font := WMGraphics.GetDefaultFont();
 		END New;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR font : WMGraphics.Font; name, temp : ARRAY 32 OF CHAR; size : SIGNED32; style : SET;
 		BEGIN
 			AcquireWrite;
@@ -1694,7 +1694,7 @@ TYPE
 			ReleaseWrite
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		VAR font : WMGraphics.Font; temp : ARRAY 32 OF CHAR;
 		BEGIN
 			AcquireRead;
@@ -1835,7 +1835,7 @@ TYPE
 			RETURN font.style;
 		END GetSyle;
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR s : String; name : ARRAY 32 OF CHAR; size : SIGNED32; style : SET;
 		BEGIN
 			s := xml.GetAttributeValue("name");
@@ -1847,7 +1847,7 @@ TYPE
 			SetFont(name, size, style);
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR s: ARRAY 32 OF CHAR;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -1861,7 +1861,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; font : WMGraphics.Font; temp : ARRAY 32 OF CHAR;
 		BEGIN
 			name := GetName();
@@ -1886,7 +1886,7 @@ TYPE
 	VAR
 		value : WMGraphics.Point2d;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR new : WMGraphics.Point2d;
 		BEGIN
 			AcquireWrite;
@@ -1900,7 +1900,7 @@ TYPE
 			ReleaseWrite
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			w.Int(value.x, 0); w.Char(" ");
@@ -1983,7 +1983,7 @@ TYPE
 			RETURN value.y
 		END GetY;
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR en : XMLObjects.Enumerator; p : ANY; s: String;
 		BEGIN
 			AcquireWrite;
@@ -2005,7 +2005,7 @@ TYPE
 			ReleaseWrite
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR cs: ARRAY 10 OF CHAR; sub: XML.Element; t: WMGraphics.Point2d;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -2019,7 +2019,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; t : WMGraphics.Point2d;
 		BEGIN
 			name := GetName();
@@ -2043,7 +2043,7 @@ TYPE
 	VAR
 		value : WMRectangles.Rectangle;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR new : WMRectangles.Rectangle; v: SIGNED32;
 		BEGIN
 			AcquireWrite;
@@ -2059,7 +2059,7 @@ TYPE
 			ReleaseWrite
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			w.Int(value.l, 0); w.Char(" "); w.Int(value.t, 0); w.Char(" ");
@@ -2202,7 +2202,7 @@ TYPE
 			height := r.b - r.t;
 		END GetExtents;
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR en : XMLObjects.Enumerator; p : ANY; s: String;
 		BEGIN
 			AcquireWrite;
@@ -2229,7 +2229,7 @@ TYPE
 		END FromXML;
 
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR cs: ARRAY 10 OF CHAR; sub: XML.Element; t: WMRectangles.Rectangle;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -2247,7 +2247,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; t : WMRectangles.Rectangle;
 		BEGIN
 			name := GetName();
@@ -2285,7 +2285,7 @@ TYPE
 			New(prototype, name, info);
 		END NewRef;
 
-		PROCEDURE FromStream*(r : Streams.Reader);
+		PROCEDURE { OVERRIDE } FromStream*(r : Streams.Reader);
 		VAR
 			fullname, repositoryName : ARRAY 256 OF CHAR; componentName : ARRAY 128 OF CHAR;
 			writer : Streams.Writer; buffer : Streams.Buffer; ch : CHAR;
@@ -2320,7 +2320,7 @@ TYPE
 			END;
 		END FromStream;
 
-		PROCEDURE ToStream*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } ToStream*(w : Streams.Writer);
 		BEGIN
 			AcquireRead;
 			IF (generator # NIL) THEN
@@ -2379,7 +2379,7 @@ TYPE
 			ReleaseWrite
 		END SetPassive;
 
-	PROCEDURE LinkChanged(sender, object: ANY);
+	PROCEDURE { OVERRIDE } LinkChanged(sender, object: ANY);
 		BEGIN
 			IF (list # NIL) THEN list.onLinkChanged.CallWithSender(SELF,object) END;
 		END LinkChanged;
@@ -2394,7 +2394,7 @@ TYPE
 			GetLinkAsString(string)
 		END GetAsString;
 
-		PROCEDURE Reset*;
+		PROCEDURE { OVERRIDE } Reset*;
 		BEGIN
 			AcquireWrite;
 			ReplaceLink(NIL);
@@ -2405,7 +2405,7 @@ TYPE
 			ReleaseWrite;
 		END Reset;
 
-		PROCEDURE FromXML*(xml : XML.Element);
+		PROCEDURE { OVERRIDE } FromXML*(xml : XML.Element);
 		VAR en : XMLObjects.Enumerator; p : ANY; s : String;
 		BEGIN
 			ReplaceLink(NIL);
@@ -2428,7 +2428,7 @@ TYPE
 			END
 		END FromXML;
 
-		PROCEDURE ToXML*(VAR element: XML.Element);
+		PROCEDURE { OVERRIDE } ToXML*(VAR element: XML.Element);
 		VAR cs: ARRAY 10 OF CHAR; sub: XML.Element; t: WMRectangles.Rectangle;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
@@ -2438,7 +2438,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
+		PROCEDURE { OVERRIDE } WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
 		VAR name : String; id: SIZE; res: INTEGER; repository: Repositories.Repository; objectName: String;
 		BEGIN
 			name := GetName();
@@ -2461,7 +2461,7 @@ TYPE
 			END
 		END WriteXML;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			AcquireWrite;
 			ReplaceLink(NIL);

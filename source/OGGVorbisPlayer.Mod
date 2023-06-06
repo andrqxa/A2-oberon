@@ -950,7 +950,7 @@ TYPE
 		END Init;
 
 		(** print to the logfile *)
-		PROCEDURE Print;
+		PROCEDURE { OVERRIDE } Print;
 		VAR i: SIGNED32;
 		BEGIN
 			OGGUtilities.String("### FloorType1 ###");
@@ -972,7 +972,7 @@ TYPE
 			OGGUtilities.String("### END (FloorType1) ###"); OGGUtilities.String("")
 		END Print;
 
-		PROCEDURE ComputeCurve(VAR decState: DecoderState; ch: SIGNED32);
+		PROCEDURE { OVERRIDE } ComputeCurve(VAR decState: DecoderState; ch: SIGNED32);
 		VAR
 			i: SIGNED32;
 			range, lowNeighborOff, highNeighborOff, predicted, val, highroom, lowroom, room: SIGNED32; (* step 1 variables *)
@@ -1054,7 +1054,7 @@ TYPE
 			END;
 		END ComputeCurve;
 
-		PROCEDURE DecodePacket(VAR bufReader: BufferReader; VAR buf: ARRAY OF CHAR; VAR decState: DecoderState): SIGNED32;
+		PROCEDURE { OVERRIDE } DecodePacket(VAR bufReader: BufferReader; VAR buf: ARRAY OF CHAR; VAR decState: DecoderState): SIGNED32;
 		VAR
 			range, book, i, j, class, cdim, cbits, csub, cval, offset, nonzero: SIGNED32;
 			codebook: Codebook;
@@ -1107,7 +1107,7 @@ TYPE
 		END DecodePacket;
 
 		(* decode floor1-description from codec setup header *)
-		PROCEDURE DecodeHeader(VAR bufReader: BufferReader; VAR buf: ARRAY OF CHAR;
+		PROCEDURE { OVERRIDE } DecodeHeader(VAR bufReader: BufferReader; VAR buf: ARRAY OF CHAR;
 										VAR info: Info; VAR codec: CodecSetup): BOOLEAN;
 		VAR i, j, k: SIGNED32;
 		BEGIN
@@ -1858,7 +1858,7 @@ TYPE
 			vendorString*: ARRAY MaxVendorLength OF CHAR;
 			(* other comment fields are already defined in OGGUtilities.List *)
 
-		PROCEDURE Print*;
+		PROCEDURE { OVERRIDE } Print*;
 		VAR cur: CommentListElement;
 		BEGIN
 			IF cur = NIL THEN
@@ -2319,7 +2319,7 @@ TYPE
 			writer: Files.Writer;
 			frameCnt: SIGNED32;
 
-		PROCEDURE &Init*(nrOfBuffers, volume: SIGNED32);
+		PROCEDURE (* OVERRIDE *) & Init*(nrOfBuffers, volume: SIGNED32);
 		BEGIN
 			filenameSet := FALSE;
 			file := NIL;
@@ -2333,7 +2333,7 @@ TYPE
 			filenameSet := TRUE
 		END SetFilename;
 
-		PROCEDURE CloseSoundChannel*;
+		PROCEDURE { OVERRIDE } CloseSoundChannel*;
 		BEGIN
 			(* close file *)
 			IF file # NIL THEN
@@ -2342,7 +2342,7 @@ TYPE
 			END
 		END CloseSoundChannel;
 
-		PROCEDURE InitSoundChannel*(localNrOfChannels, samplingRate, localSamplingResolution: SIGNED32);
+		PROCEDURE { OVERRIDE } InitSoundChannel*(localNrOfChannels, samplingRate, localSamplingResolution: SIGNED32);
 		BEGIN
 			nrOfChannels := localNrOfChannels;
 			samplingResolution := localSamplingResolution;
@@ -2355,7 +2355,7 @@ TYPE
 			initSoundChannelDone := TRUE
 		END InitSoundChannel;
 
-		PROCEDURE Output*(VAR input: ARRAY OF OGGUtilities.PCMBuffer; nrOfSamples: SIGNED32);
+		PROCEDURE { OVERRIDE } Output*(VAR input: ARRAY OF OGGUtilities.PCMBuffer; nrOfSamples: SIGNED32);
 			VAR i, ch, current: SIGNED32;
 		BEGIN
 			INC(frameCnt);

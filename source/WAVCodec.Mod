@@ -32,7 +32,7 @@ TYPE
 		out: Streams.Writer;
 		h: WaveHeader;
 
-		PROCEDURE Open*(out: Streams.Writer; sRate, sRes, nofCh: SIGNED32; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(out: Streams.Writer; sRate, sRes, nofCh: SIGNED32; VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			IF out = NIL THEN
@@ -84,7 +84,7 @@ TYPE
 			res := 0
 		END Open;
 
-		PROCEDURE Write*(buffer : SoundDevices.Buffer; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Write*(buffer : SoundDevices.Buffer; VAR res : INTEGER);
 		BEGIN
 			out.Bytes(buffer.data^, 0, buffer.len);
 			out.Update
@@ -98,7 +98,7 @@ TYPE
 		h: WaveHeader;
 		hasMoreBytes : BOOLEAN;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR len: SIGNED32; inLen: SIZE; c: CHAR;
 		BEGIN
 			res := -1; inLen := 0;
@@ -173,12 +173,12 @@ TYPE
 			res := 0
 		END Open;
 
-		PROCEDURE HasMoreData*():BOOLEAN;
+		PROCEDURE { OVERRIDE } HasMoreData*():BOOLEAN;
 		BEGIN
 			RETURN hasMoreBytes
 		END HasMoreData;
 
-		PROCEDURE GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample : SIGNED32);
+		PROCEDURE { OVERRIDE } GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample : SIGNED32);
 		BEGIN
 			nofChannels := h.nofCh;
 			bitsPerSample := h.bitsPerSample;
@@ -198,35 +198,35 @@ TYPE
 			KernelLog.String("h.dataSize= "); KernelLog.Int(h.dataSize, 0)
 		END DumpHeader;
 
-		PROCEDURE CanSeek*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSeek*() : BOOLEAN;
 		BEGIN
 			KernelLog.String("Not Implemented");
 			RETURN FALSE;
 		END CanSeek;
 
-		PROCEDURE GetCurrentSample*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetCurrentSample*() : SIGNED32;
 		BEGIN
 			RETURN ENTIER((in.Pos() - (h.fileSize - h.dataSize)) / h.bRate * h.sRate)
 		END GetCurrentSample;
 
-		PROCEDURE GetTotalSamples*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetTotalSamples*() : SIGNED32;
 		BEGIN
 			RETURN ENTIER(h.dataSize / h.bRate * h.sRate)
 		END GetTotalSamples;
 
 		(* Returns the current time in 1/10 sec *)
-		PROCEDURE GetCurrentTime*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetCurrentTime*() : SIGNED32;
 		BEGIN
 			RETURN ENTIER((in.Pos() - (h.fileSize - h.dataSize)) / h.bRate * 10)
 		END GetCurrentTime;
 
-		PROCEDURE SetStreamLength*(length : SIGNED32);
+		PROCEDURE { OVERRIDE } SetStreamLength*(length : SIGNED32);
 		BEGIN
 			h.fileSize := length-8;
 			h.dataSize := length-SIZEOF(WaveHeader);
 		END SetStreamLength;
 
-		PROCEDURE SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		VAR seekType: SIGNED32;
 		BEGIN
 			seekType := Codecs.SeekByte;
@@ -234,16 +234,16 @@ TYPE
 			in.SetPos(h.fileSize - h.dataSize + ENTIER(sample / h.sRate * h.bRate))
 		END SeekSample;
 
-		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		BEGIN
 			SeekSample(ENTIER(millisecond / 1000 * h.sRate), goKeySample, res)
 		END SeekMillisecond;
 
 		(** Prepare the next audio bytes not yet filled into a buffer *)
-		PROCEDURE Next*;
+		PROCEDURE { OVERRIDE } Next*;
 		END Next;
 
-		PROCEDURE FillBuffer*(buffer : SoundDevices.Buffer);
+		PROCEDURE { OVERRIDE } FillBuffer*(buffer : SoundDevices.Buffer);
 		BEGIN
 			in.Bytes(buffer.data^, 0, LEN(buffer.data^), buffer.len);
 			IF (in.res = Streams.EOF) OR (buffer.len < LEN(buffer.data)) THEN
@@ -260,7 +260,7 @@ TYPE
 		h : WaveHeader;
 		hasMoreBytes : BOOLEAN;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			IF in = NIL THEN
@@ -273,19 +273,19 @@ TYPE
 			res := 0
 		END Open;
 
-		PROCEDURE HasMoreData*():BOOLEAN;
+		PROCEDURE { OVERRIDE } HasMoreData*():BOOLEAN;
 		BEGIN
 			RETURN hasMoreBytes
 		END HasMoreData;
 
-		PROCEDURE GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample : SIGNED32);
+		PROCEDURE { OVERRIDE } GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample : SIGNED32);
 		BEGIN
 			nofChannels := h.nofCh;
 			bitsPerSample := h.bitsPerSample;
 			samplesPerSecond := h.sRate
 		END GetAudioInfo;
 
-		PROCEDURE SetAudioInfo*(nofChannels, samplesPerSecond, bitsPerSample : SIGNED32);
+		PROCEDURE { OVERRIDE } SetAudioInfo*(nofChannels, samplesPerSecond, bitsPerSample : SIGNED32);
 		BEGIN
 			h.nofCh := SHORT(nofChannels);
 			h.bitsPerSample := SHORT(bitsPerSample);
@@ -295,38 +295,38 @@ TYPE
 			h.blockAlign := h.nofCh * h.bitsPerSample DIV 8
 		END SetAudioInfo;
 
-		PROCEDURE CanSeek*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSeek*() : BOOLEAN;
 		BEGIN
 			KernelLog.String("Not Implemented");
 			RETURN FALSE;
 		END CanSeek;
 
-		PROCEDURE GetCurrentSample*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetCurrentSample*() : SIGNED32;
 		BEGIN
 			KernelLog.String("pi= ");
 			RETURN ENTIER(8 * in.Pos() / h.bitsPerSample / h.nofCh)
 		END GetCurrentSample;
 
-		PROCEDURE GetTotalSamples*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetTotalSamples*() : SIGNED32;
 		BEGIN
 			KernelLog.String("pa= ");
 			RETURN ENTIER(8 * h.dataSize / h.bitsPerSample / h.nofCh)
 		END GetTotalSamples;
 
 		(* Returns the current time in 1/10 sec *)
-		PROCEDURE GetCurrentTime*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetCurrentTime*() : SIGNED32;
 		BEGIN
 			KernelLog.String("po= ");
 			RETURN ENTIER(8 * in.Pos() / h.bitsPerSample / h.nofCh / h.sRate * 10)
 		END GetCurrentTime;
 
-		PROCEDURE SetStreamLength*(length : SIGNED32);
+		PROCEDURE { OVERRIDE } SetStreamLength*(length : SIGNED32);
 		BEGIN
 			h.fileSize := length+SIZEOF(WaveHeader)-8;
 			h.dataSize := length
 		END SetStreamLength;
 
-		PROCEDURE SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		VAR seekType: SIGNED32;
 		BEGIN
 			KernelLog.String("pu= "); KernelLog.Int(sample, 0);
@@ -336,16 +336,16 @@ TYPE
 			in.SetPos(ENTIER(sample * h.bitsPerSample / 8 * h.nofCh))
 		END SeekSample;
 
-		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		BEGIN
 			SeekSample(ENTIER(millisecond / 1000 * h.sRate), goKeySample, res)
 		END SeekMillisecond;
 
 		(** Prepare the next audio bytes not yet filled into a buffer *)
-		PROCEDURE Next*;
+		PROCEDURE { OVERRIDE } Next*;
 		END Next;
 
-		PROCEDURE FillBuffer*(buffer : SoundDevices.Buffer);
+		PROCEDURE { OVERRIDE } FillBuffer*(buffer : SoundDevices.Buffer);
 		BEGIN
 			in.Bytes(buffer.data^, 0, LEN(buffer.data^), buffer.len);
 			IF (in.res = Streams.EOF) OR (buffer.len < LEN(buffer.data)) THEN

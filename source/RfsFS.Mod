@@ -34,7 +34,7 @@ TYPE
 		VAR stubs: RfsClientProxy.Proxy;
 
 		(** Creates a new file with the specified name **)
-		PROCEDURE New0*(CONST name: ARRAY OF CHAR): Files.File;
+		PROCEDURE { OVERRIDE } New0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR
 			res: INTEGER;
 			f: File;
@@ -81,7 +81,7 @@ TYPE
 		END New0;
 
 		(** opens an existing File **)
-		PROCEDURE Old0*(CONST name: ARRAY OF CHAR): Files.File;
+		PROCEDURE { OVERRIDE } Old0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR
 			res: INTEGER;
 			f: File;
@@ -135,7 +135,7 @@ TYPE
 		END Old0;
 
 		(** deletes a file, res = 0 indicates succsess **)
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
 		VAR namebuf: FileName; errorcode: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			Check(name, namebuf, res);
@@ -164,7 +164,7 @@ TYPE
 		END Delete0;
 
 		(** renames a file. res = 0 indicates success **)
-		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
 		VAR oldbuf, newbuf: FileName; errorcode: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			Check(old, oldbuf, res);
@@ -195,7 +195,7 @@ TYPE
 		END Rename0;
 
 		(** enumerates the contents of a directory **)
-		PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
+		PROCEDURE { OVERRIDE } Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
 		VAR fnTmp, fn: ARRAY Files.PrefixLength+FnLength OF CHAR; dir: RfsClientProxy.Dir;
 				errorcode, cookie, endOfDir, helper, time, date, size, detail: SIGNED32;
 		BEGIN {EXCLUSIVE}
@@ -233,7 +233,7 @@ TYPE
 		END Enumerate0;
 
 		(** return an unique id for a file registered in the filesystem **)
-		PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
+		PROCEDURE { OVERRIDE } FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
 			VAR
 				res: INTEGER;
 				namebuf: FileName;
@@ -262,7 +262,7 @@ TYPE
 			SELF.stubs := vol;
 		END RfsInit;
 
-		PROCEDURE Finalize;
+		PROCEDURE { OVERRIDE } Finalize;
 			VAR errorcode: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			stubs.Unmount(errorcode);
@@ -282,7 +282,7 @@ TYPE
 			time, date: SIGNED32;
 
 		(** positions a rider on a file at a given position. Riders cannot be positioned past the end of a file **)
-		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
+		PROCEDURE { OVERRIDE } Set*(VAR r: Files.Rider; pos: Files.Position);
 		VAR a, b: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			r.eof := FALSE;
@@ -311,7 +311,7 @@ TYPE
 		END Set;
 
 		(** return the current position of a rider **)
-		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
+		PROCEDURE { OVERRIDE } Pos*(VAR r: Files.Rider): Files.Position;
 		BEGIN
 			IF Trace = 1 THEN
 				KernelLog.Enter;
@@ -324,7 +324,7 @@ TYPE
 		END Pos;
 
 		(** reads one byte from a file **)
-		PROCEDURE Read*(VAR r: Files.Rider; VAR x: CHAR);
+		PROCEDURE { OVERRIDE } Read*(VAR r: Files.Rider; VAR x: CHAR);
 		VAR buf: Buffer; errorcode: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			buf := r.hint(Buffer);
@@ -367,7 +367,7 @@ TYPE
 		END Read;
 
 		(** read len bytes from a file. **)
-		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE { OVERRIDE } ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR src, dst: ADDRESS; m: SIZE; errorcode: SIGNED32; buf: Buffer;
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN
@@ -440,7 +440,7 @@ TYPE
 		END ReadBytes;
 
 		(** writes one byte into a file **)
-		PROCEDURE Write*(VAR r: Files.Rider; x: CHAR);
+		PROCEDURE { OVERRIDE } Write*(VAR r: Files.Rider; x: CHAR);
 		VAR buf: Buffer; errorcode: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			buf := r.hint(Buffer);
@@ -487,7 +487,7 @@ TYPE
 		END Write;
 
 		(** write len bytes into a file **)
-		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE { OVERRIDE } WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR src, dst: ADDRESS; m: SIZE; errorcode: SIGNED32; buf: Buffer;
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN
@@ -564,7 +564,7 @@ TYPE
 		END WriteBytes;
 
 		(** return the lenght of a file **)
-		PROCEDURE Length*(): Files.Size;
+		PROCEDURE { OVERRIDE } Length*(): Files.Size;
 		BEGIN {EXCLUSIVE}
 			IF Trace = 1 THEN
 				KernelLog.Enter;
@@ -577,7 +577,7 @@ TYPE
 		END Length;
 
 		(** returns the last modified of a file **)
-		PROCEDURE GetDate*(VAR t, d: SIGNED32);
+		PROCEDURE { OVERRIDE } GetDate*(VAR t, d: SIGNED32);
 		BEGIN {EXCLUSIVE}
 			t := time;
 			d := date;
@@ -594,7 +594,7 @@ TYPE
 		END GetDate;
 
 		(** sets the write-timestamp of file **)
-		PROCEDURE SetDate*(t, d: SIGNED32);
+		PROCEDURE { OVERRIDE } SetDate*(t, d: SIGNED32);
 			VAR errorcode: SIGNED32; fsCasted: FileSystem;
 		BEGIN {EXCLUSIVE}
 			time := t;
@@ -613,7 +613,7 @@ TYPE
 		END SetDate;
 
 		(** return the name of a file **)
-		PROCEDURE GetName*(VAR name: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetName*(VAR name: ARRAY OF CHAR);
 		BEGIN {EXCLUSIVE}
 			Files.JoinName(fs.prefix, SELF.name, name);
 
@@ -626,7 +626,7 @@ TYPE
 		END GetName;
 
 		(** registers a file in the filesystem **)
-		PROCEDURE Register0*(VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Register0*(VAR res: INTEGER);
 		VAR
 			buf: Buffer;
 			errorcode: SIGNED32;
@@ -659,7 +659,7 @@ TYPE
 		END Register0;
 
 
-		PROCEDURE Update*;
+		PROCEDURE { OVERRIDE } Update*;
 			VAR buf: Buffer; errorcode: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			buf := firstbuf;

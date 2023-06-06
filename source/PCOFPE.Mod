@@ -135,12 +135,12 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 				END
 			END Receive;
 
-			PROCEDURE Pos*(): Streams.Position;
+			PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 			BEGIN
 				RETURN org + Pos^()
 			END Pos;
 
-			PROCEDURE SetPos*(ofs: Streams.Position);
+			PROCEDURE { OVERRIDE } SetPos*(ofs: Streams.Position);
 			BEGIN
 				Reset();
 				SELF.org := SIZE(ofs); SELF.ofs := SIZE(ofs)
@@ -165,12 +165,12 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 				IF SELF.ofs > sect.used THEN sect.used := SELF.ofs END
 			END Send;
 
-			PROCEDURE Pos*(): Streams.Position;
+			PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 			BEGIN
 				RETURN org + Pos^()
 			END Pos;
 
-			PROCEDURE SetPos*(ofs: Streams.Position);
+			PROCEDURE { OVERRIDE } SetPos*(ofs: Streams.Position);
 			BEGIN
 				Update(); Reset();
 				SELF.org := ofs(SIGNED32); SELF.ofs := ofs(SIGNED32);

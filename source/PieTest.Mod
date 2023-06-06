@@ -60,13 +60,13 @@ TYPE
 			RETURN panel
 		END CreateForm;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
 		END Close;
 
-		PROCEDURE Handle *(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle *(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 			ELSE Handle^ (x)
@@ -80,14 +80,14 @@ TYPE
 	VAR
 
 		(* overwrite PointerDown method *)
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF keys * {0, 1, 2} = {2} THEN 					(* right mouse button pressed *)
 				ShowContextMenu(x, y);
 			END
 		END PointerDown;
 
-		PROCEDURE ShowContextMenu*(x, y :  SIZE);
+		PROCEDURE { OVERRIDE } ShowContextMenu*(x, y :  SIZE);
 		VAR bimbo : WMPieMenu.Menu;
 			manager : WM.WindowManager;
 			window : WM.Window;

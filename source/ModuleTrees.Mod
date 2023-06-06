@@ -89,7 +89,7 @@ TYPE
 		diagnostics : Diagnostics.StreamDiagnostics;
 		writer : Streams.Writer;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			showPublicOnly := FALSE;
@@ -138,7 +138,7 @@ TYPE
 			toolbar.AddContent(publicBtn);
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		BEGIN
 			IF (data = showTypeHierarchy) THEN
 				RefreshHandler(NIL, NIL);

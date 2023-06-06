@@ -40,13 +40,13 @@ TYPE
 			Init(width, height, alpha);
 		END InitWindow;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
 		END Close;
 
-		PROCEDURE Handle*(VAR m : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m : WMMessages.Message);
 		VAR data: XML.Element;
 		BEGIN
 			IF (m.msgType = WMMessages.MsgExt) & (m.ext # NIL) THEN
@@ -60,7 +60,7 @@ TYPE
 			END;
 		END Handle;
 
-		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y:SIZE; keys:SET);
 		BEGIN
 			lastX := bounds.l + x; lastY:=bounds.t + y;
 			IF (keys = {0}) & (FlagMoveable IN flags) THEN
@@ -71,7 +71,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x,y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x,y:SIZE; keys:SET);
 		VAR dx, dy : SIZE;
 		BEGIN
 			IF dragging THEN
@@ -83,7 +83,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y:SIZE; keys:SET);
 		BEGIN
 			dragging := FALSE;
 			PointerDown^(x,y,keys);

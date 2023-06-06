@@ -33,18 +33,18 @@ TYPE
 	VAR in: antsArrayObjects.tINTEGERObject;
 		out: vyRealVec.tChunkedMatrix;  x0, y0, w0, h0: SIGNED32;
 
-	PROCEDURE Update*;
+	PROCEDURE { OVERRIDE } Update*;
 	BEGIN
 		UpdateMatrix(in,out.buf,x0, y0, w0, h0,TRUE);
 		(* vyBase.Update(out); *)
 	END Update;
 
-	PROCEDURE Bind*(VAR M:Objects.BindMsg);
+	PROCEDURE { OVERRIDE } Bind*(VAR M:Objects.BindMsg);
 	BEGIN
 		BindObj(M,in); BindObj(M,out); Bind^(M);
 	END Bind;
 
-	PROCEDURE Load*(VAR R: Files.Rider);
+	PROCEDURE { OVERRIDE } Load*(VAR R: Files.Rider);
 	VAR obj: Objects.Object;
 	BEGIN
 		Load^(R);
@@ -54,7 +54,7 @@ TYPE
 
 	END Load;
 
-	PROCEDURE Store*(VAR R: Files.Rider);
+	PROCEDURE { OVERRIDE } Store*(VAR R: Files.Rider);
 	BEGIN
 		Store^(R);
 		Files.WriteLInt(R,x0); Files.WriteLInt(R,y0); Files.WriteLInt(R,w0); Files.WriteLInt(R,h0);

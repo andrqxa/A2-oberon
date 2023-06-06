@@ -1865,7 +1865,7 @@ TYPE
 			UpdatePageNumber;
 		END SetMasterHandler;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			drawPanel.CloseContentProps;

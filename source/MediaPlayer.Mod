@@ -216,12 +216,12 @@ TYPE
 		END ToggleFullscreen;
 
 		(* Overwrite draw procedure because we do not want any interpolation *)
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32);
 		BEGIN
 			Draw^(canvas, w, h, 0);
 		END Draw;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			player.Close;
 			alive := FALSE; IF timer # NIL THEN timer.Wakeup; END;
@@ -230,7 +230,7 @@ TYPE
 		END Close;
 
 		(* Key Handler *)
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		BEGIN
 			IF extKeyEventHandler # NIL THEN extKeyEventHandler(ucs, flags, keysym); END;
 			IF keysym = 0FF50H THEN (* Cursor Home *)
@@ -270,7 +270,7 @@ TYPE
 		END ShowFrame;
 
 		(* Make pointer visible when it is moved *)
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF PointerInvisibleAfter > 0 THEN
 				lastTimestamp := Kernel.GetTicks();
@@ -278,7 +278,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF PointerInvisibleAfter > 0 THEN
 				lastTimestamp := Kernel.GetTicks();

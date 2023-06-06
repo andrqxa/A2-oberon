@@ -131,7 +131,7 @@ TYPE
 		lastPos : SIZE;
 		lastBackwards : BOOLEAN;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrSearchPanel);
@@ -636,7 +636,7 @@ TYPE
 			highlightAll := SELF.highlightAll;
 		END GetSettings;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF searchEdit # NIL THEN searchEdit.text.onTextChanged.Remove(TextChanged); END;
@@ -674,7 +674,7 @@ TYPE
 			WMWindowManager.DefaultAddWindow(SELF);
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			IF searchPanel.highlights # NIL THEN
@@ -716,7 +716,7 @@ TYPE
 			RETURN TRUE;
 		END HandleShortcut;
 
-		PROCEDURE Handle*(VAR m: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m: WMMessages.Message);
 		BEGIN
 			IF m.msgType = WMMessages.MsgKey THEN
 				IF ~HandleShortcut(m.x, m.flags, m.y) THEN

@@ -38,12 +38,12 @@ TYPE
 			bsValid := FALSE
 		END Init;
 
-		PROCEDURE SetIndex*(idx : SIGNED32);
+		PROCEDURE { OVERRIDE } SetIndex*(idx : SIGNED32);
 		BEGIN
 			index := idx
 		END SetIndex;
 
-		PROCEDURE AddTexture*(img : Raster.Image): AbstractWorld.Texture;
+		PROCEDURE { OVERRIDE } AddTexture*(img : Raster.Image): AbstractWorld.Texture;
 		VAR t : Texture;
 		BEGIN
 			NEW(t);
@@ -51,7 +51,7 @@ TYPE
 			RETURN t
 		END AddTexture;
 
-		PROCEDURE AddVertex*(p : Vectors.TVector3d): AbstractWorld.Vertex;
+		PROCEDURE { OVERRIDE } AddVertex*(p : Vectors.TVector3d): AbstractWorld.Vertex;
 		VAR n : VertexArray; i : SIGNED32;
 			v: Vertex;
 		BEGIN
@@ -71,7 +71,7 @@ TYPE
 			bsValid := TRUE
 		END CalcBS;
 
-		PROCEDURE AddTriangle*(a, b, c : AbstractWorld.Vertex; color : SIGNED32; tex : AbstractWorld.Texture; mask0, culled: BOOLEAN);
+		PROCEDURE { OVERRIDE } AddTriangle*(a, b, c : AbstractWorld.Vertex; color : SIGNED32; tex : AbstractWorld.Texture; mask0, culled: BOOLEAN);
 		VAR n : TriangleArray; i : SIGNED32;
 				f : FLOAT32;
 		BEGIN
@@ -98,7 +98,7 @@ TYPE
 			 INC(nofTriangles)
 		END AddTriangle;
 
-		PROCEDURE Clear*;
+		PROCEDURE { OVERRIDE } Clear*;
 		VAR i : SIGNED32;
 		BEGIN
 			FOR i := nofVertices - 1 TO 0 BY - 1 DO vertices[i] := NIL END;
@@ -135,35 +135,35 @@ TYPE
 			NEW(tempv0); NEW(tempv1);
 		END Init;
 
-		PROCEDURE CreateObject*(): AbstractWorld.Object;
+		PROCEDURE { OVERRIDE } CreateObject*(): AbstractWorld.Object;
 		VAR obj : Object;
 		BEGIN
 			NEW(obj); RETURN obj
 		END CreateObject;
 
-		PROCEDURE AddObject*(x: AbstractWorld.Object);
+		PROCEDURE { OVERRIDE } AddObject*(x: AbstractWorld.Object);
 		BEGIN
 			objects.Add(x)
 		END AddObject;
 
-		PROCEDURE ReplaceObject*(x, y : AbstractWorld.Object);
+		PROCEDURE { OVERRIDE } ReplaceObject*(x, y : AbstractWorld.Object);
 		BEGIN
 			objects.Replace(x, y)
 		END ReplaceObject;
 
-		PROCEDURE SetAnimated*(obj : AbstractWorld.Object; animated: BOOLEAN);
+		PROCEDURE { OVERRIDE } SetAnimated*(obj : AbstractWorld.Object; animated: BOOLEAN);
 		BEGIN
 			obj(Object).isAnimated := animated;
 			worldValid := FALSE
 		END SetAnimated;
 
-		PROCEDURE Clear*;
+		PROCEDURE { OVERRIDE } Clear*;
 		BEGIN
 			objects.Clear;
 			animated.Clear
 		END Clear;
 
-		PROCEDURE SetCamera*(p, d, u : Vectors.TVector3d);
+		PROCEDURE { OVERRIDE } SetCamera*(p, d, u : Vectors.TVector3d);
 		BEGIN {EXCLUSIVE}
 			SELF.p := p; SELF.d := d; SELF.u := u;
 			trans := Matrix.CameraMatrix(p, d, u);
@@ -342,12 +342,12 @@ TYPE
 			IF img # NIL THEN Raster.Copy(rasterizer.img, img, 0, 0, width, height, 0, 0, srcCopy) END;
 		END RenderInternal;
 
-		PROCEDURE Render*(img : Raster.Image; movingOnly : BOOLEAN);
+		PROCEDURE { OVERRIDE } Render*(img : Raster.Image; movingOnly : BOOLEAN);
 		BEGIN {EXCLUSIVE}
 			RenderInternal(img, movingOnly)
 		END Render;
 
-		PROCEDURE GetOwnerIndex*(x, y : SIZE): SIGNED32;
+		PROCEDURE { OVERRIDE } GetOwnerIndex*(x, y : SIZE): SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF ~changed THEN RETURN rasterizer.GetInvIdx(x, y) ELSE
 				invertable := TRUE;

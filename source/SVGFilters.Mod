@@ -81,7 +81,7 @@ TYPE
 			mode*: SIGNED8;
 
 		(* Apply this filter element *)
-		PROCEDURE ApplyFilter*(window: FilterWindow; target: Buffer);
+		PROCEDURE { OVERRIDE } ApplyFilter*(window: FilterWindow; target: Buffer);
 		VAR tx,ty: SIZE;
 			source,source2: Buffer;
 			pix,pix2: Raster.Pixel;
@@ -158,7 +158,7 @@ TYPE
 			dx*,dy*: SVG.Length;
 
 		(* Apply this filter element *)
-		PROCEDURE ApplyFilter*(window: FilterWindow; target: Buffer);
+		PROCEDURE { OVERRIDE } ApplyFilter*(window: FilterWindow; target: Buffer);
 		VAR tx,ty, sx,sy: SIZE;
 			source: Buffer;
 			pix: Raster.Pixel;
@@ -184,7 +184,7 @@ TYPE
 			matrix*: ColorMatrix;
 
 		(* Apply this filter element *)
-		PROCEDURE ApplyFilter*(window: FilterWindow; target: Buffer);
+		PROCEDURE { OVERRIDE } ApplyFilter*(window: FilterWindow; target: Buffer);
 		VAR tx,ty: SIZE;
 			source: Buffer;
 			pix: Raster.Pixel;
@@ -204,7 +204,7 @@ TYPE
 			stdDeviationX*, stdDeviationY*: SVG.Length;
 
 		(* Apply this filter element *)
-		PROCEDURE ApplyFilter*(window: FilterWindow; target: Buffer);
+		PROCEDURE { OVERRIDE } ApplyFilter*(window: FilterWindow; target: Buffer);
 		VAR tx,ty, k: SIZE;
 			source: Buffer;
 			pix: Raster.Pixel;
@@ -269,7 +269,7 @@ TYPE
 		VAR in2: XMLObjects.List;
 
 		(* Apply this filter element *)
-		PROCEDURE ApplyFilter*(window: FilterWindow; target: Buffer);
+		PROCEDURE { OVERRIDE } ApplyFilter*(window: FilterWindow; target: Buffer);
 		VAR tx,ty: SIZE;
 			source: Buffer;
 			pix: Raster.Pixel;
@@ -314,7 +314,7 @@ TYPE
 			pix*: Raster.Pixel;
 
 		(* Apply this filter element *)
-		PROCEDURE ApplyFilter*(window: FilterWindow; target: Buffer);
+		PROCEDURE { OVERRIDE } ApplyFilter*(window: FilterWindow; target: Buffer);
 		VAR tx,ty: SIZE;
 		BEGIN
 			FOR ty:=0 TO target.height-1 DO
@@ -328,7 +328,7 @@ TYPE
 		VAR image*: Buffer;
 
 		(* Apply this filter element *)
-		PROCEDURE ApplyFilter*(window: FilterWindow; target: Buffer);
+		PROCEDURE { OVERRIDE } ApplyFilter*(window: FilterWindow; target: Buffer);
 		VAR tx,ty, sx,sy: SIZE;
 			pix: Raster.Pixel;
 		BEGIN
@@ -349,7 +349,7 @@ TYPE
 	feTile*=OBJECT(FilterElement)
 
 		(* Apply this filter element *)
-		PROCEDURE ApplyFilter*(window: FilterWindow; target: Buffer);
+		PROCEDURE { OVERRIDE } ApplyFilter*(window: FilterWindow; target: Buffer);
 		VAR tx,ty, sx,sy: SIZE;
 			source: Buffer;
 			pix: Raster.Pixel;

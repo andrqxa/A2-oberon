@@ -15,7 +15,7 @@ TYPE
 				ske, skd: ARRAY 96 OF SET32; ski: SIGNED32;
 				ivx, ivy: SET32;
 
-				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE );
+				PROCEDURE { OVERRIDE } InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE );
 				VAR X, Y: SET32;  i: SIGNED32;
 				BEGIN
 					ASSERT( keybits = 192 );
@@ -42,13 +42,13 @@ TYPE
 					END
 				END InitKey;
 
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
+				PROCEDURE { OVERRIDE } SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
 				BEGIN
 					SetIV^( src, mode );   (* set mode *)
 					ivx := U.SetFromBufferBE( src, 0 );  ivy := U.SetFromBufferBE( src, 4 )
 				END SetIV;
 
-				PROCEDURE Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR i: SIZE;  r: INTEGER;  X, Y: SET32;
 				BEGIN
 					ASSERT( isKeyInitialized & (mode IN {Ciphers.ECB, Ciphers.CBC}) );
@@ -77,7 +77,7 @@ TYPE
 					END
 				END Encrypt;
 
-				PROCEDURE Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
+				PROCEDURE { OVERRIDE } Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
 				VAR i: SIZE;  r: INTEGER;  X, Y, X0, Y0: SET32;
 				BEGIN
 					ASSERT( isKeyInitialized );
@@ -128,7 +128,7 @@ TYPE
 					y := y / D.sb7[i.a] / D.sb5[i.b] / D.sb3[i.c] / D.sb1[i.d]
 				END RoundD;
 
-				PROCEDURE & Init*;
+				PROCEDURE (* OVERRIDE *) & Init*;
 				BEGIN
 					SetNameAndBlocksize( "3des", 8 );
 				END Init;

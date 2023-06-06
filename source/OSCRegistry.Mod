@@ -405,7 +405,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 The OpenSound Control WWW page is http://www.cnmat.berkeley.edu/OpenSoundControl *)
 
 			(* dumps this container *)
-			PROCEDURE dump(ident: SIGNED16);
+			PROCEDURE { OVERRIDE } dump(ident: SIGNED16);
 			VAR i: SIGNED16;
 			BEGIN
 				FOR i := 0 TO ident DO KernelLog.String(dumpident); END;
@@ -439,7 +439,7 @@ The OpenSound Control WWW page is http://www.cnmat.berkeley.edu/OpenSoundControl
 				SELF.method(m);
 			END runMessage;
 
-			PROCEDURE dump(ident: SIGNED16);
+			PROCEDURE { OVERRIDE } dump(ident: SIGNED16);
 			VAR i: SIGNED16;
 			BEGIN
 				FOR i := 0 TO ident DO KernelLog.String(dumpident); END;

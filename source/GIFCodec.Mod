@@ -31,15 +31,15 @@ TYPE
 		lastBlock: ARRAY 4096 OF SIGNED32;
 
 		(* open the encoder on a Streams writer *)
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			w := out
 		END Open;
 
-		PROCEDURE SetQuality*(quality : SIGNED32);
+		PROCEDURE { OVERRIDE } SetQuality*(quality : SIGNED32);
 		END SetQuality;
 
-		PROCEDURE WriteImage*(img : Raster.Image; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteImage*(img : Raster.Image; VAR res : INTEGER);
 		VAR pal : Raster.Palette;
 		BEGIN
 			NEW(pal); Raster.ComputePalette(img, pal, 0,256, 8);
@@ -217,7 +217,7 @@ TYPE
 		END Error;
 
 		(* open the decoder on an InputStream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			header : Header;
 			ch : CHAR;
@@ -266,7 +266,7 @@ TYPE
 			res := 0;
 		END Open;
 
-		PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
+		PROCEDURE { OVERRIDE } GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
 		BEGIN
 			width := SELF.width; height := SELF.height
 		END GetImageInfo;
@@ -277,11 +277,11 @@ TYPE
 			SetProgressionLevel, the level is assumed to be maxProgressionLevel of the image,
 			which corresponds to best image quality.
 		 *)
-		PROCEDURE SetProgressionLevel*(progressionLevel: SIGNED32);
+		PROCEDURE { OVERRIDE } SetProgressionLevel*(progressionLevel: SIGNED32);
 		END SetProgressionLevel;
 
 		(* return the image in Raster format that best matches the format *)
-		PROCEDURE GetNativeImage*(VAR img : Raster.Image);
+		PROCEDURE { OVERRIDE } GetNativeImage*(VAR img : Raster.Image);
 		VAR
 			images, w, h, left, top : SIGNED16;
 			label, ch, transPix, idFlags : CHAR;
@@ -339,7 +339,7 @@ TYPE
 		END GetNativeImage;
 
 		(* renders the image into the given Raster.Image at the given progressionLevel *)
-		PROCEDURE Render*(img : Raster.Image);
+		PROCEDURE { OVERRIDE } Render*(img : Raster.Image);
 		VAR canvas : WMGraphics.BufferCanvas;
 		BEGIN
 			GetNativeImage(SELF.img);
@@ -368,7 +368,7 @@ TYPE
 		END Error;
 
 		(* open the decoder on an InputStream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			header : Header;
 			ch : CHAR;
@@ -417,7 +417,7 @@ TYPE
 			res := 0;
 		END Open;
 
-		PROCEDURE GetImageSequence*(VAR sequence : Codecs.ImageSequence; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetImageSequence*(VAR sequence : Codecs.ImageSequence; VAR res : INTEGER);
 		VAR
 			first, last, current : Codecs.ImageDescriptor;
 			label, ch, transPix, idFlags : CHAR;

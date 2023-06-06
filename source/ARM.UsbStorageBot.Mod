@@ -27,7 +27,7 @@ TYPE
 		(* Perform reset recovery, i.e. send Bulk-Only Mass Storage Reset command via default control pipe and 	*)
 		(* then clear the EndpointHalt feature of the bulk in and bulk out endpoints of the USB device. The request 	*)
 		(* shall ready the device for the next CBW from the host. See [2], pages 7 & 16								*)
-		PROCEDURE Reset*(timeout : SIGNED32) : SIGNED32;
+		PROCEDURE { OVERRIDE } Reset*(timeout : SIGNED32) : SIGNED32;
 		VAR critical : BOOLEAN; status : Usbdi.Status;
 		BEGIN
 			IF Debug.Trace & Debug.traceScRequests THEN KernelLog.String("UsbStorage: Doing reset recovery ... "); END;
@@ -50,7 +50,7 @@ TYPE
 		END Reset;
 
 		(* The Get Max LUN device request is used to determine the number of logical units supported by the device *)
-		PROCEDURE GetMaxLun*(VAR maxlun : SIGNED32): SIGNED32;
+		PROCEDURE { OVERRIDE } GetMaxLun*(VAR maxlun : SIGNED32): SIGNED32;
 		VAR buffer : Usbdi.BufferPtr;  status : Usbdi.Status;
 		BEGIN
 			IF Debug.Trace & Debug.traceScRequests THEN KernelLog.String("UsbStorage: GetMaxLUN.... "); END;
@@ -76,7 +76,7 @@ TYPE
 		(* 	1. Send command block wrapper (CBW) to device														*)
 		(*	2. Dataphase (optional)																				*)
 		(*	3. Receive command status word (CSW) from device 													*)
-		PROCEDURE Transport*(cmd : ARRAY OF CHAR; cmdlen : SIGNED32; dir :  SET;
+		PROCEDURE { OVERRIDE } Transport*(cmd : ARRAY OF CHAR; cmdlen : SIGNED32; dir :  SET;
 			VAR buffer : ARRAY OF CHAR; ofs, bufferlen : SIGNED32; VAR tlen : SIGNED32; timeout : SIGNED32) : SIGNED32;
 		VAR status : Usbdi.Status; i, residual : SIGNED32;
 			b: Usbdi.Buffer;
@@ -229,7 +229,7 @@ TYPE
 			END;
 		END Transport;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^; NEW(CBWbuffer, 31); NEW(CSWbuffer, 13); seqNbr := 0;
 		END Init;

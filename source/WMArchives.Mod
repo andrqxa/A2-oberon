@@ -33,7 +33,7 @@ TYPE
 			at := t; parent := n
 		END New;
 
-		PROCEDURE OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			caption := Strings.NewString(remoteName);
@@ -50,7 +50,7 @@ TYPE
 			outw := out;
 		END OpenPut;
 
-		PROCEDURE ClosePut*(VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } ClosePut*(VAR res : INTEGER);
 		VAR ei : EntryInfo;
 		BEGIN
 			IF out # NIL THEN out.Update END;
@@ -70,7 +70,7 @@ TYPE
 			tree := t; node := n
 		END New;
 
-		PROCEDURE GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
 		VAR di : ArchiveDropInterface;
 		BEGIN
 			IF type = WMDropTarget.TypeFiles THEN
@@ -99,7 +99,7 @@ TYPE
 
 		NodeChanged* : PROCEDURE {DELEGATE} (sender, data : ANY);
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 				(* title *)
@@ -250,7 +250,7 @@ TYPE
 		END MyDragDropped;
 
 		(* called by MyDraggedDropped *)
-		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
 		VAR dropTarget : ArchiveDropTarget;
 			parent : WMTrees.TreeNode;
 			accept : BOOLEAN;
@@ -626,7 +626,7 @@ TYPE
 			list.model.Release
 		END InitList;
 
-		PROCEDURE Resized*(width, height : SIZE);
+		PROCEDURE { OVERRIDE } Resized*(width, height : SIZE);
 		BEGIN
 			Resized^(width, height);
 			AdjustTabSize;
@@ -753,7 +753,7 @@ TYPE
 			IF curArc # NIL THEN filenameEdit.SetAsString(curArc.name); archiveTree.SetArchive(curArc) END
 		END Load;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		VAR data : XML.Element; a : XML.Attribute; n : ARRAY 16 OF CHAR;
 			filename : ARRAY 256 OF CHAR;
 		BEGIN
@@ -1042,7 +1042,7 @@ TYPE
 			END;
 		END ListDragArrived;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;

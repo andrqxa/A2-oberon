@@ -15,7 +15,7 @@ TYPE
 
 	IPStatistics* = OBJECT(WMPerfMonPlugins.Plugin)
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "IP"; p.description := "IP statistics"; p.modulename := ModuleName;
@@ -46,7 +46,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		BEGIN
 			dataset[0] := IP.NIPSentToSubnet;
 			dataset[1] := IP.NIPSentToGateway;
@@ -76,7 +76,7 @@ TYPE
 
 	TCPStatistics* = OBJECT(WMPerfMonPlugins.Plugin)
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "TCP"; p.description := "TCP statistics"; p.modulename := ModuleName;
@@ -129,7 +129,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		BEGIN
 			dataset[0] := TCP.NTCPConnectAttempt;
 			dataset[1] := TCP.NTCPPersistTimer;
@@ -181,7 +181,7 @@ TYPE
 
 	TCPErrors* = OBJECT(WMPerfMonPlugins.Plugin)
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "TCPErrors"; p.description := "TCP error statistics"; p.modulename := ModuleName;
@@ -232,7 +232,7 @@ TYPE
 			END;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		VAR i : SIGNED32;
 		BEGIN
 			FOR i := 0 TO LEN(TCP.NTCPError)-1 DO
@@ -246,7 +246,7 @@ TYPE
 
 	UDPStatistics* = OBJECT(WMPerfMonPlugins.Plugin)
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "UDP"; p.description := "UDP statistics"; p.modulename := ModuleName;
@@ -266,7 +266,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		BEGIN
 			dataset[0] := UDP.NUDPRcvTotal;
 			dataset[1] := UDP.NUDPTooSmall;
@@ -285,7 +285,7 @@ TYPE
 
 	DNSStatistics* = OBJECT(WMPerfMonPlugins.Plugin)
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "DNS"; p.description := "DNS statistics"; p.modulename := ModuleName;
@@ -300,7 +300,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		BEGIN
 			dataset[0] := DNS.NDNSReceived;
 			dataset[1] := DNS.NDNSSent;
@@ -314,7 +314,7 @@ TYPE
 
 	ICMPStatistics* = OBJECT(WMPerfMonPlugins.Plugin)
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "ICMP"; p.description := "ICMP statistics"; p.modulename := ModuleName;
@@ -332,7 +332,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		BEGIN
 			dataset[0] := ICMP.NICMPRcvTotal;
 			dataset[1] := ICMP.NICMPTooSmall;
@@ -349,7 +349,7 @@ TYPE
 
 	ARPStatistics* = OBJECT(WMPerfMonPlugins.Plugin)
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "IPv4"; p.description := "IPv4 ARP statistics"; p.modulename := ModuleName;
@@ -369,7 +369,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		BEGIN
 			dataset[0] := IPv4.NARPPut;
 			dataset[1] := IPv4.NARPRcvTotal;

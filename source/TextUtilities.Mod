@@ -117,7 +117,7 @@ TYPE
 		END Add;
 
 		(** Write end-of-line character *)
-		PROCEDURE Ln*; (** overwrite Ln^ *)
+		PROCEDURE { OVERRIDE } Ln*; (** overwrite Ln^ *)
 		BEGIN
 			Char(CHR(Texts.NewLineChar));
 		END Ln;
@@ -224,12 +224,12 @@ TYPE
 			reader.text.ReleaseRead;
 		END Receive;
 
-		PROCEDURE CanSetPos*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*() : BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END CanSetPos;
 
-		PROCEDURE SetPos*(pos: Streams.Position);
+		PROCEDURE { OVERRIDE } SetPos*(pos: Streams.Position);
 		BEGIN
 			reader.text.AcquireRead;
 			reader.SetPosition(pos(SIZE)); (* pos is clipped *)
@@ -257,7 +257,7 @@ TYPE
 		operations : Operations;
 		nofOperations, nofDeleted : SIZE;
 
-		PROCEDURE &New*(t : Texts.Text);
+		PROCEDURE (* OVERRIDE *) & New*(t : Texts.Text);
 		BEGIN
 			New^(t);
 			NEW(positions, 256); NEW(operations, 256);
@@ -295,7 +295,7 @@ TYPE
 		END Cleanup;
 
 		(** Listens for text changes *)
-		PROCEDURE Changed*(op : INTEGER; pos, len : SIZE);
+		PROCEDURE { OVERRIDE } Changed*(op : INTEGER; pos, len : SIZE);
 		CONST MaxOperations = 4096;
 		BEGIN
 			IF nofOperations > MaxOperations THEN Cleanup END;
@@ -409,7 +409,7 @@ TYPE
 			IF attr # NIL THEN text.SetAttributes(oldpos, len, attr) END
 		END InsertPiece;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		CONST DocBlockId = 0F7X; OldTextBlockId = 1X; TextBlockId = 0F0X; OldTextSpex = 0F0X; TextSpex = 1X; LibBlockId = 0DBX;
 		VAR
 			ch: CHAR;
@@ -527,7 +527,7 @@ TYPE
 			text.ReleaseWrite;
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text;
 		END GetText;
@@ -587,7 +587,7 @@ TYPE
 		voff: SIGNED32;
 		color : SIGNED32;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("Oberon Encoder Error: output stream is NIL");
 			ELSE SELF.out := out;
@@ -644,7 +644,7 @@ TYPE
 			w.RawLInt(len(SIGNED32));
 		END WritePiece;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		CONST TextBlockId = 0F0X;
 		VAR r: Texts.TextReader;
 			ch :Char32;
@@ -904,7 +904,7 @@ TYPE
 			Error(msg);
 		END MalformedXML;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			scanner : XMLScanner.Scanner; parser : XMLParser.Parser;
 			d : XML.Document;
@@ -990,7 +990,7 @@ TYPE
 			text.ReleaseWrite;
 		END OpenXML;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text;
 		END GetText;
@@ -1189,14 +1189,14 @@ TYPE
 			out.String('name="'); out.String(label); out.String('"/>');
 		END WriteLabel;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("Bluebottle Encoder Error: output stream is NIL");
 			ELSE SELF.out := out;
 			END;
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR
 			buf : Strings.String; rbuf : ARRAY 4 OF CHAR;
 			bytesPerChar, length, counter : SIZE;
@@ -1315,7 +1315,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIZE;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ch, last : Texts.Char32;
@@ -1351,7 +1351,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text;
 		END GetText;
@@ -1361,14 +1361,14 @@ TYPE
 	UTF8Encoder = OBJECT(Codecs.TextEncoder)
 	VAR out: Streams.Writer;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("UTF-8 Encoder Error: output stream is NIL");
 			ELSE SELF.out := out;
 			END;
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 		BEGIN
 			res := -1;
@@ -1403,7 +1403,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIZE;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ucs, last : Texts.Char32;
@@ -1439,7 +1439,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text;
 		END GetText;
@@ -1455,14 +1455,14 @@ TYPE
 			SELF.byteOrder := order;
 		END InitUTF16Encoder;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("UTF-16 Encoder Error: output stream is NIL");
 			ELSE SELF.out := out;
 			END;
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 		BEGIN
 			res := -1;
@@ -1501,7 +1501,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIZE;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ucs, last : Texts.Char32;
@@ -1537,7 +1537,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text;
 		END GetText;
@@ -1553,14 +1553,14 @@ TYPE
 			SELF.byteOrder := order;
 		END InitUTF32Encoder;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("UTF-32 Encoder Error: output stream is NIL");
 			ELSE SELF.out := out;
 			END;
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 		BEGIN
 			res := -1;
@@ -1593,7 +1593,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, m: SIGNED32;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ch, last : CHAR;
@@ -1623,7 +1623,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text;
 		END GetText;
@@ -1633,14 +1633,14 @@ TYPE
 	ISO88591Encoder = OBJECT(Codecs.TextEncoder)
 	VAR out: Streams.Writer;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("ISO8859-1 Encoder Error: output stream is NIL");
 			ELSE SELF.out := out;
 			END;
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Texts.Char32; i : SIZE;
 		BEGIN
 			res :=  -1;
@@ -1669,7 +1669,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR i, j, m : SIZE;
 			tempUCS32 : ARRAY 1057 OF Char32; (* 1025 *)
 			ch : CHAR;
@@ -1708,7 +1708,7 @@ TYPE
 			text.ReleaseWrite
 		END Open;
 
-		PROCEDURE GetText*() : Texts.Text;
+		PROCEDURE { OVERRIDE } GetText*() : Texts.Text;
 		BEGIN
 			RETURN text;
 		END GetText;
@@ -1718,14 +1718,14 @@ TYPE
 	HEXEncoder = OBJECT(Codecs.TextEncoder)
 	VAR out: Streams.Writer;
 
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			IF out = NIL THEN KernelLog.String("HEX Encoder Error: output stream is NIL");
 			ELSE SELF.out := out;
 			END;
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteText*(text : Texts.Text; VAR res : INTEGER);
 		VAR r : Texts.TextReader; ch : Char32; i, j: SIZE; k : INTEGER;
 			byte : ARRAY 2 OF CHAR;
 		BEGIN

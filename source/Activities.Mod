@@ -72,7 +72,7 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 		SELF.procedure := procedure;
 	END InitializeActivity;
 
-	PROCEDURE ~Finalize;
+	PROCEDURE (* OVERRIDE *) ~ Finalize;
 	VAR address: ADDRESS; stackFrame {UNTRACED}: BaseTypes.StackFrame; currentActivity {UNTRACED}: Activity; stack{UNTRACED}, next{UNTRACED}: Stack; stackRecord{UNTRACED}: StackRecord;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		address := framePointer;
@@ -116,7 +116,7 @@ TYPE Process = OBJECT {DISPOSABLE} (Activity)
 	BEGIN {UNCOOPERATIVE, UNCHECKED} object := NIL;
 	END Unlink;
 
-	PROCEDURE ~Finalize;
+	PROCEDURE (* OVERRIDE *) ~ Finalize;
 	VAR currentActivity {UNTRACED}: Activity; item: Queues.Item;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF object # NIL THEN

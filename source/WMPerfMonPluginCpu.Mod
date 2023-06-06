@@ -26,7 +26,7 @@ TYPE
 		lastTimeStamp, timestamp : SIGNED64;
 		lastCycles : ARRAY Machine.MaxCPU OF SIGNED64;
 
-		PROCEDURE Update;
+		PROCEDURE { OVERRIDE } Update;
 		VAR cpuNbr : SIGNED32; dCycles, total : FLOAT64;
 		BEGIN
 			timestamp := Machine.GetTimer();
@@ -78,7 +78,7 @@ TYPE
 		processorID : SIZE;
 		h : CpuLoadHelper;
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR nbr : ARRAY 4 OF CHAR;
 		BEGIN
 			p.name := "CPU Load"; p.description := "100% - % the idle thread is running";
@@ -97,7 +97,7 @@ TYPE
 			p.helper := cpuLoadHelper; h := cpuLoadHelper;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		VAR cpu : SIGNED32; sum : FLOAT32;
 		BEGIN
 			IF processorID = CpuLoadAll THEN
@@ -116,14 +116,14 @@ TYPE
 
 	ReadyCounter = OBJECT(WMPerfMonPlugins.Plugin);
 
-		PROCEDURE Init(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init(p : WMPerfMonPlugins.Parameter);
 		BEGIN
 			p.name := "NumReady"; p.description := "Number of processes in ready queue";
 			p.modulename := ModuleName;
 			p.autoMax := TRUE; p.minDigits := 2;
 		END Init;
 
-		PROCEDURE UpdateDataset;
+		PROCEDURE { OVERRIDE } UpdateDataset;
 		BEGIN
 			dataset[0] := Objects.NumReady();
 		END UpdateDataset;

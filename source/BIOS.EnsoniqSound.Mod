@@ -102,7 +102,7 @@ TYPE
 			SELF.drv.mixerChannels[i] := SELF
 		END Constr;
 
-		PROCEDURE SetVolume*(vol : SIGNED32);
+		PROCEDURE { OVERRIDE } SetVolume*(vol : SIGNED32);
 		VAR resl : SIGNED32;
 		BEGIN
 			IF vol > 0FFH THEN SELF.vol := 0FFH END;
@@ -114,12 +114,12 @@ TYPE
 			CallListener
 		END SetVolume;
 
-		PROCEDURE GetVolume*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetVolume*() : SIGNED32;
 		BEGIN
 			RETURN(vol)
 		END GetVolume;
 
-		PROCEDURE GetIsMute*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } GetIsMute*(): BOOLEAN;
 		BEGIN
 			RETURN muted
 		END GetIsMute;
@@ -141,17 +141,17 @@ TYPE
 			END
 		END CallListener;
 
-		PROCEDURE GetName*(VAR name: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetName*(VAR name: ARRAY OF CHAR);
 		BEGIN
 			COPY(SELF.name^, name)
 		END GetName;
 
-		PROCEDURE GetDesc*(VAR desc: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetDesc*(VAR desc: ARRAY OF CHAR);
 		BEGIN
 			COPY (SELF.desc^, desc)
 		END GetDesc;
 
-		PROCEDURE SetMute*(muted: BOOLEAN);
+		PROCEDURE { OVERRIDE } SetMute*(muted: BOOLEAN);
 		BEGIN
 			IF SELF.muted # muted THEN (* change mute state *)
 				IF muted THEN
@@ -166,7 +166,7 @@ TYPE
 	END MixerChannel;
 
 	PlayMixerChannel=OBJECT(MixerChannel)
-		PROCEDURE SetVolume*(vol: SIGNED32);
+		PROCEDURE { OVERRIDE } SetVolume*(vol: SIGNED32);
 		VAR resl : SIGNED32;
 		BEGIN
 			IF vol > 0FFH THEN vol := 0FFH END;
@@ -180,7 +180,7 @@ TYPE
 	END PlayMixerChannel;
 
 	RecMixerChannel=OBJECT(MixerChannel)
-		PROCEDURE SetVolume*(vol: SIGNED32);
+		PROCEDURE { OVERRIDE } SetVolume*(vol: SIGNED32);
 		VAR resl : SIGNED32;
 		BEGIN
 			IF vol > 0FFH THEN vol := 0FFH END;
@@ -224,7 +224,7 @@ TYPE
 			pause := FALSE; stop := FALSE; start := FALSE
 		END Init;
 
-		PROCEDURE SetVolume*(vol: SIGNED32);
+		PROCEDURE { OVERRIDE } SetVolume*(vol: SIGNED32);
 		(* standard : 100H *)
 		BEGIN
 			IF vol > 0FFFFH THEN vol := 0FFFFH; END;
@@ -232,17 +232,17 @@ TYPE
 			SELF.vol := SHORT(vol)
 		END SetVolume;
 
-		PROCEDURE GetVolume*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetVolume*() : SIGNED32;
 		BEGIN
 			RETURN vol
 		END GetVolume;
 
-		PROCEDURE GetPosition() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetPosition() : SIGNED32;
 		BEGIN
 			RETURN pos
 		END GetPosition;
 
-		PROCEDURE Pause*; (* generic pause, used by recordchannel *)
+		PROCEDURE { OVERRIDE } Pause*; (* generic pause, used by recordchannel *)
 		BEGIN {EXCLUSIVE}
 			active := FALSE
 		END Pause;
@@ -252,13 +252,13 @@ TYPE
 			active := FALSE
 		END PauseNonExclusive;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Stop;
 			free := TRUE
 		END Close;
 
-		PROCEDURE RegisterBufferListener*(blistener: SoundDevices.BufferListener);
+		PROCEDURE { OVERRIDE } RegisterBufferListener*(blistener: SoundDevices.BufferListener);
 		BEGIN
 			SELF.blistener := blistener
 		END RegisterBufferListener;
@@ -267,22 +267,22 @@ TYPE
 	PlayerChannel=OBJECT(Channel)
 	VAR sample, oldsample : Sample; (*both needed for linear interpolation*)
 
-		PROCEDURE Pause*;
+		PROCEDURE { OVERRIDE } Pause*;
 		BEGIN {EXCLUSIVE}
 			pause := TRUE (* triggers drv.introbj.Deactivate(SELF) *)
 		END Pause;
 
-		PROCEDURE PauseNonExclusive;
+		PROCEDURE { OVERRIDE } PauseNonExclusive;
 		BEGIN
 			drv.introbj.Deactivate(SELF)
 		END PauseNonExclusive;
 
-		PROCEDURE Stop*;
+		PROCEDURE { OVERRIDE } Stop*;
 		BEGIN {EXCLUSIVE}
 			stop := TRUE
 		END Stop;
 
-		PROCEDURE QueueBuffer*(buf: SoundDevices.Buffer);
+		PROCEDURE { OVERRIDE } QueueBuffer*(buf: SoundDevices.Buffer);
 		VAR bufferlist: POINTER TO Bufferlist;
 		BEGIN {EXCLUSIVE}
 			IF last # NIL THEN
@@ -320,7 +320,7 @@ TYPE
 			END
 		END NextBuffer;
 
-		PROCEDURE Start*;
+		PROCEDURE { OVERRIDE } Start*;
 		BEGIN {EXCLUSIVE}
 				start := TRUE
 		END Start;
@@ -354,14 +354,14 @@ TYPE
 
 	RecordChannel=OBJECT(Channel)
 
-		PROCEDURE Stop*;
+		PROCEDURE { OVERRIDE } Stop*;
 		BEGIN {EXCLUSIVE}
 			PauseNonExclusive;
 			drv.introbj.WaitNoRec;(*AWAIT(~reccopy);*)
 			drv.bufferobj.ReturnAllBuffers(SELF)
 		END Stop;
 
-		PROCEDURE QueueBuffer*(buf: SoundDevices.Buffer);
+		PROCEDURE { OVERRIDE } QueueBuffer*(buf: SoundDevices.Buffer);
 		VAR bufferlist: POINTER TO Bufferlist;
 		BEGIN
 			IF last # NIL THEN
@@ -392,7 +392,7 @@ TYPE
 			END
 		END NextBuffer;
 
-		PROCEDURE Start;
+		PROCEDURE { OVERRIDE } Start;
 		BEGIN {EXCLUSIVE}
 			IF first#NIL THEN (* at least one buffer registered *)
 				active := TRUE;
@@ -808,7 +808,7 @@ TYPE
 			END
 		END Finalize;
 
-		PROCEDURE Init*;
+		PROCEDURE { OVERRIDE } Init*;
 		VAR i : SIGNED32;
 		BEGIN
 			Initdrv;
@@ -850,7 +850,7 @@ TYPE
 			IF Trace THEN KernelLog.String("init done"); KernelLog.Ln END
 		END Init;
 
-		PROCEDURE OpenPlayChannel*(VAR channel : SoundDevices.Channel;
+		PROCEDURE { OVERRIDE } OpenPlayChannel*(VAR channel : SoundDevices.Channel;
 		samplingRate, samplingResolution, nofSubChannels, format : SIGNED32;
 		VAR res : INTEGER);
 		VAR i, count : SIGNED32;
@@ -885,7 +885,7 @@ TYPE
 			END
 		END OpenPlayChannel;
 
-		PROCEDURE OpenRecordChannel*(VAR channel : SoundDevices.Channel;
+		PROCEDURE { OVERRIDE } OpenRecordChannel*(VAR channel : SoundDevices.Channel;
 		samplingRate, samplingResolution, nofSubChannels, format : SIGNED32;
 		VAR res: INTEGER);
 		VAR i : SIGNED32;
@@ -911,17 +911,17 @@ TYPE
 			END
 		END OpenRecordChannel;
 
-		PROCEDURE NofNativeFrequencies*():SIGNED32;
+		PROCEDURE { OVERRIDE } NofNativeFrequencies*():SIGNED32;
 		BEGIN
 			RETURN 1
 		END NofNativeFrequencies;
 
-		PROCEDURE GetNativeFrequency*(nr: SIGNED32): SIGNED32;
+		PROCEDURE { OVERRIDE } GetNativeFrequency*(nr: SIGNED32): SIGNED32;
 		BEGIN
 			RETURN 48000
 		END GetNativeFrequency;
 
-		PROCEDURE RegisterMixerChangeListener*(mixChangedProc: SoundDevices.MixerChangedProc);
+		PROCEDURE { OVERRIDE } RegisterMixerChangeListener*(mixChangedProc: SoundDevices.MixerChangedProc);
 		VAR nlistenerlist, nl : POINTER TO Listenerlist;
 		BEGIN
 			IF listenerlist.proc = NIL THEN
@@ -938,7 +938,7 @@ TYPE
 			END
 		END RegisterMixerChangeListener;
 
-		PROCEDURE UnregisterMixerChangeListener*(mixChangedProc: SoundDevices.MixerChangedProc);
+		PROCEDURE { OVERRIDE } UnregisterMixerChangeListener*(mixChangedProc: SoundDevices.MixerChangedProc);
 		VAR nlistenerlist, nl : POINTER TO Listenerlist;
 		BEGIN
 			nlistenerlist := listenerlist;
@@ -958,7 +958,7 @@ TYPE
 			END
 		END UnregisterMixerChangeListener;
 
-		PROCEDURE GetMixerChannel*(channelNr: SIGNED32; VAR channel: SoundDevices.MixerChannel);
+		PROCEDURE { OVERRIDE } GetMixerChannel*(channelNr: SIGNED32; VAR channel: SoundDevices.MixerChannel);
 		BEGIN
 			IF (channelNr<NumMixerChannels) & (channelNr>=0) THEN
 				channel := (mixerChannels[channelNr])
@@ -967,7 +967,7 @@ TYPE
 			END;
 		END GetMixerChannel;
 
-		PROCEDURE GetNofMixerChannels*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetNofMixerChannels*() : SIGNED32;
 		BEGIN
 			RETURN NumMixerChannels
 		END GetNofMixerChannels;

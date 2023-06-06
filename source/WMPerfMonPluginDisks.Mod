@@ -26,7 +26,7 @@ TYPE
 	VAR
 		dev : Disks.Device;
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := PluginName; p.description := "Disk device statistics";
@@ -47,7 +47,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		VAR read, written, nofReads, nofWrites, nofTot, nofErrors : SIGNED64; total : FLOAT32;
 		BEGIN
 			read := dev.NbytesRead; nofReads := dev.NnofReads;

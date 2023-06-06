@@ -76,7 +76,7 @@ TYPE
 		VAR
 
 		(** Start is called indirectly by OpenService. *)
-		PROCEDURE &Start*(port: SIGNED32; new: NewAgent; VAR res: INTEGER);
+		PROCEDURE (* OVERRIDE *) & Start*(port: SIGNED32; new: NewAgent; VAR res: INTEGER);
 			VAR
 		   certificate : ARRAY 500 OF CHAR;
 		   pHex, qHex, eHex : ARRAY 1000 OF CHAR;

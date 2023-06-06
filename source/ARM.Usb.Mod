@@ -255,7 +255,7 @@ TYPE
 		END GetPipeByInterface;
 
 		(** Allocate a pipe for the specified endpoint *)
-		PROCEDURE GetPipe*(endpoint : SIGNED32) : Usbdi.Pipe;
+		PROCEDURE { OVERRIDE } GetPipe*(endpoint : SIGNED32) : Usbdi.Pipe;
 		VAR pipe : UsbHcdi.Pipe; intfc, altIntfc : SIGNED32; interface : InterfaceDescriptor;
 		BEGIN
 			IF SYSTEM.VAL(SET, endpoint) * {0..3} = {} THEN (* Special case: Default control pipe is always allocated *)
@@ -282,7 +282,7 @@ TYPE
 		END GetPipe;
 
 		(** De-allocate the specified pipe *)
-		PROCEDURE FreePipe*(pipe : Usbdi.Pipe);
+		PROCEDURE { OVERRIDE } FreePipe*(pipe : Usbdi.Pipe);
 		BEGIN
 			controller.FreePipe(pipe (UsbHcdi.Pipe));
 		END FreePipe;
@@ -437,7 +437,7 @@ TYPE
 		END SynchFrame;
 
 		(** USB device request *)
-		PROCEDURE Request*(bmRequestType : SET;  bRequest, wValue, wIndex, wLength : SIGNED32; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
+		PROCEDURE { OVERRIDE } Request*(bmRequestType : SET;  bRequest, wValue, wIndex, wLength : SIGNED32; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
 		BEGIN
 			RETURN defaultpipe.Request(bmRequestType, bRequest, wValue, wIndex, wLength, buffer);
 		END Request;
@@ -576,23 +576,23 @@ TYPE
 	 * UsbDevice object use Request for the actual transfer, we simply overwrite it and emulated the results of the control transfers. *)
 	EmulatedHubDevice* = OBJECT(UsbDevice);
 
-		PROCEDURE GetPipe*(endpoint : SIGNED32) : Usbdi.Pipe;
+		PROCEDURE { OVERRIDE } GetPipe*(endpoint : SIGNED32) : Usbdi.Pipe;
 		BEGIN
 			HALT(99); RETURN NIL; (* Root hubs don't provide pipes *)
 		END GetPipe;
 
-		PROCEDURE FreePipe*(pipe : Usbdi.Pipe);
+		PROCEDURE { OVERRIDE } FreePipe*(pipe : Usbdi.Pipe);
 		BEGIN
 			HALT(99); (* Root hubs don't provide pipes *)
 		END FreePipe;
 
-		PROCEDURE Register*(hub: UsbDevice; portNbr: SIGNED32);
+		PROCEDURE { OVERRIDE } Register*(hub: UsbDevice; portNbr: SIGNED32);
 		BEGIN
 			HALT(99);
 		END Register;
 
 		(** Emulated USB device request *)
-		PROCEDURE Request*(bmRequestType : SET;  bRequest, wValue, wIndex, wLength : SIGNED32; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
+		PROCEDURE { OVERRIDE } Request*(bmRequestType : SET;  bRequest, wValue, wIndex, wLength : SIGNED32; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
 		VAR res : Usbdi.Status;
 		BEGIN
 			res := Usbdi.Stalled;
@@ -891,7 +891,7 @@ TYPE
 		END ProbeDeviceChain;
 
 		(** Add a USB device driver to the internal registry. Driver names have to be unique and no longer than 30 characters (incl. Null-String) *)
-		PROCEDURE Add*(probe : Usbdi.ProbeProc; CONST name: Usbdi.Name; CONST desc: Usbdi.Description; priority : SIGNED32);
+		PROCEDURE { OVERRIDE } Add*(probe : Usbdi.ProbeProc; CONST name: Usbdi.Name; CONST desc: Usbdi.Description; priority : SIGNED32);
 		VAR temp, new : RegisteredDriver; i : SIGNED32;
 		BEGIN
 			(* The specified name mustn't be longer than 30 characters (including 0X) *)
@@ -991,7 +991,7 @@ TYPE
 		(**
 		 * Calls Disconnect of all instances of the driver. All instances are removed from the usbDrivers registry
 		 * and the device driver is removed from the internal registry. *)
-		PROCEDURE Remove*(CONST name : Plugins.Name);
+		PROCEDURE { OVERRIDE } Remove*(CONST name : Plugins.Name);
 		VAR
 			prev, temp : RegisteredDriver;
 			regname : Plugins.Name;

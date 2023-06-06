@@ -61,7 +61,7 @@ TYPE
 	LinkDevice = OBJECT (Network.LinkDevice)
 		VAR ctrl: Controller;
 
-		PROCEDURE Linked*(): SIGNED32;
+		PROCEDURE { OVERRIDE } Linked*(): SIGNED32;
 			BEGIN
 			IF ctrl.Linked() THEN
 				RETURN Network.LinkLinked;
@@ -70,7 +70,7 @@ TYPE
 			END;
 		END Linked;
 
-		PROCEDURE DoSend*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32);
+		PROCEDURE { OVERRIDE } DoSend*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32);
 		VAR i: SIGNED32; bufAdr: ADDRESS; txState:SIGNED32; txs:SET; t, totlen:SIGNED32;
 		BEGIN {EXCLUSIVE}
 			(* Disable IRQ *)
@@ -133,7 +133,7 @@ TYPE
 			END
 		END DoSend;
 
-		PROCEDURE Finalize(connected: BOOLEAN);
+		PROCEDURE { OVERRIDE } Finalize(connected: BOOLEAN);
 		BEGIN
 			ctrl.Finalize;
 			Finalize^(connected);

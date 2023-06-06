@@ -27,7 +27,7 @@ TYPE
 		enabled, hover : SET;
 		sent : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 
@@ -81,7 +81,7 @@ TYPE
 			SetNameAsString(StrPieMenu);
 		END Init;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR s : String;
 		BEGIN
 			IF useBgBitmap.Get() THEN
@@ -89,7 +89,7 @@ TYPE
 			END;
 		END RecacheProperties;
 
-		PROCEDURE PropertyChanged*(sender, prop : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, prop : ANY);
 		BEGIN
 			IF prop = bgBitmapName THEN
 				RecacheProperties
@@ -156,7 +156,7 @@ TYPE
 			Invalidate
 		END SetHover;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR tdist, tx, ty : SIZE;
 		BEGIN
 			dx := x - bounds.GetWidth() DIV 2 + 4;
@@ -176,7 +176,7 @@ TYPE
 			ELSE SetHover({}) END
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR tdist, tx, ty : SIZE;
 		BEGIN
 			IF sent THEN RETURN END;
@@ -201,7 +201,7 @@ TYPE
 			closeIt.Call(NIL); dirNr := -1
 		END PointerUp;
 
-		PROCEDURE KeyEvent*(ucs :SIZE; flags : SET; VAR keySym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs :SIZE; flags : SET; VAR keySym : SIZE);
 		BEGIN
 			IF keySym = 0FF51H THEN (* Cursor Left *)
 				SetHover({2}); on2.Call(NIL); dirNr := 2; closeIt.Call(NIL)
@@ -216,7 +216,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas);
 		VAR sector, shadow : ARRAY 2 * MenuPoints + 2 OF WMGraphics.Point2d;
 			i, j: SIZE; shadowEffect : SIGNED32;
 			x, y, dx, dy : SIZE;
@@ -312,7 +312,7 @@ TYPE
 			RETURN piemenu;
 		END CreateForm;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			Close;
@@ -374,7 +374,7 @@ TYPE
 			END;
 		END Show;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			shown := FALSE;

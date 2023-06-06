@@ -31,14 +31,14 @@ VAR log : AosLog.Log;
 TYPE
 	CodeRedPlugin = OBJECT(WebHTTPServer.HTTPPlugin)
 
-		PROCEDURE CanHandle(host: WebHTTPServer.Host; VAR h : WebHTTP.RequestHeader; secure : BOOLEAN): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanHandle(host: WebHTTPServer.Host; VAR h : WebHTTP.RequestHeader; secure : BOOLEAN): BOOLEAN;
 		VAR i : SIGNED32;
 		BEGIN
 			WHILE (h.uri[i] # 0X) & (i < LEN(h.uri)) DO INC(i) END;
 			RETURN (i>100)
 		END CanHandle;
 
-		PROCEDURE Handle(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader;
+		PROCEDURE { OVERRIDE } Handle(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader;
 			VAR in: Streams.Reader; VAR out: Streams.Writer);
 		VAR fn, vn : ARRAY 32 OF CHAR;
 		BEGIN
@@ -54,12 +54,12 @@ TYPE
 TYPE
 	NimdaPlugin = OBJECT(WebHTTPServer.HTTPPlugin)
 
-		PROCEDURE CanHandle(host: WebHTTPServer.Host; VAR h : WebHTTP.RequestHeader; secure : BOOLEAN): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanHandle(host: WebHTTPServer.Host; VAR h : WebHTTP.RequestHeader; secure : BOOLEAN): BOOLEAN;
 		BEGIN
 			RETURN h.uri = "/scripts/root.exe"
 		END CanHandle;
 
-		PROCEDURE Handle(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader;
+		PROCEDURE { OVERRIDE } Handle(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader;
 			VAR in: Streams.Reader; VAR out: Streams.Writer);
 		BEGIN
 			INC(nofNimda);

@@ -43,7 +43,7 @@ TYPE
 		PArray: WMProperties.PropertyArray; (* PArray#NIL !*)
 		lineCB*: PROCEDURE{DELEGATE} (canvas : WMGraphics.Canvas; y, x0, x1 : SIZE);
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrFigure);
@@ -165,7 +165,7 @@ TYPE
 		END MoveFigure;
 
 		(* fx,fy in Figure coordinate system, NOT in parent coordinates*)
-		PROCEDURE PointerDown*(fx, fy : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(fx, fy : SIZE; keys : SET);
 		BEGIN
 			lastKeys := keys;
 			IF (0 IN keys) THEN
@@ -179,7 +179,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerUp*(fx, fy : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(fx, fy : SIZE; keys : SET);
 		VAR dx,dy,bt,bl:SIZE;
 		BEGIN
 			bl:=bounds.GetLeft();
@@ -211,7 +211,7 @@ TYPE
 			selectedPoint:=NIL;
 		END PointerUp;
 
-		PROCEDURE PointerMove*(fx, fy : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(fx, fy : SIZE; keys : SET);
 		VAR dx,dy,bl,bt:SIZE; pp:WMProperties.Property;
 		BEGIN
 			IF (Reshape IN state)  & (keys*{0,1}#{})  & (selectedPoint # NIL) THEN
@@ -240,14 +240,14 @@ TYPE
 		END Inside;
 
 		(** Return if the line is hit at (x, y) in parent coordinates *)
-		PROCEDURE IsHit*(x, y: SIZE): BOOLEAN; (*Prototype*)
+		PROCEDURE { OVERRIDE } IsHit*(x, y: SIZE): BOOLEAN; (*Prototype*)
 		END IsHit;
 		
 		PROCEDURE Length*():REAL;
 		END Length;
 		
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF closed.Get() THEN INCL(state,Closed) ELSE EXCL(state,Closed) END;
 			
@@ -342,7 +342,7 @@ TYPE
 			RETURN rect;
 		END GetBoundingBox;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN (* called by sequencer -> hierarchy is locked, see WMVisualComponentSkeleton.Mod *)
 			RecacheProperties^;
 			IF closed.Get() THEN INCL(state,Closed) ELSE EXCL(state,Closed) END;
@@ -386,7 +386,7 @@ TYPE
 			WMGraphicUtilities.DrawRect(canvas, rect, WMGraphics.Black, WMGraphics.ModeSrcOverDst);
 		END DrawDisplayPoint;
 
-		PROCEDURE DrawForeground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawForeground*(canvas : WMGraphics.Canvas);
 		VAR a: BOOLEAN; i:SIZE;
 		BEGIN
 			DrawForeground^(canvas);
@@ -422,7 +422,7 @@ TYPE
 	VAR
 		pointArray : PointArray; (* {pointArray # NIL} *)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMFigures.GenLine");
@@ -432,7 +432,7 @@ TYPE
 			NEW(pointArray, nofPoints);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		VAR pp:WMProperties.PointProperty;
 		BEGIN
 			RecachePoints;
@@ -449,7 +449,7 @@ TYPE
 			Initialize^;
 		END Initialize;
 
-		PROCEDURE Scale;
+		PROCEDURE { OVERRIDE } Scale;
 		VAR p : Point; bounds, box : WMRectangles.Rectangle; oldWidth, oldHeight, newWidth, newHeight, n : SIZE;
 		BEGIN
 			Acquire;
@@ -472,7 +472,7 @@ TYPE
 		END Scale;
 
 		(* Is X, Y somewhere inside the polygon defined by p ? *)
-		PROCEDURE Inside*(X, Y: SIZE): BOOLEAN;
+		PROCEDURE { OVERRIDE } Inside*(X, Y: SIZE): BOOLEAN;
 		VAR c: SIGNED32; p, q: Point;
 		BEGIN
 			c := 0;
@@ -487,7 +487,7 @@ TYPE
 			RETURN ODD(c);
 		END Inside;
 
-		PROCEDURE IsHit*(mx, my: SIZE): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(mx, my: SIZE): BOOLEAN;
 		VAR p, q: Point; i : SIGNED32;
 		BEGIN
 			IF (points = NIL) OR (points.next = NIL) THEN RETURN FALSE; END;
@@ -506,7 +506,7 @@ TYPE
 			RETURN FALSE
 		END IsHit;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR p, plast : Point; i : SIGNED32;
 		BEGIN
 			canvas.SetLineWidth(width.Get());
@@ -530,7 +530,7 @@ TYPE
 
 	Circle* = OBJECT(Figure)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMFigures.GenCircle");
@@ -538,7 +538,7 @@ TYPE
 			EXCL(state, EditPoints);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		VAR pp: WMProperties.PointProperty;
 		BEGIN
 			RecachePoints;
@@ -552,7 +552,7 @@ TYPE
 			Initialize^;
 		END Initialize;
 
-		PROCEDURE Normalize;
+		PROCEDURE { OVERRIDE } Normalize;
 		VAR p:Point; rect: WMRectangles.Rectangle; r,n:SIZE;
 		BEGIN
 			rect.l := MAX(SIZE); rect.t := MAX(SIZE); rect.r := MIN(SIZE); rect.b := MIN(SIZE);
@@ -570,7 +570,7 @@ TYPE
 			bounds.Set(rect);
 		END Normalize;
 
-		PROCEDURE IsHit*(mx, my: SIZE): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(mx, my: SIZE): BOOLEAN;
 		VAR radius0, radius: SIZE;
 		BEGIN
 			IF ~ (Reshape IN state) THEN RETURN FALSE END;
@@ -583,7 +583,7 @@ TYPE
 			END;
 		END IsHit;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR p, q : Point;
 		BEGIN
 			DrawBackground^(canvas);
@@ -605,7 +605,7 @@ TYPE
 
 	Rectangle* = OBJECT(Figure)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMFigures.GenRectangle");
@@ -613,7 +613,7 @@ TYPE
 			EXCL(state, EditPoints);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		VAR pp: WMProperties.PointProperty;
 		BEGIN
 			RecachePoints;
@@ -627,7 +627,7 @@ TYPE
 			Initialize^;
 		END Initialize;
 
-		PROCEDURE IsHit*(mx, my: SIZE): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(mx, my: SIZE): BOOLEAN;
 		BEGIN
 			IF ~ (Reshape IN state) THEN RETURN FALSE
 			ELSIF Filled IN state THEN
@@ -641,7 +641,7 @@ TYPE
 		END IsHit;
 
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR p, q : Point; rect : WMRectangles.Rectangle;
 		BEGIN
 			DrawBackground^(canvas);
@@ -668,7 +668,7 @@ TYPE
 		pointArray- : ARRAY 2048 OF WMGraphics.Point2d; (* read-only export for re-use of functionality *)
 		nSegments-:SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMFigures.GenSpline");
@@ -677,7 +677,7 @@ TYPE
 			RecachePoints;
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		VAR pp:WMProperties.PointProperty;
 		BEGIN
 			Initialize^;
@@ -709,7 +709,7 @@ TYPE
 		END Inside0;*)
 
 		(* Is X, Y somewhere inside the polygon defined by p ? *)
-		PROCEDURE Inside*(X, Y: SIZE): BOOLEAN;
+		PROCEDURE { OVERRIDE } Inside*(X, Y: SIZE): BOOLEAN;
 		VAR c: SIGNED32; p,q: WMGraphics.Point2d;
 			i:SIZE;
 		BEGIN
@@ -726,7 +726,7 @@ TYPE
 			RETURN ODD(c);
 		END Inside;
 
-		PROCEDURE IsHit*(mx, my: SIZE): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(mx, my: SIZE): BOOLEAN;
 		VAR p, q: Point; i : SIGNED32;
 		BEGIN
 			IF (points = NIL) OR (points.next = NIL) THEN RETURN FALSE; END;
@@ -748,7 +748,7 @@ TYPE
 			RETURN FALSE
 		END IsHit;
 
-		PROCEDURE RecachePoints*; (*build point list in parent coordinates*)
+		PROCEDURE { OVERRIDE } RecachePoints*; (*build point list in parent coordinates*)
 		BEGIN
 			Acquire;
 			RecachePoints^;(*no normalization at this location => the following procedure yields results in parent coordinates, stored in PointProperties; see AddPoint()*)
@@ -756,7 +756,7 @@ TYPE
 			Release;
 		END RecachePoints;
 
-		PROCEDURE Normalize*;
+		PROCEDURE { OVERRIDE } Normalize*;
 		VAR i:SIGNED32; rect:WMRectangles.Rectangle; p:Point;
 		BEGIN (*if called after RecachePoints, point coordinates are in stable parent coordinates*)(*oldrect:=bounds.Get();*)
 			Acquire;
@@ -781,7 +781,7 @@ TYPE
 			Release;
 		END Normalize;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR p: Point; col: WMGraphics.Color; 
 		BEGIN
 			DrawBackground^(canvas);
@@ -801,7 +801,7 @@ TYPE
 			END;
 		END DrawBackground;
 		
-		PROCEDURE Length*(): REAL;
+		PROCEDURE { OVERRIDE } Length*(): REAL;
 		VAR i,x,y,x0,y0:SIZE; 
 			l,length: REAL;
 			nSegments:SIZE;

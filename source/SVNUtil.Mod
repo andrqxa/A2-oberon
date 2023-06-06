@@ -33,7 +33,7 @@ TYPE
 			RETURN found & (Files.Old ( mask^ ) # NIL);
 		END FileExists;
 
-		PROCEDURE Open*(CONST m: ARRAY OF CHAR; flags: SET);
+		PROCEDURE { OVERRIDE } Open*(CONST m: ARRAY OF CHAR; flags: SET);
 		BEGIN
 			COPY ( m, mask^ );
 			(* remove path delimiter at the end *)
@@ -50,7 +50,7 @@ TYPE
 			adding := FALSE;
 		END Open;
 
-		PROCEDURE GetEntry*(VAR name: ARRAY OF CHAR; VAR flags: SET; VAR time, date: SIGNED32; VAR size: Files.Size): BOOLEAN;
+		PROCEDURE { OVERRIDE } GetEntry*(VAR name: ARRAY OF CHAR; VAR flags: SET; VAR time, date: SIGNED32; VAR size: Files.Size): BOOLEAN;
 		BEGIN
 			IF found THEN
 				COPY ( name0, name );
@@ -65,7 +65,7 @@ TYPE
 
 		(** For internal use only. *)
 
-		PROCEDURE PutEntry*(CONST name: ARRAY OF CHAR; flags: SET; time, date: SIGNED32; size: Files.Size);
+		PROCEDURE { OVERRIDE } PutEntry*(CONST name: ARRAY OF CHAR; flags: SET; time, date: SIGNED32; size: Files.Size);
 		BEGIN
 			ASSERT(adding);
 

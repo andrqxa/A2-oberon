@@ -32,7 +32,7 @@ TYPE
 		gradientHorizontal: BOOLEAN;
 		properties : RectPropWindow;
 
-		PROCEDURE &New*;
+		PROCEDURE (* OVERRIDE *) & New*;
 		BEGIN
 			(* default values *)
 			lineColor := 0000000FFH;
@@ -45,7 +45,7 @@ TYPE
 			NEW(properties, SELF);
 		END New;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: FLOAT32; quality, preview: BOOLEAN);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: FLOAT32; quality, preview: BOOLEAN);
 		VAR rw, rh: FLOAT32; linePixel: SIZE;
 		BEGIN
 
@@ -78,12 +78,12 @@ TYPE
 
 		END Draw;
 
-		PROCEDURE Redraw*;
+		PROCEDURE { OVERRIDE } Redraw*;
 		BEGIN
 			Redraw^;
 		END Redraw;
 
-		PROCEDURE Clone*(): DTPData.ContentObject;
+		PROCEDURE { OVERRIDE } Clone*(): DTPData.ContentObject;
 		VAR newObj: RectObject;
 		BEGIN
 			NEW(newObj); newObj.contentName := Strings.NewString(contentName^);
@@ -100,7 +100,7 @@ TYPE
 			RETURN newObj;
 		END Clone;
 
-		PROCEDURE Load*(elem: XML.Element);
+		PROCEDURE { OVERRIDE } Load*(elem: XML.Element);
 		VAR name : Strings.String;
 			cont: XMLObjects.Enumerator;
 			ptr: ANY;
@@ -138,7 +138,7 @@ TYPE
 			END;
 		END Load;
 
-		PROCEDURE Store*(VAR w: Files.Writer);
+		PROCEDURE { OVERRIDE } Store*(VAR w: Files.Writer);
 		VAR tempString: ARRAY 256 OF CHAR;
 		BEGIN
 			w.String('  <node-attribute name="type" value="Rectangle" />'); w.Ln;
@@ -150,12 +150,12 @@ TYPE
 			w.String('  <node-attribute name="gradient-horizontal" value="'); IF gradientHorizontal THEN w.Int(1, 0); ELSE w.Int(0, 0); END; w.String('" />'); w.Ln;
 		END Store;
 
-		PROCEDURE Show*(x, y: SIZE);
+		PROCEDURE { OVERRIDE } Show*(x, y: SIZE);
 		BEGIN
 			properties.Show(x, y);
 		END Show;
 
-		PROCEDURE Hide*;
+		PROCEDURE { OVERRIDE } Hide*;
 		VAR viewport: WMWindowManager.ViewPort;
 		BEGIN
 			viewport := WMWindowManager.GetDefaultView();
@@ -163,7 +163,7 @@ TYPE
 			properties.Hide;
 		END Hide;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Hide;
 		END Close;
@@ -486,7 +486,7 @@ TYPE
 			RefreshValues;
 		END SetValueHandler;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			shown := FALSE;
 			Hide;

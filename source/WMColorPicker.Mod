@@ -32,7 +32,7 @@ TYPE
 		owner : PickColorDlg;
 		(*This is need for update of type spector & gradient when select text editor*)
 		(* *)
-		PROCEDURE FocusReceived*;
+		PROCEDURE { OVERRIDE } FocusReceived*;
 		VAR
 			i : SIZE;
 		BEGIN
@@ -53,7 +53,7 @@ TYPE
 		updatePanels, updateEditors:BOOLEAN;(*!Stupid*)
 		owner:PickColorDlg;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			updateEditors:=TRUE;
@@ -63,7 +63,7 @@ TYPE
 (*			SetExternalColorChangeHandler(ColorChanged);*)
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, data : ANY);
 		VAR
 			tempString : ARRAY 256 OF CHAR;
 			c, R, G, B : WMGraphics.Color;
@@ -101,7 +101,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE DrawBackground(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground(canvas : WMGraphics.Canvas);
 		VAR mode : INTEGER;
 			 rect : WMGraphics.Rectangle;
 		BEGIN
@@ -116,13 +116,13 @@ TYPE
 	VAR
 		onSelect- : WMEvents.EventSource;
 
-		PROCEDURE &Init;
+		PROCEDURE (* OVERRIDE *) & Init;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("ColorBut"));
 			NEW(onSelect, SELF, Strings.NewString("onSelect"), NIL, NIL); events.Add(onSelect);
 		END Init;
-		PROCEDURE DrawBackground(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground(canvas : WMGraphics.Canvas);
 		VAR mode: INTEGER; borderWidth : SIZE; mid : WMGraphics.Color;
 			 rect : WMGraphics.Rectangle;
 		BEGIN
@@ -141,7 +141,7 @@ TYPE
 
 			Release
 		END DrawBackground;
-		PROCEDURE PointerDown(x, y: SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerDown(x, y: SIZE; keys : SET); (** PROTECTED *)
 		VAR
 			o:ColorBut;
 		BEGIN
@@ -156,7 +156,7 @@ TYPE
 			PointerDown^(x, y, keys);
 		END PointerDown;
 
-		PROCEDURE DragDropped(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		BEGIN
 			ConfirmDrag(FALSE, NIL);
 		END DragDropped;
@@ -231,14 +231,14 @@ TYPE
 				END;
 		END UpdateCur;
 
-		PROCEDURE PointerDown(x, y: SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerDown(x, y: SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			down:=TRUE;
 			SetPosition((MIN(MAX(y,gRect.t),gRect.b)-gRect.t)*255 DIV gh);
 			PointerDown^(x, y, keys)
 		END PointerDown;
 
-		PROCEDURE PointerMove(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerMove(x, y : SIZE; keys : SET); (** PROTECTED *)
 
 		BEGIN
 			IF down THEN
@@ -247,13 +247,13 @@ TYPE
 			PointerMove^(x, y, keys)
 		END PointerMove;
 
-		PROCEDURE PointerUp(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerUp(x, y : SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			down:=FALSE;
 			PointerUp^(x, y, keys)
 		END PointerUp;
 
-		PROCEDURE &Init;
+		PROCEDURE (* OVERRIDE *) & Init;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("Gradient"));
@@ -360,7 +360,7 @@ TYPE
 			END;
 		END DrawGradientb;
 
-		PROCEDURE DrawBackground(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground(canvas : WMGraphics.Canvas);
 		VAR
 			mode : INTEGER;
 			y : SIZE;
@@ -441,14 +441,14 @@ TYPE
 
 		END SetPosition;
 
-		PROCEDURE PointerDown(x, y: SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerDown(x, y: SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			down:=TRUE;
 			PointerDown^(x, y, keys);
 			SetPosition(x, y);
 		END PointerDown;
 
-		PROCEDURE PointerMove(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerMove(x, y : SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			SetPointerInfo(pointer);
 			IF down THEN
@@ -483,14 +483,14 @@ TYPE
 				END;
 		END UpdateCur;
 
-		PROCEDURE PointerUp(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerUp(x, y : SIZE; keys : SET); (** PROTECTED *)
 		BEGIN
 			down:=FALSE;
 			PointerUp^(x, y, keys)
 		END PointerUp;
 
 
-		PROCEDURE &Init;
+		PROCEDURE (* OVERRIDE *) & Init;
 		BEGIN
 			Init^;
 			NEW(pointer);
@@ -628,7 +628,7 @@ TYPE
 		END DrawSpectrumLa;
 
 
-		PROCEDURE DrawBackground(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground(canvas : WMGraphics.Canvas);
 		VAR
 			mode : INTEGER;
 			r : WMGraphics.Rectangle;
@@ -801,12 +801,12 @@ TYPE
 			RETURN panel
 		END CreateForm;
 
-		PROCEDURE Ok*(sender, data:ANY);
+		PROCEDURE { OVERRIDE } Ok*(sender, data:ANY);
 		BEGIN {EXCLUSIVE}
 			result := WMDialogs.ResOk
 		END Ok;
 
-		PROCEDURE Abort*(sender, data:ANY);
+		PROCEDURE { OVERRIDE } Abort*(sender, data:ANY);
 		BEGIN {EXCLUSIVE}
 			result := WMDialogs.ResAbort
 		END Abort;

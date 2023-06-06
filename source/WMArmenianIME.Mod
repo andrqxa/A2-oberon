@@ -11,7 +11,7 @@ TYPE
 
 
 		(* Map characters from US-Keyboard to  armenian keyboard *)
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		BEGIN
 			CASE ucs OF
 			(* unshifted *)

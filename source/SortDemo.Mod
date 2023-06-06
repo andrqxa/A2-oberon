@@ -59,7 +59,7 @@ TYPE
 		END New;
 
 
-		PROCEDURE Handle*( VAR x: WMMessages.Message );
+		PROCEDURE { OVERRIDE } Handle*( VAR x: WMMessages.Message );
 		BEGIN
 			IF x.msgType = WMMessages.MsgClose THEN  cw.Close  ELSE  Handle^( x )  END
 		END Handle;
@@ -655,12 +655,12 @@ TYPE
 				NEW( sorter, av )
 			END New;
 
-			PROCEDURE Handle*( VAR x: WMMessages.Message );
+			PROCEDURE { OVERRIDE } Handle*( VAR x: WMMessages.Message );
 			BEGIN
 				IF x.msgType = WMMessages.MsgClose THEN  Close  ELSE  Handle^( x )  END
 			END Handle;
 
-			PROCEDURE Close*;
+			PROCEDURE { OVERRIDE } Close*;
 			BEGIN
 				sorter.Terminate;  av.Close;  Close^
 			END Close;

@@ -20,20 +20,20 @@ IMPORT SYSTEM, Machine, KernelLog, ASPI := SymbiosASPI, Disks, Plugins;
 	Device = OBJECT (Disks.Device)
 	VAR drive: SIGNED32;
 
-		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		BEGIN
 			IF op = Disks.Read THEN res := ReadBlocks(drive, block, num, ADDRESSOF(data[ofs]), 0)
 			ELSIF op = Disks.Write THEN res := WriteBlocks(drive, block, num, ADDRESSOF(data[ofs]), 0)
 			END
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			size := devs[drive].capacity;
 			res := Disks.Ok
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message;  VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg: Disks.Message;  VAR res: INTEGER);
 		BEGIN
 			IF msg IS Disks.GetGeometryMsg THEN
 				WITH msg: Disks.GetGeometryMsg DO

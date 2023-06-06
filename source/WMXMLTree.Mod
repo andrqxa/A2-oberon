@@ -38,7 +38,7 @@ TYPE
 
 		editor : WMEditors.Editor;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrXMLView);

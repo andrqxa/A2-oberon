@@ -42,7 +42,7 @@ BEGIN
 	END;
 END seed;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 VAR
 	i, j: SIGNED32;
 BEGIN
@@ -68,7 +68,7 @@ BEGIN
 	END
 END tick;
 
-PROCEDURE Shade*(VAR ray: srBase.Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: srBase.Ray);
 VAR
 	x,y: SIGNED32;
 	lx, ly: SREAL;
@@ -155,7 +155,7 @@ BEGIN
 	passable:=FALSE;
 END init;
 
-PROCEDURE Shade*(VAR ray: srBase.Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: srBase.Ray);
 VAR
 	lx, ly: SREAL;
 	color: srBase.COLOR;
@@ -195,7 +195,7 @@ END Shade;
 END RDVox;
 
 TYPE RDMirror*=OBJECT(RDVox);
-PROCEDURE Shade*(VAR ray: srBase.Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: srBase.Ray);
 VAR
 	i, j: SIGNED32;
 	lx, ly: SREAL;
@@ -294,7 +294,7 @@ BEGIN
 	END
 END bounds;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 VAR
 		i, j,k: SIGNED32;
 		A1, B1, C1, D1: FLOAT32;
@@ -333,7 +333,7 @@ BEGIN
 	END;
  END tick;
 
-PROCEDURE probe*(x,y,z: SREAL):Voxel;
+PROCEDURE { OVERRIDE } probe*(x,y,z: SREAL):Voxel;
 VAR
 	X,Y,Z: SREAL;
 	i,j,k: SIGNED32;
@@ -352,7 +352,7 @@ BEGIN
 	END
 END probe;
 
-PROCEDURE Shade*(VAR ray: srBase.Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: srBase.Ray);
 VAR
 	oldxyz: srBase.PT;
 	drx, dry, drz: SREAL;
@@ -484,7 +484,7 @@ END RDVolVox;
 
 TYPE RDCloud*=OBJECT(RDVolVox);
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 VAR
 		i, j,k: SIGNED32;
 		A1, B1, C1, D1: FLOAT32;

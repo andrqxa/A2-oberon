@@ -166,7 +166,7 @@ TYPE
 		number : SIGNED32; (* Suffix appended to name to get unique device name *)
 		next : UsbStorageDevice;
 
-		PROCEDURE Transfer* (op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR diskres: INTEGER);
+		PROCEDURE { OVERRIDE } Transfer* (op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR diskres: INTEGER);
 		VAR direction : SET; cmd : ARRAY 12 OF CHAR; trans: SIGNED32; i, tlen, num0, offset: SIZE;
 		BEGIN {EXCLUSIVE}
 			IF (op = Disks.Read) OR (op = Disks.Write) THEN
@@ -215,7 +215,7 @@ TYPE
 		END Transfer;
 
 		(** Get number of blocks and size of blocks using the UFI Read Capacity command *)
-		PROCEDURE GetSize* (VAR size: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } GetSize* (VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF Debug.Trace & Debug.traceInfo THEN KernelLog.String("UsbStorage: GetSize: "); KernelLog.Ln; END;
 			(* Some devices I've seen didn't like to be asked for their capacity when no medium was inserted... *)
@@ -235,7 +235,7 @@ TYPE
 			res := ResOk; (* Allow short transfer *)
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message; VAR diskres: INTEGER);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg: Disks.Message; VAR diskres: INTEGER);
 		VAR cmd : ARRAY 12 OF CHAR; i : SIGNED32; fdp : FlexibleDiskPage;
 		BEGIN {EXCLUSIVE}
 			FOR i := 0 TO 11 DO cmd[i] := CHR(0); END;
@@ -808,7 +808,7 @@ TYPE
 			RETURN succeeded > 0;
 		END RegisterDevices;
 
-		PROCEDURE Connect*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect*(): BOOLEAN;
 		BEGIN
 			(* note that this procedure is common to the Bulkonly, CB and CB/I transport layer *)
 			(* get the default control pipe *)
@@ -845,7 +845,7 @@ TYPE
 			RETURN TRUE;
 		END Connect;
 
-		PROCEDURE Disconnect*;
+		PROCEDURE { OVERRIDE } Disconnect*;
 		BEGIN
 			diskManager.RemovedDriver(SELF);
 		END Disconnect;

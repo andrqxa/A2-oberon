@@ -145,17 +145,17 @@ TYPE
 			END;
 		END CheckEntriesSize;
 
-		PROCEDURE Error*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Error*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN
 			Add(TypeError, source, position, message, nofErrors)
 		END Error;
 
-		PROCEDURE Warning*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Warning*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN
 			Add(TypeWarning, source, position, message, nofWarnings);
 		END Warning;
 
-		PROCEDURE Information*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Information*(CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN
 			Add(TypeInformation, source, position, message, nofInformations);
 		END Information;
@@ -289,7 +289,7 @@ TYPE
 
 		summary : ARRAY 256 OF CHAR;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrDiagnosticsView);
@@ -308,7 +308,7 @@ TYPE
 			onClick.Add(OnClickHandler);
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = showMarkers) THEN
 				ShowMarkers(showMarkers.Get());
@@ -319,7 +319,7 @@ TYPE
 			END
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			ShowMarkers(showMarkers.Get());
@@ -402,7 +402,7 @@ TYPE
 			Release;
 		END SortBy;
 
-		PROCEDURE GetCellData*(column, row : SIZE) : ANY; (* override *)
+		PROCEDURE { OVERRIDE } GetCellData*(column, row : SIZE) : ANY; (* override *)
 		VAR info : CellInfo; entryValid : BOOLEAN; entry : ViewEntry;
 		BEGIN
 			Acquire;

@@ -514,7 +514,7 @@ TYPE
 		lcr : SET;   (* Line Control Register *)
 		mc : SET; (*  Serials.DTR, Serials.RTS, Serials.DSR, Serials.CTS, Serials.RI, Serials.DCD & Serials.BI (Break Interrupt) *)
 
-		PROCEDURE Connect() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect() : BOOLEAN;
 		VAR ignore : Usbdi.Status;
 		BEGIN
 			(* Get default control pipe *)
@@ -565,7 +565,7 @@ TYPE
 			RETURN TRUE;
 		END Connect;
 
-		PROCEDURE Disconnect;
+		PROCEDURE { OVERRIDE } Disconnect;
 		BEGIN
 			IF Debug THEN ShowModule("Driver Disconnected"); KernelLog.Ln; END;
 			Serials.UnRegisterPort(SELF.port);
@@ -941,7 +941,7 @@ TYPE
 			NEW(sendBuffer, 128); NEW(data1,1);
 		END InitPort;
 
-		PROCEDURE Open(bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Open(bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF open THEN
 				IF Verbose THEN ShowModule(name); KernelLog.String(" already open"); KernelLog.Ln; END;
@@ -957,7 +957,7 @@ TYPE
 		END Open;
 
 		(** Send len characters from buf to output, starting at ofs. res is non-zero on error. *)
-		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR status : Usbdi.Status;
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN res := Serials.Closed; RETURN; END;
@@ -975,7 +975,7 @@ TYPE
 		END Send;
 
 		(** Send a single character to the UART. *)
-		PROCEDURE SendChar(ch: CHAR; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SendChar(ch: CHAR; VAR res : INTEGER);
 		VAR status : Usbdi.Status;
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN res := Serials.Closed; RETURN; END;
@@ -992,7 +992,7 @@ TYPE
 		END SendChar;
 
 		(** Wait for the next character is received in the input buffer. The buffer is fed by HandleData *)
-		PROCEDURE ReceiveChar(VAR ch: CHAR; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } ReceiveChar(VAR ch: CHAR; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN res := Serials.Closed; RETURN; END;
 			AWAIT(tail # head);
@@ -1007,7 +1007,7 @@ TYPE
 
 		(** Receive size characters into buf, starting at ofs and return the effective number of bytes read in len.
 			Wait until at least min bytes (possibly zero) are available. res is non-zero on error. *)
-		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR ch: CHAR;
 		BEGIN
 			len := 0;
@@ -1066,7 +1066,7 @@ TYPE
 			END;
 		END HandleData;
 
-		PROCEDURE Available(): SIZE;
+		PROCEDURE { OVERRIDE } Available(): SIZE;
 		BEGIN {EXCLUSIVE}
 			RETURN (tail - head) MOD BufSize
 		END Available;
@@ -1132,7 +1132,7 @@ TYPE
 		END SetPortState;
 
 		(** Get the port state: speed, no. of data bits, parity, no. of stop bits *)
-		PROCEDURE GetPortState(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : SIGNED32);
+		PROCEDURE { OVERRIDE } GetPortState(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : SIGNED32);
 		VAR set : SET; res : BOOLEAN;
 		BEGIN
 			(* get parameters *)
@@ -1179,7 +1179,7 @@ TYPE
 		END GetPortState;
 
 		(** ClearMC - Clear the specified modem control lines.  s may contain DTR, RTS & Break. *)
-		PROCEDURE ClearMC(s: SET);
+		PROCEDURE { OVERRIDE } ClearMC(s: SET);
 		VAR  temp : SET; ignore : BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			IF s * {Serials.DTR, Serials.RTS} # {} THEN
@@ -1196,7 +1196,7 @@ TYPE
 		END ClearMC;
 
 		(** SetMC - Set the specified modem control lines.  s may contain DTR, RTS & Break. *)
-		PROCEDURE SetMC(s: SET);
+		PROCEDURE { OVERRIDE } SetMC(s: SET);
 		VAR ignore : BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			IF s * {Serials.DTR, Serials.RTS} # {} THEN ignore := driver.SetMCR(s * {Serials.DTR, Serials.RTS}); END;
@@ -1206,13 +1206,13 @@ TYPE
 		END SetMC;
 
 		(** GetMC - Return the state of the specified modem control lines. s contains the current state of DSR, CTS, RI, DCD & Break Interrupt. *)
-		PROCEDURE GetMC(VAR s: SET);
+		PROCEDURE { OVERRIDE } GetMC(VAR s: SET);
 		BEGIN {EXCLUSIVE}
 			s := driver.msr; (* Inlcudes CTS, DSR, RI, CD *)
 			IF FtdiRsBi IN driver.lsr THEN INCL(s, Serials.Break); END;
 		END GetMC;
 
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		VAR timer : Kernel.Timer; counter : SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN

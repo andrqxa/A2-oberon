@@ -84,7 +84,7 @@ TYPE
 		leftClick, dragPossible : BOOLEAN;
 		downX, downY : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrMenuPanel);
@@ -106,7 +106,7 @@ TYPE
 			takesFocus.Set(TRUE);
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = clSelected) THEN
 				Invalidate;
@@ -123,7 +123,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			horizontalI := horizontal.Get();
@@ -181,7 +181,7 @@ TYPE
 			END;
 		END Measure;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR
 			child : WMTrees.TreeNode;
 			x, y, dx, dy, t, textY : SIZE;
@@ -495,7 +495,7 @@ TYPE
 			END;
 		END CloseSubMenu;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR node : WMTrees.TreeNode;
 		BEGIN
 			IF horizontal.Get() THEN
@@ -515,7 +515,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR node : WMTrees.TreeNode;
 		BEGIN
 			IF leftClick THEN
@@ -535,7 +535,7 @@ TYPE
 			dragPossible := FALSE;
 		END PointerUp;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR node : WMTrees.TreeNode;
 		BEGIN
 			IF dragPossible THEN
@@ -557,7 +557,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			IF hover # NIL THEN hover := NIL; Invalidate; END;
 		END PointerLeave;
@@ -718,7 +718,7 @@ TYPE
 			Release;
 		END SelectCurrent;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags: SET; VAR keySym: SIZE); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags: SET; VAR keySym: SIZE); (** PROTECTED *)
 		VAR focusPanel : MenuPanel;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
@@ -741,7 +741,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			CloseSubMenu(FALSE);
@@ -751,7 +751,7 @@ TYPE
 			END;
 		END FocusLost;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			CloseSubMenu(FALSE);
@@ -773,7 +773,7 @@ TYPE
 			color := 04FH;
 		END New;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32);
 		BEGIN
 			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), color, WMGraphics.ModeSrcOverDst);
 		END Draw;
@@ -833,7 +833,7 @@ TYPE
 			END
 		END CloseMenu;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			IF takesFocus THEN
@@ -841,7 +841,7 @@ TYPE
 			END;
 		END FocusLost;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32); (** override *)
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32); (** override *)
 		BEGIN
 			Draw^(canvas, w, h, q);
 			WMGraphicUtilities.DrawRect(canvas, WMRectangles.MakeRect(0, 0, w, h), WMGraphics.Black, WMGraphics.ModeCopy);

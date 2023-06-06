@@ -57,12 +57,12 @@ TYPE
 			streamInfo.seekability := {SeekByte};
 		END InitFileReader;
 
-		PROCEDURE CanSetPos*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*(): BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END CanSetPos;
 
-		PROCEDURE SetPos*(pos : Streams.Position);
+		PROCEDURE { OVERRIDE } SetPos*(pos : Streams.Position);
 		BEGIN
 			f.Set(r, pos);
 			Reset;
@@ -123,7 +123,7 @@ TYPE
 			demultiplexer.GetData(streamNr, buf, ofs, size, min, len, res)
 		END Receive;
 
-		PROCEDURE SetPos*(pos : Streams.Position);
+		PROCEDURE { OVERRIDE } SetPos*(pos : Streams.Position);
 		VAR  seekType, itemSize: SIGNED32; res: INTEGER;
 		BEGIN
 			seekType := SeekByte;

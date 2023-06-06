@@ -23,7 +23,7 @@ MODULE SymbiosDisks;	(** non-portable *)
 				writePreComp: SIGNED32;
 				capacity: SIGNED32;
 
-			PROCEDURE Transfer* (op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
+			PROCEDURE { OVERRIDE } Transfer* (op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 			VAR
 				srb: ASPI.ExecIOCmdSRB; size, n, i, copyAdr, orgadr, orgsize: SIGNED32; phys: ARRAY MaxRanges OF Machine.Range;
 			BEGIN
@@ -122,7 +122,7 @@ MODULE SymbiosDisks;	(** non-portable *)
 *)
 			END Transfer;
 
-			PROCEDURE GetSize* (VAR size: SIGNED32; VAR res: INTEGER);
+			PROCEDURE { OVERRIDE } GetSize* (VAR size: SIGNED32; VAR res: INTEGER);
 			BEGIN
 				size := capacity; res := Disks.Ok;
 				IF TraceVerbose THEN

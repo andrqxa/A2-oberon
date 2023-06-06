@@ -85,7 +85,7 @@ TYPE
 			END
 		END CheckVertical;
 
-		PROCEDURE IsHit*(x, y : SIZE) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(x, y : SIZE) : BOOLEAN;
 		BEGIN
 			IF ~useBitmaps THEN RETURN TRUE
 			ELSE
@@ -95,7 +95,7 @@ TYPE
 			END
 		END IsHit;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF ~hasFocus OR (ABS(lastX - (bounds.l + x)) < 10) & (ABS(lastY - (bounds.t + y)) < 10) THEN manager.ToFront(master) END;
 			lastX := bounds.l + x; lastY := bounds.t + y;
@@ -122,7 +122,7 @@ TYPE
 			IF master # NIL THEN master.HintReduceQuality(TRUE) END
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR curX, curY, dx, dy, moveX, moveY, newWidth, newHeight, snapWidth, snapHeight: SIZE;
 		tx, ty : SIZE;
 		BEGIN
@@ -250,7 +250,7 @@ TYPE
 			IF (width > snapWidth - draggingSnapRange) & (width < snapWidth + draggingSnapRange) THEN width := snapWidth END;
 		END SnapDraggingSize;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys:SET);
 		VAR m : Messages.Message;
 		BEGIN
 			IF master # NIL THEN master.HintReduceQuality(FALSE) END;
@@ -265,7 +265,7 @@ TYPE
 			corner := NoCorner;
 		END PointerUp;
 
-		PROCEDURE Handle*(VAR m : Messages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m : Messages.Message);
 		BEGIN
 			IF m.msgType = Messages.MsgFocus THEN
 				IF m.msgSubType = Messages.MsgSubMasterFocusGot THEN hasFocus := TRUE
@@ -353,7 +353,7 @@ TYPE
 			END;
 		END CheckButtons;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR oldHover : SIGNED32;
 		BEGIN
 			IF ~dragging THEN
@@ -377,7 +377,7 @@ TYPE
 			PointerMove^(x, y, keys);
 		END PointerMove;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			CheckButtons(x, y, down);
 			PointerDown^(x, y, keys);
@@ -387,7 +387,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerUp*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y:SIZE; keys:SET);
 		VAR temp : SIGNED32; l, t, w, h: SIZE;
 			m : Messages.Message;
 		BEGIN
@@ -421,7 +421,7 @@ TYPE
 			down := NoButton;
 		END PointerUp;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			PointerLeave^;
 			IF (hover # NoButton) THEN
@@ -430,7 +430,7 @@ TYPE
 			END;
 		END PointerLeave;
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
+		PROCEDURE { OVERRIDE } Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
 		CONST IconBorder  = 5;
 		VAR
 			color, tc, sw : SIGNED32; tx, ty, dx, dy : SIZE; fw, fh : FLOAT32; a, b, c, img : Graphics.Image; title : String;
@@ -563,7 +563,7 @@ TYPE
 			END;
 		END CloseDispatch;
 
-		PROCEDURE StyleChanged*;
+		PROCEDURE { OVERRIDE } StyleChanged*;
 		VAR s : WM.WindowStyle; r : WMRectangles.Rectangle;
 		BEGIN
 			s := manager.GetStyle();
@@ -594,7 +594,7 @@ TYPE
 
 	LeftWindow* = OBJECT(DecorWindow)
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
+		PROCEDURE { OVERRIDE } Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
 		VAR color, sw : SIGNED32; a, b, c : Graphics.Image;
 		BEGIN
 			IF hasFocus THEN color := sac; sw := basw ELSE color := sic; sw := bisw END;
@@ -607,7 +607,7 @@ TYPE
 			END
 		END Draw;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF ~dragging & ~(WM.FlagNoResizing IN flags) THEN
 				IF (y < distXY) THEN SetPointerInfo(manager.pointerULDR);
@@ -618,7 +618,7 @@ TYPE
 			PointerMove^(x, y, keys)
 		END PointerMove;
 
-		PROCEDURE StyleChanged*;
+		PROCEDURE { OVERRIDE } StyleChanged*;
 		VAR s : WM.WindowStyle; r : WMRectangles.Rectangle;
 		BEGIN
 			s := manager.GetStyle();
@@ -639,7 +639,7 @@ TYPE
 
 	RightWindow* = OBJECT(DecorWindow)
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
+		PROCEDURE { OVERRIDE } Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
 		VAR color, sw : SIGNED32; a, b, c : Graphics.Image;
 		BEGIN
 			IF hasFocus THEN color := sac; sw := basw ELSE color := sic; sw := bisw END;
@@ -652,7 +652,7 @@ TYPE
 			END
 		END Draw;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF ~dragging & ~(WM.FlagNoResizing IN flags) THEN
 				IF (y < distXY) THEN SetPointerInfo(manager.pointerURDL);
@@ -663,7 +663,7 @@ TYPE
 			PointerMove^(x, y, keys)
 		END PointerMove;
 
-		PROCEDURE StyleChanged*;
+		PROCEDURE { OVERRIDE } StyleChanged*;
 		VAR s : WM.WindowStyle; r : WMRectangles.Rectangle;
 		BEGIN
 			s := manager.GetStyle();
@@ -683,7 +683,7 @@ TYPE
 
 	BottomWindow* = OBJECT(DecorWindow)
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
+		PROCEDURE { OVERRIDE } Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
 		VAR color, sw : SIGNED32; a, b, c : Graphics.Image;
 		BEGIN
 			IF hasFocus THEN color := sac; sw := basw ELSE color := sic; sw := bisw END;
@@ -696,7 +696,7 @@ TYPE
 			END
 		END Draw;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF ~dragging & ~(WM.FlagNoResizing IN flags) THEN
 				IF (x < distXY) THEN SetPointerInfo(manager.pointerURDL);
@@ -707,7 +707,7 @@ TYPE
 			PointerMove^(x, y, keys)
 		END PointerMove;
 
-		PROCEDURE StyleChanged*;
+		PROCEDURE { OVERRIDE } StyleChanged*;
 		VAR s : WM.WindowStyle; r : WMRectangles.Rectangle;
 		BEGIN
 			s := manager.GetStyle();
@@ -735,7 +735,7 @@ TYPE
 			isVisible := TRUE;
 		END New;
 
-		PROCEDURE StyleChanged*;
+		PROCEDURE { OVERRIDE } StyleChanged*;
 		VAR s : WM.WindowStyle; r : WMRectangles.Rectangle;
 		BEGIN
 			s := manager.GetStyle();
@@ -748,7 +748,7 @@ TYPE
 			END;
 		END StyleChanged;
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
+		PROCEDURE { OVERRIDE } Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
 		VAR rect : WMRectangles.Rectangle;
 		BEGIN
 			canvas.GetClipRect(rect);

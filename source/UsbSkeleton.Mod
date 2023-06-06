@@ -37,7 +37,7 @@ TYPE
 
 		(*	This procedure is called by the USB system software after an instance of this object has been passed to it via the probe procedure.
 		 	Typically, the code here sets up the communication pipe(s) use by the driver using device.GetPipe(endpointnumber) *)
-		PROCEDURE Connect() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect() : BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END Connect;
@@ -45,7 +45,7 @@ TYPE
 		(*	This procedure is called by the USB system software when the device is removed or your driver is
 		 	unregistered using Usbdi.drivers.Remove(Name).
 		 	Note that the USB system software will automatically remove all pipes allocated by this driver *)
-		PROCEDURE Disconnect;
+		PROCEDURE { OVERRIDE } Disconnect;
 		END Disconnect;
 
 	END YourDriver;

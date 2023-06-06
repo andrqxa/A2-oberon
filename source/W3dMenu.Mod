@@ -262,7 +262,7 @@ TYPE
 			Render
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			IF blurp # NIL THEN blurp.Kill; blurp.AwaitDead END;
 			Close^;
@@ -289,13 +289,13 @@ TYPE
 			Invalidate(Rect.MakeRect(0, 0, img.width, img.height))
 		END Render;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys :SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys :SET);
 		BEGIN
 			mouseKeys := (keys * {0, 1, 2});
 			oldX := x; oldY := y
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y: SIZE; keys: SET);
 		VAR idx : SIGNED32;
 			info : Symbol; dummy : ANY;
 		BEGIN
@@ -336,7 +336,7 @@ TYPE
 			oldX := x; oldY := y
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y: SIZE; keys: SET);
 		BEGIN
 			IF mouseKeys = {0} THEN
 				IF selectedSymbol # NIL THEN
@@ -368,7 +368,7 @@ TYPE
 		END KeyPressed;
 *)
 
-		PROCEDURE Handle*(VAR m : Messages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m : Messages.Message);
 		BEGIN
 			IF m.msgType = Messages.MsgExt THEN
 				IF m.ext IS ReloadMsg THEN Load(m.ext(ReloadMsg).name) END

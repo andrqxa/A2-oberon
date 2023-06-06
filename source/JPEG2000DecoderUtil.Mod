@@ -136,7 +136,7 @@ MODULE JPEG2000DecoderUtil;
 					curByte := 0;
 			END ReInit;
 
-			PROCEDURE NextBit* () : SIGNED32;
+			PROCEDURE { OVERRIDE } NextBit* () : SIGNED32;
 				BEGIN
 					IF curBytePos =  0 THEN
 						(* Do bit unstuffing? *)

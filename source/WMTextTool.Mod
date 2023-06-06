@@ -219,14 +219,14 @@ TYPE
 			END;
 		END New;
 
-		PROCEDURE Resizing*( VAR width, height : SIZE );
+		PROCEDURE { OVERRIDE } Resizing*( VAR width, height : SIZE );
 		BEGIN
 			IF width < WindowWidth THEN width := WindowWidth END;
 			IF height < WindowHeight THEN height := WindowHeight END;
 			Resizing^( width, height )
 		END Resizing;
 
-		PROCEDURE Resized*(width, height: SIZE);
+		PROCEDURE { OVERRIDE } Resized*(width, height: SIZE);
 		BEGIN
 			Resized^(width, height);
 			leftPanel.bounds.SetWidth(width DIV 2);
@@ -450,7 +450,7 @@ TYPE
 			bgColB.clDefault.Set(color);
 		END UpdateColors;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			colorEdit.onChanged.Remove(UpdateColors);
@@ -501,7 +501,7 @@ TYPE
 		END StoreData;
 
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		VAR data: XML.Element;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN

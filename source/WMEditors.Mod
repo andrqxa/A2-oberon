@@ -43,7 +43,7 @@ TYPE
 			SELF.position := position;
 		END Init;
 
-		PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 		VAR sdi : DropString;
 		BEGIN
 			IF (type = WMDropTarget.TypeString) THEN
@@ -69,7 +69,7 @@ TYPE
 			SELF.position := position;
 		END Init;
 
-		PROCEDURE Set*(CONST string : ARRAY OF CHAR; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Set*(CONST string : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			setString(string, position, res);
 		END Set;
@@ -138,7 +138,7 @@ TYPE
 		renderOffsetX : SIZE;
 		lastX, lastY : SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(GSTextField);
@@ -178,7 +178,7 @@ TYPE
 			changeDue := FALSE;
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			(*Resized;
@@ -193,7 +193,7 @@ TYPE
 			END;
 		END SetCurrentCursorVisibility;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR f: WMGraphics.Font;
 
 			PROCEDURE TextHeight(): SIZE;
@@ -221,7 +221,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			typeI := type.Get();
@@ -302,7 +302,7 @@ TYPE
 			END;
 		END SetAsString;
 
-		PROCEDURE LinkChanged*(sender, object : ANY);
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, object : ANY);
 		VAR string : Types.String256; res : INTEGER; real: Types.Longreal; m: Models.Model;
 		BEGIN
 			IF (sender = model) & WMProperties.GetModel(model,m) THEN
@@ -383,7 +383,7 @@ TYPE
 			RETURN ENTIER(x + 0.5);
 		END GetCursorCoordinateX;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas);
 		CONST CursorWidth = 2; BorderWidth = 1;
 		VAR
 			font : WMGraphics.Font; g : WMGraphics.GlyphSpacings;
@@ -848,7 +848,7 @@ TYPE
 			END;
 		END Paste;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; VAR keySym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; VAR keySym : SIZE);
 		BEGIN
 			currentFlags := flags;
 			IF readOnlyI THEN RETURN END;
@@ -907,7 +907,7 @@ TYPE
 			WMTextView.cursorBlinker.Show(SELF);
 		END KeyEvent;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR newCursorPosition: SIZE; oldInterclick : SIGNED32;
 		BEGIN
 			PointerDown^(x, y, keys);
@@ -953,7 +953,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN
 			PointerUp^(x, y, keys);
 			selecting := FALSE;
@@ -968,7 +968,7 @@ TYPE
 			IF dragPossible THEN ResetSelection; dragPossible := FALSE; END;
 		END PointerUp;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR posX : SIGNED32; valid : BOOLEAN; start, end : SIZE;
 		BEGIN
 			IF dragPossible THEN
@@ -992,7 +992,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			PointerLeave^;
 			IF changeDue THEN Changed END;
@@ -1000,7 +1000,7 @@ TYPE
 		END PointerLeave;
 
 		(* Drag away operations *)
-		PROCEDURE AutoStartDrag*;
+		PROCEDURE { OVERRIDE } AutoStartDrag*;
 		VAR
 			image : WMGraphics.Image; canvas : WMGraphics.BufferCanvas;
 			font : WMGraphics.Font;
@@ -1080,7 +1080,7 @@ TYPE
 			END;
 		END DragWasAccepted;
 
-		PROCEDURE DragOver*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragOver*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR pos : SIGNED32; doInvalidate : BOOLEAN;
 		BEGIN
 			IF takesFocus.Get() THEN
@@ -1099,7 +1099,7 @@ TYPE
 			END;
 		END DragOver;
 
-		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR dt : DropTarget; pos : SIGNED32;
 		BEGIN
 			IF takesFocus.Get() THEN
@@ -1154,7 +1154,7 @@ TYPE
 			ime.SetInterface(i);
 		END SetIMEInterface;
 
-		PROCEDURE FocusReceived*;
+		PROCEDURE { OVERRIDE } FocusReceived*;
 		BEGIN
 			FocusReceived^;
 			cursorIsVisible := TRUE;
@@ -1162,7 +1162,7 @@ TYPE
 			Invalidate;
 		END FocusReceived;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			currentFlags := {};
@@ -1181,7 +1181,7 @@ TYPE
 		fractionalDigits-: WMProperties.Int32Property;
 		unitModel-: WMProperties.ReferenceProperty;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(GSNumberField);
@@ -1202,14 +1202,14 @@ TYPE
 			RETURN FALSE
 		END GetUnit;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			IF unitModel.Get()# NIL THEN LinkChanged(unitModel, unitModel.Get()) END;
 			IF model.Get()# NIL THEN LinkChanged(model, model.Get()) END;
 		END RecacheProperties;
 
-		PROCEDURE LinkChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, data : ANY);
 		VAR string : Types.String256; res : INTEGER; real: Types.Longreal; unit: FLOAT64; m: Models.Model;
 		BEGIN
 			IF (sender = model) OR (sender = unitModel) THEN
@@ -1234,7 +1234,7 @@ TYPE
 			END;
 		END LinkChanged;
 
-		PROCEDURE UpdateModel;
+		PROCEDURE { OVERRIDE } UpdateModel;
 		VAR string : Types.String256; res : INTEGER; str: Strings.String; real: Types.Longreal; u: FLOAT64; m: Models.Model;
 		BEGIN
 			GetAsString(string.value);
@@ -1245,7 +1245,7 @@ TYPE
 			END;
 		END UpdateModel;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR reference: XML.Element; unitModel: XML.Element;
 		BEGIN
 			IF property = fractionalDigits THEN
@@ -1288,7 +1288,7 @@ TYPE
 		allowScrollbars- : WMProperties.BooleanProperty;
 		undoMgr*: UndoManager.UndoManager;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(GSEditor);
@@ -1322,7 +1322,7 @@ TYPE
 			tv.SetExtPointerDownHandler(MousePressed);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			tv.focusPrevious.Set(focusPrevious.Get());
@@ -1354,7 +1354,7 @@ TYPE
 			END
 		END Redo;
 
-		PROCEDURE SetFocus*;
+		PROCEDURE { OVERRIDE } SetFocus*;
 		BEGIN
 			(* block super call to avoid loop *)
 			tv.SetFocus
@@ -1369,7 +1369,7 @@ TYPE
 			END
 		END CheckScrollbars;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			tv.isMultiLine.Set(multiLine.Get());
@@ -1381,7 +1381,7 @@ TYPE
 			CheckScrollbars
 		END RecacheProperties;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR reference: XML.Element;
 		BEGIN
 			IF (property = multiLine) THEN tv.isMultiLine.Set(multiLine.Get()); CheckScrollbars;
@@ -1399,7 +1399,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE LinkChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, data : ANY);
 		VAR string : Types.String256; res : INTEGER; real: Types.Longreal; unit: FLOAT64; m: Models.Model;
 		BEGIN
 			LinkChanged^(sender, data);
@@ -1467,13 +1467,13 @@ TYPE
 			SELF.extInterface:=extInterface;
 		END SetExtInterface;
 
-		PROCEDURE FocusReceived*;
+		PROCEDURE { OVERRIDE } FocusReceived*;
 		BEGIN
 			FocusReceived^;
 			tv.SetFocus
 		END FocusReceived;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			tv.FocusLost;
 			IF ime # NIL THEN ime.Hide END;
@@ -1839,7 +1839,7 @@ TYPE
 			text.ReleaseWrite
 		END SetAsString;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF ime # NIL THEN ime.Hide END;

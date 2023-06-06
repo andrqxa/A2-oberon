@@ -22,7 +22,7 @@ TYPE
 		pos: Streams.Position;
 		previous, next : Content;
 
-		PROCEDURE &Init*;
+		PROCEDURE & Init*;
 		BEGIN
 			pos := 0;
 			previous := NIL; next := NIL;
@@ -48,7 +48,7 @@ TYPE
 	VAR
 		name: String;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			name := StrNoName;
@@ -73,7 +73,7 @@ TYPE
 			END;
 		END SetNameAsString;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		BEGIN
 			w.String(name^)
 		END Write;
@@ -85,7 +85,7 @@ TYPE
 		first, last : Content;
 		nofContents : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			first := NIL; last := NIL;
@@ -235,7 +235,7 @@ TYPE
 		dtd: DocTypeDecl;
 		root: Element;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			xmldecl := NIL;
@@ -258,7 +258,7 @@ TYPE
 			RETURN root
 		END GetRoot;
 
-		PROCEDURE AddContent*(c: Content);
+		PROCEDURE { OVERRIDE } AddContent*(c: Content);
 		BEGIN
 			IF (c IS XMLDecl) & (xmldecl = NIL) THEN xmldecl := c(XMLDecl)
 			ELSIF (c IS DocTypeDecl) THEN dtd := c(DocTypeDecl)
@@ -267,7 +267,7 @@ TYPE
 			AddContent^(c)
 		END AddContent;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR e: Objects.Enumerator; c: ANY;
 		BEGIN
 			e := GetContents();
@@ -283,7 +283,7 @@ TYPE
 	VAR
 		version, encoding: String;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			version := NIL; encoding := NIL;
@@ -309,7 +309,7 @@ TYPE
 			SELF.encoding := NewString(encoding)
 		END SetEncoding;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		BEGIN
 			w.String('<?xml version="'); w.String(version^);
 			IF encoding # NIL THEN w.String('" encoding="'); w.String(encoding^) END;
@@ -322,7 +322,7 @@ TYPE
 	VAR
 		standalone: BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			standalone := FALSE;
@@ -338,7 +338,7 @@ TYPE
 			SELF.standalone := standalone
 		END SetStandalone;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		BEGIN
 			w.String('<?xml version="'); w.String(version^);
 			IF encoding # NIL THEN w.String('" encoding="'); w.String(encoding^) END;
@@ -355,7 +355,7 @@ TYPE
 		allMarkupDecls: Objects.Collection;
 		externalSubset: EntityDecl;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) &  Init*;
 		VAR (* ed: EntityDecl; *) arrDict: Objects.ArrayDict; arrColl: Objects.ArrayCollection;
 		BEGIN
 			Init^;
@@ -436,7 +436,7 @@ TYPE
 			SELF.externalSubset := externalSubset
 		END SetExternalSubset;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY;  level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY;  level : SIGNED32);
 		VAR e: Objects.Enumerator; p: ANY; s: String;
 		BEGIN
 			w.String("<!DOCTYPE "); w.String(name^);
@@ -467,7 +467,7 @@ TYPE
 	VAR
 		systemId, publicId: String;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			systemId := NIL; publicId := NIL;
@@ -493,7 +493,7 @@ TYPE
 			SELF.publicId := NewString(publicId)
 		END SetPublicId;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		BEGIN
 			w.String("<!NOTATION "); w.String(name^);
 			IF publicId # NIL THEN
@@ -518,7 +518,7 @@ TYPE
 		value, notationName: String;
 		type: SIGNED8;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			value := NIL; notationName := NIL;
@@ -555,7 +555,7 @@ TYPE
 			SELF.notationName := NewString(notationName)
 		END SetNotationName;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		BEGIN
 			w.String("<!ENTITY ");
 			IF type = ParameterEntity THEN w.String("% ") END;
@@ -592,7 +592,7 @@ TYPE
 		content: CollectionCP;	(* for contentType = Mixed or contentType = Element *)
 		attributeDecls: Objects.Dictionary;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) &  Init*;
 		VAR arrDict: Objects.ArrayDict;
 		BEGIN
 			Init^;
@@ -638,7 +638,7 @@ TYPE
 			attributeDecls.Add(attributeDecl.name^, attributeDecl)
 		END AddAttributeDecl;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR e: Objects.Enumerator; p: ANY;
 		BEGIN
 			w.String("<!ELEMENT "); w.String(name^); w.Char(Space);
@@ -674,7 +674,7 @@ TYPE
 	VAR
 		occurence: SIGNED8;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			occurence := ZeroOrOnce;
@@ -706,7 +706,7 @@ TYPE
 	VAR
 		name: String;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			name := NIL;
@@ -727,7 +727,7 @@ TYPE
 			SELF.name := name;
 		END SetNameAsString;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR ch: CHAR;
 		BEGIN
 			w.String(name^);
@@ -747,7 +747,7 @@ TYPE
 		children: Objects.Collection;
 		type: SIGNED8;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) &  Init*;
 		VAR arrColl: Objects.ArrayCollection;
 		BEGIN
 			Init^;
@@ -775,7 +775,7 @@ TYPE
 			children.Add(cp)
 		END AddChild;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR e: Objects.Enumerator; ch: CHAR; p: ANY;
 		BEGIN
 			e := GetChildren();
@@ -816,7 +816,7 @@ TYPE
 		allowedValues: Objects.Dictionary;
 		required: BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR arrDict: Objects.ArrayDict;
 		BEGIN
 			Init^;
@@ -869,7 +869,7 @@ TYPE
 			SELF.required := required
 		END SetRequired;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR e: Objects.Enumerator; p: ANY;
 		BEGIN
 			w.String(name^); w.Char(Space);
@@ -913,7 +913,7 @@ TYPE
 	VAR
 		code: SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			code := 0;
@@ -929,7 +929,7 @@ TYPE
 			RETURN code
 		END GetCode;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR codeArray: ARRAY 16 OF CHAR; codeStr: String;
 		BEGIN
 			Strings.IntToStr(code, codeArray);
@@ -944,7 +944,7 @@ TYPE
 	VAR
 		decl: EntityDecl;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			decl := NIL;
@@ -964,7 +964,7 @@ TYPE
 			END
 		END SetDocument;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		BEGIN
 			w.Char('&'); w.String(name^); w.Char(';')
 		END Write;
@@ -989,7 +989,7 @@ TYPE
 		coll: Objects.Collection;
 		textDecl: TextDecl;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			coll := NIL;
@@ -1056,7 +1056,7 @@ TYPE
 			RETURN 0
 		END GetLength;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR s: String;
 		BEGIN
 			s := GetStr(); w.String(s^)
@@ -1070,18 +1070,18 @@ TYPE
 		str: String;
 		len: SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			str := NIL;
 			len := 0;
 		END Init;
 
-		PROCEDURE GetStr*(): String;
+		PROCEDURE { OVERRIDE } GetStr*(): String;
 		BEGIN
 			RETURN str
 		END GetStr;
 
-		PROCEDURE GetLength*(): SIZE;
+		PROCEDURE { OVERRIDE } GetLength*(): SIZE;
 		BEGIN
 			RETURN len
 		END GetLength;
@@ -1102,7 +1102,7 @@ TYPE
 
 	Comment* = OBJECT (ArrayChars)
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		BEGIN
 			NewLine(w, level-1); w.String("<!--"); Write^(w, context, level); w.String("-->"); NewLine(w, level)
 		END Write;
@@ -1112,7 +1112,7 @@ TYPE
 TYPE
 	CDataSect* = OBJECT (ArrayChars)
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR s : String; i, j : SIGNED32; buf : ARRAY 4 OF CHAR;
 		BEGIN
 			w.String("<![CDATA[");
@@ -1156,7 +1156,7 @@ TYPE
 	VAR
 		target, instruction: String;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			target := NIL; instruction := NIL;
@@ -1182,7 +1182,7 @@ TYPE
 			SELF.instruction := NewString(instruction)
 		END SetInstruction;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		BEGIN
 			w.String("<?"); w.String(target^); w.Char(Space);
 			w.String(instruction^); w.String("?>"); NewLine(w, level)
@@ -1197,7 +1197,7 @@ TYPE
 		document: Document;
 		decl: AttributeDecl;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			value := NIL; elementName := NIL;
@@ -1265,7 +1265,7 @@ TYPE
 			END;
 		END SetValueAsString;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		BEGIN
 			IF value = NIL THEN KernelLog.String("NIL attribute "); KernelLog.Ln; RETURN END;
 			w.Char(Space); w.String(name^);
@@ -1290,7 +1290,7 @@ TYPE
 		attributes : Attribute;
 		idAttribute: Attribute;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			root := NIL; parent := NIL;
@@ -1299,7 +1299,7 @@ TYPE
 			idAttribute := NIL;
 		END Init;
 
-		PROCEDURE AddContent*(content: Content);
+		PROCEDURE { OVERRIDE } AddContent*(content: Content);
 		BEGIN
 			ASSERT(content # NIL);
 			AddContent^(content);
@@ -1311,7 +1311,7 @@ TYPE
 			END;
 		END AddContent;
 
-		PROCEDURE RemoveContent*(content : Content);
+		PROCEDURE { OVERRIDE } RemoveContent*(content : Content);
 		BEGIN
 			(*ASSERT(content # NIL);*)
 			IF content=NIL THEN RETURN END; (*PH 12/13: removing nothing is logically correct *)
@@ -1572,7 +1572,7 @@ TYPE
 			END;
 		END WriteAttributes;
 
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
+		PROCEDURE { OVERRIDE } Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR c : Content;
 		BEGIN
 			w.Char('<'); w.String(name^);
@@ -1601,7 +1601,7 @@ TYPE
 		generator-: GeneratorProcedure;
 		generatorModule-, generatorProcedure- : Modules.Name;
 
-		PROCEDURE &Init*;
+		PROCEDURE & Init*;
 		BEGIN
 			generator := NIL;
 			COPY("", generatorModule); COPY("", generatorProcedure);

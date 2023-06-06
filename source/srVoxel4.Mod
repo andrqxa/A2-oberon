@@ -26,7 +26,7 @@ BEGIN
 	fuzzsubtract := 1/(2*fuzzdivisor)
 END setFuzz;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 BEGIN
 	ray.changed := TRUE;
 	ray.dxyz.x := ray.dxyz.x + rand.Uniform()/100 - 0.005;
@@ -39,7 +39,7 @@ END FuzzVox;
 TYPE LifeVox*=OBJECT(srVoxel2.Bloc10);
 VAR
 	alive,dead: srVoxel.ColoredVox;
-PROCEDURE & init*;
+PROCEDURE (* OVERRIDE *) & init*;
 VAR
 	i, j, k: SIGNED16;
 BEGIN
@@ -153,7 +153,7 @@ BEGIN
 	ph :=  6.28*srMath.cos(y);
 END ctop;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	theta, phi, r, g, b: SREAL;
 BEGIN
@@ -173,7 +173,7 @@ VAR
 	A2, B2, C2, D*:SREAL;
 	shader, inshader: Voxel;
 
-PROCEDURE dee2(p:PT):SREAL;
+PROCEDURE { OVERRIDE } dee2(p:PT):SREAL;
 BEGIN
 	 RETURN((cx-p.x)*(cx-p.x)/A2 + (cy-p.y)*(cy-p.y)/B2 + (cz-p.z)*(cz-p.z)/C2);
 END dee2;
@@ -200,7 +200,7 @@ BEGIN
 	D:= x*x;
 END size;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 BEGIN
 	IF rand.Dice(100) = 0 THEN
 		cx := rand.Uniform();
@@ -209,7 +209,7 @@ BEGIN
 	END
 END tick;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	A,B,C: PT;
 	i:SIGNED16;
@@ -237,7 +237,7 @@ VAR
 	A2, B2, C2, D*:SREAL;
 	V: Voxel;
 
-PROCEDURE d2(x,y,z: SREAL): SREAL;
+PROCEDURE { OVERRIDE } d2(x,y,z: SREAL): SREAL;
 BEGIN
 	 RETURN(-(cx-x)*(cx-x)/A2 - (cy-y)*(cy-y)/B2 + (cz-z)*(cz-z)/C2);
 END d2;
@@ -259,12 +259,12 @@ BEGIN
 	D:= x*x;
 END size;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 BEGIN
 	D:= 1/4 + rand.Uniform()/200 ;
 END tick;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	x,y,z, d,r,g,blue: SREAL;
 	a,b,n: srBase.PT;
@@ -356,11 +356,11 @@ BEGIN
 	D2 := x*x;
 END setSize;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 BEGIN
 	D2:= 1/4 + rand.Uniform()/200 ;
 END tick;
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	x,y,z, d,r,g,blue: SREAL;
 	a,b,n: srBase.PT;
@@ -433,7 +433,7 @@ BEGIN
 	register;
 END init;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	x,y,z, d: SREAL;
 	a,b,n: srBase.PT;
@@ -481,7 +481,7 @@ BEGIN
 	END;
 END Shade;
 
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 BEGIN
 	D2:= 1/3 + rand.Uniform()/50 ;
 END tick;
@@ -498,7 +498,7 @@ BEGIN
 	D2 := 1/3;
 END init;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	x,y,z: SREAL;
 	ax, ay, az, bx, by, bz : SREAL;
@@ -571,7 +571,7 @@ BEGIN
 	END
 END bounds;
 
-PROCEDURE Shade*(VAR ray: Ray);
+PROCEDURE { OVERRIDE } Shade*(VAR ray: Ray);
 VAR
 	x, y, z, dx, dy, dz: SREAL;
 	i, j, k: SIGNED16;
@@ -596,7 +596,7 @@ END Shade;
 END ArVox;
 
 TYPE checkboard* = OBJECT(srVoxel2.Bloc10);
-PROCEDURE & init*;
+PROCEDURE (* OVERRIDE *) & init*;
 VAR
 	i, j, k: SIGNED16;
 	black, white: srVoxel.ColoredVox;

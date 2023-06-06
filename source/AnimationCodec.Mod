@@ -76,7 +76,7 @@ TYPE
 		END ReportError;
 
 		(* open the decoder on an InputStream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			scanner : XMLScanner.Scanner; parser : XMLParser.Parser; document : XML.Document;
 			content : XML.Content;
@@ -227,7 +227,7 @@ TYPE
 			END;
 		END ProcessFrames;
 
-		PROCEDURE GetImageSequence*(VAR sequence : Codecs.ImageSequence; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } GetImageSequence*(VAR sequence : Codecs.ImageSequence; VAR res : INTEGER);
 		VAR content : XML.Content; frames : XML.Element; string : Strings.String;
 		BEGIN
 			IF (animation = NIL) THEN res := Codecs.ResFailed; RETURN; END;

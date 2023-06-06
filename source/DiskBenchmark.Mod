@@ -48,7 +48,7 @@ TYPE
 			SELF.nbrOfBlocks := nbrOfBlocks; SELF.blocksizes := blocksizes;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF ~doRead & ~doWrite THEN ReportError("Wrong Parameter: Neither read nor write benchmark?"); RETURN FALSE; END;
 			IF doRandom & (nbrOfBlocks <= 0) THEN ReportError("Wrong Parameter: nbrOfBlocks < 1"); RETURN FALSE; END;
@@ -65,7 +65,7 @@ TYPE
 			RETURN result;
 		END GetNbrOfSectors;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR sectors, blocksize, maxBlocksize, i : SIGNED32;
 		BEGIN
 			(* General information *)
@@ -253,7 +253,7 @@ TYPE
 			Strings.IntToStr(k, string); Strings.Append(string, suffix);
 		END WriteK;
 
-		PROCEDURE &Init*(disk :Lib.Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk :Lib.Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "DiskBenchmark"; desc := "Perform disk benchmark on partition"; locktype := Lib.WriterLock;

@@ -42,7 +42,7 @@ TYPE
 
 		showDeadzone- : WMProperties.BooleanProperty;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrAxisComponent);
@@ -62,7 +62,7 @@ TYPE
 			SetNameAsString(Strings.NewString("Axis Viewer"));
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = min) OR (property = max) THEN
 				cur.SetBounds(min.Get(), max.Get());
@@ -74,7 +74,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR
 			rect: WMRectangles.Rectangle;
 			pt: ARRAY 4 OF WMGraphics.Point2d;
@@ -372,7 +372,7 @@ TYPE
 			panel.AddContent(calibrationLabel);
 		END InitToolbar;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			joystick.Unregister(HandleJoystickMessage);
@@ -421,13 +421,13 @@ TYPE
 			WMWindowManager.DefaultAddWindow(SELF);
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;
 		END Close;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS KillerMsg) THEN Close

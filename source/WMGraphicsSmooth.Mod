@@ -34,7 +34,7 @@ TYPE
 		invLineWidthBy255: Real;
 		halfLineWidthSqr: Real;
 
-		PROCEDURE &New*(img : Raster.Image);
+		PROCEDURE (* OVERRIDE *) & New*(img : Raster.Image);
 		VAR firstTime: BOOLEAN;
 		BEGIN
 			firstTime := generator = NIL;
@@ -65,7 +65,7 @@ TYPE
 		(**
 			Set line width in pixels
 		*)
-		PROCEDURE SetLineWidth*(w: Real);
+		PROCEDURE { OVERRIDE } SetLineWidth*(w: Real);
 		BEGIN
 			IF w < 0.5 THEN w := 0.5; END;
 			IF w # lineWidth THEN
@@ -90,7 +90,7 @@ TYPE
 		(**
 			Draw an antialiased line represented by real-valued coordinates of the starting and end points
 		*)
-		PROCEDURE LineReal*(x0, y0, x1, y1: Real; color: WMGraphics.Color; mode: SIGNED32);
+		PROCEDURE { OVERRIDE } LineReal*(x0, y0, x1, y1: Real; color: WMGraphics.Color; mode: SIGNED32);
 		BEGIN
 
 			(*! do not do anything in case of an invalid line specification *)

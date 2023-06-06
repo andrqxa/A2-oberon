@@ -82,12 +82,12 @@ TYPE
 		END InitNew;
 
 		(* Overwrite draw procedure because we do not want any interpolation *)
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			Draw^(canvas, w, h, 0)
 		END Draw;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 		END Close;
@@ -181,7 +181,7 @@ TYPE
 		END Init;
 
 		(* Open a video stream by reading the sequence header *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			marker: CHAR;
 
@@ -248,7 +248,7 @@ TYPE
 			END;
 		END Open;
 
-		PROCEDURE HasMoreData*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } HasMoreData*(): BOOLEAN;
 		BEGIN
 			RETURN hasMoreFrames;
 		END HasMoreData;
@@ -445,29 +445,29 @@ TYPE
 
 
 		(* return some information about the video stream *)
-		PROCEDURE GetVideoInfo*(VAR width, height, millisecondsPerFrame : SIGNED32);
+		PROCEDURE { OVERRIDE } GetVideoInfo*(VAR width, height, millisecondsPerFrame : SIGNED32);
 		BEGIN
 			width := videoWidth;
 			height := videoHeight;
 			millisecondsPerFrame := mspf;
 		END GetVideoInfo;
 
-		PROCEDURE CanSeek*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSeek*() : BOOLEAN;
 		BEGIN
 			RETURN TRUE
 		END CanSeek;
 
-		PROCEDURE GetCurrentFrame*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetCurrentFrame*() : SIGNED32;
 		BEGIN
 			RETURN realFrameNr;
 		END GetCurrentFrame;
 
-		PROCEDURE GetCurrentTime*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetCurrentTime*() : SIGNED32;
 		BEGIN
 			RETURN time;
 		END GetCurrentTime;
 
-		PROCEDURE SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		VAR
 			i: SIGNED32;
 			code: CHAR;
@@ -539,7 +539,7 @@ TYPE
 			res := Codec.ResOk;
 		END SeekFrame;
 
-		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekMillisecond*(millisecond : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		VAR
 			newframe: SIGNED32;
 
@@ -711,7 +711,7 @@ TYPE
 
 
 		(* Prepare the next frame *)
-		PROCEDURE Next*;
+		PROCEDURE { OVERRIDE } Next*;
 		VAR
 			marker: CHAR;
 			picType: SIGNED32;			(* 1=I-, 2=P-, 3=B-, 4=D-Picture, other values are illegal *)
@@ -1909,7 +1909,7 @@ TYPE
 
 
 		(* Render the current picture to img *)
-		PROCEDURE Render*(img : Raster.Image);
+		PROCEDURE { OVERRIDE } Render*(img : Raster.Image);
 		BEGIN
 			yuv2rgb.Convert(
 				nextFrameToRender.buffer, 0, videoWidth, videoWidth * videoHeight,
@@ -1933,7 +1933,7 @@ TYPE
 		END Init;
 
 		(** open the demultiplexer on an input stream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			oldPos: Streams.Position;
 			i: SIGNED32;
@@ -2088,7 +2088,7 @@ TYPE
 		END isNewStream;
 
 
-		PROCEDURE GetNumberOfStreams*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetNumberOfStreams*() : SIGNED32;
 		BEGIN
 			IF singleStream THEN
 				RETURN 1;
@@ -2097,7 +2097,7 @@ TYPE
 			END;
 		END GetNumberOfStreams;
 
-		PROCEDURE GetStreamType*(streamNr : SIGNED32): SIGNED32;
+		PROCEDURE { OVERRIDE } GetStreamType*(streamNr : SIGNED32): SIGNED32;
 		VAR
 			streamid: SIGNED32;
 
@@ -2131,7 +2131,7 @@ TYPE
 			END;
 		END GetStreamType;
 
-		PROCEDURE GetStream*(streamNr: SIGNED32): Codec.DemuxStream;
+		PROCEDURE { OVERRIDE } GetStream*(streamNr: SIGNED32): Codec.DemuxStream;
 		BEGIN
 			IF streams[streamNr] # NIL THEN
 				RETURN streams[streamNr].stream;
@@ -2140,7 +2140,7 @@ TYPE
 			END;
 		END GetStream;
 
-		PROCEDURE GetStreamInfo*(streamNr : SIGNED32): Codec.AVStreamInfo;
+		PROCEDURE { OVERRIDE } GetStreamInfo*(streamNr : SIGNED32): Codec.AVStreamInfo;
 		VAR si : Codec.AVStreamInfo;
 		BEGIN
 			CASE GetStreamType(streamNr) OF
@@ -2153,7 +2153,7 @@ TYPE
 		END GetStreamInfo;
 
 		(* read data from streamNr, store it into buffer buf starting at offset ofs, store size bytes if possible, block if not read min bytes at least. Return number of read bytes in len and return code res *)
-		PROCEDURE GetData*(streamNr : SIGNED32; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } GetData*(streamNr : SIGNED32; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			cur: POINTER TO StreamType;
 			length: SIZE;
@@ -2356,7 +2356,7 @@ TYPE
 
 
 		(* seek the streamNr to position pos with seekType. itemSize contains the size of the element seeked to, if known and applicable; res = 0 if Ok, otherwise an error number *)
-		PROCEDURE SetStreamPos*(streamNr :  SIGNED32; seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32;  VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SetStreamPos*(streamNr :  SIGNED32; seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32;  VAR res : INTEGER);
 		VAR
 			cur: POINTER TO StreamType;
 			len: SIZE;

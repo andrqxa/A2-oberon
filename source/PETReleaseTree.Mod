@@ -12,13 +12,13 @@ TYPE
 
 	Tree* = OBJECT (PETTrees.Tree)
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetTitle(Title);
 		END Init;
 
-		PROCEDURE AddNodes*(parent : PETTrees.TreeNode; diagnostics : Diagnostics.Diagnostics; log : Streams.Writer);
+		PROCEDURE { OVERRIDE } AddNodes*(parent : PETTrees.TreeNode; diagnostics : Diagnostics.Diagnostics; log : Streams.Writer);
 		VAR builds : Build.Builds; succeeded : BOOLEAN;
 		BEGIN
 			AddNodes^(parent, diagnostics, log);

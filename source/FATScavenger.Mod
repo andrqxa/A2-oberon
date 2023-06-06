@@ -247,7 +247,7 @@ TYPE
 
 		directory : BOOLEAN; (* is this ShortEntry a folder? *)
 
-		PROCEDURE ParseRawEntry;
+		PROCEDURE { OVERRIDE } ParseRawEntry;
 		VAR i : SIGNED32;
 		BEGIN
 
@@ -300,7 +300,7 @@ TYPE
 		END GetChecksum;
 
 		(* debug: display content of this short entry to KernelLog *)
-		PROCEDURE Print;
+		PROCEDURE { OVERRIDE } Print;
 		BEGIN
 			KernelLog.String(shortName);
 			IF FATFiles.faReadOnly IN attr THEN KernelLog.String("   R"); ELSE KernelLog.String("   r"); END;
@@ -328,7 +328,7 @@ TYPE
 		next : LongEntry;  (* link to next longentry; used by LongEntryList *)
 		last : BOOLEAN; (* last cluster in longname cluster chain *)
 
-		PROCEDURE ParseRawEntry;
+		PROCEDURE { OVERRIDE } ParseRawEntry;
 		VAR
 			i,j : SIGNED16;
 		BEGIN
@@ -355,7 +355,7 @@ TYPE
 			COPY(rawEntry, correctedEntry);
 		END ParseRawEntry;
 
-		PROCEDURE Print;
+		PROCEDURE { OVERRIDE } Print;
 		VAR longname : ARRAY 256 OF CHAR;
 		BEGIN
 			KernelLog.String("Long: "); 	KernelLog.String("order: "); KernelLog.Int(order,3); KernelLog.String("   ");
@@ -719,7 +719,7 @@ TYPE
 			IF doLostClusters THEN INC(maxOp); END;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			dev := disk.device;
 			IF dev = NIL THEN ReportError("Could not access device"); RETURN FALSE; END;
@@ -729,7 +729,7 @@ TYPE
 			RETURN TRUE;
 		END ValidParameters;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR
 			string, str : String;
 			collision : BOOLEAN;
@@ -892,7 +892,7 @@ TYPE
 			IF Trace THEN IF ~alive THEN KernelLog.String("Scanner aborted."); ELSE KernelLog.String("Scanner finished."); KernelLog.Ln; END; END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk : PartitionsLib.Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : PartitionsLib.Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "FATScavenger"; desc := "Check FAT file system on partition"; locktype := PartitionsLib.WriterLock;
@@ -1714,7 +1714,7 @@ TYPE
 			SELF.volumeName := volumeName; SELF.quickFormat := quickFormat;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF disk.device.blockSize # BS THEN ReportError("Blocksize not supported"); RETURN FALSE END;
 			IF ~PartitionsLib.IsFatType(disk.table[partition].type) & ~disk.isDiskette THEN
@@ -1723,7 +1723,7 @@ TYPE
 			RETURN TRUE;
 		END ValidParameters;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR
 			vol : FATVolumes.Volume;
 			block : Block;
@@ -2029,7 +2029,7 @@ TYPE
 					(clusterSize=8192) OR (clusterSize=16384) OR (clusterSize=32768));
 		END ValidClusterSize;
 
-		PROCEDURE &Init*(disk : PartitionsLib.Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : PartitionsLib.Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "FormatFAT"; desc := "Format partition"; locktype := PartitionsLib.WriterLock;

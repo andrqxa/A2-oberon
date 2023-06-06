@@ -17,7 +17,7 @@ TYPE
 	VAR
 		port : Serials.Port;
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := PluginName; p.description := PluginDescription;
@@ -34,7 +34,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		VAR sent, received : Streams.Position;
 		BEGIN
 			sent := port.charactersSent; received := port.charactersReceived;

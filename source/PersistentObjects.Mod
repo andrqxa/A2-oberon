@@ -507,13 +507,13 @@ TYPE
 			IF list.Length() = i THEN list.Add(o) ELSE list.Set(i,o) END;
 		END SetElement;
 
-		PROCEDURE Enumerate*(enum: Enumerator);
+		PROCEDURE { OVERRIDE } Enumerate*(enum: Enumerator);
 		BEGIN
 			Enumerate^(enum);
 			enum("element", TRUE);
 		END Enumerate;
 
-		PROCEDURE Get*(CONST name: ARRAY OF CHAR; index: SIZE; c: Content);
+		PROCEDURE { OVERRIDE } Get*(CONST name: ARRAY OF CHAR; index: SIZE; c: Content);
 		BEGIN
 			IF (name = "element") OR (name="") THEN
 				c.SetObject(GetElement(index), baseType);
@@ -522,7 +522,7 @@ TYPE
 			END;
 		END Get;
 
-		PROCEDURE Set*(CONST name: ARRAY OF CHAR; index: SIZE; c: Content);
+		PROCEDURE { OVERRIDE } Set*(CONST name: ARRAY OF CHAR; index: SIZE; c: Content);
 		VAR object: Object;
 		BEGIN
 			IF (name = "element") OR (name="") THEN
@@ -542,7 +542,7 @@ TYPE
 			RETURN list.Contains(o);
 		END Contains;
 
-		PROCEDURE Traverse*(action: Action);
+		PROCEDURE { OVERRIDE } Traverse*(action: Action);
 		VAR i: SIZE;
 		BEGIN
 			FOR i := 0 TO Length()-1 DO
@@ -781,14 +781,14 @@ TYPE
 			w := writer; NEW(document); NEW(written,16); current := document; NEW(scope,current);
 		END InitXMLWriter;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			IF w # NIL THEN
 				document.Write(w,NIL,-1); w.Update;
 			END
 		END Close;
 
-		PROCEDURE NameAttribute*(CONST name, str: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } NameAttribute*(CONST name, str: ARRAY OF CHAR);
 		BEGIN
 			element.SetAttributeValue(name, str);
 		END NameAttribute;
@@ -807,7 +807,7 @@ TYPE
 			IF (current IS XML.Element) THEN element := current(XML.Element) ELSE element := NIL END;
 		END Exit;
 
-		PROCEDURE WriteObject*(CONST name: ARRAY OF CHAR; index: SIGNED32; o: Object);
+		PROCEDURE { OVERRIDE } WriteObject*(CONST name: ARRAY OF CHAR; index: SIGNED32; o: Object);
 		VAR guid: SIGNED32;
 		BEGIN
 			IF o # NIL THEN
@@ -1023,7 +1023,7 @@ TYPE
 			NEW(read,16);
 		END InitXMLReader;
 
-		PROCEDURE Error(CONST s1,s2: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Error(CONST s1,s2: ARRAY OF CHAR);
 		BEGIN
 			err := TRUE;
 			error.String("error in file "); error.String(filename); error.String(" ");
@@ -1031,7 +1031,7 @@ TYPE
 			error.Update;
 		END Error;
 
-		PROCEDURE StringAttribute*(CONST name: ARRAY OF CHAR; VAR str: Strings.String): BOOLEAN;
+		PROCEDURE { OVERRIDE } StringAttribute*(CONST name: ARRAY OF CHAR; VAR str: Strings.String): BOOLEAN;
 		BEGIN
 			IF element # NIL THEN
 				str := element.GetAttributeValue(name);
@@ -1097,7 +1097,7 @@ TYPE
 			END;
 		END CheckUse;
 
-		PROCEDURE ReadObject*(CONST name, optionalType: ARRAY OF CHAR; index: SIGNED32; VAR o: Object): BOOLEAN;
+		PROCEDURE { OVERRIDE } ReadObject*(CONST name, optionalType: ARRAY OF CHAR; index: SIGNED32; VAR o: Object): BOOLEAN;
 		VAR type: ARRAY 32 OF CHAR; id: SIGNED64;
 		BEGIN
 			(*IF err THEN RETURN FALSE END;*)

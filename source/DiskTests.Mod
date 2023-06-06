@@ -30,7 +30,7 @@ TYPE
 			SELF.sectorsPerTransfer := sectorsPerTransfer;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF sectorsPerTransfer < 1 THEN ReportError("SectorsPerTransfer must be >= 1"); RETURN FALSE; END;
 			IF disk.device.blockSize MOD 256 # 0 THEN ReportError("Device blocksize MOD 256 MUST BE 0"); RETURN FALSE; END;
@@ -50,7 +50,7 @@ TYPE
 			FOR i := 0 TO LEN(buffer) - 1 DO buffer[i] := CHR(i MOD 256); END;
 		END FillWithTestData;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR pos, num, nbrOfBlocks, blocksWritten : SIGNED32; res : INTEGER; temp : ARRAY 256 OF CHAR;
 		BEGIN
 			SetStatus(state.status, "Writing test data...", 0, 0, disk.table[partition].size, TRUE);
@@ -72,7 +72,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk :Lib.Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk :Lib.Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "WriteTestData"; desc := "Write test data to partition"; locktype := Lib.WriterLock;
@@ -85,7 +85,7 @@ TYPE
 	(** Checks whether the test data written by the WriteTestData object can be read back correctly *)
 	TestDataChecker* = OBJECT(TestDataBase);
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		VAR
 			pos, num, nbrOfBlocks, blocksRead : SIGNED32; res : INTEGER; string, nbr : ARRAY 128 OF CHAR;
 			expected, found, foundAt : SIGNED32;
@@ -116,7 +116,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk :Lib.Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk :Lib.Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "CheckTestData"; desc := "Verify test data on partition"; locktype := Lib.ReaderLock;
@@ -128,13 +128,13 @@ TYPE
 
 	ZeroWriter* = OBJECT(TestDataWriter);
 
-		PROCEDURE FillWithTestData*(VAR buffer : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } FillWithTestData*(VAR buffer : ARRAY OF CHAR);
 		VAR i : SIZE;
 		BEGIN
 			FOR i := 0 TO LEN(buffer) - 1 DO buffer[i] := 0X; END;
 		END FillWithTestData;
 
-		PROCEDURE & Init*(disk : Lib.Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk : Lib.Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "ZeroWriter"; desc := "Fill with zeros partition"; locktype := Lib.WriterLock;
@@ -171,7 +171,7 @@ TYPE
 			SELF.nbrOfTests := nbrOfTests; SELF.maxNbrOfSectors := maxNbrOfSectors; SELF.maxOffset := maxOffset;
 		END SetParameters;
 
-		PROCEDURE ValidParameters*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } ValidParameters*() : BOOLEAN;
 		BEGIN
 			IF ~doRead & ~doWrite THEN ReportError("Either read or write tests must be done"); RETURN FALSE; END;
 			IF maxNbrOfSectors < 1 THEN ReportError("MaxNbrOfSectors must be >= 1"); RETURN FALSE; END;
@@ -244,7 +244,7 @@ TYPE
 			END;
 		END PerformStep;
 
-		PROCEDURE DoOperation*;
+		PROCEDURE { OVERRIDE } DoOperation*;
 		BEGIN
 			start := disk.table[partition].start; size := disk.table[partition].size;
 			NEW(buffer, maxNbrOfSectors * disk.device.blockSize + maxOffset);
@@ -273,7 +273,7 @@ TYPE
 			END;
 		END DoOperation;
 
-		PROCEDURE &Init*(disk :Lib.Disk; partition : SIGNED32; out : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & Init*(disk :Lib.Disk; partition : SIGNED32; out : Streams.Writer);
 		BEGIN
 			Init^(disk, partition, out);
 			name := "DiskTester"; desc := "Perform disk test on partition"; locktype := Lib.ReaderLock;

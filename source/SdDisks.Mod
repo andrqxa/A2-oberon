@@ -62,7 +62,7 @@ TYPE
 			END
 		END Transfer0;
 
-		PROCEDURE Transfer * (op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; offs: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Transfer * (op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; offs: SIZE; VAR res: INTEGER);
 		VAR
 			t: SdEnvironment.Time;
 		BEGIN{EXCLUSIVE}
@@ -82,14 +82,14 @@ TYPE
 (*			TRACE(block,num,t);*)
 		END Transfer;
 
-		PROCEDURE GetSize * (VAR size: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } GetSize * (VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			size := SIGNED32(card.csd.capacity);
 			IF size < 0 THEN size := MAX(SIGNED32) END;
 			res := Disks.Ok
 		END GetSize;
 
-		PROCEDURE Handle * (VAR msg: Disks.Message;  VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Handle * (VAR msg: Disks.Message;  VAR res: INTEGER);
 		BEGIN
 			res := 0;
 			IF msg IS Disks.LockMsg THEN

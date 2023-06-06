@@ -157,7 +157,7 @@ TYPE
 			SELF.value := v;
 		END InitImm;
 
-		PROCEDURE Emit(out: BinaryCode.Section);
+		PROCEDURE { OVERRIDE } Emit(out: BinaryCode.Section);
 		BEGIN
 			IF out.comments # NIL THEN
 				out.comments.String("longint/real");
@@ -177,7 +177,7 @@ TYPE
 			SELF.value := v;
 		END InitImm;
 
-		PROCEDURE Emit(out: BinaryCode.Section);
+		PROCEDURE { OVERRIDE } Emit(out: BinaryCode.Section);
 		BEGIN
 			IF out.comments # NIL THEN
 				out.comments.String("hugeint/longreal");
@@ -203,7 +203,7 @@ TYPE
 			symbolOffset := offs;
 		END InitSym;
 
-		PROCEDURE Emit(out: BinaryCode.Section);
+		PROCEDURE { OVERRIDE } Emit(out: BinaryCode.Section);
 		VAR
 			fixup: BinaryCode.Fixup;
 		BEGIN
@@ -397,12 +397,12 @@ TYPE
 		END InitPhysicalRegisters;
 
 		(** the number of physical registers **)
-		PROCEDURE NumberRegisters*(): SIGNED32;
+		PROCEDURE { OVERRIDE } NumberRegisters*(): SIGNED32;
 		BEGIN RETURN InstructionSet.NumberRegisters
 		END NumberRegisters;
 
 		(** allocate, i.e., map, a physical register to a ticket **)
-		PROCEDURE Allocate*(physicalRegisterNumber: SIGNED32; ticket: Ticket);
+		PROCEDURE { OVERRIDE } Allocate*(physicalRegisterNumber: SIGNED32; ticket: Ticket);
 		VAR index: SIGNED32;
 		BEGIN
 			ASSERT(~ticket.spilled);
@@ -422,17 +422,17 @@ TYPE
 		END Allocate;
 
 		(** set whether a certain physical register is reserved or not **)
-		PROCEDURE SetReserved*(physicalRegisterNumber: SIGNED32; isReserved: BOOLEAN);
+		PROCEDURE { OVERRIDE } SetReserved*(physicalRegisterNumber: SIGNED32; isReserved: BOOLEAN);
 		BEGIN reserved[physicalRegisterNumber] := isReserved
 		END SetReserved;
 
 		(** whether a certain physical register is reserved **)
-		PROCEDURE Reserved*(physicalRegisterNumber: SIGNED32): BOOLEAN;
+		PROCEDURE { OVERRIDE } Reserved*(physicalRegisterNumber: SIGNED32): BOOLEAN;
 		BEGIN RETURN (physicalRegisterNumber > 0) & reserved[physicalRegisterNumber]
 		END Reserved;
 
 		(** free a certain physical register **)
-		PROCEDURE Free*(physicalRegisterNumber: SIGNED32);
+		PROCEDURE { OVERRIDE } Free*(physicalRegisterNumber: SIGNED32);
 		VAR index: SIGNED32;
 		BEGIN
 			Assert((toVirtual[physicalRegisterNumber] # NIL), "register not reserved");
@@ -459,7 +459,7 @@ TYPE
 		(** get the number of the next free physical register for a certain data type
 		- if a register hint has been set, it is respected if possible
 		**)
-		PROCEDURE NextFree*(CONST type: IntermediateCode.Type): SIGNED32;
+		PROCEDURE { OVERRIDE } NextFree*(CONST type: IntermediateCode.Type): SIGNED32;
 		VAR
 			result, i: SIGNED32;
 		BEGIN
@@ -513,17 +513,17 @@ TYPE
 		END NextFree;
 
 		(** give the register allocator a hint on what physical register to use next **)
-		PROCEDURE AllocationHint*(physicalRegisterNumber: SIGNED32);
+		PROCEDURE { OVERRIDE } AllocationHint*(physicalRegisterNumber: SIGNED32);
 		BEGIN hint := physicalRegisterNumber
 		END AllocationHint;
 
 		(** get the ticket that is currently mapped to a certain physical register **)
-		PROCEDURE Mapped*(physicalRegisterNumber: SIGNED32): Ticket;
+		PROCEDURE { OVERRIDE } Mapped*(physicalRegisterNumber: SIGNED32): Ticket;
 		BEGIN RETURN toVirtual[physicalRegisterNumber]
 		END Mapped;
 
 		(** dump the current register mapping to a stream **)
-		PROCEDURE Dump*(w: Streams.Writer);
+		PROCEDURE { OVERRIDE } Dump*(w: Streams.Writer);
 		VAR i: SIGNED32; virtual: Ticket;
 		BEGIN
 			w.String("---- registers ----"); w.Ln;
@@ -593,7 +593,7 @@ TYPE
 		(*------------------- overwritten methods ----------------------*)
 
 		(* TODO: revise this *)
-		PROCEDURE Section*(in: IntermediateCode.Section; out: BinaryCode.Section);
+		PROCEDURE { OVERRIDE } Section*(in: IntermediateCode.Section; out: BinaryCode.Section);
 		VAR
 			oldSpillStackSize: SIGNED32;
 
@@ -641,7 +641,7 @@ TYPE
 		(* TODO: complete this *)
 		(** whether the code generator can generate code for a certain intermediate code intstruction
 		if not, the location of a runtime is returned **)
-		PROCEDURE Supported*(CONST irInstruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
+		PROCEDURE { OVERRIDE } Supported*(CONST irInstruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
 		VAR
 			result: BOOLEAN; value: SIGNED64; exp: SIGNED32;
 		BEGIN
@@ -1431,7 +1431,7 @@ TYPE
 
 		(* the intermediate code type of a part
 		- a part type is by definition directly representable in a register *)
-		PROCEDURE GetPartType*(CONST type: IntermediateCode.Type; part: SIGNED32; VAR partType: IntermediateCode.Type);
+		PROCEDURE { OVERRIDE } GetPartType*(CONST type: IntermediateCode.Type; part: SIGNED32; VAR partType: IntermediateCode.Type);
 		BEGIN
 			ASSERT((part = Low) OR (part = High));
 			IF (type.sizeInBits <= 32) OR (type.form = IntermediateCode.Float) & backend.useFPU64 THEN
@@ -1500,7 +1500,7 @@ TYPE
 		END NegatedIrOperandIsDirectlyEncodable;
 
 		(** generate code for a certain IR instruction **)
-		PROCEDURE Generate*(VAR irInstruction: IntermediateCode.Instruction);
+		PROCEDURE { OVERRIDE } Generate*(VAR irInstruction: IntermediateCode.Instruction);
 		BEGIN
 			(* CheckFixups; *)
 			EmitFixupBlockIfNeeded;
@@ -1563,7 +1563,7 @@ TYPE
 
 		END Generate;
 
-		PROCEDURE PostGenerate*(CONST instruction: IntermediateCode.Instruction);
+		PROCEDURE { OVERRIDE } PostGenerate*(CONST instruction: IntermediateCode.Instruction);
 		VAR ticket: Ticket;
 		BEGIN
 			TryUnmap(instruction.op3); TryUnmap(instruction.op2); TryUnmap(instruction.op1);
@@ -3529,7 +3529,7 @@ TYPE
 			SetName("ARM");
 		END InitBackendARM;
 
-		PROCEDURE Initialize*(diagnostics: Diagnostics.Diagnostics; log: Streams.Writer; flags: SET; checker: SemanticChecker.Checker; system: Global.System);
+		PROCEDURE { OVERRIDE } Initialize*(diagnostics: Diagnostics.Diagnostics; log: Streams.Writer; flags: SET; checker: SemanticChecker.Checker; system: Global.System);
 		BEGIN
 			Initialize^(diagnostics, log, flags, checker, system);
 			NEW(cg, builtinsModuleName, diagnostics, SELF)
@@ -3616,7 +3616,7 @@ TYPE
 			New; RealVarPar; IntVarPar; Finish("UNPK", UNPK);
 		END EnterCustomBuiltins;
 
-		PROCEDURE GetSystem*(): Global.System;
+		PROCEDURE { OVERRIDE } GetSystem*(): Global.System;
 		VAR variableOffset: INTEGER;
 		BEGIN
 			(* create system object if not yet existing *)
@@ -3667,7 +3667,7 @@ TYPE
 
 		(** whether the code generator can generate code for a certain IR instruction
 		if not, where to find the runtime procedure that is to be called instead **)
-		PROCEDURE SupportedInstruction*(CONST irInstruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
+		PROCEDURE { OVERRIDE } SupportedInstruction*(CONST irInstruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
 		BEGIN
 			(* only necessary for binary object file format for symbol / module entry in IntermediateBackend *)
 			RETURN cg.Supported(irInstruction, moduleName, procedureName);
@@ -3675,7 +3675,7 @@ TYPE
 
 		(** whether a certain intermediate code immediate value can be directly appear in code
 		if not, the value is stored in a const section and loaded from there **)
-		PROCEDURE SupportedImmediate*(CONST irImmediateOperand: IntermediateCode.Operand): BOOLEAN;
+		PROCEDURE { OVERRIDE } SupportedImmediate*(CONST irImmediateOperand: IntermediateCode.Operand): BOOLEAN;
 		VAR
 			result: BOOLEAN;
 		BEGIN
@@ -3696,13 +3696,13 @@ TYPE
 			RETURN result
 		END SupportedImmediate;
 
-		PROCEDURE ResetParameterRegisters*;
+		PROCEDURE { OVERRIDE } ResetParameterRegisters*;
 		BEGIN
 			intParameterIndex := 0;
 			floatParameterIndex := 0;
 		END ResetParameterRegisters;
 		
-		PROCEDURE GetParameterRegister*(callingConvention: SyntaxTree.CallingConvention;  type: IntermediateCode.Type; VAR register: INTEGER): BOOLEAN;
+		PROCEDURE { OVERRIDE } GetParameterRegister*(callingConvention: SyntaxTree.CallingConvention;  type: IntermediateCode.Type; VAR register: INTEGER): BOOLEAN;
 		BEGIN
 			IF type.form IN IntermediateCode.Integer THEN
 				CASE callingConvention OF
@@ -3858,7 +3858,7 @@ TYPE
 		END GenerateBinary;
 
 		(** create an ARM code module from an intermediate code module **)
-		PROCEDURE ProcessIntermediateCodeModule*(intermediateCodeModule: Formats.GeneratedModule): Formats.GeneratedModule;
+		PROCEDURE { OVERRIDE } ProcessIntermediateCodeModule*(intermediateCodeModule: Formats.GeneratedModule): Formats.GeneratedModule;
 		VAR
 			result: Formats.GeneratedModule;
 		BEGIN
@@ -3895,7 +3895,7 @@ TYPE
 			RETURN result
 		END ProcessIntermediateCodeModule;
 
-		PROCEDURE DefineOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } DefineOptions*(options: Options.Options);
 		BEGIN
 			options.Add(0X, UseFPU32Flag, Options.Flag);
 			options.Add(0X, UseFPU64Flag, Options.Flag);
@@ -3903,7 +3903,7 @@ TYPE
 			DefineOptions^(options);
 		END DefineOptions;
 
-		PROCEDURE GetOptions*(options: Options.Options);
+		PROCEDURE { OVERRIDE } GetOptions*(options: Options.Options);
 		BEGIN
 			IF options.GetFlag(UseFPU32Flag) THEN useFPU32 := TRUE END;
 			IF options.GetFlag(UseFPU64Flag) THEN useFPU64 := TRUE; useFPU32 := TRUE END;
@@ -3911,20 +3911,20 @@ TYPE
 			GetOptions^(options);
 		END GetOptions;
 
-		PROCEDURE DefaultObjectFileFormat*(): Formats.ObjectFileFormat;
+		PROCEDURE { OVERRIDE } DefaultObjectFileFormat*(): Formats.ObjectFileFormat;
 		BEGIN RETURN ObjectFileFormat.Get();
 		END DefaultObjectFileFormat;
 
-		PROCEDURE DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
+		PROCEDURE { OVERRIDE } DefaultSymbolFileFormat*(): Formats.SymbolFileFormat;
 		BEGIN RETURN NIL
 		END DefaultSymbolFileFormat;
 
 		(** get the name of the backend **)
-		PROCEDURE GetDescription*(VAR instructionSet: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetDescription*(VAR instructionSet: ARRAY OF CHAR);
 		BEGIN instructionSet := "ARM"
 		END GetDescription;
 
-		PROCEDURE FindPC*(x: SyntaxTree.Module; CONST sectionName: ARRAY OF CHAR; sectionOffset: SIGNED32);
+		PROCEDURE { OVERRIDE } FindPC*(x: SyntaxTree.Module; CONST sectionName: ARRAY OF CHAR; sectionOffset: SIGNED32);
 		VAR
 			section: Sections.Section; binarySection: BinaryCode.Section; label: BinaryCode.LabelList; module: Formats.GeneratedModule;
 			i: SIGNED32; pooledName: Basic.SegmentedName;

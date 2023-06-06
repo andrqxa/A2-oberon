@@ -27,7 +27,7 @@ TYPE
 		lastTimer : SIGNED64;
 		lastSamplesValid : BOOLEAN;
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR
 			ds : WMPerfMonPlugins.DatasetDescriptor;
 			name, temp : WMPerfMonPlugins.Description;
@@ -74,7 +74,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		VAR
 			i : SIZE; timer : SIGNED64;
 			pAll, timeDiff, cyclesDiff : FLOAT64;

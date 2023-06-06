@@ -126,12 +126,12 @@ TYPE
 			RETURN result;
 		END GetItemIndex;
 
-		PROCEDURE IsHit*(x, y : SIZE) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsHit*(x, y : SIZE) : BOOLEAN;
 		BEGIN
 			RETURN (mode = Mode_Drawing) OR (GetItemIndex(x, y) >= 0);
 		END IsHit;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; width, height : SIZE; quality : INTEGER);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; width, height : SIZE; quality : INTEGER);
 		CONST IconBorder = 8;
 		VAR image : WMGraphics.Image; nbr : ARRAY 8 OF CHAR; color, i : SIGNED32;
 		BEGIN
@@ -161,7 +161,7 @@ TYPE
 			END;
 		END Draw;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR icon, oldMouseOver : SIZE;
 
 			PROCEDURE InvalidateIcon(idx  : SIZE);
@@ -205,7 +205,7 @@ TYPE
 			lx := x; ly := y
 		END PointerMove;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR rect : WMRectangles.Rectangle; index : SIZE;
 		BEGIN
 			PointerDown^(x, y, keys);
@@ -239,7 +239,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR rect : WMRectangles.Rectangle;
 		BEGIN
 			PointerUp^(x, y, keys);
@@ -253,7 +253,7 @@ TYPE
 			END;
 		END PointerUp;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			PointerLeave^;
 			IF (mouseOver >= 0) THEN mouseOver := -1; Invalidate(bounds); END;
@@ -283,7 +283,7 @@ TYPE
 			END;
 		END ProcessCommand;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			modifierFlags := {};
@@ -295,7 +295,7 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()))
 		END Fill;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keySym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keySym : SIZE);
 		VAR
 			filename : Files.FileName; newImg : WMGraphics.Image; oldMode: SIGNED32; res: INTEGER;
 			string : ARRAY 2 OF CHAR; dx, dy : SIZE;

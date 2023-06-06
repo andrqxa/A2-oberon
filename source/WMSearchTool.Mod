@@ -17,7 +17,7 @@ TYPE
 		nextFocus, prevFocus: WMComponents.VisualComponent;
 		withShift: BOOLEAN;
 
-		PROCEDURE FocusNext*;
+		PROCEDURE { OVERRIDE } FocusNext*;
 		BEGIN
 			IF withShift THEN
 				FocusPrev;
@@ -36,7 +36,7 @@ TYPE
 			END;
 		END FocusNext;
 
-		PROCEDURE FocusPrev*;
+		PROCEDURE { OVERRIDE } FocusPrev*;
 		BEGIN
 			IF prevFocus # NIL THEN
 				prevFocus.SetFocus;
@@ -51,7 +51,7 @@ TYPE
 			END;
 		END FocusPrev;
 
-		PROCEDURE KeyPressed*(ucs : SIZE; flags : SET; VAR keySym : SIZE; VAR handled : BOOLEAN);
+		PROCEDURE { OVERRIDE } KeyPressed*(ucs : SIZE; flags : SET; VAR keySym : SIZE; VAR handled : BOOLEAN);
 		BEGIN
 			IF (flags # {}) & (flags - Inputs.Shift = {}) THEN
 				withShift := TRUE;
@@ -109,7 +109,7 @@ TYPE
 			NEW(d, lb, filelist.DisplayGrid, SearchStartHandler, SearchDoneHandler)
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
@@ -292,7 +292,7 @@ TYPE
 			d.Stop()
 		END StopSearcherAndDisplayer;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS KillerMsg) THEN Close

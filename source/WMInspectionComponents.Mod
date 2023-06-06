@@ -26,7 +26,6 @@ MODULE WMInspectionComponents; (** AUTHOR "staubesv"; PURPOSE "Components for co
 *)
 
 IMPORT
-	SYSTEM,
 	Modules, Kernel, KernelLog, Strings, Inputs, Files, XML, XMLObjects, Repositories, Types, Models, WMDialogs, WMUtilities,
 	WMMessages, WMWindowManager,
 	WMRectangles, WMGraphics, WMEvents, WMProperties, WMComponents, WMStandardComponents,
@@ -64,7 +63,7 @@ TYPE
 			SELF.position := position;
 		END Init;
 
-		PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 		VAR sdi : DropString;
 		BEGIN
 			IF (type = WMDropTarget.TypeString) THEN
@@ -90,7 +89,7 @@ TYPE
 			SELF.position := position;
 		END Init;
 
-		PROCEDURE Set*(CONST string : ARRAY OF CHAR; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Set*(CONST string : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			setString(string, position, res);
 		END Set;
@@ -111,7 +110,7 @@ TYPE
 
 		nameLabel, infoLabel, adrLabel : WMStandardComponents.Label;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("PropertyView"));
@@ -271,7 +270,7 @@ TYPE
 		PROCEDURE Disable;
 		END Disable;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas);
 		BEGIN
 			Draw^(canvas);
 			(*
@@ -400,7 +399,7 @@ TYPE
 		boolean : WMProperties.BooleanProperty;
 		checkbox : WMStandardComponents.Checkbox;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrBooleanPropertyView);
@@ -411,7 +410,7 @@ TYPE
 			AddContent(checkbox);
 		END Init;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR boolean : WMProperties.BooleanProperty; value : BOOLEAN; state : SIGNED32;
 		BEGIN
 			boolean := SELF.boolean;
@@ -430,7 +429,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR boolean : WMProperties.BooleanProperty; state : SIGNED32;
 		BEGIN
 			Synchronize^(force);
@@ -446,22 +445,22 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.BooleanProperty);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			checkbox.enabled.Set(TRUE);
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			checkbox.enabled.Set(FALSE);
 		END Disable;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.BooleanProperty)));
 			SetProperty^(property);
@@ -488,7 +487,7 @@ TYPE
 		editor : WMEditors.TextField;
 		outOfDate : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrInt32PropertyView);
@@ -502,7 +501,7 @@ TYPE
 			AddContent(editor);
 		END Init;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR int32 : WMProperties.Int32Property; string : ARRAY 256 OF CHAR; value : SIGNED32;
 		BEGIN
 			int32 := SELF.int32;
@@ -517,7 +516,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR int32 : WMProperties.Int32Property; value : SIGNED32; string : ARRAY 256 OF CHAR;
 		BEGIN
 			Synchronize^(force);
@@ -531,22 +530,22 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.Int32Property);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			editor.enabled.Set(TRUE);
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			editor.enabled.Set(FALSE);
 		END Disable;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.Int32Property)));
 			SetProperty^(property);
@@ -590,7 +589,7 @@ TYPE
 		editor : WMEditors.TextField;
 		outOfDate : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrSizePropertyView);
@@ -604,7 +603,7 @@ TYPE
 			AddContent(editor);
 		END Init;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR size : WMProperties.SizeProperty; string : ARRAY 256 OF CHAR; value : SIZE;
 		BEGIN
 			size := SELF.size;
@@ -619,7 +618,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR size : WMProperties.SizeProperty; value : SIZE; string : ARRAY 256 OF CHAR;
 		BEGIN
 			Synchronize^(force);
@@ -633,22 +632,22 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.SizeProperty);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			editor.enabled.Set(TRUE);
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			editor.enabled.Set(FALSE);
 		END Disable;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.SizeProperty)));
 			SetProperty^(property);
@@ -692,7 +691,7 @@ TYPE
 		editor : WMEditors.TextField;
 		outOfDate : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrRealPropertyView);
@@ -707,7 +706,7 @@ TYPE
 			AddContent(editor);
 		END Init;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR real : WMProperties.RealProperty; string : ARRAY 256 OF CHAR; value : FLOAT64;
 		BEGIN
 			real := SELF.real;
@@ -722,7 +721,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR real : WMProperties.RealProperty; value : FLOAT64; string : ARRAY 256 OF CHAR; sw: Streams.StringWriter;
 		BEGIN
 			Synchronize^(force);
@@ -740,22 +739,22 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.RealProperty);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			editor.enabled.Set(TRUE);
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			editor.enabled.Set(FALSE);
 		END Disable;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.RealProperty)));
 			SetProperty^(property);
@@ -842,7 +841,7 @@ TYPE
 			IF (editHeight # NIL) THEN UpdateState(editHeight, 5); END;
 		END UpdateEditorStates;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR rectangle : WMProperties.RectangleProperty; rect, r : WMRectangles.Rectangle; string : ARRAY 32 OF CHAR;
 			width, height: SIZE;
 		BEGIN
@@ -865,7 +864,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR rectangle : WMProperties.RectangleProperty; rect : WMRectangles.Rectangle; string : ARRAY 32 OF CHAR;
 		BEGIN
 			Synchronize^(force);
@@ -885,24 +884,24 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.RectangleProperty);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			UpdateEditorStates;
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			editLeft.enabled.Set(FALSE); editTop.enabled.Set(FALSE); editRight.enabled.Set(FALSE); editBottom.enabled.Set(FALSE);
 			IF (editWidth # NIL) THEN editWidth.enabled.Set(FALSE); END;
 			IF (editHeight # NIL) THEN editHeight.enabled.Set(FALSE); END;
 		END Disable;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.RectangleProperty)));
 			SetProperty^(property);
@@ -1012,7 +1011,7 @@ TYPE
 			UpdateState(editY, 1);
 		END UpdateEditorStates;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR point : WMProperties.PointProperty; pnt, p : WMGraphics.Point2d; string : ARRAY 32 OF CHAR;
 		BEGIN
 			point := SELF.point;
@@ -1028,7 +1027,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR point : WMProperties.PointProperty; pnt : WMGraphics.Point2d; string : ARRAY 32 OF CHAR;
 		BEGIN
 			Synchronize^(force);
@@ -1042,22 +1041,22 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.PointProperty);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			UpdateEditorStates;
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			editX.enabled.Set(FALSE); editY.enabled.Set(FALSE);
 		END Disable;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.PointProperty)));
 			SetProperty^(property);
@@ -1131,7 +1130,7 @@ TYPE
 		editor : WMEditors.TextField;
 		outOfDate : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrStringPropertyView);
@@ -1143,7 +1142,7 @@ TYPE
 			outOfDate := FALSE;
 		END Init;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR string : WMProperties.StringProperty; value, oldValue : ARRAY 1024 OF CHAR;
 		BEGIN
 			string := SELF.string;
@@ -1158,7 +1157,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR string : WMProperties.StringProperty; value : Strings.String;
 		BEGIN
 			Synchronize^(force);
@@ -1171,22 +1170,22 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.StringProperty);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			editor.enabled.Set(TRUE);
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			editor.enabled.Set(FALSE);
 		END Disable;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.StringProperty)));
 			SetProperty^(property);
@@ -1232,7 +1231,7 @@ TYPE
 		res : INTEGER;
 		outOfDate : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrColorPropertyView);
@@ -1251,7 +1250,7 @@ TYPE
 			AddContent(editor);
 		END Init;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR color : WMProperties.ColorProperty; string : ARRAY 16 OF CHAR; value : SIGNED32;
 		BEGIN
 			color := SELF.color;
@@ -1267,7 +1266,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR color : WMProperties.ColorProperty;  string : ARRAY 16 OF CHAR; value : WMGraphics.Color;
 		BEGIN
 			Synchronize^(force);
@@ -1282,22 +1281,22 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.ColorProperty);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			editor.enabled.Set(TRUE); colorPot.enabled.Set(TRUE);
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			editor.enabled.Set(FALSE); colorPot.enabled.Set(FALSE);
 		END Disable;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.ColorProperty)));
 			SetProperty^(property);
@@ -1386,7 +1385,7 @@ TYPE
 			UpdateState(editStyle, 2);
 		END UpdateEditorStates;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR font : WMProperties.FontProperty; f : WMGraphics.Font; temp, name : ARRAY 32 OF CHAR; size : SIGNED32; style : SET;
 		BEGIN
 			font := SELF.font;
@@ -1404,7 +1403,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR font : WMProperties.FontProperty; name, temp : ARRAY 32 OF CHAR; size : SIZE; style : SET;
 		BEGIN
 			Synchronize^(force);
@@ -1419,22 +1418,22 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.FontProperty);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			editName.enabled.Set(TRUE); editSize.enabled.Set(TRUE); editStyle.enabled.Set(TRUE);
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			editName.enabled.Set(FALSE); editSize.enabled.Set(FALSE); editStyle.enabled.Set(FALSE);
 		END Disable;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.FontProperty)));
 			SetProperty^(property);
@@ -1502,7 +1501,7 @@ TYPE
 		button : WMStandardComponents.Button;
 		outOfDate : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrReferencePropertyView);
@@ -1533,13 +1532,13 @@ TYPE
 			outOfDate := FALSE;
 		END Init;
 
-		PROCEDURE AdrLabelMove(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE { OVERRIDE } AdrLabelMove(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		VAR dx, dy, dp, d : SIGNED32; f : FLOAT32; tmax, tmin : SIGNED32;
 		BEGIN
 			IF keys = {0} THEN adrLabel.AutoStartDrag END;
 		END AdrLabelMove;
 
-		PROCEDURE MyStartDrag(sender, data: ANY);
+		PROCEDURE { OVERRIDE } MyStartDrag(sender, data: ANY);
 		VAR w,h: SIZE; img: WMGraphics.Image; canvas: WMGraphics.BufferCanvas;
 		BEGIN
 			NEW(img);
@@ -1569,7 +1568,7 @@ TYPE
 			END;
 		END HandleButton;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR reference : WMProperties.ReferenceProperty; string, oldString : ARRAY 256 OF CHAR; stringType: Types.String256; res: INTEGER;
 		BEGIN
 			reference := SELF.reference;
@@ -1595,7 +1594,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR reference : WMProperties.ReferenceProperty;string : ARRAY 256 OF CHAR; stringType: Types.String256; res: INTEGER;
 		BEGIN
 			reference := SELF.reference;
@@ -1614,17 +1613,17 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL) & (property IS WMProperties.ReferenceProperty);
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			editor.enabled.Set(TRUE);
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			editor.enabled.Set(FALSE);
 		END Disable;
@@ -1656,7 +1655,7 @@ TYPE
 			END;
 		END UpdateButton;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.ReferenceProperty)));
 			SetProperty^(property);
@@ -1703,7 +1702,7 @@ TYPE
 		int32 : WMProperties.Int32Property;
 		alignment_chooser : WMDropDownLists.DropDownList;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR res : INTEGER;
 		BEGIN
 			Init^;
@@ -1727,7 +1726,7 @@ TYPE
 			AddContent(alignment_chooser);
 		END Init;
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		VAR int32 : WMProperties.Int32Property; e : WMDropDownLists.Entry;
 		BEGIN
 			int32 := SELF.int32;
@@ -1739,7 +1738,7 @@ TYPE
 			END;
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		VAR int32 : WMProperties.Int32Property;
 		BEGIN
 			Synchronize^(force);
@@ -1750,7 +1749,7 @@ TYPE
 			END;
 		END Synchronize;
 
-		PROCEDURE SetProperty(property : WMProperties.Property);
+		PROCEDURE { OVERRIDE } SetProperty(property : WMProperties.Property);
 		BEGIN
 			ASSERT((property = NIL) OR ((property # NIL) & (property IS WMProperties.Int32Property)));
 			SetProperty^(property);
@@ -1767,17 +1766,17 @@ TYPE
 			Apply(FALSE);
 		END AlignmentSelected;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN FALSE; (* only to be used by VisualComponentView *)
 		END IsCompatible;
 
-		PROCEDURE Enable;
+		PROCEDURE { OVERRIDE } Enable;
 		BEGIN
 			alignment_chooser.enabled.Set(TRUE);
 		END Enable;
 
-		PROCEDURE Disable;
+		PROCEDURE { OVERRIDE } Disable;
 		BEGIN
 			alignment_chooser.enabled.Set(FALSE);
 		END Disable;
@@ -1788,22 +1787,22 @@ TYPE
 
 	UnknownPropertyView = OBJECT(PropertyView)
 
-		PROCEDURE Apply(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Apply(force : BOOLEAN);
 		BEGIN
 			(* do nothing *)
 		END Apply;
 
-		PROCEDURE Synchronize(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize(force : BOOLEAN);
 		BEGIN
 			(* do nothing *)
 		END Synchronize;
 
-		PROCEDURE IsCompatible(property : WMProperties.Property) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCompatible(property : WMProperties.Property) : BOOLEAN;
 		BEGIN
 			RETURN (property # NIL);
 		END IsCompatible;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR label : WMStandardComponents.Label;
 		BEGIN
 			Init^;
@@ -1825,7 +1824,7 @@ TYPE
 	VAR
 		event : WMEvents.EventSource;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrEventSourceView);
@@ -1870,7 +1869,7 @@ TYPE
 	VAR
 		event : WMEvents.EventListenerInfo;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrEventListenerView);
@@ -1916,7 +1915,7 @@ TYPE
 		idView, uidView : StringPropertyView;
 		enabledView : BooleanPropertyView;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("ComponentView"));
@@ -2005,7 +2004,7 @@ TYPE
 
 		focusNextView, focusPrevView : StringPropertyView;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("VisualComponentView"));
@@ -2166,7 +2165,7 @@ TYPE
 		component : WMComponents.Component;
 		nofElements : SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("ComponentElement"));
@@ -2207,7 +2206,7 @@ TYPE
 		componentView : ComponentView;
 		visualComponentView : VisualComponentView;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrStandardProperties);
@@ -2222,7 +2221,7 @@ TYPE
 			bounds.SetHeight(componentView.bounds.GetHeight() + visualComponentView.bounds.GetHeight() + 2 * LineBearing);
 		END Init;
 
-		PROCEDURE CountNofElements(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } CountNofElements(component : WMComponents.Component);
 		VAR propertyArray : WMProperties.PropertyArray;  i : SIZE;
 		BEGIN
 			nofElements := 0;
@@ -2264,7 +2263,7 @@ TYPE
 			END;
 		END SetProperties;
 
-		PROCEDURE SetComponent*(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } SetComponent*(component : WMComponents.Component);
 		BEGIN
 			IF (component # SELF.component) THEN
 				DisableUpdate;
@@ -2292,7 +2291,7 @@ TYPE
 			END;
 		END SetComponent;
 
-		PROCEDURE Apply*;
+		PROCEDURE { OVERRIDE } Apply*;
 		BEGIN
 			Acquire;
 			IF (componentView.visible.Get()) THEN componentView.Apply; END;
@@ -2300,7 +2299,7 @@ TYPE
 			Release;
 		END Apply;
 
-		PROCEDURE Synchronize*(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize*(force : BOOLEAN);
 		BEGIN
 			Acquire;
 			IF (componentView.visible.Get()) THEN componentView.Synchronize(force); END;
@@ -2400,7 +2399,7 @@ TYPE
 		cache : PropertySheetCache;
 		current : ExtendedProperties;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrExtendedPropertiesView);
@@ -2408,12 +2407,12 @@ TYPE
 			current := NIL;
 		END Init;
 
-		PROCEDURE CountNofElements(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } CountNofElements(component : WMComponents.Component);
 		BEGIN
 			nofElements := CountExtendedProperties(component);
 		END CountNofElements;
 
-		PROCEDURE SetComponent*(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } SetComponent*(component : WMComponents.Component);
 		VAR ps : ExtendedProperties; generateNew : BOOLEAN;
 		BEGIN
 			DisableUpdate;
@@ -2457,12 +2456,12 @@ TYPE
 			Invalidate;
 		END SetComponent;
 
-		PROCEDURE Apply*;
+		PROCEDURE { OVERRIDE } Apply*;
 		BEGIN
 			IF (current # NIL) THEN current.Apply; END;
 		END Apply;
 
-		PROCEDURE Synchronize*(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize*(force : BOOLEAN);
 		BEGIN
 			IF (current # NIL) THEN current.Synchronize(force); END;
 		END Synchronize;
@@ -2486,7 +2485,7 @@ TYPE
 		list : PropertyViewList;
 		content : WMStandardComponents.Panel;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrExtendedProperties);
@@ -2494,7 +2493,7 @@ TYPE
 			content := NIL;
 		END Init;
 
-		PROCEDURE CountNofElements(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } CountNofElements(component : WMComponents.Component);
 		BEGIN
 			nofElements := CountExtendedProperties(component);
 		END CountNofElements;
@@ -2676,7 +2675,7 @@ TYPE
 			bounds.SetHeight(height);
 		END SetProperties;
 
-		PROCEDURE SetComponent*(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } SetComponent*(component : WMComponents.Component);
 		BEGIN
 			IF (component # SELF.component) THEN
 				Acquire;
@@ -2703,14 +2702,14 @@ TYPE
 			p.Synchronize(force);
 		END SynchronizeToModel;
 
-		PROCEDURE Apply*;
+		PROCEDURE { OVERRIDE } Apply*;
 		BEGIN
 			Acquire;
 			list.Enumerate(ApplyToView, FALSE);
 			Release;
 		END Apply;
 
-		PROCEDURE Synchronize*(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize*(force : BOOLEAN);
 		BEGIN
 			Acquire;
 			list.Enumerate(SynchronizeToModel, force);
@@ -2745,7 +2744,7 @@ TYPE
 	VAR
 		content : WMStandardComponents.Panel;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrEventSources);
@@ -2753,7 +2752,7 @@ TYPE
 			content := NIL;
 		END Init;
 
-		PROCEDURE CountNofElements(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } CountNofElements(component : WMComponents.Component);
 		VAR eventsArray : WMEvents.EventSourceArray;
 		BEGIN
 			nofElements := 0;
@@ -2765,7 +2764,7 @@ TYPE
 			END;
 		END CountNofElements;
 
-		PROCEDURE SetComponent*(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } SetComponent*(component : WMComponents.Component);
 		VAR eventsArray : WMEvents.EventSourceArray; source : EventSourceView;  height : SIZE; i : SIZE;
 		BEGIN
 			IF (component # SELF.component) THEN
@@ -2791,12 +2790,12 @@ TYPE
 			END;
 		END SetComponent;
 
-		PROCEDURE Apply*;
+		PROCEDURE { OVERRIDE } Apply*;
 		BEGIN
 
 		END Apply;
 
-		PROCEDURE Synchronize*(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize*(force : BOOLEAN);
 		BEGIN
 
 		END Synchronize;
@@ -2809,7 +2808,7 @@ TYPE
 	VAR
 		content : WMStandardComponents.Panel;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrEventListeners);
@@ -2817,7 +2816,7 @@ TYPE
 			content := NIL;
 		END Init;
 
-		PROCEDURE CountNofElements(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } CountNofElements(component : WMComponents.Component);
 		VAR eventsArray : WMEvents.EventListenerArray;
 		BEGIN
 			nofElements := 0;
@@ -2829,7 +2828,7 @@ TYPE
 			END;
 		END CountNofElements;
 
-		PROCEDURE SetComponent*(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } SetComponent*(component : WMComponents.Component);
 		VAR eventsArray : WMEvents.EventListenerArray; listener : EventListenerView; height : SIZE; i : SIZE;
 		BEGIN
 			IF (component # SELF.component) THEN
@@ -2855,12 +2854,12 @@ TYPE
 			END;
 		END SetComponent;
 
-		PROCEDURE Apply*;
+		PROCEDURE { OVERRIDE } Apply*;
 		BEGIN
 
 		END Apply;
 
-		PROCEDURE Synchronize*(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize*(force : BOOLEAN);
 		BEGIN
 
 		END Synchronize;
@@ -2876,7 +2875,7 @@ TYPE
 		editor : WMEditors.TextField;
 		next : AttributeView;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("AttributeView"));
@@ -2952,7 +2951,7 @@ TYPE
 			SetOutOfDate(TRUE);
 		END EditorContentChanged;
 
-		PROCEDURE DrawForeground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawForeground*(canvas : WMGraphics.Canvas);
 		VAR attribute : XML.Attribute; name : Strings.String;
 		BEGIN
 			DrawForeground^(canvas);
@@ -2979,7 +2978,7 @@ TYPE
 		(* display attributes *)
 		views : AttributeView;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("Attributes"));
@@ -3061,7 +3060,7 @@ TYPE
 			RETURN v;
 		END NewAttributeView;
 
-		PROCEDURE CountNofElements(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } CountNofElements(component : WMComponents.Component);
 		VAR enumerator : XMLObjects.Enumerator; ignore : ANY;
 		BEGIN
 			nofElements := 0;
@@ -3113,7 +3112,7 @@ TYPE
 			Invalidate;
 		END SetAttributes;
 
-		PROCEDURE SetComponent*(component : WMComponents.Component);
+		PROCEDURE { OVERRIDE } SetComponent*(component : WMComponents.Component);
 		BEGIN
 			IF (component # SELF.component) THEN
 				DisableUpdate;
@@ -3127,14 +3126,14 @@ TYPE
 			END;
 		END SetComponent;
 
-		PROCEDURE Apply*;
+		PROCEDURE { OVERRIDE } Apply*;
 		VAR v : AttributeView;
 		BEGIN
 			v := views;
 			WHILE (v # NIL) DO v.Apply; v := v.next; END;
 		END Apply;
 
-		PROCEDURE Synchronize*(force : BOOLEAN);
+		PROCEDURE { OVERRIDE } Synchronize*(force : BOOLEAN);
 		BEGIN
 			SetAttributes(SELF.component);
 		END Synchronize;
@@ -3181,7 +3180,7 @@ TYPE
 		state, internalState : SIGNED32;
 		timer : Kernel.Timer;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR panel, toolbar : WMStandardComponents.Panel;  i : SIGNED32;
 		BEGIN
 			Init^;
@@ -3290,7 +3289,7 @@ TYPE
 			SetState(State_Synchronize);
 		END PropertyListChanged;
 
-		PROCEDURE LinkChanged*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, data : ANY);
 		BEGIN
 			SetState(State_SynchronizeForce);
 		END LinkChanged;
@@ -3407,7 +3406,7 @@ TYPE
 			END;
 		END ButtonHandler;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF (component # NIL) THEN
@@ -3459,7 +3458,7 @@ TYPE
 		state : SIGNED32;
 		timer : Kernel.Timer;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("RepositoryPanel"));
@@ -3605,7 +3604,7 @@ TYPE
 			timer.Wakeup; (* force update *)
 		END SetComponent;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			BEGIN {EXCLUSIVE} state := State_Terminating; END;
@@ -3651,7 +3650,7 @@ TYPE
 		component : Repositories.Component;
 		showBtn : WMStandardComponents.Button;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("XMLPanel"));
@@ -3697,7 +3696,7 @@ TYPE
 
 		autoRefresh : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR panel : WMStandardComponents.Panel; label : WMStandardComponents.Label;
 		BEGIN
 			Init^;
@@ -3822,7 +3821,7 @@ TYPE
 			END;
 		END ModelChanged;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF (model # NIL) THEN model.onChanged.Remove(ModelChanged); END;
@@ -3847,13 +3846,13 @@ TYPE
 			WMWindowManager.DefaultAddWindow(SELF);
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close;
 			ELSE Handle^(x)

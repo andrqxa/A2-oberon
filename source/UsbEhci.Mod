@@ -318,7 +318,7 @@ TYPE
 		interruptsEnabled * : SET;
 
 		(** Enable power for the specified port *)
-		PROCEDURE EnablePortPower*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } EnablePortPower*(port : SIGNED32);
 		VAR status : SET;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -326,7 +326,7 @@ TYPE
 		END EnablePortPower;
 
 		(** Disable power for the specified port *)
-		PROCEDURE DisablePortPower*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } DisablePortPower*(port : SIGNED32);
 		VAR status : SET;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -336,7 +336,7 @@ TYPE
 		(** Enable the specified port.
 		 	The EHCI host controllers do not explicitly support a port enable command. The port will be automatically enabled
 		 	by the host controller after a port reset, if a high-speed capable device is attached to it *)
-		PROCEDURE ResetAndEnablePort*(port : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ResetAndEnablePort*(port : SIGNED32) : BOOLEAN;
 		VAR status : SET; mtimer : Kernel.MilliTimer;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -353,7 +353,7 @@ TYPE
 		END ResetAndEnablePort;
 
 		(** Disable the specified port. *)
-		PROCEDURE DisablePort*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } DisablePort*(port : SIGNED32);
 		VAR status : SET;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -362,7 +362,7 @@ TYPE
 		END DisablePort;
 
 		(** Suspend the specified port (selective suspend). *)
-		PROCEDURE SuspendPort*(port : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } SuspendPort*(port : SIGNED32) : BOOLEAN;
 		VAR status : SET;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -375,7 +375,7 @@ TYPE
 		END SuspendPort;
 
 		(** Resume a selectively suspended port. *)
-		PROCEDURE ResumePort*(port : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ResumePort*(port : SIGNED32) : BOOLEAN;
 		VAR status : SET; timer : Kernel.Timer;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(iobase + HcUsbCmd));
@@ -433,7 +433,7 @@ TYPE
 		 * @param port Port to get the status of
 		 * @return Port status
 		 *)
-		PROCEDURE GetPortStatus*(port : SIGNED32; ack : BOOLEAN) : SET;
+		PROCEDURE { OVERRIDE } GetPortStatus*(port : SIGNED32; ack : BOOLEAN) : SET;
 		VAR status, s : SET;
 		BEGIN
 			s := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -467,7 +467,7 @@ TYPE
 		END GetPortStatus;
 
 		(** Route the specified port to a companion host controller if supported. *)
-		PROCEDURE RoutePortToCompanion*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } RoutePortToCompanion*(port : SIGNED32);
 		VAR dword : SET;
 		BEGIN
 			(* Assert ports are not globally routed to companion controllers *)
@@ -477,7 +477,7 @@ TYPE
 		END RoutePortToCompanion;
 
 		(** Indicate a port state using the port indicators *)
-		PROCEDURE IndicatePort*(port, indicate : SIGNED32);
+		PROCEDURE { OVERRIDE } IndicatePort*(port, indicate : SIGNED32);
 		VAR indicators, dword : SET;
 		BEGIN
 			IF indicate = UsbHcdi.Amber THEN indicators := {14};
@@ -589,7 +589,7 @@ TYPE
 		END BuildQueueHead;
 
 		(** Build a Queue Head for the specified pipe and insert it into the host controller schedule. *)
-		PROCEDURE InsertQH*(pipe : UsbHcdi.Pipe) : BOOLEAN;
+		PROCEDURE { OVERRIDE } InsertQH*(pipe : UsbHcdi.Pipe) : BOOLEAN;
 		VAR adr, asyncListAddr : SIGNED32; dword : SET;
 		BEGIN (* Only call from exclusive regions *)
 			ASSERT((pipe # NIL) & (pipe.qh # 0) & (SYSTEM.VAL(SET, pipe.qh) * {0..4} = {}));
@@ -817,7 +817,7 @@ TYPE
 		END RemovePeriodicQH;
 
 		(** Remove the pipe's queue head from the host controller schedule *)
-		PROCEDURE RemoveQH*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } RemoveQH*(pipe : UsbHcdi.Pipe);
 		BEGIN (* caller must hold obj lock *)
 			IF Debug.Trace & Debug.traceQueuing THEN Show("Removing QH at "); KernelLog.Hex(pipe.qh, 8); KernelLog.Ln; END;
 			(* First remove all transfer descriptors from the queue head *)
@@ -833,7 +833,7 @@ TYPE
 		END RemoveQH;
 
 		(** Checks whether TDs may be linked to the pipe's QH *)
-		PROCEDURE LinkTDsAllowed*(pipe : UsbHcdi.Pipe) : BOOLEAN;
+		PROCEDURE { OVERRIDE } LinkTDsAllowed*(pipe : UsbHcdi.Pipe) : BOOLEAN;
 		VAR dword : SET;
 		BEGIN {EXCLUSIVE}
 			dword := SYSTEM.VAL(SET, SYSTEM.GET32(pipe.qh + QhQtdToken));
@@ -852,7 +852,7 @@ TYPE
 		END LinkTDsAllowed;
 
 		(* Insert the TD list <td> into the queue (ED) <queue> *)
-		PROCEDURE LinkTDs*(pipe : UsbHcdi.Pipe;  qtd : Machine.Address32);
+		PROCEDURE { OVERRIDE } LinkTDs*(pipe : UsbHcdi.Pipe;  qtd : Machine.Address32);
 		VAR dword : SET;
 		BEGIN {EXCLUSIVE}
 			ASSERT(SYSTEM.VAL(SET, qtd) * {0..4} = {}); (* 32byte alignment *)
@@ -875,7 +875,7 @@ TYPE
 		END LinkTDs;
 
 		(** Remove all transfer descriptors from the pipe's queue head *)
-		PROCEDURE UnlinkTDs*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } UnlinkTDs*(pipe : UsbHcdi.Pipe);
 		BEGIN {EXCLUSIVE}
 			UnlinkTDsInternal(pipe);
 		END UnlinkTDs;
@@ -932,7 +932,7 @@ TYPE
 		 * Note that this only makes sense if the Halt feature of the USB device is also cleared used the ClearFeature standard
 		 * request. This procedure here only changes the pipe's queue head.
 		 *)
-		PROCEDURE ClearHalt(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } ClearHalt(pipe : UsbHcdi.Pipe);
 		VAR dword : SET;
 		BEGIN
 			Machine.InvalidateDCacheRange(pipe.qh, sizeQh);
@@ -975,7 +975,7 @@ TYPE
 		 * @param bufferlen Number of bytes transmitted/received in the data stage
 		 * @param buffer Buffer where to get/put the specified number of bytes
 		 *)
-		PROCEDURE ScheduleControl*(pipe : UsbHcdi.Pipe; direction : SIGNED32; msg : UsbHcdi.ControlMessage;  bufferLen : SIZE; VAR buffer : Usbdi.Buffer);
+		PROCEDURE { OVERRIDE } ScheduleControl*(pipe : UsbHcdi.Pipe; direction : SIGNED32; msg : UsbHcdi.ControlMessage;  bufferLen : SIZE; VAR buffer : Usbdi.Buffer);
 		VAR
 			qtd : Machine.Address32;
 			dword : SET;
@@ -1093,7 +1093,7 @@ TYPE
 			pipe.lastTD := qtd;
 		END ScheduleControl;
 
-		PROCEDURE Schedule*(pipe : UsbHcdi.Pipe; bufferLen, offset: SIZE; VAR buffer: Usbdi.Buffer);
+		PROCEDURE { OVERRIDE } Schedule*(pipe : UsbHcdi.Pipe; bufferLen, offset: SIZE; VAR buffer: Usbdi.Buffer);
 		VAR dword : SET;
 		BEGIN
 			Machine.FlushDCacheRange(ADDRESSOF(buffer[offset]), bufferLen);
@@ -1276,7 +1276,7 @@ TYPE
 		END InterruptHandler;
 
 		(* re-evaluate the status of the pipe's qh (endpoint descriptor) and its TD list *)
-		PROCEDURE UpdatePipeStatus*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } UpdatePipeStatus*(pipe : UsbHcdi.Pipe);
 		CONST MaxLoops = 10000;
 		VAR
 			qtd : SIGNED32;
@@ -1719,13 +1719,13 @@ TYPE
 			RETURN InitUlpi();
 		END Start;
 
-		PROCEDURE &Default*(bus, device, function : SIGNED32);
+		PROCEDURE (* OVERRIDE *) & Default*(bus, device, function : SIGNED32);
 		BEGIN
 			Default^(bus, device, function); (* The high-speed default pipe uses 64byte maxPacketSize0 *)
 			pipes[0, 0, 0].maxPacketSize := 64;
 		END Default;
 
-		PROCEDURE Cleanup;
+		PROCEDURE { OVERRIDE } Cleanup;
 		BEGIN
 			IF state >= UsbHcdi.Initialized THEN Objects.RemoveHandler(InterruptHandler, Machine.IRQ0 + irq); END;
 			Cleanup^;
@@ -1739,7 +1739,7 @@ TYPE
 		END Cleanup;
 
 		(** Displays the host controller's data struture on KernelLog *)
-		PROCEDURE ShowSchedule*;
+		PROCEDURE { OVERRIDE } ShowSchedule*;
 		CONST MaxIterations =21;
 		VAR dword : SET; first, cur : SIGNED32; i, ms : SIGNED32;
 		BEGIN
@@ -1824,13 +1824,13 @@ TYPE
 			END;
 		END ShowSchedule;
 
-		PROCEDURE ShowPipe*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } ShowPipe*(pipe : UsbHcdi.Pipe);
 		BEGIN
 			ShowQueueHead(pipe.qh, pipe.firstTD, cap64bit);
 		END ShowPipe;
 
 		(* Show some information on this host controller on KernelLog *)
-		PROCEDURE Diag;
+		PROCEDURE { OVERRIDE } Diag;
 		VAR dword : SET;
 		BEGIN
 			IF Debug.Trace THEN

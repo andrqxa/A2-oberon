@@ -28,13 +28,13 @@ TYPE
 			WMWindowManager.DefaultAddWindow(SELF);
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN Close
 			ELSE Handle^(x)
@@ -49,7 +49,7 @@ TYPE
 	VAR
 		vc : WMComponents.VisualComponent;
 
-		PROCEDURE CreateForm() : WMComponents.VisualComponent;
+		PROCEDURE { OVERRIDE } CreateForm() : WMComponents.VisualComponent;
 		BEGIN
 			RETURN vc;
 		END CreateForm;
@@ -81,7 +81,7 @@ TYPE
 			KernelLog.String("SayBye"); KernelLog.Ln
 		END SayBye;
 
-		PROCEDURE CreateForm() : WMComponents.VisualComponent;
+		PROCEDURE { OVERRIDE } CreateForm() : WMComponents.VisualComponent;
 		VAR
 			panel : WMStandardComponents.Panel;
 			toolbar : WMStandardComponents.Panel;
@@ -138,7 +138,7 @@ TYPE
 			tabs.model.Release;
 		END Test;
 
-		PROCEDURE CreateForm(): WMComponents.VisualComponent;
+		PROCEDURE { OVERRIDE } CreateForm(): WMComponents.VisualComponent;
 		VAR
 			panel : WMStandardComponents.Panel;
 			toolbar: WMStandardComponents.Panel;

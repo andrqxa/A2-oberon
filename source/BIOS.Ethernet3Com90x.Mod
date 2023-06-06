@@ -296,7 +296,7 @@ TYPE
 			hdr: ARRAY Network.MaxPacketSize OF CHAR; (* internal buffer for eventual header copy in DoSend *)
 			ctrl*: Controller;
 
-		PROCEDURE DoSend(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32);
+		PROCEDURE { OVERRIDE } DoSend(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32);
 		VAR
 			dpd: DPD;
 			t: Kernel.MilliTimer;
@@ -368,7 +368,7 @@ TYPE
 			INC(sendCount)
 		END DoSend;
 
-		PROCEDURE Finalize(connected: BOOLEAN);
+		PROCEDURE { OVERRIDE } Finalize(connected: BOOLEAN);
 		BEGIN
 			ctrl.Finalize;
 			Finalize^(connected);

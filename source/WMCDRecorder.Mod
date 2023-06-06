@@ -205,7 +205,7 @@ TYPE
 			END;
 		END EnableComponents;
 
-		PROCEDURE Resized(width, height: SIZE);
+		PROCEDURE { OVERRIDE } Resized(width, height: SIZE);
 		VAR
 			oldWidth: SIZE;
 			factor: FLOAT32;
@@ -1044,7 +1044,7 @@ TYPE
 			burnPanel.SetTime(Strings.NewString(timeStr));
 		END TimeHandler;
 
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		BEGIN
 			Close^();
 			DecCount();
@@ -1058,7 +1058,7 @@ TYPE
 			session: SIGNED32;
 			sessionList: Utils.ListBox;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		VAR
 			bearing: WMRectangles.Rectangle;
 		BEGIN
@@ -1074,7 +1074,7 @@ TYPE
 			content.AddContent(sessionList);
 		END CreateDialog;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		BEGIN
 			CASE sessionList.selected.Get() OF
 				  0: session := NoMultisession;
@@ -1092,7 +1092,7 @@ TYPE
 			tool: SIGNED32;
 			toolList: Utils.ListBox;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		VAR
 			bearing: WMRectangles.Rectangle;
 		BEGIN
@@ -1107,7 +1107,7 @@ TYPE
 			content.AddContent(toolList);
 		END CreateDialog;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		BEGIN
 			CASE toolList.selected.Get() OF
 				  0: tool := OpenIsoTool;
@@ -1124,7 +1124,7 @@ TYPE
 			disc: CDRecord.Disc;
 			grid: WMStringGrids.StringGrid;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		VAR
 			bearing: WMRectangles.Rectangle;
 		BEGIN
@@ -1140,7 +1140,7 @@ TYPE
 			grid.model.Release
 		END CreateDialog;
 
-		PROCEDURE Show;
+		PROCEDURE { OVERRIDE } Show;
 		VAR
 			tmp: ARRAY MaxLen OF CHAR;
 			colWidths: WMGrids.Spacings;
@@ -1220,7 +1220,7 @@ TYPE
 			type: SIGNED32;
 			typeList: Utils.ListBox;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		VAR
 			bearing: WMRectangles.Rectangle;
 		BEGIN
@@ -1233,7 +1233,7 @@ TYPE
 			content.AddContent(typeList);
 		END CreateDialog;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		BEGIN
 			CASE typeList.selected.Get() OF
 				   0: type := Lib.BDQuick;
@@ -1248,7 +1248,7 @@ TYPE
 			recorder: CDRecord.CDRecorder;
 			recList: Utils.ListBox;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		VAR
 			bearing: WMRectangles.Rectangle;
 			label:  WMStandardComponents.Label;
@@ -1269,7 +1269,7 @@ TYPE
 			content.AddContent(recList);
 		END CreateDialog;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		BEGIN
 			recorder := recorders[recList.selected.Get()];
 			Ok^(sender, data);
@@ -1280,7 +1280,7 @@ TYPE
 		VAR
 			label: WMStandardComponents.Label;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		VAR
 			bearing: WMRectangles.Rectangle;
 		BEGIN
@@ -1298,7 +1298,7 @@ TYPE
 			IF ~abortable THEN content.RemoveContent(abort) END;
 		END Create;
 
-		PROCEDURE Abort(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Abort(sender, data: ANY);
 		BEGIN
 			IF result < 0 THEN
 				manager.Remove(SELF);
@@ -1306,7 +1306,7 @@ TYPE
 			result := WMDialogs.ResAbort;
 		END Abort;
 
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		BEGIN
 			Abort(SELF, NIL);
 		END Close;
@@ -1325,7 +1325,7 @@ TYPE
 		result: SIGNED32;
 		prepareLabel, titleLabel0, titleLabel1, opLabel, bufLabel, speedLabel, timeLabel: WMStandardComponents.Label;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 			preparePanel, burnPanel, bufPanel, speedPanel, opPanel, timePanel, buttonPanel: WMStandardComponents.Panel;
 			label0, label1, label2, label3 : WMStandardComponents.Label;
@@ -1495,7 +1495,7 @@ TYPE
 		sourcePage: SourcePage;
 		burnPage: BurnPage;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		BEGIN
 			CreateDialog^;
 			NEW(sourcePage);
@@ -1512,7 +1512,7 @@ TYPE
 			AddPage(burnPage, Strings.NewString("Burn"));
 		END CreateDialog;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		BEGIN
 			sourcePage.UpdateData(TRUE);
 			burnPage.UpdateData(TRUE);
@@ -1525,7 +1525,7 @@ TYPE
 		audioPage: AudioPage;
 		burnPage: BurnPage;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		BEGIN
 			CreateDialog^;
 			NEW(audioPage);
@@ -1544,7 +1544,7 @@ TYPE
 
 		END CreateDialog;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		BEGIN
 			audioPage.UpdateData(TRUE);
 			burnPage.UpdateData(TRUE);
@@ -1557,7 +1557,7 @@ TYPE
 		isoPage: IsoPage;
 		burnPage: BurnPage;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		BEGIN
 			CreateDialog^;
 			NEW(isoPage);
@@ -1579,7 +1579,7 @@ TYPE
 			burnPage.UpdateData(FALSE);
 		END CreateDialog;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		BEGIN
 			isoPage.UpdateData(TRUE);
 			burnPage.UpdateData(TRUE);
@@ -1592,7 +1592,7 @@ TYPE
 		imagePage: ImagePage;
 		burnPage: BurnPage;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		BEGIN
 			CreateDialog^;
 			NEW(imagePage);
@@ -1609,7 +1609,7 @@ TYPE
 			burnPage.UpdateData(FALSE)
 		END CreateDialog;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		BEGIN
 			imagePage.UpdateData(TRUE);
 			burnPage.UpdateData(TRUE);
@@ -1624,7 +1624,7 @@ TYPE
 		platformList, emulList: Utils.ListBox;
 		imageSize: SIGNED32;
 
-		PROCEDURE CreateDialog;
+		PROCEDURE { OVERRIDE } CreateDialog;
 		VAR
 			label1, label2: WMStandardComponents.Label;
 			bearing: WMRectangles.Rectangle;
@@ -1687,7 +1687,7 @@ TYPE
 			END;
 		END OnBrowse;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		VAR
 			image, id: ARRAY MaxLen OF CHAR;
 			emulation, platform: CHAR;
@@ -1726,7 +1726,7 @@ TYPE
 		location: WMProperties.StringProperty;
 		locationEdit: WMEditors.Editor;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 			label: WMStandardComponents.Label;
 			bearing: WMRectangles.Rectangle;
@@ -1748,7 +1748,7 @@ TYPE
 			AddContent(removeChk);
 		END Init;
 
-		PROCEDURE UpdateData(save: BOOLEAN);
+		PROCEDURE { OVERRIDE } UpdateData(save: BOOLEAN);
 		VAR
 			str: ARRAY MaxLen OF CHAR;
 			string: String;
@@ -1777,7 +1777,7 @@ TYPE
 		recList: Utils.ListBox;
 		recorder: CDRecord.CDRecorder;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 			label: WMStandardComponents.Label;
 			bearing: WMRectangles.Rectangle;
@@ -1809,7 +1809,7 @@ TYPE
 			AddContent(removeChk);
 		END Init;
 
-		PROCEDURE UpdateData(save: BOOLEAN);
+		PROCEDURE { OVERRIDE } UpdateData(save: BOOLEAN);
 		VAR
 			str: ARRAY MaxLen OF CHAR;
 			string: String;
@@ -1836,7 +1836,7 @@ TYPE
 		location: WMProperties.StringProperty;
 		locationEdit: WMEditors.Editor;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 			label: WMStandardComponents.Label;
 			bearing: WMRectangles.Rectangle;
@@ -1876,7 +1876,7 @@ TYPE
 			END;
 		END OnBrowse;
 
-		PROCEDURE UpdateData(save: BOOLEAN);
+		PROCEDURE { OVERRIDE } UpdateData(save: BOOLEAN);
 		VAR
 			str: ARRAY MaxLen OF CHAR;
 			string: String;
@@ -1909,7 +1909,7 @@ TYPE
 		verifyChk, bufeChk: WMStandardComponents.Checkbox;
 
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 			bearing: WMRectangles.Rectangle;
 			i: SIGNED32;
@@ -2004,7 +2004,7 @@ TYPE
 			typeList.Update();
 		END ListTypes;
 
-		PROCEDURE UpdateData(save: BOOLEAN);
+		PROCEDURE { OVERRIDE } UpdateData(save: BOOLEAN);
 		BEGIN
 			IF save THEN
 				recorder := recorders[recList.selected.Get()];
@@ -2033,7 +2033,7 @@ TYPE
 		levelList: Utils.ListBox;
 		locationEdit: WMEditors.Editor;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 
 			label: WMStandardComponents.Label;
@@ -2066,7 +2066,7 @@ TYPE
 			AddContent(removeChk);
 		END Init;
 
-		PROCEDURE UpdateData(save: BOOLEAN);
+		PROCEDURE { OVERRIDE } UpdateData(save: BOOLEAN);
 		VAR
 			str: ARRAY MaxLen OF CHAR;
 			string: String;
@@ -2106,7 +2106,7 @@ TYPE
 			SELF.node := node;
 		END New;
 
-		PROCEDURE GetInterface*(type: SIGNED32): WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type: SIGNED32): WMDropTarget.DropInterface;
 		VAR
 			di: DropURL;
 
@@ -2131,7 +2131,7 @@ TYPE
 			SELF.node := node;
 		END New;
 
-		PROCEDURE URL*(CONST url: ARRAY OF CHAR; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } URL*(CONST url: ARRAY OF CHAR; VAR res: INTEGER);
 		BEGIN
 			IF panel.enabled.Get() THEN
 				panel.AddFile(url, node);
@@ -2293,7 +2293,7 @@ TYPE
 			Refresh();
 		END DeleteFiles;
 
-		PROCEDURE AddFile(CONST name: ARRAY OF CHAR; node: ANY);
+		PROCEDURE { OVERRIDE } AddFile(CONST name: ARRAY OF CHAR; node: ANY);
 		VAR
 			title, file, path, ext: ARRAY MaxLen OF CHAR;
 			mp3info: Utils.MP3Info;
@@ -2384,7 +2384,7 @@ TYPE
 			grid.model.Release;
 		END Refresh;
 
-		PROCEDURE Resized;
+		PROCEDURE { OVERRIDE } Resized;
 		VAR
 			width: SIZE;
 		BEGIN
@@ -2416,7 +2416,7 @@ TYPE
 		popup: WMPopups.Popup;
 		px, py: SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 		BEGIN
 			Init^;
@@ -2564,7 +2564,7 @@ TYPE
 			tree.Release
 		END ExpandNode;
 
-		PROCEDURE DragDropped(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR
 			dropTarget: URLDropTarget;
 			node : WMTrees.TreeNode;
@@ -2617,7 +2617,7 @@ TYPE
 		px, py: SIZE;
 		nofEntries: SIZE;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(onPathChanged, SELF, NIL, NIL, NIL);
@@ -2972,7 +2972,7 @@ TYPE
 			END;
 		END PathChanged;
 
-		PROCEDURE AddFile(CONST name: ARRAY OF CHAR; node: ANY);
+		PROCEDURE { OVERRIDE } AddFile(CONST name: ARRAY OF CHAR; node: ANY);
 		VAR
 			file: Files.File;
 			parent, newDir: Directory;
@@ -3149,7 +3149,7 @@ TYPE
 			onUpdate*: WMEvents.EventSource;
 			time: Time;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^();
 			NEW(onUpdate, SELF, NIL, NIL, NIL);
@@ -3166,7 +3166,7 @@ TYPE
 			onUpdate.Call(time);
 		END UpdateHandler;
 
-		PROCEDURE Start(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Start(sender, data: ANY);
 		BEGIN
 			start := Kernel.GetTicks ();
 			Start^(sender, data);

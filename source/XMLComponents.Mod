@@ -189,7 +189,7 @@ TYPE
 		VAR
 			locks: SIGNED32;
 
-		PROCEDURE AddAttribute*(attribute: XML.Attribute);
+		PROCEDURE { OVERRIDE } AddAttribute*(attribute: XML.Attribute);
 		BEGIN
 			ConnectAttribute(attribute);
 			AddAttribute^(attribute)
@@ -366,13 +366,13 @@ TYPE
 		VAR
 			properties-: CSS2Properties.AllMediaProperties;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^();
 			NEW(properties);
 		END Init;
 
-		PROCEDURE AddContent*(c: XML.Content);
+		PROCEDURE { OVERRIDE } AddContent*(c: XML.Content);
 		BEGIN
 			IF c IS CSS2Component THEN c(CSS2Component).properties.SetParent(properties) END;
 			AddContent^(c)
@@ -521,7 +521,7 @@ TYPE
 			lastX-, lastY-: SIGNED32;
 			trueStateMsg, falseStateMsg: StateMessage;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR vprop: CSS2Properties.VisualProperties; arrColl: XMLObjects.ArrayCollection;
 		BEGIN
 			Init^();
@@ -536,7 +536,7 @@ TYPE
 			NEW(pointerMoveListeners, SELF); NEW(hoverListeners, SELF); NEW(activeListeners, SELF); NEW(focusListeners, SELF)
 		END Init;
 
-		PROCEDURE AddContent*(c: XML.Content);
+		PROCEDURE { OVERRIDE } AddContent*(c: XML.Content);
 		BEGIN
 			IF c IS CSS2Component THEN
 				c(VisualComponent).properties.SetParent(properties);
@@ -544,7 +544,7 @@ TYPE
 			AddContent^(c)
 		END AddContent;
 
-		PROCEDURE SetProperties*(p: CSS2Properties.AllMediaProperties);
+		PROCEDURE { OVERRIDE } SetProperties*(p: CSS2Properties.AllMediaProperties);
 		BEGIN
 			IF (p # NIL) & (p IS CSS2Properties.VisualProperties) THEN
 				SetProperties^(p)
@@ -751,12 +751,12 @@ TYPE
 			IF ~IsHit(lastX, lastY) THEN PointerUp(lastX, lastY, lastMouseKeys) END
 		END ComputeHeights;
 
-		PROCEDURE GetNumberOfEvents*(): SIGNED32;
+		PROCEDURE { OVERRIDE } GetNumberOfEvents*(): SIGNED32;
 		BEGIN
 			RETURN GetNumberOfEvents^() + 4
 		END GetNumberOfEvents;
 
-		PROCEDURE GetEventName*(i: SIGNED32): String;
+		PROCEDURE { OVERRIDE } GetEventName*(i: SIGNED32): String;
 		VAR s: String;
 		BEGIN
 			CASE i - GetNumberOfEvents^() OF
@@ -769,7 +769,7 @@ TYPE
 			RETURN s
 		END GetEventName;
 
-		PROCEDURE AddEventListener*(listener: Listener; event: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } AddEventListener*(listener: Listener; event: ARRAY OF CHAR);
 		BEGIN
 			IF event = "hover" THEN hoverListeners.AddListener(listener)
 			ELSIF event = "active" THEN activeListeners.AddListener(listener)
@@ -779,7 +779,7 @@ TYPE
 			END
 		END AddEventListener;
 
-		PROCEDURE UnlockUpdate*;
+		PROCEDURE { OVERRIDE } UnlockUpdate*;
 		BEGIN
 			UnlockUpdate^();
 			IF ~IsLocked() & ~invalidBox.IsEmpty() THEN
@@ -1026,7 +1026,7 @@ TYPE
 			IF (parent # NIL) & (parent IS VisualComponent) THEN parent(VisualComponent).Resized() END;
 		END Resized;
 
-		PROCEDURE PropertiesChanged*;
+		PROCEDURE { OVERRIDE } PropertiesChanged*;
 		BEGIN
 			PropertiesChanged^();
 			IF properties(CSS2Properties.VisualProperties).dimensionChanged THEN Resized() END
@@ -1047,7 +1047,7 @@ TYPE
 			END
 		END InvalidateRange;
 
-		PROCEDURE Invalidate*;
+		PROCEDURE { OVERRIDE } Invalidate*;
 		BEGIN
 			Invalidate^();
 			InvalidateRange(0, 0, bounds.w, bounds.h)

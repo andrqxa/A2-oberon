@@ -413,7 +413,7 @@ TYPE
 
 
 		(** Send data on a TCP connection. *)
-		PROCEDURE Send*(CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Send*(CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR buf: SendBuffer; len0: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF StrongChecks THEN Invariant(SELF) END;
@@ -460,7 +460,7 @@ TYPE
 
 
 		(** Receive data on a TCP connection. The data parameter specifies the buffer. The ofs parameters specify the position in the buffer where data should be received (usually 0), and the size parameters specifies how many bytes of data can be received in the buffer. The min parameter specifies the minimum number of bytes to receive before Receive returns and must by <= size. The len parameter returns the number of bytes received, and the res parameter returns 0 if ok, or a non-zero error code otherwise (e.g. if the connection is closed by the communication partner, or by a call of the Close method). *)
-		PROCEDURE Receive*(VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Receive*(VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			buf: Network.Buffer;
 			rlen: SIGNED32;
@@ -651,7 +651,7 @@ TYPE
 		END HandleTimeout;
 
 		(** Close a TCP connection (half-close). *)
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN {EXCLUSIVE}
 			IF state < Established THEN
 				CloseConnection(SELF)

@@ -89,7 +89,7 @@ TYPE
 			END
 		END SetLanguage;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			FreeWindow (SELF)

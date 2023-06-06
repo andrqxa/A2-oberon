@@ -1689,7 +1689,7 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 		hasMoreBytes : BOOLEAN;
 
 		(* Read Headers of the next frame and decode it *)
-		PROCEDURE Next*;
+		PROCEDURE { OVERRIDE } Next*;
 		VAR
 			ret: BOOLEAN;
 			done: BOOLEAN;
@@ -1781,7 +1781,7 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 			END;
 		END Next;
 
-		PROCEDURE Render*(img : Raster.Image);
+		PROCEDURE { OVERRIDE } Render*(img : Raster.Image);
 		BEGIN
 			SELF.img := img;
 
@@ -1794,7 +1794,7 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 		END Render;
 
 		(* returns false if the stream has ended *)
-		PROCEDURE HasMoreData*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } HasMoreData*(): BOOLEAN;
 		BEGIN
 			RETURN hasMoreBytes
 		END HasMoreData;
@@ -1822,7 +1822,7 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 
 
 		(* Sets the the stream on which to read *)
-		PROCEDURE Open*(in: Streams.Reader; VAR res: INTEGER );
+		PROCEDURE { OVERRIDE } Open*(in: Streams.Reader; VAR res: INTEGER );
 		BEGIN
 			SELF.s := in;
 			NEW( mp4State);
@@ -1839,7 +1839,7 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 		END Open;
 
 		(* Sets the necessary videoInfo, which is needed to decode frames *)
-		PROCEDURE  GetVideoInfo*(VAR width, height, milliSecondsPerFrame: SIGNED32);
+		PROCEDURE  { OVERRIDE } GetVideoInfo*(VAR width, height, milliSecondsPerFrame: SIGNED32);
 		VAR si : Codecs.AVStreamInfo;
 		BEGIN
 			height := SELF.videoHeight;
@@ -1853,17 +1853,17 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 			END
 		END GetVideoInfo;
 
-		PROCEDURE CanSeek*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSeek*(): BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END CanSeek;
 
-		PROCEDURE GetCurrentFrame*() : SIGNED32;
+		PROCEDURE { OVERRIDE } GetCurrentFrame*() : SIGNED32;
 		BEGIN
 			RETURN frameCounter;
 		END GetCurrentFrame;
 
-		PROCEDURE SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		VAR
 			seekType: SIGNED32;
 			dummy: INTEGER;
@@ -1881,7 +1881,7 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 		END SeekFrame;
 
 		(* Seeks a position based on timevalue. If gokeyframe is set, the next following keyframe is searched *)
-		PROCEDURE SeekMillisecond*(millisecond: SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } SeekMillisecond*(millisecond: SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		VAR
 			frame: SIGNED32;
 			dummy: INTEGER;

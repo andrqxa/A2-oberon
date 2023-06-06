@@ -290,7 +290,7 @@ TYPE
 			END;
 		END EventHandler;
 
-		PROCEDURE Connect*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect*(): BOOLEAN;
 		VAR status : Usbdi.Status; endpoint: SIGNED32; i: ADDRESS; k : ARRAY 32 OF CHAR;
 		BEGIN
 			IF ~SetProtocol(0) THEN
@@ -335,7 +335,7 @@ TYPE
 			RETURN TRUE;
 		END Connect;
 
-		PROCEDURE Disconnect*;
+		PROCEDURE { OVERRIDE } Disconnect*;
 		BEGIN
 			KernelLog.String("UsbKeyboard: USB Keyboard disconnected."); KernelLog.Ln;
 		END Disconnect;

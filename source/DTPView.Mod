@@ -73,7 +73,7 @@ TYPE
 		ownerWindowUpdatePageNumber* : PROCEDURE {DELEGATE};
 		ownerWindowExitFullScreen*: PROCEDURE {DELEGATE};
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			ready := FALSE;
@@ -101,14 +101,14 @@ TYPE
 
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF property = fillColor THEN Invalidate
 			ELSE PropertyChanged^(sender, property)
 			END;
 		END PropertyChanged;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		VAR
 			cpage: DTPData.PageObject;
 			cframe: DTPData.FrameObject;
@@ -163,7 +163,7 @@ TYPE
 			render := state;
 		END Render;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			Invalidate;
@@ -464,7 +464,7 @@ TYPE
 			gridDivision := gDiv;
 		END SetGrid;
 
-		PROCEDURE WheelMove*(dz: SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz: SIZE);
 		BEGIN
 			IF ~previewMode THEN
 				IF wheelMode = 0 THEN								(* wheel zoom *)
@@ -482,7 +482,7 @@ TYPE
 			END;
 		END WheelMove;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR
 (*			cpage: DTPData.PageObject;
 			cframe: DTPData.FrameObject;
@@ -586,7 +586,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR
 (*			cpage: DTPData.PageObject;
 			cframe: DTPData.FrameObject;
@@ -795,7 +795,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR string, tempString, tempString2: ARRAY 32 OF CHAR;
 			content, activeContent: DTPData.ContentObject;
 			resguide: DTPData.GuideObject;
@@ -971,7 +971,7 @@ TYPE
 			END;
 		END PointerUp;
 
-		PROCEDURE KeyEvent*(ucs: SIZE; flags: SET; VAR keySym: SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs: SIZE; flags: SET; VAR keySym: SIZE);
 		VAR
 (*			cpage: DTPData.PageObject;
 			cframe: DTPData.FrameObject;
@@ -1351,7 +1351,7 @@ TYPE
 			RETURN res;
 		END IsInFrameHandle;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas);
 		VAR
 		BEGIN
 			Draw^(canvas);
@@ -2305,7 +2305,7 @@ TYPE
 			theCaller.Invalidate;
 		END SetValueHandler;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			theCaller.propertyOpen := FALSE;
 			Hide;

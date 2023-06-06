@@ -31,7 +31,7 @@ TYPE
 			SELF.addComponent := addComponent;
 		END Init;
 
-		PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 		VAR dc : DropComponent;
 		BEGIN
 			IF (type = WMDropTarget.TypeUser) THEN
@@ -73,7 +73,7 @@ TYPE
 		lastTimestamp : SIGNED32;
 		state : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR i : SIZE;
 		BEGIN
 			Init^;
@@ -84,7 +84,7 @@ TYPE
 			state := State_NotInitialized;
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			BEGIN {EXCLUSIVE} state := State_Running; END;
@@ -156,7 +156,7 @@ TYPE
 			grid.Release;
 		END UpdateGrid;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		VAR ignore : SIGNED32;
 		BEGIN
 			Finalize^;
@@ -205,7 +205,7 @@ TYPE
 		lastTimestamp, lastRepositoryTimestamp : SIGNED32;
 		state : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(showDetails, NIL, NIL, NIL); properties.Add(showDetails);
@@ -220,7 +220,7 @@ TYPE
 			state := State_NotInitialized;
 		END Init;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = showDetails) THEN
 				showDetailsI := showDetails.Get();
@@ -231,7 +231,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			BEGIN {EXCLUSIVE} state := State_Running; END;
@@ -387,7 +387,7 @@ TYPE
 			grid.Release;
 		END SetDetails;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			UpdateGridSpacings;
 			Resized^;
@@ -522,7 +522,7 @@ TYPE
 			END;
 		END UpdateGrid;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		VAR ignore : SIGNED32;
 		BEGIN
 			Finalize^;
@@ -701,7 +701,7 @@ TYPE
 			END;
 		END OnComponentClicked;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS KillerMsg) THEN Close
@@ -713,7 +713,7 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;

@@ -117,7 +117,7 @@ TYPE
 		SELF.displacement := displacement; maxUnitSize := 1; NEW (bits, 0); exportInfo := NIL; NEW(relocInfo);
 	END InitArrangement;
 
-	PROCEDURE Allocate* (CONST section: ObjectFile.Section): GenericLinker.Address;
+	PROCEDURE { OVERRIDE } Allocate* (CONST section: ObjectFile.Section): GenericLinker.Address;
 	VAR address, alignment: ObjectFile.Bits; i, j: SIZE; name: ObjectFile.SegmentedName;
 	BEGIN
 		IF section.unit > maxUnitSize THEN maxUnitSize := section.unit END;
@@ -156,11 +156,11 @@ TYPE
 	BEGIN RETURN bits.GetSize()
 	END SizeInBits;
 
-	PROCEDURE Patch* (pos, value: GenericLinker.Address; offset, bits, unit: ObjectFile.Bits);
+	PROCEDURE { OVERRIDE } Patch* (pos, value: GenericLinker.Address; offset, bits, unit: ObjectFile.Bits);
 	BEGIN SELF.bits.SetBits ((pos - displacement) * unit + offset, bits, value);
 	END Patch;
 
-	PROCEDURE CheckReloc*(target: GenericLinker.Address; pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
+	PROCEDURE { OVERRIDE } CheckReloc*(target: GenericLinker.Address; pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
 	BEGIN
 		IF (pattern.mode = ObjectFile.Absolute) & (relocInfo # NIL) THEN
 			relocInfo.AddReloc(SIGNED32(target+patch.offset));

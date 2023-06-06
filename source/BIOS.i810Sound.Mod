@@ -566,13 +566,13 @@ TYPE
 				NABMBAR.RegWrite8(BMRInBase + BMRLastValidIndexReg, recLastValidIndex)
 			END ReturnBuffers;
 
-			PROCEDURE Init*;
+			PROCEDURE { OVERRIDE } Init*;
 			BEGIN
 				SetName("i810 Sound driver");
 				desc := "Sound driver for the Intel 810 chips"
 			END Init;
 
-			PROCEDURE Enable*;
+			PROCEDURE { OVERRIDE } Enable*;
 			BEGIN
 				(* PCM Out *)
 				IF TestBit(NABMBAR.RegRead16(BMROutBase + BMRStatusReg), 0) THEN
@@ -585,7 +585,7 @@ TYPE
 				END
 			END Enable;
 
-			PROCEDURE Disable*;
+			PROCEDURE { OVERRIDE } Disable*;
 			BEGIN
 				(* PCM Out *)
 				NABMBAR.RegWrite16(BMROutBase + BMRStatusReg, 0002H);
@@ -601,17 +601,17 @@ TYPE
 				RETURN 0;
 			END NofNativeFrequences;
 
-			PROCEDURE GetNativeFrequency*(nr : SIGNED32) : SIGNED32;
+			PROCEDURE { OVERRIDE } GetNativeFrequency*(nr : SIGNED32) : SIGNED32;
 			BEGIN
 				RETURN 48000;
 			END GetNativeFrequency;
 
-			PROCEDURE NofSamplingResolutions*() : SIGNED32;
+			PROCEDURE { OVERRIDE } NofSamplingResolutions*() : SIGNED32;
 			BEGIN
 				RETURN 2 (* 16 Bit and 8 Bit *)
 			END NofSamplingResolutions;
 
-			PROCEDURE GetSamplingResolution(nr : SIGNED32) : SIGNED32;
+			PROCEDURE { OVERRIDE } GetSamplingResolution(nr : SIGNED32) : SIGNED32;
 			BEGIN
 				ASSERT((nr >= 0) & (nr <2));
 				IF nr = 0 THEN
@@ -621,12 +621,12 @@ TYPE
 				END;
 			END GetSamplingResolution;
 
-			PROCEDURE NofSubChannelSettings*() : SIGNED32;
+			PROCEDURE { OVERRIDE } NofSubChannelSettings*() : SIGNED32;
 			BEGIN
 				RETURN 2 (* Mono and stereo *)
 			END NofSubChannelSettings;
 
-			PROCEDURE GetSubChannelSetting*(nr : SIGNED32) : SIGNED32;
+			PROCEDURE { OVERRIDE } GetSubChannelSetting*(nr : SIGNED32) : SIGNED32;
 			BEGIN
 				ASSERT((nr >= 0) & (nr <= 2));
 				IF nr = 0 THEN
@@ -636,12 +636,12 @@ TYPE
 				END
 			END GetSubChannelSetting;
 
-			PROCEDURE NofWaveFormats*() : SIGNED32;
+			PROCEDURE { OVERRIDE } NofWaveFormats*() : SIGNED32;
 			BEGIN
 				RETURN 1 (* Only PCM *)
 			END NofWaveFormats;
 
-			PROCEDURE OpenPlayChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution,
+			PROCEDURE { OVERRIDE } OpenPlayChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution,
 				nofSubChannels, format : SIGNED32; VAR res : INTEGER);
 			VAR
 				playChannel : PlayChannel;
@@ -723,7 +723,7 @@ TYPE
 				firstPlayChannel := item
 			END AddPlayChannel;
 
-			PROCEDURE OpenRecordChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution,
+			PROCEDURE { OVERRIDE } OpenRecordChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution,
 				nofSubChannels, format : SIGNED32; VAR res : INTEGER);
 			VAR
 				recChannel : RecChannel;
@@ -819,7 +819,7 @@ TYPE
 				firstRecChannel := item
 			END AddRecChannel;
 
-			PROCEDURE RegisterMixerChangeListener*(mixChangedProc : SoundDevices.MixerChangedProc);
+			PROCEDURE { OVERRIDE } RegisterMixerChangeListener*(mixChangedProc : SoundDevices.MixerChangedProc);
 			VAR
 				item : MixerChangedProcList;
 			BEGIN {EXCLUSIVE}
@@ -831,7 +831,7 @@ TYPE
 				firstMixerChangedProc := item
 			END RegisterMixerChangeListener;
 
-			PROCEDURE UnregisterMixerChangeListener*(mixChangeProc : SoundDevices.MixerChangedProc);
+			PROCEDURE { OVERRIDE } UnregisterMixerChangeListener*(mixChangeProc : SoundDevices.MixerChangedProc);
 			VAR
 				item : MixerChangedProcList;
 			BEGIN {EXCLUSIVE}
@@ -861,7 +861,7 @@ TYPE
 				END;
 			END UnregisterMixerChangeListener;
 
-			PROCEDURE GetMixerChannel*(channelNr : SIGNED32; VAR channel : SoundDevices.MixerChannel);
+			PROCEDURE { OVERRIDE } GetMixerChannel*(channelNr : SIGNED32; VAR channel : SoundDevices.MixerChannel);
 			BEGIN
 				IF (channelNr >= 0) & (channelNr < NofMixerChannels) THEN
 					channel := mixerChannelList[channelNr]
@@ -870,7 +870,7 @@ TYPE
 				END
 			END GetMixerChannel;
 
-			PROCEDURE GetNofMixerChannels*() : SIGNED32;
+			PROCEDURE { OVERRIDE } GetNofMixerChannels*() : SIGNED32;
 			BEGIN
 				RETURN NofMixerChannels
 			END GetNofMixerChannels;
@@ -941,17 +941,17 @@ TYPE
 				SetVolume(InitVolume)
 			END Constr;
 
-			PROCEDURE GetName*(VAR name : ARRAY OF CHAR);
+			PROCEDURE { OVERRIDE } GetName*(VAR name : ARRAY OF CHAR);
 			BEGIN
 				COPY(SELF.name^, name)
 			END GetName;
 
-			PROCEDURE GetDesc*(VAR desc : ARRAY OF CHAR);
+			PROCEDURE { OVERRIDE } GetDesc*(VAR desc : ARRAY OF CHAR);
 			BEGIN
 				COPY(SELF.desc^, desc)
 			END GetDesc;
 
-			PROCEDURE SetVolume*(volume : SIGNED32);
+			PROCEDURE { OVERRIDE } SetVolume*(volume : SIGNED32);
 			BEGIN {EXCLUSIVE}
 				ASSERT((volume >= 0) & (volume <= 255));
 				SELF.volume := volume;
@@ -967,13 +967,13 @@ TYPE
 				CallMixerListeners
 			END SetVolume;
 
-			PROCEDURE GetVolume*() : SIGNED32;
+			PROCEDURE { OVERRIDE } GetVolume*() : SIGNED32;
 			BEGIN
 				RETURN SELF.volume
 			END GetVolume;
 
 			(* Volume has to be 0 <= volume < 256 *)
-			PROCEDURE SetMute*(mute : BOOLEAN);
+			PROCEDURE { OVERRIDE } SetMute*(mute : BOOLEAN);
 			VAR
 				volume : SIGNED32;
 			BEGIN {EXCLUSIVE}
@@ -986,7 +986,7 @@ TYPE
 *)				CallMixerListeners
 			END SetMute;
 
-			PROCEDURE GetIsMute*() : BOOLEAN;
+			PROCEDURE { OVERRIDE } GetIsMute*() : BOOLEAN;
 			BEGIN
 				RETURN SELF.mute;
 			END GetIsMute;
@@ -1035,12 +1035,12 @@ TYPE
 				SetVolume(255)
 			END Constr;
 
-			PROCEDURE GetChannelKind*() : SIGNED32;
+			PROCEDURE { OVERRIDE } GetChannelKind*() : SIGNED32;
 			BEGIN
 				HALT(99) (* ABSTRACT *)
 			END GetChannelKind;
 
-			PROCEDURE SetVolume*(volume : SIGNED32);
+			PROCEDURE { OVERRIDE } SetVolume*(volume : SIGNED32);
 			BEGIN
 				SELF.volume := volume
 			END SetVolume;
@@ -1069,22 +1069,22 @@ TYPE
 				sample[3] := CHR(LSH(right, -8))
 			END SampleSetVolume;
 
-			PROCEDURE GetVolume*() : SIGNED32;
+			PROCEDURE { OVERRIDE } GetVolume*() : SIGNED32;
 			BEGIN
 				RETURN SELF.volume
 			END GetVolume;
 
-			PROCEDURE GetPosition*() : SIGNED32;
+			PROCEDURE { OVERRIDE } GetPosition*() : SIGNED32;
 			BEGIN
 				RETURN firstBufferPos
 			END GetPosition;
 
-			PROCEDURE RegisterBufferListener*(bufferListener : SoundDevices.BufferListener);
+			PROCEDURE { OVERRIDE } RegisterBufferListener*(bufferListener : SoundDevices.BufferListener);
 			BEGIN {EXCLUSIVE}
 				SELF.bufferListener := bufferListener
 			END RegisterBufferListener;
 
-			PROCEDURE QueueBuffer*(x : SoundDevices.Buffer);
+			PROCEDURE { OVERRIDE } QueueBuffer*(x : SoundDevices.Buffer);
 			VAR
 				bufferListItem : BufferList;
 			BEGIN
@@ -1105,23 +1105,23 @@ TYPE
 				RETURN playRecBuffer
 			END ReturnBuffer;
 
-			PROCEDURE Start*;
+			PROCEDURE { OVERRIDE } Start*;
 			BEGIN
 				HALT(99) (* ABSTRACT *)
 			END Start;
 
-			PROCEDURE Pause*;
+			PROCEDURE { OVERRIDE } Pause*;
 			BEGIN
 				state := StatePaused
 			END Pause;
 
-			PROCEDURE Stop*;
+			PROCEDURE { OVERRIDE } Stop*;
 			BEGIN
 				state := StateStoped;
 				ReturnAllBuffers;
 			END Stop;
 
-			PROCEDURE Close*;
+			PROCEDURE { OVERRIDE } Close*;
 			BEGIN
 				HALT(99) (* ABSTRACT *)
 			END Close;
@@ -1165,14 +1165,14 @@ TYPE
 				Constr(driver, samplingRate, samplingResolution, nofSubChannels);
 			END ConstrPlay;
 
-			PROCEDURE Start*;
+			PROCEDURE { OVERRIDE } Start*;
 			BEGIN
 				ASSERT(state # StateClosed);
 				state := StatePlaying;
 				driver.Enable;
 			END Start;
 
-			PROCEDURE Close*;
+			PROCEDURE { OVERRIDE } Close*;
 			BEGIN
 				Stop;
 				state := StateClosed;
@@ -1304,14 +1304,14 @@ TYPE
 
 		RecChannel = OBJECT(Channel)
 
-			PROCEDURE Start*;
+			PROCEDURE { OVERRIDE } Start*;
 			BEGIN
 				ASSERT(state # StateClosed);
 				state := StateRecording;
 				driver.Enable
 			END Start;
 
-			PROCEDURE Close*;
+			PROCEDURE { OVERRIDE } Close*;
 			BEGIN
 				Stop;
 				state := StateClosed;

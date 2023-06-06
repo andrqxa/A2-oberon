@@ -356,7 +356,7 @@ TYPE
 		handler: Handler;
 
 		(** Enable power for the specified port *)
-		PROCEDURE EnablePortPower*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } EnablePortPower*(port : SIGNED32);
 		VAR status : SET;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -364,7 +364,7 @@ TYPE
 		END EnablePortPower;
 
 		(** Disable power for the specified port *)
-		PROCEDURE DisablePortPower*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } DisablePortPower*(port : SIGNED32);
 		VAR status : SET;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -374,7 +374,7 @@ TYPE
 		(** Enable the specified port.
 		 	The EHCI host controllers do not explicitly support a port enable command. The port will be automatically enabled
 		 	by the host controller after a port reset, if a high-speed capable device is attached to it *)
-		PROCEDURE ResetAndEnablePort*(port : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ResetAndEnablePort*(port : SIGNED32) : BOOLEAN;
 		VAR status : SET; mtimer : Kernel.MilliTimer;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -391,7 +391,7 @@ TYPE
 		END ResetAndEnablePort;
 
 		(** Disable the specified port. *)
-		PROCEDURE DisablePort*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } DisablePort*(port : SIGNED32);
 		VAR status : SET;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -400,7 +400,7 @@ TYPE
 		END DisablePort;
 
 		(** Suspend the specified port (selective suspend). *)
-		PROCEDURE SuspendPort*(port : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } SuspendPort*(port : SIGNED32) : BOOLEAN;
 		VAR status : SET;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -413,7 +413,7 @@ TYPE
 		END SuspendPort;
 
 		(** Resume a selectively suspended port. *)
-		PROCEDURE ResumePort*(port : SIGNED32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } ResumePort*(port : SIGNED32) : BOOLEAN;
 		VAR status : SET; timer : Kernel.Timer;
 		BEGIN
 			status := SYSTEM.VAL(SET, SYSTEM.GET32(iobase + HcUsbCmd));
@@ -471,7 +471,7 @@ TYPE
 		 * @param port Port to get the status of
 		 * @return Port status
 		 *)
-		PROCEDURE GetPortStatus*(port : SIGNED32; ack : BOOLEAN) : SET;
+		PROCEDURE { OVERRIDE } GetPortStatus*(port : SIGNED32; ack : BOOLEAN) : SET;
 		VAR status, s : SET;
 		BEGIN
 			s := SYSTEM.VAL(SET, SYSTEM.GET32(ports[port]));
@@ -504,13 +504,13 @@ TYPE
 			RETURN status;
 		END GetPortStatus;
 
-		PROCEDURE HasCompanion*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } HasCompanion*(): BOOLEAN;
 		BEGIN
 			RETURN TRUE
 		END HasCompanion;
 
 		(** Route the specified port to a companion host controller if supported. *)
-		PROCEDURE RoutePortToCompanion*(port : SIGNED32);
+		PROCEDURE { OVERRIDE } RoutePortToCompanion*(port : SIGNED32);
 		VAR dword : SET;
 		BEGIN
 			(* Assert ports are not globally routed to companion controllers *)
@@ -520,7 +520,7 @@ TYPE
 		END RoutePortToCompanion;
 
 		(** Indicate a port state using the port indicators *)
-		PROCEDURE IndicatePort*(port, indicate : SIGNED32);
+		PROCEDURE { OVERRIDE } IndicatePort*(port, indicate : SIGNED32);
 		VAR indicators, dword : SET;
 		BEGIN
 			IF indicate = UsbHcdi.Amber THEN indicators := {14};
@@ -1011,7 +1011,7 @@ TYPE
 		 * Note that this only makes sense if the Halt feature of the USB device is also cleared used the ClearFeature standard
 		 * request. This procedure here only changes the pipe's queue head.
 		 *)
-		PROCEDURE ClearHalt(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } ClearHalt(pipe : UsbHcdi.Pipe);
 		VAR
 			qh: Qh;
 			dword : SET;
@@ -1042,7 +1042,7 @@ TYPE
 			END;
 		END ClearHalt;
 
-		PROCEDURE Schedule * (transfer: UsbHcdi.TransferToken);
+		PROCEDURE { OVERRIDE } Schedule * (transfer: UsbHcdi.TransferToken);
 		BEGIN
 			(* Checks *)
 			ASSERT(transfer # NIL);
@@ -1066,7 +1066,7 @@ TYPE
 		 * Cancel scheduled transfer.
 		 * Tries to cancel a scheduled transfer. Fails if transfer is completed or active.
 		 *)
-		PROCEDURE Cancel * (transfer: UsbHcdi.TransferToken): BOOLEAN;
+		PROCEDURE { OVERRIDE } Cancel * (transfer: UsbHcdi.TransferToken): BOOLEAN;
 		BEGIN (*{EXCLUSIVE}*) HALT(301) (* abstract *)
 		END Cancel;
 
@@ -1074,7 +1074,7 @@ TYPE
 		 * Checks that a periodic pipe policy is allowed for this HCD. Returns FALSE if the policy
 		 * requires too much bandwidth, TRUE if the policy is schedulable.
 		 *)
-		PROCEDURE CheckPipePolicy * (interval, size: SIGNED32): BOOLEAN;
+		PROCEDURE { OVERRIDE } CheckPipePolicy * (interval, size: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN TRUE
 		END CheckPipePolicy;
@@ -1084,7 +1084,7 @@ TYPE
 		 * pipe is created, so that the HCDI can take the necessary actions. This is needed, e.g. for bulk and control pipes
 		 * on EHCI: we build one qh per pipe.
 		 *)
-		PROCEDURE RegisterPipe * (pipe: UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } RegisterPipe * (pipe: UsbHcdi.Pipe);
 		BEGIN (* Call only from exclusive sections *)
 			CASE pipe.type OF
 				 UsbHcdi.PipeControl, UsbHcdi.PipeBulk:
@@ -1120,7 +1120,7 @@ TYPE
 		 * so that the HCDI can take necessary steps. This is needed e.g. for bulk and control pipes on EHCI, so that the
 		 * controller can remove the queue head.
 		 *)
-		PROCEDURE UnregisterPipe * (pipe: UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } UnregisterPipe * (pipe: UsbHcdi.Pipe);
 		BEGIN
 			CASE pipe.type OF
 				 UsbHcdi.PipeControl, UsbHcdi.PipeBulk, UsbHcdi.PipeInterrupt:
@@ -1914,7 +1914,7 @@ TYPE
 		END DoHandleInterrupt;
 
 		(* re-evaluate the status of the pipe's qh (endpoint descriptor) and its TD list *)
-		PROCEDURE UpdatePipeStatus * (pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } UpdatePipeStatus * (pipe : UsbHcdi.Pipe);
 		BEGIN
 			CASE pipe.type OF
 				 UsbHcdi.PipeControl, UsbHcdi.PipeBulk, UsbHcdi.PipeInterrupt:
@@ -2563,7 +2563,7 @@ TYPE
 			RETURN TRUE;
 		END Start;
 
-		PROCEDURE &Default*(bus, device, function : SIGNED32);
+		PROCEDURE (* OVERRIDE *) & Default*(bus, device, function : SIGNED32);
 		BEGIN
 			Default^(bus, device, function); (* The high-speed default pipe uses 64byte maxPacketSize0 *)
 			pipes[0, 0, 0].maxPacketSize := 64;
@@ -2572,7 +2572,7 @@ TYPE
 			NEW(handler, SELF)
 		END Default;
 
-		PROCEDURE Cleanup;
+		PROCEDURE { OVERRIDE } Cleanup;
 		BEGIN
 			IF state >= UsbHcdi.Initialized THEN Objects.RemoveHandler(InterruptHandler, Machine.IRQ0 + irq); END;
 			Cleanup^;
@@ -2587,7 +2587,7 @@ TYPE
 		END Cleanup;
 
 		(** Displays the host controller's data struture on KernelLog *)
-		PROCEDURE ShowSchedule*;
+		PROCEDURE { OVERRIDE } ShowSchedule*;
 		CONST MaxIterations =21;
 		VAR dword : SET; first, cur : SIGNED32; i, ms : SIGNED32;
 		BEGIN
@@ -2637,7 +2637,7 @@ TYPE
 			END;
 		END ShowSchedule;
 
-		PROCEDURE ShowPipe*(pipe : UsbHcdi.Pipe);
+		PROCEDURE { OVERRIDE } ShowPipe*(pipe : UsbHcdi.Pipe);
 		VAR
 			qh: Qh;
 		BEGIN
@@ -2657,7 +2657,7 @@ TYPE
 		END ShowPipe;
 
 		(* Show some information on this host controller on KernelLog *)
-		PROCEDURE Diag;
+		PROCEDURE { OVERRIDE } Diag;
 		VAR dword : SET;
 		BEGIN
 			IF Debug.Trace THEN

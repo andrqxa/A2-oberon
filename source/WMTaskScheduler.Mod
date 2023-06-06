@@ -158,7 +158,7 @@ TYPE
 			END;
 		END Update;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR days, hours, minutes, seconds : SIGNED32;
 		BEGIN
 			PointerUp^(x, y, keys);
@@ -171,7 +171,7 @@ TYPE
 			END;
 		END PointerUp;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR popup : WMPopups.Popup; str : ARRAY 256 OF CHAR; command, s : Strings.String; clickInfo:ClickInfo;
 		BEGIN
 			PointerDown^(x, y, keys);
@@ -208,7 +208,7 @@ TYPE
 			END
 		END RightClickAction;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR
 			x, dx, dy, height : SIZE;
 			string : ARRAY 1024 OF CHAR; temp : ARRAY 32 OF CHAR;
@@ -862,7 +862,7 @@ TYPE
 			timer.Wakeup;
 		END SetSelectMode;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			IF (inputWindow # NIL) THEN inputWindow.Close; END;
@@ -872,7 +872,7 @@ TYPE
 			DecCount;
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		VAR configuration : WMRestorable.XmlElement; filename : Files.FileName;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN

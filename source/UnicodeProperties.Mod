@@ -283,7 +283,7 @@ TYPE
 		END Init;
 
 		(* The property file has no leading comments. Therefore there are no lines to be skipped *)
-		PROCEDURE FindStartPos;
+		PROCEDURE { OVERRIDE } FindStartPos;
 		BEGIN
 			startPos := 0;
 		END FindStartPos;
@@ -445,7 +445,7 @@ TYPE
 
 		(* Finds the start position of the relevant data. The mirroring file has a large comment at the beginning,
 		so the scanner needs to be set to the first line of interest. *)
-		PROCEDURE FindStartPos;
+		PROCEDURE { OVERRIDE } FindStartPos;
 		VAR
 			thisChar : Texts.Char32;
 		BEGIN

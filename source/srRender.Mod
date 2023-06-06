@@ -52,17 +52,17 @@ BEGIN
 	IF filter THEN Draw^(canvas, w, h, q) ELSE Draw^(canvas, w, h, 0) END
 END Draw; *)
 
-PROCEDURE FocusGot*;
+PROCEDURE { OVERRIDE } FocusGot*;
 BEGIN
 	focus := TRUE;
 END FocusGot;
 
-PROCEDURE FocusLost*;
+PROCEDURE { OVERRIDE } FocusLost*;
 BEGIN
 	focus := FALSE;
 END FocusLost;
 
-PROCEDURE Close*;
+PROCEDURE { OVERRIDE } Close*;
 BEGIN
 	srBase.worldalive := FALSE;
 	Close^;
@@ -78,7 +78,7 @@ BEGIN
 	speed := speed * 2 / 3;
 END slowdown;
 
-PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
+PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 BEGIN
 	Key := CHR(ucs);
 	CASE CHR(ucs) OF
@@ -125,7 +125,7 @@ BEGIN
 	END;
 END KeyEvent;
 
-PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 BEGIN
 	pointerlastx := x ; pointerlasty := y;
 	pkeys := keys;
@@ -137,25 +137,25 @@ BEGIN
 	camera.deathray(pointerlastx,pointerlasty)
 END deathray;
 
-PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 BEGIN
 	pkeys := keys;
 	DEATH:=FALSE;
 	srRayEngine.fast:=FALSE;
 END PointerUp;
 
-PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 BEGIN
 	pdx := px - x; pdy := py - y;
 	px := ABS(x); py := ABS(y); pkeys := keys;
 END PointerMove;
 
-PROCEDURE PointerLeave*;
+PROCEDURE { OVERRIDE } PointerLeave*;
 BEGIN
 	focus := FALSE;
 END PointerLeave;
 
-PROCEDURE WheelMove*(dz : SIZE);
+PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 BEGIN
     	camera.up(dz/10);
 END WheelMove;

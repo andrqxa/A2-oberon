@@ -127,7 +127,7 @@ TYPE
 		END SetCompareMethod;
 
 		(** Add an object to the list. Add may block if number of calls to Lock is bigger than the number of calls to Unlock *)
-		PROCEDURE Add*(x : ANY);
+		PROCEDURE { OVERRIDE } Add*(x : ANY);
 		BEGIN {EXCLUSIVE}
 			AWAIT(readLock = 0);
 			AddUnlocked(x);
@@ -180,7 +180,7 @@ TYPE
 		END FindPosition;
 
 		(** Remove an object from the list. Remove may block if number of calls to Lock is bigger than the number of calls to Unlock *)
-		PROCEDURE Remove*(x : ANY);
+		PROCEDURE { OVERRIDE } Remove*(x : ANY);
 		BEGIN {EXCLUSIVE}
 			AWAIT(readLock = 0);
 			RemoveUnlocked(x);
@@ -199,7 +199,7 @@ TYPE
 		END RemoveUnlocked;
 
 		(** atomic replace x by y. That means that x is removed and y is added to the SortedList *)
-		PROCEDURE Replace*(x, y : ANY);
+		PROCEDURE { OVERRIDE } Replace*(x, y : ANY);
 		BEGIN {EXCLUSIVE}
 			AWAIT(readLock = 0);
 			RemoveUnlocked(x);

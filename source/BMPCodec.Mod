@@ -34,7 +34,7 @@ TYPE
 		END Log;
 
 		(* open the decoder on a file *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			pix: Raster.Pixel; ch: CHAR;
 		BEGIN
@@ -88,7 +88,7 @@ TYPE
 			res := 0;
 		END Open;
 
-		PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
+		PROCEDURE { OVERRIDE } GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
 		BEGIN
 			width := SELF.width;
 			height := SELF.height;
@@ -100,11 +100,11 @@ TYPE
 			SetProgressionLevel, the level is assumed to be maxProgressionLevel of the image,
 			which corresponds to best image quality.
 		 *)
-		PROCEDURE SetProgressionLevel*(progressionLevel: SIGNED32);
+		PROCEDURE { OVERRIDE } SetProgressionLevel*(progressionLevel: SIGNED32);
 		END SetProgressionLevel;
 
 		(* return the image in Raster format that best matches the format *)
-		PROCEDURE GetNativeImage*(VAR img : Raster.Image);
+		PROCEDURE { OVERRIDE } GetNativeImage*(VAR img : Raster.Image);
 		BEGIN
 			IF ~decoded & ~errors THEN
 				img := SELF.img;
@@ -121,7 +121,7 @@ TYPE
 		END GetNativeImage;
 
 		(* renders the image into the given Raster.Image at the given progressionLevel *)
-		PROCEDURE Render*(img : Raster.Image);
+		PROCEDURE { OVERRIDE } Render*(img : Raster.Image);
 		VAR canvas : WMGraphics.BufferCanvas;
 		BEGIN
 			GetNativeImage(SELF.img);
@@ -136,15 +136,15 @@ TYPE
 	VAR out : Streams.Writer;
 
 		(* open the encoder on a Streams writer *)
-		PROCEDURE Open*(out : Streams.Writer);
+		PROCEDURE { OVERRIDE } Open*(out : Streams.Writer);
 		BEGIN
 			SELF.out := out
 		END Open;
 
-		PROCEDURE SetQuality*(quality : SIGNED32);
+		PROCEDURE { OVERRIDE } SetQuality*(quality : SIGNED32);
 		END SetQuality;
 
-		PROCEDURE WriteImage*(img : Raster.Image; VAR res : INTEGER);
+		PROCEDURE { OVERRIDE } WriteImage*(img : Raster.Image; VAR res : INTEGER);
 		VAR
 			col, redMask, greenMask, blueMask: SIGNED32;
 			palentries, dataSize: SIGNED32; bpp: SIGNED16;

@@ -16,14 +16,14 @@ TYPE
 
 	CpuLoad* = OBJECT(WMPerfMonPlugins.Plugin);
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		BEGIN
 			p.name := "NumReady"; p.description := "Number of processes in ready queue";
 			p.modulename := ModuleName;
 			p.autoMin := TRUE; p.autoMax := TRUE; p.minDigits := 2;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		BEGIN
 			dataset[0] := Objects.NumReady();
 		END UpdateDataset;

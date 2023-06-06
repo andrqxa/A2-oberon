@@ -170,7 +170,7 @@ TYPE
 			started: BOOLEAN;
 			next*: Disk;
 
-		PROCEDURE Transfer*(op, start, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Transfer*(op, start, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		VAR  requ: Command;  str: ARRAY 32 OF CHAR;
 		BEGIN
 			IF (op = Disks.Read) OR (op = Disks.Write) THEN
@@ -194,7 +194,7 @@ TYPE
 			END
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		VAR  blkSize: SIGNED32;
 		BEGIN
 			DoReadCapacity(bus, target, 0, size, blkSize, res);
@@ -204,7 +204,7 @@ TYPE
 			END;
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
 		BEGIN
 			IF msg IS Disks.EjectMsg THEN
 				res := Disks.Unsupported

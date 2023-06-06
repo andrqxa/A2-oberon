@@ -2237,7 +2237,7 @@ TYPE
 	VAR
 		bodyscope: PCT.ProcScope; old: PCT.Scope;
 
-		PROCEDURE Body(suppress: BOOLEAN);	(*override Parser.Body*)
+		PROCEDURE { OVERRIDE } Body(suppress: BOOLEAN);	(*override Parser.Body*)
 		BEGIN
 			IF sym = begin THEN
 				scope := bodyscope; codescope := scope;
@@ -2260,7 +2260,7 @@ TYPE
 			END
 		END Body;
 
-		PROCEDURE DeclSeq;	(* vars and procs are allowed, no const and types *)
+		PROCEDURE { OVERRIDE } DeclSeq;	(* vars and procs are allowed, no const and types *)
 		VAR res: INTEGER;
 		BEGIN
 			LOOP
@@ -2317,7 +2317,7 @@ TYPE
 	VAR
 		bodyscope: PCT.ProcScope; old: PCT.Scope;
 
-		PROCEDURE Body(suppress: BOOLEAN);	(*override Parser.Body*)
+		PROCEDURE { OVERRIDE } Body(suppress: BOOLEAN);	(*override Parser.Body*)
 		BEGIN
 			IF sym = begin THEN
 				scope := bodyscope; codescope := scope;
@@ -2340,7 +2340,7 @@ TYPE
 			END
 		END Body;
 
-		PROCEDURE DeclSeq;	(* vars and procs are allowed, no const and types *)
+		PROCEDURE { OVERRIDE } DeclSeq;	(* vars and procs are allowed, no const and types *)
 		VAR res: INTEGER;
 		BEGIN
 			LOOP
@@ -2394,12 +2394,12 @@ TYPE
 
 	RecordParser = OBJECT (Parser)
 
-		PROCEDURE Body(suppress: BOOLEAN);
+		PROCEDURE { OVERRIDE } Body(suppress: BOOLEAN);
 		BEGIN
 			Check(end)
 		END Body;
 
-		PROCEDURE DeclSeq;	(* the DeclSeq of a record is a simplified DeclSeq, but nevertheless different *)
+		PROCEDURE { OVERRIDE } DeclSeq;	(* the DeclSeq of a record is a simplified DeclSeq, but nevertheless different *)
 		BEGIN
 			LOOP
 				IF sym = semicolon THEN
@@ -2424,12 +2424,12 @@ TYPE
 
 	InterfaceParser = OBJECT (Parser)
 
-		PROCEDURE Body(suppress: BOOLEAN);
+		PROCEDURE { OVERRIDE } Body(suppress: BOOLEAN);
 		BEGIN
 			Check(end)
 		END Body;
 
-		PROCEDURE DeclSeq;
+		PROCEDURE { OVERRIDE } DeclSeq;
 			VAR name: PCS.Name; procscope: PCT.ProcScope;  t: PCT.Struct; pos: SIGNED32; res: INTEGER;
 		BEGIN
 			WHILE sym = procedure DO
@@ -2476,12 +2476,12 @@ TYPE
 	(* Parse the condition in an AWAIT statement as a separate procedure *)
 	AwaitParser = OBJECT(Parser)
 
-		PROCEDURE DeclSeq;
+		PROCEDURE { OVERRIDE } DeclSeq;
 		BEGIN
 			PCT.ChangeState(scope, PCT.hiddenvarsdeclared, scanner.errpos)
 		END DeclSeq;
 
-		PROCEDURE Body(suppress: BOOLEAN);
+		PROCEDURE { OVERRIDE } Body(suppress: BOOLEAN);
 		VAR x: PCB.Expression;
 		BEGIN
 			code := PCB.Enter(scope);
@@ -2648,7 +2648,7 @@ TYPE
 		END InitModule;
 
 		(** fof >> *)
-		PROCEDURE Epilog;
+		PROCEDURE { OVERRIDE } Epilog;
 		VAR res: INTEGER;  sym: PCT.Symbol;  var: PCT.Variable;
 		BEGIN
 			(* check if the array module has been used in PCArrays. If so then put it into the scope to protect from unloading *)

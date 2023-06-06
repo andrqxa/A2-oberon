@@ -612,7 +612,7 @@ TYPE
 		width : SIGNED32;
 		arg1, arg2, arg3 : IA32Arg;
 
-		PROCEDURE &New*(proc : Decoder.ProcedureInfo; stream : Streams.Writer);
+		PROCEDURE (* OVERRIDE *) & New*(proc : Decoder.ProcedureInfo; stream : Streams.Writer);
 		BEGIN
 			New^(proc, stream);
 			prefixes := 0;
@@ -637,7 +637,7 @@ TYPE
 			ELSIF b = OpSize THEN opPrefix := TRUE END
 		END AddPrefixByte;
 
-		PROCEDURE PrintOpcodeBytes*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } PrintOpcodeBytes*(w : Streams.Writer);
 		VAR
 			string : ARRAY 100 OF CHAR;
 			hexStr : ARRAY 3 OF CHAR;
@@ -654,7 +654,7 @@ TYPE
 			END
 		END PrintOpcodeBytes;
 
-		PROCEDURE PrintInstruction*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } PrintInstruction*(w : Streams.Writer);
 		VAR
 			i : SIGNED32;
 			opStr : ARRAY 20 OF CHAR;
@@ -1152,7 +1152,7 @@ TYPE
 			w.String(opStr)
 		END PrintInstruction;
 
-		PROCEDURE PrintArguments*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } PrintArguments*(w : Streams.Writer);
 		BEGIN
 			IF (argStructure >=0) & (arg1 = NIL) THEN w.String("{too little arguments}");RETURN
 			ELSIF (argStructure >= ArgRegReg) & (arg2=NIL) THEN w.String("{too little arguments}");RETURN
@@ -1185,7 +1185,7 @@ TYPE
 			END
 		END PrintArguments;
 
-		PROCEDURE PrintVariables*(w : Streams.Writer);
+		PROCEDURE { OVERRIDE } PrintVariables*(w : Streams.Writer);
 		VAR
 			numPrints : SIGNED32;
 
@@ -1227,7 +1227,7 @@ TYPE
 			END
 		END PrintVariables;
 
-		PROCEDURE ToString*() : Strings.String;
+		PROCEDURE { OVERRIDE } ToString*() : Strings.String;
 		VAR
 			str : ARRAY 255 OF CHAR;
 			temp : ARRAY 10 OF CHAR;
@@ -3072,7 +3072,7 @@ TYPE
 			END
 		END Escape;
 
-		PROCEDURE DecodeThis*(opcode : Decoder.Opcode);
+		PROCEDURE { OVERRIDE } DecodeThis*(opcode : Decoder.Opcode);
 		VAR
 			op : IA32Opcode;
 		BEGIN
@@ -3294,7 +3294,7 @@ TYPE
 				(* end of WAIT hack *)
 		END DecodeThis;
 
-		PROCEDURE NewOpcode*() :Decoder. Opcode;
+		PROCEDURE { OVERRIDE } NewOpcode*() :Decoder. Opcode;
 		VAR
 			opcode : IA32Opcode;
 		BEGIN

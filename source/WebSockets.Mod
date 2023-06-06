@@ -184,14 +184,14 @@ TYPE
 			END;
 		END FindEndpoint;
 
-		PROCEDURE &Init(CONST name: WebHTTPServer.Name);
+		PROCEDURE (* OVERRIDE *) & Init(CONST name: WebHTTPServer.Name);
 		BEGIN
 			Init^(name);
 			(*NEW(log,"WsPlugin");*)
 		END Init;
 
 		(* Returns TRUE for a WebSocket upgrade request *)
-		PROCEDURE CanHandle(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; secure: BOOLEAN): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanHandle(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; secure: BOOLEAN): BOOLEAN;
 		BEGIN
 			(*BEGIN{EXCLUSIVE}
 				log.String("got a request"); log.Ln;
@@ -206,7 +206,7 @@ TYPE
 		END CanHandle;
 
 		(* Handle a WebSocket upgrade request *)
-		PROCEDURE Handle(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader; VAR in: Streams.Reader; VAR out: Streams.Writer);
+		PROCEDURE { OVERRIDE } Handle(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader; VAR in: Streams.Reader; VAR out: Streams.Writer);
 		VAR
 			handshake: Handshake;
 			endpointHandler: EndpointHandler;

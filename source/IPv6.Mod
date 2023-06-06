@@ -1274,7 +1274,7 @@ TYPE
 
 
 		(** Close and deactivate the interface, i.e. remove it from the configuration. *)
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		VAR
 			i: SIGNED32;
 
@@ -1295,7 +1295,7 @@ TYPE
 
 		(** Set addresses. Is normally called just after instanciation, but can also be called later, e.g. by DHCP.
 			If "gatewayAdr" is not "NilAdr", it will be added to the default router list. *)
-		PROCEDURE SetAdrs*(localAdr, prefixAdr, defaultRouterAdr: IP.Adr; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } SetAdrs*(localAdr, prefixAdr, defaultRouterAdr: IP.Adr; VAR res: INTEGER);
 		VAR
 			devListItem: DeviceList;
 
@@ -1360,7 +1360,7 @@ TYPE
 
 
 		(* Receive an IP packet *)
-		PROCEDURE IPInput*(dev: Network.LinkDevice; type: SIGNED32; buffer: Network.Buffer);
+		PROCEDURE { OVERRIDE } IPInput*(dev: Network.LinkDevice; type: SIGNED32; buffer: Network.Buffer);
 		VAR
 			payloadLength: SIGNED32;
 			nextHeader: SIGNED32;
@@ -1630,7 +1630,7 @@ TYPE
 
 
 		(** Send an IP packet on this interface. *)
-		PROCEDURE Send*(nextHeader: SIGNED32; destAdr: IP.Adr; CONST l4hdr, data: ARRAY OF CHAR; h4len, dofs, dlen, hopLimit: SIGNED32);
+		PROCEDURE { OVERRIDE } Send*(nextHeader: SIGNED32; destAdr: IP.Adr; CONST l4hdr, data: ARRAY OF CHAR; h4len, dofs, dlen, hopLimit: SIGNED32);
 		VAR
 			l3hdr: ARRAY MaxIPHdrLen OF CHAR;
 			i: SIGNED32;
@@ -1664,7 +1664,7 @@ TYPE
 
 
 		(* Internal procedure to perform the rest of the send operation. Used by "Send" and for IP forwarding. *)
-		PROCEDURE DoSend*(destAdr: IP.Adr; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32) ;
+		PROCEDURE { OVERRIDE } DoSend*(destAdr: IP.Adr; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32) ;
 		VAR
 			linkDst: Network.LinkAdr;
 			nextHop: IP.Adr;
@@ -1823,7 +1823,7 @@ TYPE
 
 
 		(** Enumerate all ARP table entries. In IPv6 Enumerate the Neighbors*)
-		PROCEDURE ARPEnumerate*(handle: IP.ARPHandler);
+		PROCEDURE { OVERRIDE } ARPEnumerate*(handle: IP.ARPHandler);
 			(* This procedure has to be inherited but is ignored because in IPv6 ARP is not used *)
 		END ARPEnumerate;
 
@@ -1854,14 +1854,14 @@ TYPE
 
 
 		(** Checks if an IPv6 address is a multicast address in IPv6 there are no broadcasts *)
-		PROCEDURE IsBroadcast*(adr: IP.Adr) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsBroadcast*(adr: IP.Adr) : BOOLEAN;
 		BEGIN
 			RETURN IsMulticast (adr);
 		END IsBroadcast;
 
 
 		(** Check if adr is a local multicast address *)
-		PROCEDURE IsMulticast*(adr: IP.Adr) : BOOLEAN;
+		PROCEDURE { OVERRIDE } IsMulticast*(adr: IP.Adr) : BOOLEAN;
 		BEGIN
 			IF adr.ipv6Adr[0] = 0FFX THEN
 				RETURN TRUE;
@@ -1911,7 +1911,7 @@ TYPE
 
 
 		(* Reads the source address of a IP packet buffer *)
-		PROCEDURE ReadSrcAdr* (buffer: Network.Buffer): IP.Adr;
+		PROCEDURE { OVERRIDE } ReadSrcAdr* (buffer: Network.Buffer): IP.Adr;
 		VAR
 			i: SIGNED32;
 			retAdr: IP.Adr;
@@ -1926,7 +1926,7 @@ TYPE
 
 
 		(* Reads the destination address of a IP packet buffer *)
-		PROCEDURE ReadDestAdr* (buffer: Network.Buffer):IP. Adr;
+		PROCEDURE { OVERRIDE } ReadDestAdr* (buffer: Network.Buffer):IP. Adr;
 		VAR
 			i: SIGNED32;
 			retAdr: IP.Adr;
@@ -1981,7 +1981,7 @@ TYPE
 
 
 		(** Creates a pseudo-header for checksum calculation (TCP/UDP) and returns the length of this header *)
-		PROCEDURE WritePseudoHeader*(VAR pseudoHdr: ARRAY OF CHAR;
+		PROCEDURE { OVERRIDE } WritePseudoHeader*(VAR pseudoHdr: ARRAY OF CHAR;
 										     src, dst: IP.Adr;
 										     nextHeader, pktLengthUpperLayer: SIGNED32): SIGNED32;
 		VAR
@@ -2705,7 +2705,7 @@ TYPE
 
 
 		(** Writes the configuration of this interface *)
-		PROCEDURE OutInterface*;
+		PROCEDURE { OVERRIDE } OutInterface*;
 		VAR i: SIGNED32;
 			str : ARRAY 32 OF CHAR;
 

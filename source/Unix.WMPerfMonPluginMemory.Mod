@@ -13,7 +13,7 @@ TYPE
 	VAR
 		free, total, largest : SIZE;
 
-		PROCEDURE Update;
+		PROCEDURE { OVERRIDE } Update;
 		BEGIN
 			Heaps.GetHeapInfo(total, free, largest);
 		END Update;
@@ -26,7 +26,7 @@ TYPE
 	VAR
 		h : HeapHelper;
 
-		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
+		PROCEDURE { OVERRIDE } Init*(p : WMPerfMonPlugins.Parameter);
 		VAR ds : WMPerfMonPlugins.DatasetDescriptor;
 		BEGIN
 			p.name := "Heap"; p.description := "Heap statistics"; p.modulename := ModuleName;
@@ -40,7 +40,7 @@ TYPE
 			p.datasetDescriptor := ds;
 		END Init;
 
-		PROCEDURE UpdateDataset*;
+		PROCEDURE { OVERRIDE } UpdateDataset*;
 		BEGIN
 			dataset[0] := h.total DIV 1024;
 			dataset[1] := h.free DIV 1024;

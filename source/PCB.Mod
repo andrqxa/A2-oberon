@@ -150,7 +150,7 @@ TYPE
 		VAR	con-: PCT.Const;
 		cd: ConstDesignator;   (* fof  *)
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR  pos: SIGNED32;
 		BEGIN
 			pos := SELF.pos;
@@ -211,7 +211,7 @@ TYPE
 			END;
 		END AssignIndices;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR l: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR l: PCC.Item);
 		VAR i: SIZE; v: PCT.Value;
 		BEGIN
 			NEW(aindex,dim);
@@ -256,7 +256,7 @@ TYPE
 	DOp* = OBJECT (Expression)
 		VAR	op: Operator;  lopd, ropd: Expression;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR l: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR l: PCC.Item);
 		VAR	r: PCC.Item;  pos, op: SIGNED32;  t1, t2: StringBuf;
 		BEGIN
 			pos := SELF.pos;  op := SELF.op;
@@ -309,7 +309,7 @@ TYPE
 	MOp* = OBJECT (Expression)
 		VAR	op: Operator;  opd: Expression;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR tmp: Operator;  pos: SIGNED32;  t: PCT.Struct;
 		BEGIN
 			pos := SELF.pos;
@@ -349,7 +349,7 @@ TYPE
 	Conversion* = OBJECT (Expression)
 		VAR	exp: Expression;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR  pos: SIGNED32;
 		BEGIN
 			pos := SELF.pos;
@@ -363,7 +363,7 @@ TYPE
 		END InitC;
 
 		(** fof >> *)
-		PROCEDURE Written;
+		PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			Written^();
 			exp.Written();
@@ -375,7 +375,7 @@ TYPE
 	Projection* = OBJECT (Expression)
 		VAR  exp: Expression;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		BEGIN
 			exp.Emit(code, i);  PCC.Convert(code, i, type, TRUE)
 		END Emit;
@@ -385,7 +385,7 @@ TYPE
 		END InitP;
 
 	(** fof 070731 >> *)
-		PROCEDURE Written;
+		PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			Written^();
 			exp.Written();
@@ -992,7 +992,7 @@ g) Static array as return type of a function
 		aarray: PCT.Tensor;
 		(** << fof  *)
 
-		PROCEDURE Append*(stat: Expression);		(*only check the parameters, call created in NewFuncCall, NewProcCall*)
+		PROCEDURE { OVERRIDE } Append*(stat: Expression);		(*only check the parameters, call created in NewFuncCall, NewProcCall*)
 			VAR i: SIGNED32; p: PCT.Proc; ff, pp: SIGNED32;  t: PCT.Struct; ptr: PCT.Pointer; rec: PCT.Record;  tmparr: PCT.Array;
 (** fof >> *)
 			tmpearr: PCT.EnhArray;
@@ -1491,7 +1491,7 @@ g) Static array as return type of a function
 	FunCall* = OBJECT (Expression)
 		VAR	proc*: Designator;  params*: ExprList;  curLevel: SIGNED8;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR  lev: SIGNED8;  pos: SIGNED32;  p: AnyProc;  scope: PCT.Scope;
 		cparams: PCT.Parameter; cpsize, gap: SIGNED32;	(* fld *)
 		BEGIN
@@ -1541,7 +1541,7 @@ g) Static array as return type of a function
 	Designator* = OBJECT (Expression)
 		VAR  readonly-: BOOLEAN;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR  pos: SIGNED32;
 		BEGIN
 			pos := SELF.pos;
@@ -1556,7 +1556,7 @@ g) Static array as return type of a function
 	END Designator;
 
 	Temp = OBJECT (Designator)
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		BEGIN  PCC.MakeStackItem(i, type)
 		END Emit;
 	END Temp;
@@ -1565,7 +1565,7 @@ g) Static array as return type of a function
 	ReturnItem = OBJECT (Designator)
 	VAR proc: PCT.Proc;
 
-		PROCEDURE Emit*( code: PCC.Code;  VAR i: PCC.Item );
+		PROCEDURE { OVERRIDE } Emit*( code: PCC.Code;  VAR i: PCC.Item );
 		BEGIN
 			PCC.MakeReturnItem( code, i, proc )
 		END Emit;
@@ -1580,7 +1580,7 @@ g) Static array as return type of a function
 	StackItem = OBJECT (Designator)
 	VAR offset: SIGNED32;
 
-		PROCEDURE Emit*( code: PCC.Code;  VAR i: PCC.Item );
+		PROCEDURE { OVERRIDE } Emit*( code: PCC.Code;  VAR i: PCC.Item );
 		BEGIN
 			PCC.MakeStackItem( i, type );
 		END Emit;
@@ -1599,7 +1599,7 @@ g) Static array as return type of a function
 	VAR
 		des: Designator;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		BEGIN  des.Emit(code, i)
 		END Emit;
 
@@ -1609,7 +1609,7 @@ g) Static array as return type of a function
 		END InitW;
 
 (** fof 070731  >> *)
-		PROCEDURE Written;
+		PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			Written^;  des.Written();
 		END Written;
@@ -1621,7 +1621,7 @@ g) Static array as return type of a function
 	ConstDesignator* = OBJECT (Designator)
 	VAR const: PCT.Const;
 
-		PROCEDURE Emit*( code: PCC.Code;  VAR i: PCC.Item );
+		PROCEDURE { OVERRIDE } Emit*( code: PCC.Code;  VAR i: PCC.Item );
 		VAR pos: SIGNED32;
 		BEGIN
 			pos := SELF.pos;
@@ -1644,7 +1644,7 @@ g) Static array as return type of a function
 	SProc* = OBJECT (Designator)
 		VAR nr-: SIGNED32;
 
-		PROCEDURE IsCallable*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCallable*(): BOOLEAN;
 		BEGIN	RETURN TRUE
 		END IsCallable;
 
@@ -1661,13 +1661,13 @@ g) Static array as return type of a function
 		VAR obj*: PCT.Variable;  deltaLevel: SIGNED8;
 
 		(** fof 070731  >> *)
-		PROCEDURE Written;
+		PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			PCT.Written( obj );  Written^();
 		END Written;
 	(** << fof  *)
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR  pos: SIGNED32;
 		BEGIN
 			pos := SELF.pos;
@@ -1702,7 +1702,7 @@ g) Static array as return type of a function
 			self: Designator;
 			resolved: BOOLEAN;
 
-		PROCEDURE Emit*(code: PCC.Code;  VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code;  VAR i: PCC.Item);
 		BEGIN
 			ASSERT(resolved);
 			IF self # NIL THEN
@@ -1713,7 +1713,7 @@ g) Static array as return type of a function
 			END
 		END Emit;
 
-		PROCEDURE IsCallable*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsCallable*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsCallable;
 
@@ -1793,7 +1793,7 @@ g) Static array as return type of a function
 	Type* = OBJECT (Designator)
 		VAR obj: PCT.Type;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR  pos: SIGNED32;
 		BEGIN
 			pos := SELF.pos;
@@ -1812,7 +1812,7 @@ g) Static array as return type of a function
 	Deref* = OBJECT (Designator)
 		VAR ptr*: Designator;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR  pos: SIGNED32;
 		BEGIN
 			pos := SELF.pos;
@@ -1828,7 +1828,7 @@ g) Static array as return type of a function
 		END InitD;
 
 		(** fof 070731 >> *)
-		PROCEDURE Written;
+		PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			Written^();
 			ptr.Written();
@@ -1840,7 +1840,7 @@ g) Static array as return type of a function
 	Field* = OBJECT (Designator)
 		VAR	rec*: Designator;  field*: PCT.Field;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR  pos: SIGNED32;
 			name1, name2, name3: ARRAY 64 OF CHAR;
 		BEGIN
@@ -1866,7 +1866,7 @@ g) Static array as return type of a function
 		END InitF;
 
 		(** fof 070731  >> *)
-		PROCEDURE Written;
+		PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			Written^;  rec.Written();
 		END Written;
@@ -1877,7 +1877,7 @@ g) Static array as return type of a function
 	Index* = OBJECT (Designator)
 		VAR	array*: Designator; index*: Expression; check*: BOOLEAN;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR a: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR a: PCC.Item);
 		VAR  i: PCC.Item;  pos: SIGNED32;
 		BEGIN
 			pos := SELF.pos;
@@ -1894,7 +1894,7 @@ g) Static array as return type of a function
 			Init(pos, array.type(PCT.Array).base);  SELF.array := array;  SELF.index := index;  SELF.check:=check
 		END InitI;
 	(** fof 070731 >> *)
-	PROCEDURE Written;
+	PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			Written^;  array.Written();
 		END Written;
@@ -1904,7 +1904,7 @@ g) Static array as return type of a function
 	Guard* = OBJECT (Designator)
 		VAR des: Designator;  to: PCT.Struct;  equal: BOOLEAN;
 
-		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
+		PROCEDURE { OVERRIDE } Emit*(code: PCC.Code; VAR i: PCC.Item);
 		VAR  pos: SIGNED32;
 		BEGIN
 			pos := SELF.pos;
@@ -1922,7 +1922,7 @@ g) Static array as return type of a function
 		END InitG;
 
 (** fof 070731 >> *)
-		PROCEDURE Written;
+		PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			Written^();
 			des.Written();
@@ -1983,7 +1983,7 @@ g) Static array as return type of a function
 			END;
 		END EmitEntry;
 
-		PROCEDURE Emit*( code: PCC.Code;  VAR a: PCC.Item );
+		PROCEDURE { OVERRIDE } Emit*( code: PCC.Code;  VAR a: PCC.Item );
 		VAR descr, dim: PCC.Item;
 		BEGIN
 			EmitEntry( first, 0, code, a, descr );
@@ -2131,7 +2131,7 @@ g) Static array as return type of a function
 			SELF.array := array;  Init( pos, array.type );
 		END InitI;
 
-		PROCEDURE Written;
+		PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			Written^();
 			array.Written();
@@ -2183,7 +2183,7 @@ g) Static array as return type of a function
 			END;
 		END EmitEntry;
 
-		PROCEDURE Emit*( code: PCC.Code;  VAR a: PCC.Item );
+		PROCEDURE { OVERRIDE } Emit*( code: PCC.Code;  VAR a: PCC.Item );
 		VAR descr: PCC.Item;  entry: Entry;  dim: SIGNED32;
 			nIndices: PCC.Item;  dimI: PCC.Item;
 		BEGIN
@@ -2338,7 +2338,7 @@ g) Static array as return type of a function
 			nIndex := 0;
 		END InitA;
 
-		PROCEDURE Written;
+		PROCEDURE { OVERRIDE } Written;
 		BEGIN
 			Written^();
 			array.Written();
@@ -2352,7 +2352,7 @@ g) Static array as return type of a function
 	VAR proc: PCT.Proc;
 		op: SIGNED32;
 
-		PROCEDURE Emit*( code: PCC.Code;  VAR i: PCC.Item );
+		PROCEDURE { OVERRIDE } Emit*( code: PCC.Code;  VAR i: PCC.Item );
 		BEGIN
 			PCC.SaveRegisters( code );  params.Emit( code );
 			PCC.MakeItem( i, proc, 0 );  PCC.Call( code, i );

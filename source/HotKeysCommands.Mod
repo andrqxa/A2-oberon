@@ -58,12 +58,12 @@ TYPE
 			Close;
 		END HandleEscape;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			Close;
 		END FocusLost;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^; window := NIL;
 		END Close;

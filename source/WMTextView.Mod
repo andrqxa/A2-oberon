@@ -69,7 +69,7 @@ TYPE
 	VAR
 		positions : TabPositions;
 
-		PROCEDURE GetNextTabStop*(x : SIZE) : SIZE;
+		PROCEDURE { OVERRIDE } GetNextTabStop*(x : SIZE) : SIZE;
 		VAR
 			idx : SIZE;
 		BEGIN
@@ -464,7 +464,7 @@ TYPE
 	VAR
 		isVisible : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			isVisible := TRUE;
 		END Init;
@@ -477,14 +477,14 @@ TYPE
 			END;
 		END SetCurrentVisibility;
 
-		PROCEDURE GetArea(x, y, ascent : SIZE) : WMRectangles.Rectangle;
+		PROCEDURE { OVERRIDE } GetArea(x, y, ascent : SIZE) : WMRectangles.Rectangle;
 		BEGIN
 			IF img # NIL THEN RETURN WMRectangles.MakeRect(x - hotX, y - hotY, x - hotX + img.width, y - hotY + img.height)
 			ELSE RETURN WMRectangles.MakeRect(x , y - ascent - 2, x + 1, y + 2)
 			END
 		END GetArea;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; x, y, ascent : SIZE);
+		PROCEDURE { OVERRIDE } Draw(canvas : WMGraphics.Canvas; x, y, ascent : SIZE);
 		BEGIN
 			IF ~visible OR ~isVisible THEN RETURN END;
 			IF img # NIL THEN canvas.DrawImage(x - hotX, y - hotY, img, WMGraphics.ModeSrcOverDst)
@@ -595,7 +595,7 @@ TYPE
 			SELF.text := text; SELF.pos := pos
 		END New;
 
-		PROCEDURE GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
+		PROCEDURE { OVERRIDE } GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
 		VAR di : WMDropTarget.DropText;
 		BEGIN
 			IF type = WMDropTarget.TypeText THEN
@@ -745,7 +745,7 @@ TYPE
 		oldPos, focusPos : SIZE;
 		objHasFocus : BOOLEAN;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			onChanged.SetMinimalDelay(DefaultMinimalUpdateDelay);
@@ -827,7 +827,7 @@ TYPE
 			SetPointerInfo(manager.pointerText);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
 			(*Initialize^; RecacheProperties;*)
@@ -840,14 +840,14 @@ TYPE
 			cursor.SetVisible(FALSE);
 		END Initialize;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF text # NIL THEN text.onTextChanged.Remove(TextChanged); END;
 			cursorBlinker.Remove(cursor);
 		END Finalize;
 
-		PROCEDURE FocusReceived*;
+		PROCEDURE { OVERRIDE } FocusReceived*;
 		BEGIN
 			FocusReceived^;
 			cursor.SetVisible(TRUE);
@@ -857,7 +857,7 @@ TYPE
 			currentTextView := SELF;
 		END FocusReceived;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			modifierFlags := {};
@@ -889,7 +889,7 @@ TYPE
 			END;
 		END InsertChar;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR
 			highlighter : SyntaxHighlighter.Highlighter;
 			oldBorders : WMRectangles.Rectangle;
@@ -996,7 +996,7 @@ TYPE
 			(*Invalidate;*)
 		END WrapModeChanged;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		VAR
 			highlighter : SyntaxHighlighter.Highlighter;
 			oldBorders : WMRectangles.Rectangle;
@@ -1055,7 +1055,7 @@ TYPE
 			END
 		END PropertyChanged;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		VAR prevWidth: SIZE;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
@@ -2646,7 +2646,7 @@ TYPE
 			text.ReleaseRead;
 		END RenderAboveTextMarkers;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR la, lb, i, top, b : SIZE; t: SIZE; rect, clip : WMRectangles.Rectangle; cstate : WMGraphics.CanvasState;
 		BEGIN
 			canvas.GetClipRect(clip);
@@ -2720,7 +2720,7 @@ TYPE
 		END StoreLineEnter;
 
 	(* navigation *)
-		PROCEDURE WheelMove*(dz: SIZE); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } WheelMove*(dz: SIZE); (** PROTECTED *)
 		VAR ddz: DZ;
 		BEGIN
 			IF modifierFlags * Inputs.Ctrl # {} THEN (* CTRL pressed -> Resize Font*)
@@ -2821,7 +2821,7 @@ TYPE
 			END;
 		END SetInterclick;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR pos, a, b, internalPos : SIZE; oldInterclick : SIGNED32;
 		BEGIN
 			ViewToTextPos(x,y,pos);
@@ -2894,7 +2894,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR pos, a, b, internalPos : SIZE;
 		BEGIN
 			IF ~canStart & dragPossible THEN
@@ -2934,7 +2934,7 @@ TYPE
 			END
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF canStart & (commandMarker # NIL) THEN
 				commandMarker.Sort;
@@ -3078,7 +3078,7 @@ TYPE
 		END FindLabel;
 
 		(* Drag away operations *)
-		PROCEDURE AutoStartDrag*;
+		PROCEDURE { OVERRIDE } AutoStartDrag*;
 		VAR img : WMGraphics.Image;
 			c : WMGraphics.BufferCanvas;
 			i, la, lb : SIZE;
@@ -3213,7 +3213,7 @@ TYPE
 		END DragWasAccepted;
 
 		(* Drag onto operations *)
-		PROCEDURE DragOver*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragOver*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR pos : SIZE;
 		BEGIN
 			IF takesFocus.Get() THEN
@@ -3226,14 +3226,14 @@ TYPE
 			END;
 		END DragOver;
 
-		PROCEDURE ConfirmDrag*(accept: BOOLEAN; dragInfo: WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } ConfirmDrag*(accept: BOOLEAN; dragInfo: WMWindowManager.DragInfo);
 		BEGIN
 			IF dragInfo.onAccept # NIL THEN
 				dragInfo.onAccept(SELF, dragInfo)
 			END;
 		END ConfirmDrag;
 
-		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR dropTarget : TextDropTarget;
 			pos, internalPos : SIZE;
 			p : Texts.TextPosition;
@@ -3601,7 +3601,7 @@ TYPE
 			CursorChanged
 		END End;
 
-		PROCEDURE KeyEvent*(ucs :SIZE; flags : SET; VAR keysym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs :SIZE; flags : SET; VAR keysym : SIZE);
 		BEGIN
 			modifierFlags := flags;
 			IF Inputs.Release IN flags THEN RETURN END;
@@ -3917,7 +3917,7 @@ TYPE
 			Paste;
 		END PieMenuPaste;
 
-		PROCEDURE ShowContextMenu*(x, y: SIZE);
+		PROCEDURE { OVERRIDE } ShowContextMenu*(x, y: SIZE);
 		VAR
 			popup : WMPopups.Popup;
 			start, end, bufSize : SIZE;
@@ -3974,7 +3974,7 @@ TYPE
 			END
 		END ShowContextMenu;
 
-		PROCEDURE HandleInternal*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } HandleInternal*(VAR x: WMMessages.Message);
 		VAR pos : SIZE; obj : ANY; link : Texts.Link;
 		BEGIN
 			ASSERT(IsCallFromSequencer());

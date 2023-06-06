@@ -17,7 +17,7 @@ TYPE
 			SetPointerInfo(manager.pointerCrosshair)
 	     END New;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF 0 IN keys THEN canvas.Line(lx, ly, x, y, WMGraphics.Blue, WMGraphics.ModeSrcOverDst);
 				Invalidate(
@@ -27,7 +27,7 @@ TYPE
 			lx := x; ly := y
 		END PointerMove;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			lx := x; ly := y;
 			IF 2 IN keys THEN
@@ -36,7 +36,7 @@ TYPE
 			END
 		END PointerDown;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keySym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; keySym : SIZE);
 		VAR res: INTEGER; filename : ARRAY 128 OF CHAR;
 		BEGIN
 			IF ucs = ORD("s") THEN

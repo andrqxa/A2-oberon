@@ -571,7 +571,7 @@ TYPE
 		pg*: SET;
 		ph*: SET;
 
-		PROCEDURE &Init*(packetZero: SET);
+		PROCEDURE (* OVERRIDE *) & Init*(packetZero: SET);
 		BEGIN
 			packetIdentifier:= LSH(packetZero * {30,31},-30);
 			physicalID:= LSH(packetZero * {24..29},-24);

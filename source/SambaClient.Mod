@@ -31,7 +31,7 @@ TYPE
 
 		(** Create a new file with the specified name.  End users use Files.New instead. *)
 
-		PROCEDURE New0*(CONST name: ARRAY OF CHAR): Files.File;
+		PROCEDURE { OVERRIDE } New0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR
 			key: SIGNED32;
 			f: File;
@@ -56,7 +56,7 @@ TYPE
 
 		(** Open an existing file. The same file descriptor is returned if a file is opened multiple times.  End users use Files.Old instead. *)
 
-		PROCEDURE Old0*(CONST name: ARRAY OF CHAR): Files.File;
+		PROCEDURE { OVERRIDE } Old0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR
 			f: File;
 			key: SIGNED32;
@@ -80,7 +80,7 @@ TYPE
 
 		(** Delete a file. res = 0 indicates success.  End users use Files.Delete instead. *)
 
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
 		VAR
 			check : BOOLEAN;
 			closekey : SIGNED32;
@@ -123,7 +123,7 @@ TYPE
 
 		(** Rename a file. res = 0 indicates success.  End users use Files.Rename instead. *)
 
-		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
 		VAR
 			check : BOOLEAN;
 			closekey : SIGNED32;
@@ -170,7 +170,7 @@ TYPE
 
 		(** Enumerate canonical file names. mask may contain * wildcards.  For internal use only.  End users use Enumerator instead. *)
 
-		PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
+		PROCEDURE { OVERRIDE } Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
 		VAR
 			check, endOfSearch, findFirst: BOOLEAN;
 			byteCount, dataOff, paraOff, eos: SIGNED16;
@@ -318,7 +318,7 @@ TYPE
 
 		(** Return the unique non-zero key of the named file, if it exists. *)
 
-		PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
+		PROCEDURE { OVERRIDE } FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
 		VAR key: SIGNED32;
 		BEGIN
 			lock.Acquire();
@@ -330,7 +330,7 @@ TYPE
 		(** Create a new directory structure. May not be supported by the actual implementation.
 			End users use Files.CreateDirectory instead.*)
 
-		PROCEDURE CreateDirectory0*(CONST name: ARRAY OF CHAR; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } CreateDirectory0*(CONST name: ARRAY OF CHAR; VAR res: INTEGER);
 		VAR check: BOOLEAN;
 		BEGIN
 			IF Trace THEN
@@ -362,7 +362,7 @@ TYPE
 		(** Remove a directory. If force=TRUE, any subdirectories and files should be automatically deleted.
 			End users use Files.RemoveDirectory instead. *)
 
-		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: INTEGER);
 		VAR check: BOOLEAN;
 		BEGIN
 			IF Trace THEN
@@ -393,7 +393,7 @@ TYPE
 
 		(** Finalize the file system. *)
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			connection.Close();
@@ -411,7 +411,7 @@ TYPE
 
 		(** Position a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file. A Rider cannot be positioned beyond the end of a file. *)
 
-		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
+		PROCEDURE { OVERRIDE } Set*(VAR r: Files.Rider; pos: Files.Position);
 		BEGIN
 			r.apos := pos;
 			r.file := SELF;
@@ -419,14 +419,14 @@ TYPE
 
 		(** Return the offset of a Rider positioned on a file. *)
 
-		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
+		PROCEDURE { OVERRIDE } Pos*(VAR r: Files.Rider): Files.Position;
 		BEGIN
 			RETURN r.apos;
 		END Pos;
 
 		(** Read a byte from a file, advancing the Rider one byte further.  R.eof indicates if the end of the file has been passed. *)
 
-		PROCEDURE Read*(VAR r: Files.Rider; VAR x: CHAR);
+		PROCEDURE { OVERRIDE } Read*(VAR r: Files.Rider; VAR x: CHAR);
 		VAR a : ARRAY 1 OF CHAR;
 		BEGIN
 			a[0] := x;
@@ -435,7 +435,7 @@ TYPE
 
 		(** Read a sequence of len bytes into the buffer x at offset ofs, advancing the Rider. Less bytes will be read when reading over the end of the file. r.res indicates the number of unread bytes. x must be big enough to hold all the bytes. *)
 
-		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE { OVERRIDE } ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR
 			check: BOOLEAN;
 			dataOff, byteCount, padding: SIGNED16;
@@ -525,7 +525,7 @@ TYPE
 		END ReadBytes;
 
 		(** Write a byte into the file at the Rider position, advancing the Rider by one. *)
-		PROCEDURE Write*(VAR r: Files.Rider; x: CHAR);
+		PROCEDURE { OVERRIDE } Write*(VAR r: Files.Rider; x: CHAR);
 		VAR
 			a: ARRAY 1 OF CHAR;
 		BEGIN
@@ -535,7 +535,7 @@ TYPE
 
 		(** Write the buffer x containing len bytes (starting at offset ofs) into a file at the Rider position. *)
 
-		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE { OVERRIDE } WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR
 			check: BOOLEAN;
 			bytesWritten: SIGNED16;
@@ -623,7 +623,7 @@ TYPE
 
 		(** Return the current length of a file. *)
 
-		PROCEDURE Length*(): Files.Size;
+		PROCEDURE { OVERRIDE } Length*(): Files.Size;
 		VAR
 			filesize: SIGNED32;
 			check: BOOLEAN;
@@ -667,17 +667,17 @@ TYPE
 
 		(** Return the time (t) and date (d) when a file was last modified. *)
 
-		PROCEDURE GetDate*(VAR t, d: SIGNED32);
+		PROCEDURE { OVERRIDE } GetDate*(VAR t, d: SIGNED32);
 		BEGIN HALT(301) END GetDate;	(* abstract *)
 
 		(** Set the modification time (t) and date (d) of a file. *)
 
-		PROCEDURE SetDate*(t, d: SIGNED32);
+		PROCEDURE { OVERRIDE } SetDate*(t, d: SIGNED32);
 		BEGIN HALT(301) END SetDate;	(* abstract *)
 
 		(** Return the canonical name of a file. *)
 
-		PROCEDURE GetName*(VAR name: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } GetName*(VAR name: ARRAY OF CHAR);
 		BEGIN
 			Files.JoinName(fs.prefix, filename, name);
 			IF Trace THEN
@@ -688,12 +688,12 @@ TYPE
 
 		(** Register a file created with New in the directory, replacing the previous file in the directory with the same name. The file is automatically updated.  End users use Files.Register instead. *)
 
-		PROCEDURE Register0*(VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Register0*(VAR res: INTEGER);
 		BEGIN END Register0;
 
 		(** Flush the changes made to a file from its buffers. Register0 will automatically update a file. *)
 
-		PROCEDURE Update*;
+		PROCEDURE { OVERRIDE } Update*;
 		BEGIN END Update;
 
 	END File;

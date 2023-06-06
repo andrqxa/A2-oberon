@@ -75,7 +75,7 @@ TYPE
 	VAR
 		object* : ANY;
 
-		PROCEDURE &Init*(in, arg : Streams.Reader; out, error : Streams.Writer; caller: OBJECT);
+		PROCEDURE (* OVERRIDE *) & Init*(in, arg : Streams.Reader; out, error : Streams.Writer; caller: OBJECT);
 		BEGIN
 			Init^(in, arg, out, error, caller);
 			object := NIL;
@@ -104,7 +104,7 @@ TYPE
 		timestamp- : SIGNED32;
 		onChanged* : WMEvents.EventSource; (* for update mechanisms, basically every component needs a feature to inform about updates *)
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			repository := NIL; name := NIL; refNum := 0;
@@ -179,7 +179,7 @@ TYPE
 		instance : ANY;
 		next : ComponentInfo;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrComponent);
@@ -190,7 +190,7 @@ TYPE
 			next := NIL;
 		END Init;
 
-		PROCEDURE AddAttribute*(attribute : XML.Attribute);
+		PROCEDURE { OVERRIDE } AddAttribute*(attribute : XML.Attribute);
 		VAR name, temp : Strings.String;
 		BEGIN
 			name := attribute.GetName();
@@ -226,7 +226,7 @@ TYPE
 
 	IndexRegistry* = OBJECT(XML.ElementRegistry)
 
-		PROCEDURE InstantiateElement*(CONST name: ARRAY OF CHAR): XML.Element;
+		PROCEDURE { OVERRIDE } InstantiateElement*(CONST name: ARRAY OF CHAR): XML.Element;
 		VAR element : XML.Element; appInfo : ApplicationInfo; comInfo : ComponentInfo; repository : Repository; dictionary : Dictionary;
 		BEGIN
 			element := NIL;
@@ -551,7 +551,7 @@ TYPE
 
 		next : Dictionary;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			fullname := StrNoName;
@@ -675,7 +675,7 @@ TYPE
 			RETURN translator;
 		END FindBestMatch;
 
-		PROCEDURE AddAttribute*(attribute : XML.Attribute);
+		PROCEDURE { OVERRIDE } AddAttribute*(attribute : XML.Attribute);
 		VAR name : Strings.String;
 		BEGIN
 			name := attribute.GetName();
@@ -778,7 +778,7 @@ TYPE
 
 		next : Repository;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrRepository);
@@ -1148,7 +1148,7 @@ TYPE
 			repository := r
 		END InitRegistry;
 
-		PROCEDURE InstantiateElement*(CONST name: ARRAY OF CHAR): XML.Element;
+		PROCEDURE { OVERRIDE } InstantiateElement*(CONST name: ARRAY OF CHAR): XML.Element;
 		VAR
 			repositoryName, componentName : ARRAY 128 OF CHAR; id : SIZE;
 			repository : Repository;
@@ -1186,7 +1186,7 @@ TYPE
 			RETURN element;
 		END InstantiateElement;
 
-		PROCEDURE InstantiateLate*(e: XML.Element): XML.Element;
+		PROCEDURE { OVERRIDE } InstantiateLate*(e: XML.Element): XML.Element;
 		VAR generator: XML.String; element: XML.Element;
 			moduleName, procedureName : Modules.Name; msg : ARRAY 128 OF CHAR; res : INTEGER;
 			generate : XML.GeneratorProcedure;

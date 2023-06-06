@@ -57,7 +57,7 @@ TYPE
 			ctrl: Controller;
 			hw: SIGNED32;
 
-		PROCEDURE Linked*(): SIGNED32;
+		PROCEDURE { OVERRIDE } Linked*(): SIGNED32;
 		BEGIN
 			IF ctrl.Linked() THEN
 				RETURN Network.LinkLinked;
@@ -67,7 +67,7 @@ TYPE
 		END Linked;
 
 
-		PROCEDURE DoSend*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32);
+		PROCEDURE { OVERRIDE } DoSend*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32);
 		VAR
 			i, pos: SIGNED32;
 			tBuf: TxBuffer;
@@ -123,7 +123,7 @@ TYPE
 	END DoSend;
 
 
-	PROCEDURE Finalize(connected: BOOLEAN);
+	PROCEDURE { OVERRIDE } Finalize(connected: BOOLEAN);
 		BEGIN
 			ctrl.Finalize;
 			Finalize^(connected);

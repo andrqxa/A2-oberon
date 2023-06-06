@@ -86,13 +86,13 @@ TYPE
 			RETURN ret;
 		END CreateForm;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^();
 			DecCount();
 		END Close;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN
 					Close();
@@ -185,13 +185,13 @@ TYPE
 			RETURN ret;
 		END CreateForm;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^();
 			DecCount();
 		END Close;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN
 					Close();
@@ -419,13 +419,13 @@ TYPE
 			RETURN panel;
 		END CreateForm;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^();
 			DecCount();
 		END Close;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN
 					Close();
@@ -1042,13 +1042,13 @@ TYPE
 			RETURN panel;
 		END CreateForm;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^();
 			DecCount();
 		END Close;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN
 					Close();
@@ -1465,13 +1465,13 @@ TYPE
 			RETURN panel;
 		END CreateForm;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^();
 			DecCount();
 		END Close;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) & (x.ext IS KillerMsg) THEN
 					Close();
@@ -1571,7 +1571,7 @@ TYPE
 		END New;
 
 		(* Wird aufgerufen, wenn das Fenster seine Groesse aendert *)
-		PROCEDURE Resized*(width, height : SIZE);
+		PROCEDURE { OVERRIDE } Resized*(width, height : SIZE);
 		BEGIN
 			Resized^(width, height);
 			ResizeGrid;
@@ -2409,7 +2409,7 @@ TYPE
 			NEW(pw, SELF);
 		END SetPreferences;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF(x.ext IS KillerMsg) THEN
@@ -2424,7 +2424,7 @@ TYPE
 			END;
 		END Handle;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			client.abort := TRUE;
 			client.Close();

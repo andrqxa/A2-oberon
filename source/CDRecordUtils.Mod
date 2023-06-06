@@ -305,7 +305,7 @@ TYPE
 			SetContent(content);
 		END New;
 
-		PROCEDURE Show*;
+		PROCEDURE { OVERRIDE } Show*;
 		BEGIN
 			result := -1;
 			manager := WMWindowManager.GetDefaultManager();
@@ -369,7 +369,7 @@ TYPE
 			path*: WMProperties.StringProperty;
 			explorer: ExplorerPanel;
 
-		PROCEDURE CreateDialog*;
+		PROCEDURE { OVERRIDE } CreateDialog*;
 		VAR
 			bearing: WMRectangles.Rectangle;
 		BEGIN
@@ -382,7 +382,7 @@ TYPE
 			content.AddContent(explorer);
 		END CreateDialog;
 
-		PROCEDURE Ok(sender, data: ANY);
+		PROCEDURE { OVERRIDE } Ok(sender, data: ANY);
 		VAR
 			dirEntries: WMSystemComponents.DirEntries;
 			str: ARRAY MaxLen OF CHAR;
@@ -412,7 +412,7 @@ TYPE
 		tabs: WMTabComponents.Tabs;
 		curPage: PropertyPage;
 
-		PROCEDURE CreateDialog*;
+		PROCEDURE { OVERRIDE } CreateDialog*;
 		VAR
 			topPanel: WMStandardComponents.Panel;
 		BEGIN
@@ -477,7 +477,7 @@ TYPE
 		color*: WMProperties.ColorProperty;
 		borderColor*: WMProperties.ColorProperty;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 		BEGIN
 			Init^();
@@ -488,7 +488,7 @@ TYPE
 			NEW(cur, NIL, NIL, NIL);
 		END Init;
 
-		PROCEDURE SetPos*(pos: SIGNED64);
+		PROCEDURE { OVERRIDE } SetPos*(pos: SIGNED64);
 		BEGIN
 			IF pos < start.Get() THEN
 				pos := start.Get();
@@ -499,7 +499,7 @@ TYPE
 			Invalidate();
 		END SetPos;
 
-		PROCEDURE GetPos*(): SIGNED64;
+		PROCEDURE { OVERRIDE } GetPos*(): SIGNED64;
 		BEGIN
 			RETURN cur.Get();
 		END GetPos;
@@ -519,7 +519,7 @@ TYPE
 			END;
 		END StepIt;
 
-		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR
 			rect: WMRectangles.Rectangle;
 			width: SIGNED32;
@@ -553,7 +553,7 @@ TYPE
 		selected*: WMProperties.SizeProperty;
 		onSelectionChanged* : WMEvents.EventSource;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 			leftPanel, rightPanel: WMStandardComponents.Panel;
 		BEGIN
@@ -604,7 +604,7 @@ TYPE
 			selected.Set(srow);
 		END SelectionHandler;
 
-		PROCEDURE RecacheProperties;
+		PROCEDURE { OVERRIDE } RecacheProperties;
 		BEGIN
 			label.caption.Set(caption.Get());
 			grid.SetSelection(0, selected.Get(), 0, selected.Get());
@@ -612,7 +612,7 @@ TYPE
 			RecacheProperties^;
 		END RecacheProperties;
 
-		PROCEDURE PropertyChanged(sender, property: ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged(sender, property: ANY);
 		BEGIN
 			IF property = caption THEN
 				label.caption.Set(caption.Get());
@@ -640,7 +640,7 @@ TYPE
 		tree*: WMSystemComponents.DirectoryTree;
 		list: WMFileManager.FileListPanel;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR
 			panel, sidePanel: WMStandardComponents.Panel;
 			resizer: WMStandardComponents.Resizer;

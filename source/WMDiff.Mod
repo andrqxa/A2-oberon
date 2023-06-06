@@ -41,9 +41,9 @@ TYPE
 
 	NoWheelGrid* = OBJECT(WMStringGrids.StringGrid);
 
-		PROCEDURE WheelMove*(dz : SIZE); (* do nothing *) END WheelMove;
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE); (* do nothing *) END WheelMove;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrNoWheelGrid);
@@ -118,7 +118,7 @@ TYPE
 			RETURN grid;
 		END CreateGrid;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR scrollPanel : WMScrollableComponents.ScrollableContainer; VAR dx, dy : SIZE;
 		BEGIN
 			Init^;
@@ -304,7 +304,7 @@ TYPE
 			Invalidate;
 		END Update;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		BEGIN
 			Resized^;
 			onResized.Call(NIL);
@@ -342,7 +342,7 @@ TYPE
 			Invalidate;
 		END SetPage;
 
-		PROCEDURE Resized*;
+		PROCEDURE { OVERRIDE } Resized*;
 		VAR rect: WMRectangles.Rectangle;
 		BEGIN
 			Resized^;
@@ -412,7 +412,7 @@ TYPE
 		END Update;
 
 		(** Is called before any sub-components are drawn *)
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR rect: WMRectangles.Rectangle; (* x0, x1: SIGNED32; *)
 		BEGIN
 			rect := GetClientRect();
@@ -541,7 +541,7 @@ TYPE
 			RETURN panel
 		END CreateForm;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;
@@ -555,7 +555,7 @@ TYPE
 			Resized(Width, Height);
 		END Load;
 
-		PROCEDURE Resized*(width, height : SIZE);
+		PROCEDURE { OVERRIDE } Resized*(width, height : SIZE);
 		VAR viewWidth: SIZE;
 		BEGIN
 			Resized^(width, height);
@@ -674,7 +674,7 @@ TYPE
 			RETURN handled;
 		END HandleKey;
 
-		PROCEDURE Handle*(VAR m: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m: WMMessages.Message);
 		BEGIN
 			IF (m.msgType = WMMessages.MsgKey) THEN
 				IF ~HandleKey(m.x, m.flags, m.y) THEN
@@ -688,7 +688,7 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE WheelMove*(dz : SIZE);
+		PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 		VAR pos : SIZE;
 		BEGIN
 			pos := scrolly.pos.Get() + MouseWheelMultiplier * dz;

@@ -529,19 +529,19 @@ TYPE
 			res := StringFull
 		END Send;
 
-		PROCEDURE CanSetPos*( ): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*( ): BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END CanSetPos;
 
 	(* Set the position for the writer *)
-		PROCEDURE SetPos*( pos: Position );
+		PROCEDURE { OVERRIDE } SetPos*( pos: Position );
 		BEGIN
 			IF pos > LEN( buf ) THEN tail := LEN( buf ) ELSE tail := SIZE(pos) END;
 			sent := 0;  res := Ok;
 		END SetPos;
 
-		PROCEDURE Update*;
+		PROCEDURE { OVERRIDE } Update*;
 		(* nothing to do *)
 		END Update;
 
@@ -1195,13 +1195,13 @@ TYPE
 			InitReader( Receive, size )
 		END InitStringReader;
 
-		PROCEDURE CanSetPos*( ): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*( ): BOOLEAN;
 		BEGIN
 			RETURN TRUE
 		END CanSetPos;
 
 	(** Set the reader position *)
-		PROCEDURE SetPos*( pos: Position );
+		PROCEDURE { OVERRIDE } SetPos*( pos: Position );
 		BEGIN
 			IF pos > LEN( buf ) THEN head := LEN( buf ) ELSE head := SIZE(pos) END;
 			tail := LEN( buf );  received := LEN( buf );  res := Ok;

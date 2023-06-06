@@ -57,13 +57,13 @@ TYPE
 			END
 		END CheckActive;
 
-		PROCEDURE Update*(r : Rectangle; top : WMWindowManager.Window);
+		PROCEDURE { OVERRIDE } Update*(r : Rectangle; top : WMWindowManager.Window);
 		BEGIN
 			IF ~active THEN RETURN END;
 			Draw(Rect.ResizeRect(r, 1), top.prev)
 		END Update;
 
-		PROCEDURE Refresh*(top : Window);
+		PROCEDURE { OVERRIDE } Refresh*(top : Window);
 		BEGIN
 			Update(Rect.MakeRect(ENTIER(range.l)-1, ENTIER(range.t)-1, ENTIER(range.r) + 1, ENTIER(range.b) + 1), top)
 		END Refresh;

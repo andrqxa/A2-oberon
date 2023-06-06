@@ -124,7 +124,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 
 	END New;
 
-	PROCEDURE Close*;
+	PROCEDURE { OVERRIDE } Close*;
 	BEGIN
 		open := FALSE;
 		BEGIN{EXCLUSIVE}

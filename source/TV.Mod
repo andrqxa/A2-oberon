@@ -143,7 +143,7 @@ TYPE
 		END New;
 
 		(** Close the TV window *)
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		VAR
 			vbiBuffer : TVDriver.VbiBuffer;
 		BEGIN
@@ -203,12 +203,12 @@ TYPE
 			tuner.SetTVFrequency(ch.freq)
 		END NextCh;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			lastX := bounds.l+x; lastY := bounds.t+y; dragging := TRUE
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x,y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x,y : SIZE; keys : SET);
 		VAR dx, dy : SIZE;
 		BEGIN
 			IF dragging THEN
@@ -218,17 +218,17 @@ TYPE
 			END
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y : SIZE; Keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; Keys : SET);
 		BEGIN
 			dragging := FALSE
 		END PointerUp;
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
+		PROCEDURE { OVERRIDE } Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			Draw^(canvas, w, h, 0)
 		END Draw;
 
-		PROCEDURE Handle(VAR m : Messages.Message);
+		PROCEDURE { OVERRIDE } Handle(VAR m : Messages.Message);
 		VAR
 			data : XML.Element;
 			str : ARRAY 10 OF CHAR;
@@ -327,7 +327,7 @@ TYPE
 			END
 		END StopTeletextCapture;
 
-		PROCEDURE KeyEvent(ucs : SIZE; flags : SET; keySym : SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent(ucs : SIZE; flags : SET; keySym : SIZE);
 		VAR
 			ch : CHAR;
 		BEGIN

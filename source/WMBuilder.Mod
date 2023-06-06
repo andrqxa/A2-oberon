@@ -90,7 +90,7 @@ TYPE
 
 		opNum : SIGNED32;
 
-		PROCEDURE &Init*(width, height : SIZE; alpha : BOOLEAN);
+		PROCEDURE (* OVERRIDE *) & Init*(width, height : SIZE; alpha : BOOLEAN);
 		VAR slib : Repositories.Repository;
 		BEGIN
 			Init^(width, height, FALSE);
@@ -283,7 +283,7 @@ TYPE
 	VAR
 		color, bgColor : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			color := 0FFH; bgColor := 0;
@@ -307,7 +307,7 @@ TYPE
 
 		insertAtObj : ANY;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(refreshBtn); refreshBtn.alignment.Set(WMComponents.AlignTop);
@@ -866,7 +866,7 @@ TYPE
 		syntaxHighlighterName : ARRAY 32 OF CHAR;
 		codeTags : PCodeTag;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 
@@ -1036,7 +1036,7 @@ TYPE
 		value : ARRAY 128 OF CHAR;
 		textColor : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			value := "";
@@ -1049,7 +1049,7 @@ TYPE
 			Invalidate;
 		END SetCaption;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		BEGIN
 			DrawBackground^(canvas);
 			canvas.SetColor(textColor);
@@ -1066,7 +1066,7 @@ TYPE
 	VAR
 		propertyPanel : WMInspectionComponents.PropertyPanel;
 
-		PROCEDURE &Init*(width, height : SIZE; alpha : BOOLEAN);
+		PROCEDURE (* OVERRIDE *) & Init*(width, height : SIZE; alpha : BOOLEAN);
 		BEGIN
 			Init^(width, height, alpha);
 
@@ -1880,7 +1880,7 @@ TYPE
 		state : SIGNED32;
 		timer : Kernel.Timer;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrComponentEditor);
@@ -1954,7 +1954,7 @@ TYPE
 			Invalidate;
 		END SetPanel;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = showSnapGrid) OR (property = enableSnap) OR (property = showHelperLines) OR (property = showFrames) THEN
 				RecacheProperties;
@@ -1963,7 +1963,7 @@ TYPE
 			END;
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			showSnapGridI := showSnapGrid.Get();
@@ -2296,7 +2296,7 @@ TYPE
 			END;
 		END CheckSelection;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR
 			down : BOOLEAN; oldFrame : WMRectangles.Rectangle;
 			snapX, snapY, snapDownX, snapDownY, dx, dy : SIZE; f : WMRectangles.Rectangle;
@@ -2398,14 +2398,14 @@ TYPE
 			IF (owner # NIL) THEN owner.UpdateCursorPosition(x, y); END;
 		END PointerMove;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			PointerLeave^;
 			lastX := Invalid; lastY := Invalid;
 			IF (owner # NIL) THEN owner.UpdateCursorPosition(Invalid, Invalid); END;
 		END PointerLeave;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR down : BOOLEAN; res: SIGNED32; rect : WMRectangles.Rectangle;
 		BEGIN
 			PointerDown^(x, y, keys);
@@ -2458,7 +2458,7 @@ TYPE
 			END;
 		END TakeOverSize;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR
 			vc : WMComponents.VisualComponent; down : BOOLEAN; oldParent : XML.Element;
 			component : Repositories.Component;
@@ -2530,7 +2530,7 @@ TYPE
 			END;
 		END PointerUp;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags: SET; VAR keySym: SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags: SET; VAR keySym: SIZE);
 
 			PROCEDURE ControlKey(flags : SET) : BOOLEAN;
 			BEGIN
@@ -2628,14 +2628,14 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			modifierFlags := {};
 			downX := Invalid; downY := Invalid; lastX := Invalid; lastY := Invalid;
 		END FocusLost;
 
-		PROCEDURE DragOver*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragOver*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		BEGIN
 			IF takesFocus.Get() THEN
 				dragX := x; dragY := y;
@@ -2672,7 +2672,7 @@ TYPE
 			END;
 		END DragAddComponent;
 
-		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE { OVERRIDE } DragDropped*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR dc : WMRepositories.DropTarget;
 		BEGIN
 			IF takesFocus.Get() THEN
@@ -2808,7 +2808,7 @@ TYPE
 			END;
 		END DrawHelperLines;
 
-		PROCEDURE DrawForeground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawForeground*(canvas : WMGraphics.Canvas);
 		VAR rect : WMRectangles.Rectangle; e : XML.Element; x0, y0 : SIZE;
 		BEGIN
 			DrawForeground^(canvas);
@@ -2870,7 +2870,7 @@ TYPE
 			END;
 		END DrawSnapGrid;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		BEGIN
 			DrawBackground^(canvas);
 			IF (mode = EditMode) THEN
@@ -2881,7 +2881,7 @@ TYPE
 			END;
 		END DrawBackground;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			state := State_Terminating;
@@ -2928,14 +2928,14 @@ TYPE
 		id : SIGNED32;
 		next : EditWindow;
 
-		PROCEDURE FocusGot*;
+		PROCEDURE { OVERRIDE } FocusGot*;
 		BEGIN
 			FocusGot^;
 			owner.SetActiveEditor(SELF);
 			editor.CheckSelection;
 		END FocusGot;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			owner.RemoveEditor(SELF);
@@ -3754,7 +3754,7 @@ TYPE
 			RETURN data;
 		END StoreWindows;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		VAR data : WMRestorable.XmlElement;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
@@ -3768,7 +3768,7 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		VAR windows : WindowArray; i : SIZE;
 		BEGIN
 			windows := windowList.GetAll();

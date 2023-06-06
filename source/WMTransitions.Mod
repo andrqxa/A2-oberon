@@ -23,7 +23,7 @@ TYPE
 		mW, mH : SIZE;
 		mask : POINTER TO ARRAY OF CHAR;
 
-		PROCEDURE Init*(w, h : SIZE);
+		PROCEDURE { OVERRIDE } Init*(w, h : SIZE);
 		BEGIN
 			mW := w; mH := h;
 		END Init;
@@ -91,7 +91,7 @@ TYPE
 			WMWindowManager.DefaultAddWindow(w);
 		END DumpMask;
 
-		PROCEDURE CalcImage*(a, b, result : Raster.Image; per255 : SIGNED32);
+		PROCEDURE { OVERRIDE } CalcImage*(a, b, result : Raster.Image; per255 : SIGNED32);
 		VAR i, x, y : SIZE; col : SIGNED32;
 			adra, adrb, adrr: ADDRESS;
 			mode : Raster.Mode;
@@ -152,13 +152,13 @@ TYPE
 		mW, mH : SIZE;
 		mode : Raster.Mode;
 
-		PROCEDURE Init*(w, h : SIZE);
+		PROCEDURE { OVERRIDE } Init*(w, h : SIZE);
 		BEGIN
 			mW := w; mH := h;
 			Raster.InitMode(mode, Raster.srcCopy);
 		END Init;
 
-		PROCEDURE CalcImage*(a, b, result : Raster.Image; per255 : SIGNED32);
+		PROCEDURE { OVERRIDE } CalcImage*(a, b, result : Raster.Image; per255 : SIGNED32);
 		BEGIN
 			(* correct outofbound alpha values *)
 			IF (per255 < 0) THEN per255 := 0; END;

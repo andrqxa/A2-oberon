@@ -112,7 +112,7 @@ TYPE
 			send a frame
 			padding and checksum are inserted directly by the device
 		*)
-		PROCEDURE DoSend*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32);
+		PROCEDURE { OVERRIDE } DoSend*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32);
 		CONST
 			DataOfs = 10H;	(* data block offset in transmit command block *)
 			C = 15;
@@ -191,7 +191,7 @@ TYPE
 			DEC(ctrl.rcvSize, size);
 		END ReceiveData;
 
-		PROCEDURE Finalize(connected: BOOLEAN);
+		PROCEDURE { OVERRIDE } Finalize(connected: BOOLEAN);
 		BEGIN
 			ctrl.Finalize;
 			Finalize^(connected);

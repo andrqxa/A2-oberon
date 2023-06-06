@@ -33,17 +33,17 @@ TYPE
 	VAR data-: Array1;   (*! will probably be removed, do not use ! *)
 
 		(** override *)
-		PROCEDURE Allocate*( size: SIGNED32;  VAR adr: Index;  VAR ptr: ANY );
+		PROCEDURE { OVERRIDE } Allocate*( size: SIGNED32;  VAR adr: Index;  VAR ptr: ANY );
 		BEGIN
 			NEW( data, size );  adr := ADDRESSOF( data[0] );  ptr := data;
 		END Allocate;
 
-		PROCEDURE GetInfo*( VAR elementsize: Index );
+		PROCEDURE { OVERRIDE } GetInfo*( VAR elementsize: Index );
 		BEGIN
 			elementsize := SIZEOF( Value );
 		END GetInfo;
 
-		PROCEDURE AlikeX*( ): ArrayXdBytes.Array;
+		PROCEDURE { OVERRIDE } AlikeX*( ): ArrayXdBytes.Array;
 		VAR copy: Array;
 		BEGIN
 			NEW( copy, origin, len );  RETURN copy;

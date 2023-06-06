@@ -185,14 +185,14 @@ TYPE
 			END;
 		END Load;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount
 		END Close;
 
 		(* Since the content of this window is not scalable, we don't allow window resizing *)
-		PROCEDURE Resizing*(VAR width, height : SIZE);
+		PROCEDURE { OVERRIDE } Resizing*(VAR width, height : SIZE);
 		BEGIN
 			width := WindowWidth; height := WindowHeight;
 		END Resizing;
@@ -207,7 +207,7 @@ TYPE
 			END;
 		END HandleChange;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS KillerMsg) THEN Close

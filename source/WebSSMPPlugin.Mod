@@ -21,12 +21,12 @@ TYPE
 	END ServiceInfo;
 
 	SSMPPlugin = OBJECT(WebHTTPServer.HTTPPlugin)
-		PROCEDURE &Init*(CONST name: WebHTTPServer.Name);
+		PROCEDURE (* OVERRIDE *) & Init*(CONST name: WebHTTPServer.Name);
 		BEGIN
 			Init^(PluginName)
 		END Init;
 
-		PROCEDURE CanHandle*(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; secure : BOOLEAN): BOOLEAN;
+		PROCEDURE { OVERRIDE } CanHandle*(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; secure : BOOLEAN): BOOLEAN;
 		VAR name, ext: ARRAY 16 OF CHAR;
 		BEGIN
 			Files.SplitExtension(request.uri, name, ext);
@@ -34,7 +34,7 @@ TYPE
 			RETURN (ext = "SSMP") & ((request.method = WebHTTP.GetM) OR (request.method = WebHTTP.HeadM))
 		END CanHandle;
 
-		PROCEDURE Handle*(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader;
+		PROCEDURE { OVERRIDE } Handle*(host: WebHTTPServer.Host; VAR request: WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader;
 			VAR in: Streams.Reader; VAR out: Streams.Writer);
 		VAR f: Files.File; chunker: WebHTTP.ChunkedOutStream; w: Streams.Writer;
 		BEGIN

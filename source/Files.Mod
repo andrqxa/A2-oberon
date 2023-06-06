@@ -93,12 +93,12 @@ TYPE
 			IF len >= min THEN res := Streams.Ok ELSE res := Streams.EOF (* end of file *) END
 		END Receive;
 
-		PROCEDURE CanSetPos*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*() : BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END CanSetPos;
 
-		PROCEDURE SetPos*(pos : Streams.Position);
+		PROCEDURE { OVERRIDE } SetPos*(pos : Streams.Position);
 		BEGIN
 			file.Set(r, pos);
 			Reset;
@@ -131,19 +131,19 @@ TYPE
 			IF r.res = 0 THEN res := Streams.Ok ELSE res := WriteError (* not all bytes written *) END
 		END Send;
 
-		PROCEDURE CanSetPos*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } CanSetPos*() : BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END CanSetPos;
 
-		PROCEDURE SetPos*(pos : Streams.Position);
+		PROCEDURE { OVERRIDE } SetPos*(pos : Streams.Position);
 		BEGIN
 			Update;
 			file.Set(r, pos);
 			Reset;
 		END SetPos;
 
-		PROCEDURE Pos*(): Streams.Position;
+		PROCEDURE { OVERRIDE } Pos*(): Streams.Position;
 		BEGIN
 			Update;
 			RETURN file.Pos(r)

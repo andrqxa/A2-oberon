@@ -24,7 +24,7 @@ TYPE
 		aclExpectedParams : SIGNED32; (* expected length of parameters in bytes *)
 		aclParamOffset : SIGNED32;
 
-		PROCEDURE &Init*(name: ARRAY OF CHAR; sender: Streams.Sender; receiver: Streams.Receiver);
+		PROCEDURE (* OVERRIDE *) & Init*(name: ARRAY OF CHAR; sender: Streams.Sender; receiver: Streams.Receiver);
 		VAR plugin : Plugins.Plugin;
 		BEGIN
 			Init^(name,NIL,NIL);
@@ -55,7 +55,7 @@ TYPE
 			RETURN TRUE;
 		END Init2;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		END Close;
 
 		(** receives HCI event packet fragments (each fragment 16 bytes)  and enters them into the event queue *)
@@ -191,7 +191,7 @@ TYPE
 			END;
 		END ReadACL;
 
-		PROCEDURE Send*(type: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Send*(type: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR  i: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF TraceSend THEN
@@ -212,7 +212,7 @@ TYPE
 			END;
 		END Send;
 
-		PROCEDURE Send1H*(type: SIGNED32; VAR hdr: ARRAY OF CHAR; hdrlen: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Send1H*(type: SIGNED32; VAR hdr: ARRAY OF CHAR; hdrlen: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR  i: SIGNED32; buffer : POINTER TO ARRAY OF CHAR; bufferLen : SIGNED32;
 		BEGIN
 			IF TraceSend THEN
@@ -241,7 +241,7 @@ TYPE
 			END;
 		END Send1H;
 
-		PROCEDURE Send2H*(type: SIGNED32; VAR hdr1: ARRAY OF CHAR; hdr1len: SIGNED32;
+		PROCEDURE { OVERRIDE } Send2H*(type: SIGNED32; VAR hdr1: ARRAY OF CHAR; hdr1len: SIGNED32;
 				VAR hdr2: ARRAY OF CHAR; hdr2len: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR
 			i: SIGNED32;

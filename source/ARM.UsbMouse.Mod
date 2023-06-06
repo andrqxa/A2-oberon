@@ -75,7 +75,7 @@ TYPE
 			END;
 		END HandleEvent;
 
-		PROCEDURE Connect() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect() : BOOLEAN;
 		VAR endpoint, i : SIGNED32; status : Usbdi.Status;
 		BEGIN
 			(* Set the HID boot protocol *)
@@ -111,7 +111,7 @@ TYPE
 			RETURN TRUE;
 		END Connect;
 
-		PROCEDURE Disconnect;
+		PROCEDURE { OVERRIDE } Disconnect;
 		BEGIN
 			KernelLog.String("USB mouse disconnected."); KernelLog.Ln;
 		END Disconnect;

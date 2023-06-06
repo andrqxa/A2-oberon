@@ -44,7 +44,7 @@ TYPE
 			TraceReceive*, TraceSend*: BOOLEAN;
 			dead-: BOOLEAN;
 
-		PROCEDURE &Init*(name: ARRAY OF CHAR; sender: Streams.Sender; receiver: Streams.Receiver);
+		PROCEDURE (* OVERRIDE *) & Init*(name: ARRAY OF CHAR; sender: Streams.Sender; receiver: Streams.Receiver);
 		BEGIN
 			Init^(name, sender, receiver);
 			NEW(out, sender, 512); NEW(in, receiver, 512);
@@ -52,7 +52,7 @@ TYPE
 			TraceReceive := FALSE;	TraceSend := FALSE;
 		END Init;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN {EXCLUSIVE}
 			dead := TRUE
 		END Close;
@@ -289,7 +289,7 @@ TYPE
 			RETURN res
 		END GetPacketType;
 
-		PROCEDURE Send*(type: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Send*(type: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR  pt: CHAR; i: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF ~GetPacketType(type, pt) THEN
@@ -312,7 +312,7 @@ TYPE
 			res := out.res
 		END Send;
 
-		PROCEDURE Send1H*(type: SIGNED32; VAR hdr: ARRAY OF CHAR; hdrlen: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Send1H*(type: SIGNED32; VAR hdr: ARRAY OF CHAR; hdrlen: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR pt: CHAR; i: SIGNED32;
 		BEGIN
 			IF ~GetPacketType(type, pt) THEN
@@ -337,7 +337,7 @@ TYPE
 			res := out.res
 		END Send1H;
 
-		PROCEDURE Send2H*(type: SIGNED32; VAR hdr1: ARRAY OF CHAR; hdr1len: SIGNED32;
+		PROCEDURE { OVERRIDE } Send2H*(type: SIGNED32; VAR hdr1: ARRAY OF CHAR; hdr1len: SIGNED32;
 								VAR hdr2: ARRAY OF CHAR; hdr2len: SIGNED32;
 								VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR pt: CHAR; i: SIGNED32;

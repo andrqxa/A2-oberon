@@ -670,7 +670,7 @@ TYPE
 			name := NewIdentifier(id);
 		END SetName;
 
-		PROCEDURE SetTypeDeclaration*(typeDeclaration: TypeDeclaration);
+		PROCEDURE { OVERRIDE } SetTypeDeclaration*(typeDeclaration: TypeDeclaration);
 		BEGIN (* IGNORE *)
 		END SetTypeDeclaration;
 
@@ -687,15 +687,15 @@ TYPE
 			hasPointers := TRUE;
 		END InitObjectType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this IS ObjectType)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN ((to IS AnyType) OR (to IS ObjectType))
 		END CompatibleTo;
 
-		PROCEDURE IsPointer*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsPointer*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsPointer;
 
@@ -713,15 +713,15 @@ TYPE
 			hasPointers := TRUE;
 		END InitNilType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this IS NilType)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN (to IS NilType) OR (to IS ObjectType) OR (to IS AnyType) OR (to IS PointerType) OR (to IS ProcedureType) OR (to IS AddressType)
 		END CompatibleTo;
 
-		PROCEDURE IsPointer*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsPointer*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsPointer;
 
@@ -738,15 +738,15 @@ TYPE
 			hasPointers := TRUE;
 		END InitAnyType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN this IS AnyType
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN (to IS AnyType)
 		END CompatibleTo;
 
-		PROCEDURE IsPointer*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsPointer*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsPointer;
 
@@ -760,15 +760,15 @@ TYPE
 			hasPointers := TRUE;
 		END InitAnyRecordType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN this IS AnyRecordType
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN (to IS AnyRecordType)
 		END CompatibleTo;
 
-		PROCEDURE IsRecordType*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsRecordType*(): BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END IsRecordType;
@@ -786,11 +786,11 @@ TYPE
 			SetRealtime(TRUE);
 		END InitByteType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN this IS ByteType
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN (to IS ByteType)
 		END CompatibleTo;
 
@@ -807,11 +807,11 @@ TYPE
 			SetRealtime(TRUE);
 		END InitAddressType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this IS AddressType)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN (to IS AddressType) OR (to IS SizeType) OR (to IS IntegerType) & (to.sizeInBits >= sizeInBits) OR (to IS PointerType) & to(PointerType).isUnsafe
 		END CompatibleTo;
 
@@ -828,11 +828,11 @@ TYPE
 			SetRealtime(TRUE);
 		END InitSizeType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN	RETURN (this IS SizeType)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN (to IS SizeType) OR (to IS AddressType) OR (to IS IntegerType) & (to.sizeInBits >= sizeInBits)
 		END CompatibleTo;
 
@@ -849,11 +849,11 @@ TYPE
 			SetRealtime(TRUE);
 		END InitBooleanType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this # NIL) & (this IS BooleanType)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN to IS BooleanType
 		END CompatibleTo;
 
@@ -870,11 +870,11 @@ TYPE
 			SetRealtime(TRUE);
 		END InitSetType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this = SELF) OR (this IS SetType) & (this.sizeInBits = sizeInBits);
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN (to IS SetType) & (to.sizeInBits >= sizeInBits)
 		END CompatibleTo;
 
@@ -891,11 +891,11 @@ TYPE
 			SetRealtime(TRUE);
 		END InitCharacterType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this = SELF) OR (this IS CharacterType) & (this.sizeInBits = sizeInBits)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN ((to IS CharacterType) OR (to IS ByteType)) & (to.sizeInBits >= sizeInBits)
 		END CompatibleTo;
 
@@ -911,15 +911,15 @@ TYPE
 			SetRealtime(TRUE);
 		END InitRangeType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this = SELF) OR (this IS RangeType)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN SameType(to)
 		END CompatibleTo;
 
-		PROCEDURE IsComposite*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsComposite*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsComposite;
 
@@ -952,11 +952,11 @@ TYPE
 			SELF.signed := signed;
 		END InitIntegerType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this = SELF) OR (this IS IntegerType) & (this.sizeInBits = sizeInBits) & (this(IntegerType).signed = signed)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN ((to IS IntegerType) OR (to IS AddressType) OR (to IS SizeType) OR (to IS ByteType)) & (to.sizeInBits >= sizeInBits) OR (to IS FloatType)
 				OR (to IS ComplexType) & CompatibleTo((to(ComplexType).componentType))
 		END CompatibleTo;
@@ -973,11 +973,11 @@ TYPE
 			InitNumberType("@Float",sizeInBits);
 		END InitFloatType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this = SELF) OR (this IS FloatType) & (this.sizeInBits = sizeInBits)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN
 			RETURN (to IS FloatType) & (to.sizeInBits >= sizeInBits)
 					OR (to IS ComplexType) & CompatibleTo((to(ComplexType).componentType))
@@ -999,15 +999,15 @@ TYPE
 			InitNumberType("@Complex",sizeInBits);
 		END InitComplexType;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this = SELF) OR (this IS ComplexType) & (componentType.SameType(this(ComplexType).componentType))
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN (to IS ComplexType) & (componentType.CompatibleTo(to(ComplexType).componentType))
 		END CompatibleTo;
 
-		PROCEDURE IsComposite*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsComposite*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsComposite;
 
@@ -1032,27 +1032,27 @@ TYPE
 		BEGIN ASSERT(resolved # NIL); SELF.resolvedType := resolved; hasPointers := resolved.hasPointers;
 		END SetResolved;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this # NIL) & ((this = SELF) OR resolvedType.SameType(this.resolvedType))
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN resolvedType.CompatibleTo(to)
 		END CompatibleTo;
 
-		PROCEDURE IsPointer*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsPointer*(): BOOLEAN;
 		BEGIN RETURN resolvedType.IsPointer()
 		END IsPointer;
 
-		PROCEDURE IsComposite*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsComposite*(): BOOLEAN;
 		BEGIN RETURN resolvedType.IsComposite()
 		END IsComposite;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		BEGIN RETURN resolvedType.NeedsTrace();
 		END NeedsTrace;
 
-		PROCEDURE IsRecordType*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsRecordType*(): BOOLEAN;
 		BEGIN
 			RETURN resolvedType.IsRecordType();
 		END IsRecordType;
@@ -1077,11 +1077,11 @@ TYPE
 		BEGIN SELF.length := length
 		END SetLength;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this IS StringType) & (this(StringType).length = length)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN
 			IF to IS ArrayType THEN
 				WITH to: ArrayType DO
@@ -1093,7 +1093,7 @@ TYPE
 			END;
 		END CompatibleTo;
 
-		PROCEDURE IsComposite*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsComposite*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsComposite;
 
@@ -1129,11 +1129,11 @@ TYPE
 		BEGIN	RETURN (SELF = this) OR (enumerationBase # NIL) & (enumerationBase.resolvedType(EnumerationType).Extends(this));
 		END Extends;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN this = SELF
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN (to IS EnumerationType) & (to(EnumerationType).Extends(SELF))
 		END CompatibleTo;
 
@@ -1182,7 +1182,7 @@ TYPE
 			A= POINTER TO ARRAY OF B;
 			B= POINTER TO ARRAY OF A;
 		*)
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		VAR result : BOOLEAN;
 		BEGIN
 			result := FALSE;
@@ -1200,16 +1200,16 @@ TYPE
 			RETURN result
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN
 			RETURN (form = Static) & SameType(to)
 		END CompatibleTo;
 
-		PROCEDURE IsComposite*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsComposite*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsComposite;
 
-		PROCEDURE NeedsTrace*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace*(): BOOLEAN;
 		BEGIN RETURN arrayBase.resolvedType.NeedsTrace ();
 		END NeedsTrace;
 
@@ -1275,7 +1275,7 @@ TYPE
 			A= POINTER TO ARRAY OF B;
 			B= POINTER TO ARRAY OF A;
 		*)
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		VAR result: BOOLEAN;
 		BEGIN
 			result := FALSE;
@@ -1295,7 +1295,7 @@ TYPE
 			RETURN result
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN
 			HALT(200); (*! implement *)
 			RETURN (form = Static) & SameType(to)
@@ -1352,11 +1352,11 @@ TYPE
 			RETURN result
 		END IsFullyDynamic;
 
-		PROCEDURE NeedsTrace*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace*(): BOOLEAN;
 		BEGIN RETURN hasPointers OR (arrayBase # NIL) & (arrayBase.resolvedType.NeedsTrace());
 		END NeedsTrace;
 
-		PROCEDURE IsComposite*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsComposite*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsComposite;
 
@@ -1441,19 +1441,19 @@ TYPE
 			RETURN result
 		END Extends;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN	RETURN (SELF = this) OR (this IS PointerType) & (this(PointerType).pointerBase.SameType(pointerBase.resolvedType) & (this(PointerType).isUnsafe = isUnsafe))
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN	RETURN SameType(to) OR ~(to IS RecordType) & SELF.Extends(to)
 		END CompatibleTo;
 
-		PROCEDURE IsPointer*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsPointer*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsPointer;
 
-		PROCEDURE NeedsTrace*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace*(): BOOLEAN;
 		BEGIN RETURN  ~isUntraced;
 		END NeedsTrace;
 
@@ -1476,7 +1476,7 @@ TYPE
 			cellsAreObjects := FALSE;
 		END InitPortType;
 
-		PROCEDURE SetSize*(size: SIZE);
+		PROCEDURE { OVERRIDE } SetSize*(size: SIZE);
 		BEGIN sizeInBits := size
 		END SetSize;
 
@@ -1490,15 +1490,15 @@ TYPE
 			hasPointers := b;
 		END SetCellsAreObjects;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this IS PortType) & (this(PortType).direction = direction) & (this(PortType).sizeInBits = sizeInBits)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN	RETURN SameType(to)
 		END CompatibleTo;
 
-		PROCEDURE IsPointer*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsPointer*(): BOOLEAN;
 		BEGIN RETURN cellsAreObjects;
 		END IsPointer;
 
@@ -1623,23 +1623,23 @@ TYPE
 			RETURN result
 		END Extends;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this = SELF)
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN	RETURN Extends(to)
 		END CompatibleTo;
 
-		PROCEDURE IsComposite*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsComposite*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsComposite;
 
-		PROCEDURE NeedsTrace*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace*(): BOOLEAN;
 		BEGIN RETURN recordScope.NeedsTrace();
 		END NeedsTrace;
 
-		PROCEDURE IsRecordType*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsRecordType*(): BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END IsRecordType;
@@ -1752,15 +1752,15 @@ TYPE
 		BEGIN isCellNet := t
 		END IsCellNet;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN this = SELF
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN RETURN SameType(to)
 		END CompatibleTo;
 
-		PROCEDURE IsComposite*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsComposite*(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsComposite;
 
@@ -1948,25 +1948,25 @@ TYPE
 
 		END SameSignature;
 
-		PROCEDURE SameType*(this: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } SameType*(this: Type): BOOLEAN;
 		BEGIN
 			RETURN SameSignature(this)
 				& (this(ProcedureType).isDelegate = isDelegate)
 				& (this(ProcedureType).isRealtime = isRealtime);
 		END SameType;
 
-		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
+		PROCEDURE { OVERRIDE } CompatibleTo*(to: Type): BOOLEAN;
 		BEGIN
 			RETURN SameSignature(to) & (~isDelegate OR to(ProcedureType).isDelegate) & (~to.isRealtime OR isRealtime)
 					& ((stackAlignment <=1) OR (stackAlignment <= to(ProcedureType).stackAlignment));
 		END CompatibleTo;
 
-		PROCEDURE IsComposite*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } IsComposite*(): BOOLEAN;
 		BEGIN RETURN isDelegate
 		END IsComposite;
 
 		(** Returns if the type needs to be traced for garbage collection *)
-		PROCEDURE NeedsTrace*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace*(): BOOLEAN;
 		BEGIN RETURN isDelegate;
 		END NeedsTrace;
 
@@ -2122,7 +2122,7 @@ TYPE
 			elements := elems;
 		END InitMathArrayExpression;
 
-		PROCEDURE Equals(e: Expression): BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals(e: Expression): BOOLEAN;
 		BEGIN
 			IF (e = NIL) OR ~(e IS MathArrayExpression) THEN RETURN FALSE
 			ELSE RETURN elements.Equals(e(MathArrayExpression).elements)
@@ -2290,7 +2290,7 @@ TYPE
 		BEGIN modifiers := flags
 		END SetModifiers;
 
-		PROCEDURE SetRelatedRhs*(expression: Expression);
+		PROCEDURE { OVERRIDE } SetRelatedRhs*(expression: Expression);
 		BEGIN
 			relatedRhs := expression;
 		END SetRelatedRhs;
@@ -2378,7 +2378,7 @@ TYPE
 		BEGIN SELF.symbol := s;
 		END SetSymbol;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		BEGIN
 			RETURN symbol.NeedsTrace() & ((left = NIL) OR (left.NeedsTrace()));
 		END NeedsTrace;
@@ -2412,7 +2412,7 @@ TYPE
 		BEGIN hasTensorRange := TRUE;
 		END HasTensorRange;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		BEGIN RETURN type.NeedsTrace() & left.NeedsTrace(); (* for x[y]: if x is untraced, then also x[y] should be treated untraced *)
 		END NeedsTrace;
 
@@ -2497,7 +2497,7 @@ TYPE
 		BEGIN SELF.typeExpression := typeExpression
 		END SetTypeExpression;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		BEGIN RETURN left.NeedsTrace() & type.NeedsTrace(); (* for x(Y): if x is untraced, then x as Y should also be treated untraced  *)
 		END NeedsTrace;
 
@@ -2510,7 +2510,7 @@ TYPE
 		BEGIN InitDesignator(position); SELF.left := left; original := orig;
 		END InitDereferenceDesignator;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		BEGIN
 			(*! semantic of x.y.z := new : if x is untraced then the effect of y.z := new remains untraced!
 				In other words: difference between y := x.y; y.z := new and x.y.z := new.
@@ -2536,7 +2536,7 @@ TYPE
 		BEGIN InitDesignator(position); original := orig;
 		END InitSelfDesignator;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		BEGIN RETURN type.NeedsTrace();
 		END NeedsTrace;
 
@@ -2559,7 +2559,7 @@ TYPE
 		BEGIN SELF.position := position; resolved := SELF;
 		END InitValue;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN HALT(100); (* abstract *) RETURN FALSE; END Equals;
 
 	END Value;
@@ -2578,7 +2578,7 @@ TYPE
 		BEGIN	SELF.value := value
 		END SetValue;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS BooleanValue) & (v(BooleanValue).value = value); END Equals;
 
 	END BooleanValue;
@@ -2597,7 +2597,7 @@ TYPE
 		BEGIN	SELF.value := value;
 		END SetValue;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS IntegerValue) & (v(IntegerValue).value = value); END Equals;
 
 	END IntegerValue;
@@ -2616,7 +2616,7 @@ TYPE
 		BEGIN	SELF.value := value
 		END SetValue;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS CharacterValue) & (v(CharacterValue).value = value); END Equals;
 
 	END CharacterValue;
@@ -2637,7 +2637,7 @@ TYPE
 		BEGIN	SELF.value := value
 		END SetValue;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS SetValueAlias) & (v(SetValueAlias).value = value); END Equals;
 
 	END SetValue;
@@ -2652,7 +2652,7 @@ TYPE
 			array := arr;
 		END InitMathArrayValue;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS MathArrayValue) & (v(MathArrayValue).array.Equals(array)); END Equals;
 
 	END MathArrayValue;
@@ -2676,7 +2676,7 @@ TYPE
 		BEGIN SELF.subtype := subtype;
 		END SetSubtype;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS RealValue) & (v(RealValue).value = value); END Equals;
 
 	END RealValue;
@@ -2708,7 +2708,7 @@ TYPE
 		BEGIN SELF.subtype := subtype;
 		END SetSubtype;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS ComplexValue) & (v(ComplexValue).realValue = realValue) & (v(ComplexValue).imagValue = imagValue);
 		END Equals;
 	END ComplexValue;
@@ -2753,7 +2753,7 @@ TYPE
 			Append(v);
 		END AppendChar;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS StringValue) & (v(StringValue).value = value); END Equals;
 
 	END StringValue;
@@ -2761,7 +2761,7 @@ TYPE
 	(** <<value = NIL>> **)
 	NilValue* = OBJECT (Value)
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS NilValue); END Equals;
 
 	END NilValue;
@@ -2780,7 +2780,7 @@ TYPE
 		BEGIN SELF.value := value
 		END SetValue;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS EnumerationValue) & (v(EnumerationValue).value = value); END Equals;
 
 	END EnumerationValue;
@@ -2798,7 +2798,7 @@ TYPE
 		BEGIN SELF.value := value
 		END SetValue;
 
-		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		PROCEDURE { OVERRIDE } Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS ProcedureValue) & (v(ProcedureValue).value = value); END Equals;
 
 	END ProcedureValue;
@@ -3023,13 +3023,13 @@ TYPE
 			END;
 		END SetDeclaredType;
 
-		PROCEDURE SetType*(type: Type);
+		PROCEDURE { OVERRIDE } SetType*(type: Type);
 		BEGIN
 			ASSERT(type = typeDeclarationType);
 		END SetType;
 
 		(* type declarations should be generally included in object files *)
-		PROCEDURE NeedsSection*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsSection*(): BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END NeedsSection;
@@ -3152,7 +3152,7 @@ TYPE
 		BEGIN SELF.initializer := initializer;
 		END SetInitializer;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		BEGIN RETURN ~untraced & (extern = NIL) & type.NeedsTrace ();
 		END NeedsTrace;
 
@@ -3254,7 +3254,7 @@ TYPE
 		PROCEDURE SetKind*(kind: SIGNED32);
 		BEGIN SELF.kind := kind; END SetKind;
 		
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		BEGIN RETURN ~untraced  & type.NeedsTrace ();
 		END NeedsTrace;
 
@@ -3409,7 +3409,7 @@ TYPE
 		BEGIN SELF.methodNumber := methodNumber
 		END SetMethodNumber;
 
-		PROCEDURE NeedsSection*(): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsSection*(): BOOLEAN;
 		BEGIN
 			RETURN (access * Public # {}) OR (methodNumber >= 0);
 		END NeedsSection;
@@ -3485,7 +3485,7 @@ TYPE
 			parameters := NIL;
 		END InitImport;
 
-		PROCEDURE SetType*(type: Type);
+		PROCEDURE { OVERRIDE } SetType*(type: Type);
 		BEGIN
 			ASSERT(type = importType);
 		END SetType;
@@ -3641,7 +3641,7 @@ TYPE
 		BEGIN	SELF.call := call;
 		END SetCall;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: ProcedureCallStatement;
 		BEGIN
 			NEW(copy, position, ignore, CloneExpression(call), outer);
@@ -3667,7 +3667,7 @@ TYPE
 		BEGIN SELF.right := right
 		END SetRight;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: Assignment;
 		BEGIN
 			NEW(copy, position, CloneExpression(left), CloneExpression(right), outer);
@@ -3788,7 +3788,7 @@ TYPE
 			IF elsifParts = NIL THEN RETURN 0 ELSE RETURN elsifParts.Length();  END;
 		END ElsifParts;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: IfStatement; i: SIZE;
 		BEGIN
 			NEW(copy, position, outer);
@@ -3878,7 +3878,7 @@ TYPE
 			SELF.elsePart := elsePart;
 		END SetElsePart;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: WithStatement; i: SIZE;
 		BEGIN
 			NEW(copy, position, outer);
@@ -3972,7 +3972,7 @@ TYPE
 			IF caseParts = NIL THEN RETURN 0 ELSE RETURN caseParts.Length();  END;
 		END CaseParts;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: CaseStatement; i: SIZE;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4028,7 +4028,7 @@ TYPE
 			SELF.statements := statements;
 		END SetStatements;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: WhileStatement;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4060,7 +4060,7 @@ TYPE
 			SELF.statements := statements;
 		END SetStatements;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: RepeatStatement;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4106,7 +4106,7 @@ TYPE
 		BEGIN SELF.statements := statements;
 		END SetStatements;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: ForStatement;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4132,7 +4132,7 @@ TYPE
 		BEGIN SELF.statements := statements;
 		END SetStatements;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: ExitableBlock;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4145,7 +4145,7 @@ TYPE
 	(** << LOOP statements END >> **)
 	LoopStatement* = OBJECT (ExitableBlock)
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: LoopStatement;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4158,7 +4158,7 @@ TYPE
 	(** << EXIT >> **)
 	ExitStatement* = OBJECT (Statement)
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: ExitStatement;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4185,7 +4185,7 @@ TYPE
 			assignmentOperator := op;
 		END SetAssignmentOperator;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: ReturnStatement;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4215,7 +4215,7 @@ TYPE
 		END SetProcedure;
 
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: AwaitStatement;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4309,7 +4309,7 @@ TYPE
 		BEGIN SELF.statements := statements;
 		END SetStatementSequence;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: StatementBlock;
 		BEGIN
 			NEW(copy, position, outer, scope);
@@ -4343,7 +4343,7 @@ TYPE
 			inlineCode := code;
 		END SetBinaryCode;
 
-		PROCEDURE Clone(): Statement;
+		PROCEDURE { OVERRIDE } Clone(): Statement;
 		VAR copy: Code; s: Scanner.StringType;
 		BEGIN
 			NEW(copy, position, outer);
@@ -4683,7 +4683,7 @@ TYPE
 			SELF.body := body;
 		END SetBody;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		VAR parameter: Parameter;
 		BEGIN
 			parameter := ownerProcedure.type.resolvedType(ProcedureType).firstParameter;
@@ -4704,7 +4704,7 @@ TYPE
 		ownerEnumeration-: EnumerationType;
 
 		(** Find symbol by name *)
-		PROCEDURE FindSymbol*(identifier: Identifier): Symbol;
+		PROCEDURE { OVERRIDE } FindSymbol*(identifier: Identifier): Symbol;
 		VAR p: Symbol; base: Type;
 		BEGIN
 			p := FindSymbol^(identifier);
@@ -4771,7 +4771,7 @@ TYPE
 		END AddOperator;
 
 		(** Find symbol by name *)
-		PROCEDURE FindSymbol*(identifier: Identifier): Symbol;
+		PROCEDURE { OVERRIDE } FindSymbol*(identifier: Identifier): Symbol;
 		VAR p: Symbol; base: RecordType;
 		BEGIN
 			p := FindSymbol^(identifier);
@@ -4812,7 +4812,7 @@ TYPE
 			RETURN NIL;
 		END AbstractProcedure;
 
-		PROCEDURE FindConstant*(identifier: Identifier): Constant;
+		PROCEDURE { OVERRIDE } FindConstant*(identifier: Identifier): Constant;
 		VAR p: Constant; base: RecordType;
 		BEGIN
 			p := FindConstant^(identifier);
@@ -4825,7 +4825,7 @@ TYPE
 			RETURN p;
 		END FindConstant;
 
-		PROCEDURE FindTypeDeclaration*(identifier: Identifier): TypeDeclaration;
+		PROCEDURE { OVERRIDE } FindTypeDeclaration*(identifier: Identifier): TypeDeclaration;
 		VAR p: TypeDeclaration; base: RecordType;
 		BEGIN
 			p := FindTypeDeclaration^(identifier);
@@ -4838,7 +4838,7 @@ TYPE
 			RETURN p;
 		END FindTypeDeclaration;
 
-		PROCEDURE FindVariable*(identifier: Identifier): Variable;
+		PROCEDURE { OVERRIDE } FindVariable*(identifier: Identifier): Variable;
 		VAR p: Variable; base: RecordType;
 		BEGIN
 			p := FindVariable^(identifier);
@@ -4851,7 +4851,7 @@ TYPE
 			RETURN p;
 		END FindVariable;
 
-		PROCEDURE FindProcedure*(identifier: Identifier): Procedure;
+		PROCEDURE { OVERRIDE } FindProcedure*(identifier: Identifier): Procedure;
 		VAR p: Procedure; base: RecordType;
 		BEGIN
 			p := FindProcedure^(identifier);
@@ -4864,7 +4864,7 @@ TYPE
 			RETURN p;
 		END FindProcedure;
 
-		PROCEDURE FindMethod*(number: SIZE): Procedure;
+		PROCEDURE { OVERRIDE } FindMethod*(number: SIZE): Procedure;
 		VAR p: Procedure; base: RecordType;
 		BEGIN
 			p := FindMethod^(number);
@@ -4877,7 +4877,7 @@ TYPE
 			RETURN p;
 		END FindMethod;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
+		PROCEDURE { OVERRIDE } NeedsTrace* (): BOOLEAN;
 		VAR base: RecordType;
 		BEGIN
 			base := ownerRecord.GetBaseRecord();
@@ -4903,7 +4903,7 @@ TYPE
 			firstImport := NIL; lastImport := NIL; numberImports := 0;
 		END InitCellScope;
 
-		PROCEDURE Clear*;
+		PROCEDURE { OVERRIDE } Clear*;
 		BEGIN
 			Clear^;
 			firstImport := NIL; lastImport := NIL; numberImports := 0;
@@ -4953,7 +4953,7 @@ TYPE
 			RETURN import;
 		END GetImport;
 
-		PROCEDURE FindSymbol*(identifier: Identifier): Symbol;
+		PROCEDURE { OVERRIDE } FindSymbol*(identifier: Identifier): Symbol;
 		VAR p: Symbol; base: Type;
 		BEGIN
 			p := FindSymbol^(identifier);

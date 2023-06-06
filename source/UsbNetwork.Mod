@@ -33,17 +33,17 @@ TYPE
 	VAR
 		controller : UsbNetworkController;
 
-		PROCEDURE Linked(): SIGNED32;
+		PROCEDURE { OVERRIDE } Linked(): SIGNED32;
 		BEGIN
 			RETURN controller.linkStatus;
 		END Linked;
 
-		PROCEDURE DoSend(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32);
+		PROCEDURE { OVERRIDE } DoSend(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32);
 		BEGIN
 			controller.SendFrame(dst, type, l3hdr, l4hdr, data, h3len, h4len, dofs, dlen);
 		END DoSend;
 
-		PROCEDURE Finalize(connected: BOOLEAN);
+		PROCEDURE { OVERRIDE } Finalize(connected: BOOLEAN);
 		BEGIN
 			controller.Finalize;
 			Finalize^(connected);
@@ -158,7 +158,7 @@ TYPE
 			IF interruptInEndpoint # 0 THEN interruptInPipe := device.GetPipe(interruptInEndpoint); END;
 		END GetPipes;
 
-		PROCEDURE Connect*() : BOOLEAN;
+		PROCEDURE { OVERRIDE } Connect*() : BOOLEAN;
 		VAR status : Usbdi.Status;
 		BEGIN
 			linkStatus := Network.LinkUnknown;
@@ -196,7 +196,7 @@ TYPE
 			RETURN TRUE;
 		END Connect;
 
-		PROCEDURE Disconnect*;
+		PROCEDURE { OVERRIDE } Disconnect*;
 		BEGIN
 			IF ~RegisterAtNetwork THEN RETURN; END;
 			Network.registry.Remove(linkDevice);

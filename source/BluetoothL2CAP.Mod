@@ -791,7 +791,7 @@ TYPE
 			response: Response;
 			firstReq, lastReq: Request;
 
-		PROCEDURE &Init*(l2cap: L2CAP; link: HCI.Link; cid: SIGNED32);
+		PROCEDURE (* OVERRIDE *) & Init*(l2cap: L2CAP; link: HCI.Link; cid: SIGNED32);
 		BEGIN
 			IF TraceSignallingChannel THEN
 				KernelLog.String(ModuleName);
@@ -806,7 +806,7 @@ TYPE
 			END;
 		END Init;
 
-		PROCEDURE Close;
+		PROCEDURE { OVERRIDE } Close;
 		BEGIN {EXCLUSIVE}
 			IF TraceSignallingChannel THEN
 				KernelLog.String(ModuleName);
@@ -878,7 +878,7 @@ TYPE
 		END Signal;
 
 		(* receive and parse a signalling packet *)
-		PROCEDURE Receive(p: Packet);
+		PROCEDURE { OVERRIDE } Receive(p: Packet);
 		VAR
 			pos: SIGNED32; res: INTEGER;
 			c: CHAR;

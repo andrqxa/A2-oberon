@@ -234,7 +234,7 @@ TYPE
 			edit.text.onTextChanged.Add(TextChanged)
 		END TextChanged;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			ScheduleHide
@@ -246,7 +246,7 @@ TYPE
 			manager.Remove(SELF);
 		END Hide;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) THEN
 				IF (x.ext = SELF) THEN Hide
@@ -278,7 +278,7 @@ TYPE
 			cursorScope : TS.Scope;
 			cursorIsFirstLevelScope : BOOLEAN;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 
@@ -322,7 +322,7 @@ TYPE
 			END;
 		END OnStartDrag;
 
-		PROCEDURE SetEditor*(e: WMEditors.Editor);
+		PROCEDURE { OVERRIDE } SetEditor*(e: WMEditors.Editor);
 		BEGIN
 			IF e = editor THEN RETURN END;
 			IF (highlight # NIL) & (editor # NIL) THEN
@@ -337,7 +337,7 @@ TYPE
 			NEW(posKeeper, editor.text);
 		END SetEditor;
 
-		PROCEDURE BrowseToDefinition*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } BrowseToDefinition*(sender, data : ANY);
 		VAR pos : SIZE;
 			no : TS.NamedObject;
 			scope : TS.Scope;
@@ -543,7 +543,7 @@ TYPE
 			END
 		END Refresh;
 
-		PROCEDURE AddNodes*(parent : PETTrees.TreeNode; diagnostics : Diagnostics.Diagnostics; log : Streams.Writer);
+		PROCEDURE { OVERRIDE } AddNodes*(parent : PETTrees.TreeNode; diagnostics : Diagnostics.Diagnostics; log : Streams.Writer);
 		BEGIN
 			AddNodes^(parent, diagnostics, log);
 			Refresh(parent)
@@ -617,7 +617,7 @@ TYPE
 			RETURN FALSE
 		END HasActualParameters;
 
-		PROCEDURE ClickNode*(sender, data : ANY);
+		PROCEDURE { OVERRIDE } ClickNode*(sender, data : ANY);
 		VAR
 			d: ANY;
 			text : Texts.Text;
@@ -1667,7 +1667,7 @@ TYPE
 			END
 		END TextChanged;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			IF (editor # NIL) & (editor.text # NIL) THEN

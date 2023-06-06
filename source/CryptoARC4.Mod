@@ -9,14 +9,14 @@ TYPE
 		s: ARRAY 256 OF SIGNED32; (* state array *)
 		i, j: SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			SetNameAndBlocksize( "arc4", 1 );
 			isKeyInitialized := FALSE
 		END Init;
 
 		(** initialize arc4 key. keybits = [8..2048], MUST be multiple of 8. *)
-		PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE);
+		PROCEDURE { OVERRIDE } InitKey*( CONST src: ARRAY OF CHAR; keybits: SIZE);
 		VAR
 			keydata: ARRAY 256 OF SIGNED32;
 			keybytes: SIZE;
@@ -38,7 +38,7 @@ TYPE
 		END InitKey;
 
 		(** encrypt len bytes starting at position ofs. *)
-		PROCEDURE Encrypt*( VAR buf: ARRAY OF CHAR; ofs, len: SIZE );
+		PROCEDURE { OVERRIDE } Encrypt*( VAR buf: ARRAY OF CHAR; ofs, len: SIZE );
 		VAR
 			k: SIZE;
 			temp: SIGNED32;
@@ -58,7 +58,7 @@ TYPE
 		END Encrypt;
 
 		(** decrypt len bytes starting at position ofs. *)
-		PROCEDURE Decrypt*( VAR buf: ARRAY OF CHAR; ofs, len: SIZE );
+		PROCEDURE { OVERRIDE } Decrypt*( VAR buf: ARRAY OF CHAR; ofs, len: SIZE );
 		BEGIN
 			Encrypt( buf, ofs, len )
 		END Decrypt;

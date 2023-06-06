@@ -104,7 +104,7 @@ TYPE
 		selectOnPointerOver : BOOLEAN;
 		lastkeys : SET;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(GSGenericGrid);
@@ -151,7 +151,7 @@ TYPE
 			NEW(onClickSelected, SELF, GSonClickSelected, GSonClickSelectedInfo, SELF.StringToCompCommand); events.Add(onClickSelected);
 		END Init;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 
@@ -174,7 +174,7 @@ TYPE
 			AlignSubComponents
 		END RecacheProperties;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			RecacheProperties;
 			Invalidate;
@@ -420,7 +420,7 @@ TYPE
 			RETURN rect
 		END GetVisibleCellRect;
 
-		PROCEDURE DrawBackground*(canvas : Graphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : Graphics.Canvas);
 		VAR i, j, x, y, w, h, cw, ch, ti, tj, tx, ty, fx, fy : SIZE;
 				skip : BOOLEAN;
 				r, clip : WMRectangles.Rectangle;
@@ -573,7 +573,7 @@ TYPE
 			ScrollCellVisible(focusCell.col, focusCell.row)
 		END SetFocusPos;
 
-		PROCEDURE KeyEvent*(ucs : SIZE; flags: SET; VAR keysym: SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags: SET; VAR keysym: SIZE);
 			PROCEDURE AdjustSelection;
 			BEGIN
 				IF shiftDown THEN SetSelection(selA.col, selA.row, focus.col, focus.row)
@@ -728,7 +728,7 @@ TYPE
 			END
 		END OnFixedYGridLine;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET); (** PROTECTED *)
 		VAR col, row : SIZE; state : SET;
 		BEGIN
 			PointerDown^(x, y, keys);
@@ -757,12 +757,12 @@ TYPE
 			END
 		END PointerDown;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			SetHighlight(-1, -1); pointerInside := FALSE
 		END PointerLeave;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET); (** PROTECTED *)
 		VAR col, row : SIZE; manager : WM.WindowManager; cell, pos : SIZE;
 		BEGIN
 			IF dragCellSpacingWidth THEN
@@ -831,7 +831,7 @@ TYPE
 			END
 		END CellClicked;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET); (** PROTECTED *)
 		VAR col, row : SIZE; d : BOOLEAN;
 		BEGIN
 			IF 2 IN lastkeys THEN lastkeys := keys; RETURN END;
@@ -847,7 +847,7 @@ TYPE
 			selecting := FALSE
 		END PointerUp;
 
-		PROCEDURE WheelMove*(dz: SIZE); (** PROTECTED *)
+		PROCEDURE { OVERRIDE } WheelMove*(dz: SIZE); (** PROTECTED *)
 		VAR t, l : SIZE;
 		BEGIN
 			GetTopPosition(l, t); t := t + dz; SetTopPosition(l, t, TRUE);

@@ -24,14 +24,14 @@ TYPE
 			(* overwrite me *)
 		END Update;
 
-		PROCEDURE & Init(w,h: SIZE; alpha: BOOLEAN);
+		PROCEDURE (* OVERRIDE *) & Init(w,h: SIZE; alpha: BOOLEAN);
 		BEGIN
 			Init^(w,h, alpha);
 			Update(w,h);
 			INCL(flags, WM.FlagStorable);
 		END Init;
 
-		PROCEDURE Resized( width, height: SIZE);
+		PROCEDURE { OVERRIDE } Resized( width, height: SIZE);
 		VAR rect: WMRectangles.Rectangle;
 		BEGIN
 			Resized^(width, height);
@@ -44,7 +44,7 @@ TYPE
 			Invalidate(rect);
 		END Resized;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		VAR filename: Files.FileName; f:Files.File; w:Files.Writer;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgSerialize) THEN
@@ -93,7 +93,7 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0,0,GetWidth(), GetHeight()));
 		END NewData;
 
-		PROCEDURE Update(w,h: SIZE);
+		PROCEDURE { OVERRIDE } Update(w,h: SIZE);
 		VAR i:SIZE;
 		BEGIN
 			IF Reals.IsNaNL(data[i]) THEN RETURN END;
@@ -147,7 +147,7 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0,0,GetWidth(), GetHeight()));
 		END NewData;
 
-		PROCEDURE Update(w,h: SIZE);
+		PROCEDURE { OVERRIDE } Update(w,h: SIZE);
 		VAR col: WMGraphics.Color; x,y:SIZE; val:FLOAT64; valI:SIGNED32;
 		BEGIN
 			FOR y:=0 TO LEN(data,0)-1 DO
@@ -236,7 +236,7 @@ TYPE
 			INC(timestamp);
 		END Update;
 		*)
-		PROCEDURE Update(w,h: SIZE);
+		PROCEDURE { OVERRIDE } Update(w,h: SIZE);
 		VAR i:SIZE; mn,mx,x0,y0,x1,y1:SIZE;
 		BEGIN
 			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), WMGraphics.White, WMGraphics.ModeCopy);
@@ -290,7 +290,7 @@ Graphs* = OBJECT (Window);
 			Invalidate(WMRectangles.MakeRect(0,0,GetWidth(), GetHeight()));
 		END NewData;
 
-		PROCEDURE Update(w,h: SIZE);
+		PROCEDURE { OVERRIDE } Update(w,h: SIZE);
 		VAR i,j:SIZE; mn,mx, x0,x1,y0,y1:SIZE;
 		BEGIN
 			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), WMGraphics.White, WMGraphics.ModeCopy);
@@ -378,7 +378,7 @@ GraphXY* = OBJECT (Window);
 			END;
 		END Axes;
 
-		PROCEDURE Update(w,h: SIZE);
+		PROCEDURE { OVERRIDE } Update(w,h: SIZE);
 		VAR i:SIZE; mnw,mnh,mxw,mxh,x0,x1,y0,y1:SIZE; scalex,scaley:FLOAT32;
 		BEGIN
 			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), WMGraphics.White, WMGraphics.ModeCopy);
@@ -406,7 +406,7 @@ END GraphXY;
 	optional data[3,..]: x error bars *)
 TYPE Scatter* = OBJECT (GraphXY);
 
-		PROCEDURE Update(w,h: SIZE);
+		PROCEDURE { OVERRIDE } Update(w,h: SIZE);
 		VAR i:SIZE; mnw,mnh,mxw,mxh, x,y, ex,ey:SIZE; scalex,scaley:FLOAT32; rect:WMRectangles.Rectangle;
 		BEGIN
 			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), WMGraphics.White, WMGraphics.ModeCopy);
@@ -444,13 +444,13 @@ TYPE Regression*= OBJECT (Scatter)
 		New(data,title);
 	END Initialize;
 
-	PROCEDURE NewData*(CONST data: ARRAY [*,*] OF FLOAT64);
+	PROCEDURE { OVERRIDE } NewData*(CONST data: ARRAY [*,*] OF FLOAT64);
 	BEGIN
 		regressor(data,slope,intercept);
 		NewData^(data);
 	END NewData;
 
-	PROCEDURE Update(w,h: SIZE);
+	PROCEDURE { OVERRIDE } Update(w,h: SIZE);
 	VAR mnw,mnh,x,y,xx,yy:SIZE; scalex,scaley, x0, y0, x1, y1:FLOAT64;
 	BEGIN
 		Update^(w,h);

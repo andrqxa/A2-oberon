@@ -17,7 +17,7 @@ TYPE
 		placeholderimg : Graphics.Image;
 		height : SIGNED32;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR mode : Raster.Mode; pix : Raster.Pixel;
 		BEGIN
 			Init^;
@@ -66,13 +66,13 @@ TYPE
 
 		END MapChars;
 
-		PROCEDURE HasChar*(code : Graphics.Char32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } HasChar*(code : Graphics.Char32) : BOOLEAN;
 		BEGIN
 			MapChars(code);
 			RETURN (code >= 0) & (code < 256) & (glyphs[code].available)
 		END HasChar;
 
-		PROCEDURE GetGlyphMap*(code : Graphics.Char32; VAR map : Graphics.Image);
+		PROCEDURE { OVERRIDE } GetGlyphMap*(code : Graphics.Char32; VAR map : Graphics.Image);
 		BEGIN
 			MapChars(code);
 			IF (code >= 0) & (code < 256) & (glyphs[code].available) & (glyphs[code].img # NIL) THEN
@@ -81,7 +81,7 @@ TYPE
 			END
 		END GetGlyphMap;
 
-		PROCEDURE GetGlyphSpacings*(code : Graphics.Char32; VAR glyphSpacings : Graphics.GlyphSpacings);
+		PROCEDURE { OVERRIDE } GetGlyphSpacings*(code : Graphics.Char32; VAR glyphSpacings : Graphics.GlyphSpacings);
 		BEGIN
 			MapChars(code);
 			IF (code >= 0) & (code < 256) & (glyphs[code].available) THEN

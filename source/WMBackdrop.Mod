@@ -41,7 +41,7 @@ TYPE
 			SetTitle(Strings.NewString("Backdrop"));
 		END New;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : SIGNED32);
 		BEGIN
 			IF img # NIL THEN
 				canvas.ScaleImage(img,
@@ -50,7 +50,7 @@ TYPE
 			END
 		END Draw;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		VAR view : WMWindowManager.ViewPort;
 			w, h : FLOAT32; originator : ANY;
 			contextMenu : WMPopups.Popup;
@@ -128,7 +128,7 @@ TYPE
 			windowList.Remove(SELF)
 		END HandleRemove;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		VAR configuration : XML.Element; value : SIGNED32;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN

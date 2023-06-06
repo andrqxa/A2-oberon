@@ -60,7 +60,7 @@ TYPE
 
 		END MapChars;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		VAR mode : Raster.Mode; pix : Raster.Pixel;
 		BEGIN
 			Init^;
@@ -70,7 +70,7 @@ TYPE
 			Raster.Fill(placeholderimg, 0, 0, 15, 15, pix, mode)
 		END Init;
 
-		PROCEDURE GetGlyphMap*(code : WMGraphics.Char32; VAR map : WMGraphics.Image);
+		PROCEDURE { OVERRIDE } GetGlyphMap*(code : WMGraphics.Char32; VAR map : WMGraphics.Image);
 		BEGIN
 			MapChars(code);
 			IF (code >= 0) & (code < 256) & (glyphs[code].available) & (glyphs[code].img # NIL) THEN
@@ -79,13 +79,13 @@ TYPE
 			END
 		END GetGlyphMap;
 
-		PROCEDURE HasChar*(code : WMGraphics.Char32) : BOOLEAN;
+		PROCEDURE { OVERRIDE } HasChar*(code : WMGraphics.Char32) : BOOLEAN;
 		BEGIN
 			MapChars(code);
 			RETURN (code >= 0) & (code < 256) & (glyphs[code].available)
 		END HasChar;
 
-		PROCEDURE GetGlyphSpacings*(code : WMGraphics.Char32; VAR glyphSpacings : WMGraphics.GlyphSpacings);
+		PROCEDURE { OVERRIDE } GetGlyphSpacings*(code : WMGraphics.Char32; VAR glyphSpacings : WMGraphics.GlyphSpacings);
 		BEGIN
 			MapChars(code);
 			IF (code >= 0) & (code < 256) & (glyphs[code].available) (* & (glyphs[code].img # NIL) *) THEN

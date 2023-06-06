@@ -103,13 +103,13 @@ TYPE
 			IncCount;
 		END New;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;
 		END Close;
 
-		PROCEDURE Handle*(VAR x : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		VAR data : XML.Element;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
@@ -139,7 +139,7 @@ TYPE
 		resized : BOOLEAN;
 		viewport : WMWindowManager.ViewPort;
 
-		PROCEDURE &New(CONST info : ApplicationInfo; context : WMRestorable.Context);
+		PROCEDURE (* OVERRIDE *) & New(CONST info : ApplicationInfo; context : WMRestorable.Context);
 		BEGIN
 			New^(info, context);
 			mode := Mode_Standard;
@@ -207,7 +207,7 @@ TYPE
 			RETURN (Inputs.LeftCtrl IN state);
 		END MoveOrResize;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			PointerDown^(x, y, keys);
 			lastX := bounds.l + x; lastY:=bounds.t + y;
@@ -217,7 +217,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR dx, dy, width, height, newWidth, newHeight, moveX, moveY: SIZE; tempMode : INTEGER;
 		BEGIN
 			PointerMove^(x, y, keys);
@@ -274,7 +274,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE Handle*(VAR m : WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR m : WMMessages.Message);
 		BEGIN
 			IF MoveOrResize() & (m.msgType = WMMessages.MsgPointer) THEN
 				IF m.msgSubType = WMMessages.MsgSubPointerMove THEN PointerMove(m.x, m.y, m.flags)
@@ -287,7 +287,7 @@ TYPE
 			END;
 		END Handle;
 
-		PROCEDURE PointerUp*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y:SIZE; keys:SET);
 		BEGIN
 			PointerUp^(x, y, keys);
 			IF (mode # Mode_Standard) & ~(0 IN keys) THEN
@@ -299,7 +299,7 @@ TYPE
 			END;
 		END PointerUp;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			PointerLeave^;
 		END PointerLeave;

@@ -82,7 +82,7 @@ TYPE
 		state : SIGNED32;
 		timer : Kernel.Timer;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrCalendar);
@@ -107,19 +107,19 @@ TYPE
 		 	NEW(timer);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			BEGIN {EXCLUSIVE} state := Running; END;
 		END Initialize;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			RecacheProperties;
 			PropertyChanged^(sender, property);
 		END PropertyChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		VAR dt : Dates.DateTime; ignore, weekDay : SIGNED32; string : Strings.String;
 
 			PROCEDURE GetResizedImage(name : WMProperties.StringProperty; width, height : SIZE) : WMGraphics.Image;
@@ -197,13 +197,13 @@ TYPE
 			month.Set(dt.month);
 		END ChangeMonth;
 
-		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			PointerDown^(x, y, keys);
 			IF (0 IN keys) THEN selected := TRUE; END;
 		END PointerDown;
 
-		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		VAR
 			selection : SelectionWrapper; dt : Dates.DateTime;
 			year, week, weekDay : SIGNED32;
@@ -219,7 +219,7 @@ TYPE
 			END;
 		END PointerUp;
 
-		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		VAR column, row : SIZE;
 		BEGIN
 			PointerMove^(x, y, keys);
@@ -230,7 +230,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE PointerLeave*;
+		PROCEDURE { OVERRIDE } PointerLeave*;
 		BEGIN
 			PointerLeave^;
 			mouseOverColumn := -1; mouseOverRow := -1;
@@ -259,7 +259,7 @@ TYPE
 	 		END;
 	 	END GetCell;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR
 			rect : WMRectangles.Rectangle;
 			dt : Dates.DateTime;
@@ -312,7 +312,7 @@ TYPE
 			END;
 		END DrawBackground;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			BEGIN {EXCLUSIVE} state := Terminating END;
@@ -359,7 +359,7 @@ TYPE
 		state : SIGNED32;
 		timer : Kernel.Timer;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrCalendarController);
@@ -502,13 +502,13 @@ TYPE
 			END;
 		END SetColorScheme;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Close^;
 			DecCount;
 		END Close;
 
-		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y:SIZE; keys:SET);
 		BEGIN
 			lastX := bounds.l + x; lastY:=bounds.t + y;
 			IF keys = {0} THEN
@@ -548,7 +548,7 @@ TYPE
 			SetColorScheme(colorScheme);
 		END HandleToggleColor;
 
-		PROCEDURE PointerMove*(x,y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x,y:SIZE; keys:SET);
 		VAR dx, dy, width, height : SIZE;
 		BEGIN
 			IF dragging OR resizing THEN
@@ -568,7 +568,7 @@ TYPE
 			END;
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y:SIZE; keys:SET);
 		BEGIN
 			PointerUp^(x, y, keys);
 			dragging := FALSE;
@@ -580,7 +580,7 @@ TYPE
 			END;
 		END PointerUp;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		VAR configuration : WMRestorable.XmlElement;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN

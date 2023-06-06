@@ -103,7 +103,7 @@ BEGIN
 	Out.Ln;
 	ray.a := 0;
 END probeShade;
-PROCEDURE tick*;
+PROCEDURE { OVERRIDE } tick*;
 
 END tick;
 PROCEDURE move*(VAR dx, dy, dz: SREAL; VAR blocked: BOOLEAN);

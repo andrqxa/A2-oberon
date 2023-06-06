@@ -46,31 +46,31 @@ TYPE
 			END;
 		END SetStyle;
 
-		PROCEDURE BeginAlert*;
+		PROCEDURE { OVERRIDE } BeginAlert*;
 		BEGIN INC(alertCount); IF alertCount = 1 THEN SetColor END;
 		END BeginAlert;
 
-		PROCEDURE EndAlert*;
+		PROCEDURE { OVERRIDE } EndAlert*;
 		BEGIN DEC(alertCount); IF alertCount = 0 THEN SetColor END;
 		END EndAlert;
 
-		PROCEDURE BeginComment*;
+		PROCEDURE { OVERRIDE } BeginComment*;
 		BEGIN INC(commentCount); IF commentCount = 1 THEN SetColor END;
 		END BeginComment;
 
-		PROCEDURE EndComment*;
+		PROCEDURE { OVERRIDE } EndComment*;
 		BEGIN DEC(commentCount); IF commentCount = 0 THEN SetColor END;
 		END EndComment;
 
-		PROCEDURE BeginKeyword*;
+		PROCEDURE { OVERRIDE } BeginKeyword*;
 		BEGIN INC(keywordCount);  IF keywordCount = 1 THEN SetStyle END;
 		END BeginKeyword;
 
-		PROCEDURE EndKeyword*;
+		PROCEDURE { OVERRIDE } EndKeyword*;
 		BEGIN DEC(keywordCount); IF keywordCount = 0 THEN SetStyle END;
 		END EndKeyword;
 
-		PROCEDURE AlertString*(CONST s: ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } AlertString*(CONST s: ARRAY OF CHAR);
 		BEGIN
 			BeginAlert; w.String(s); EndAlert;
 		END AlertString;
@@ -87,15 +87,15 @@ TYPE
 			writer := w;
 		END Init;
 
-		PROCEDURE Error* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Error* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN Print (writer, source, position, Diagnostics.TypeError, message);
 		END Error;
 
-		PROCEDURE Warning* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Warning* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN Print (writer, source, position, Diagnostics.TypeWarning, message);
 		END Warning;
 
-		PROCEDURE Information* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
+		PROCEDURE { OVERRIDE } Information* (CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR);
 		BEGIN Print (writer, source, position, Diagnostics.TypeInformation, message);
 		END Information;
 

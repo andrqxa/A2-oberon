@@ -39,7 +39,7 @@ TYPE
 			size, sectors, heads, tracks: SIGNED32;
 			gap, rate, spec1, spec2, fgap: CHAR;
 
-		PROCEDURE Transfer*(op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Transfer*(op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: INTEGER);
 		BEGIN
 			Transfer1(SELF, op, start, num, buf, ofs, res);
 			IF Disks.Stats THEN
@@ -61,12 +61,12 @@ TYPE
 			END;
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			GetSize1(SELF, size, res)
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message;  VAR res: INTEGER);
+		PROCEDURE { OVERRIDE } Handle*(VAR msg: Disks.Message;  VAR res: INTEGER);
 		BEGIN
 			Handle1(SELF, msg, res)
 		END Handle;

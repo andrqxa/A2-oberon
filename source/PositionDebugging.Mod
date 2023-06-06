@@ -27,7 +27,7 @@ TYPE
 			WM.ExtAddWindow(SELF, 50, 50,{WM.FlagStayOnTop})
 		END New;
 
-		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y:SIZE; keys:SET);
 		BEGIN
 			lastX := bounds.l+x; lastY:=bounds.t+y;
 			IF keys = {0} THEN
@@ -47,7 +47,7 @@ TYPE
 			Close;
 		END HandleClose;
 
-		PROCEDURE PointerMove*(x,y:SIZE; keys:SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x,y:SIZE; keys:SET);
 		VAR dx, dy : SIZE;
 		BEGIN
 			IF dragging THEN
@@ -57,12 +57,12 @@ TYPE
 			END
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y:SIZE; Keys:SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y:SIZE; Keys:SET);
 		BEGIN
 			dragging := FALSE
 		END PointerUp;
 
-		PROCEDURE Handle*(VAR x: WMMessages.Message);
+		PROCEDURE { OVERRIDE } Handle*(VAR x: WMMessages.Message);
 		BEGIN
 			Handle^(x)
 		END Handle;
@@ -89,7 +89,7 @@ TYPE
 		viewMode*, color* : WMProperties.Int32Property;
 
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		BEGIN
 			DrawBackground^(canvas);
 			canvas.SetColor(color.Get());
@@ -97,12 +97,12 @@ TYPE
 			WMGraphics.DrawStringInRect(canvas, GetClientRect(), FALSE, WMGraphics.AlignCenter, WMGraphics.AlignCenter, str^)
 		END DrawBackground;
 
-		PROCEDURE PropertyChanged*(sender, property: ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property: ANY);
 		BEGIN
 			PropertyChanged^(sender, property);
 		END PropertyChanged;
 
-		PROCEDURE & Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			NEW(str, 24);
@@ -113,7 +113,7 @@ TYPE
 			SetNameAsString(StrDebugComponent);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 		END Initialize;

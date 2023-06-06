@@ -519,7 +519,7 @@ TYPE
 		quality : BOOLEAN;
 		preview : BOOLEAN;
 
-	PROCEDURE &New*;
+	PROCEDURE (* OVERRIDE *) & New*;
 		BEGIN
 			NEW(properties);
 			NEW(props, SELF); vAlign := 0;
@@ -556,7 +556,7 @@ TYPE
 			Redraw;
 		END ClickHandler;
 
-		PROCEDURE Clone*(): DTPData.ContentObject;			(* clone all the current properties *)
+		PROCEDURE { OVERRIDE } Clone*(): DTPData.ContentObject;			(* clone all the current properties *)
 		VAR newObj: TextObject;
 		BEGIN
 			NEW(newObj); newObj.contentName := Strings.NewString(contentName^);
@@ -584,13 +584,13 @@ TYPE
 			Redraw;
 		END InvalidateRect;
 
-		PROCEDURE SetFocus*(focus: BOOLEAN);
+		PROCEDURE { OVERRIDE } SetFocus*(focus: BOOLEAN);
 		BEGIN
 			SetFocus^(focus);
 			Redraw;
 		END SetFocus;
 
-		PROCEDURE FocusLost*;
+		PROCEDURE { OVERRIDE } FocusLost*;
 		BEGIN
 			FocusLost^;
 			cursor.SetVisible(FALSE);
@@ -598,14 +598,14 @@ TYPE
 			Redraw;
 		END FocusLost;
 
-		PROCEDURE FocusReceived*;
+		PROCEDURE { OVERRIDE } FocusReceived*;
 		BEGIN
 			FocusReceived^;
 			cursor.SetVisible(TRUE);
 			Redraw;
 		END FocusReceived;
 
-		PROCEDURE GetPluginPointer*(): WMWindowManager.PointerInfo;
+		PROCEDURE { OVERRIDE } GetPluginPointer*(): WMWindowManager.PointerInfo;
 		VAR manager : WMWindowManager.WindowManager;
 		BEGIN
 			manager := WMWindowManager.GetDefaultManager();
@@ -619,7 +619,7 @@ TYPE
 			layout.FullLayout(firstPos, firstLineI); CheckNumberOfLines;
 		END BordersChanged;
 
-		PROCEDURE SetSize*(w, h: SIZE);
+		PROCEDURE { OVERRIDE } SetSize*(w, h: SIZE);
 		VAR obj: TextObject;
 		BEGIN
 			SetSize^(w, h);
@@ -636,7 +636,7 @@ TYPE
 			END;
 		END SetSize;
 
-		PROCEDURE Resize*(zoom : FLOAT32);
+		PROCEDURE { OVERRIDE } Resize*(zoom : FLOAT32);
 		BEGIN
 			Resize^(zoom);
 			(* layout.FullLayout; CheckNumberOfLines; *)
@@ -1756,7 +1756,7 @@ TYPE
 			END;
 		END RenderAboveTextMarkers;
 
-		PROCEDURE PointerDown*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerDown*(x, y: SIZE; keys: SET);
 		VAR pos, a, b : SIZE; ch: Char32;
 			selectionText: Texts.Text;
 			from, to: Texts.TextPosition;
@@ -1808,7 +1808,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerMove*(x, y: SIZE; keys: SET);
 		VAR pos: SIZE;
 		BEGIN
 			(*KernelLog.String("Pointer Move"); KernelLog.Ln; *)
@@ -1834,7 +1834,7 @@ TYPE
 			(* KernelLog.Int(x, 0); KernelLog.String(" : "); KernelLog.Int(y, 0);KernelLog.Ln; *)
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y: SIZE; keys: SET);
+		PROCEDURE { OVERRIDE } PointerUp*(x, y: SIZE; keys: SET);
 		BEGIN
 			(* KernelLog.String("Pointer Up (selecting = FALSE)"); KernelLog.Ln; *)
 			selecting := FALSE;
@@ -1842,7 +1842,7 @@ TYPE
 			dragPossible := FALSE
 		END PointerUp;
 
-		PROCEDURE KeyEvent*(ucs: SIZE; flags: SET; VAR keysym: SIZE);
+		PROCEDURE { OVERRIDE } KeyEvent*(ucs: SIZE; flags: SET; VAR keysym: SIZE);
 		BEGIN
 			modifierFlags := flags;
 			(* KernelLog.String("KeyPressed"); KernelLog.Int(ucs, 0); KernelLog.Ln; *)
@@ -2258,7 +2258,7 @@ TYPE
 			text.ReleaseRead
 		END End;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE;  zoomF: FLOAT32; quality, preview: BOOLEAN);
+		PROCEDURE { OVERRIDE } Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE;  zoomF: FLOAT32; quality, preview: BOOLEAN);
 		VAR la, lb, i, top : SIZE; cliprect : WMRectangles.Rectangle; cstate : WMGraphics.CanvasState;
 			t: SIZE;
 			color: SIGNED32;
@@ -2369,7 +2369,7 @@ TYPE
 			canvas.RestoreState(canvasState);
 *)		END Draw;
 
-		PROCEDURE Redraw*;
+		PROCEDURE { OVERRIDE } Redraw*;
 		BEGIN
 			Redraw^;
 		END Redraw;
@@ -2391,7 +2391,7 @@ TYPE
 			END;
 		END GetFont;
 
-		PROCEDURE OnDelete*;
+		PROCEDURE { OVERRIDE } OnDelete*;
 		VAR textObj, tempObj : TextObject;
 			text: Texts.Text;
 		BEGIN
@@ -2412,7 +2412,7 @@ TYPE
 			END;
 		END OnDelete;
 
-		PROCEDURE Load*(elem: XML.Element);
+		PROCEDURE { OVERRIDE } Load*(elem: XML.Element);
 		VAR str : Strings.String;
 			node, para, span, tc: XMLObjects.Enumerator;
 			ptr: ANY;
@@ -2656,7 +2656,7 @@ TYPE
 
 		END Load;
 
-		PROCEDURE FixLinks*;
+		PROCEDURE { OVERRIDE } FixLinks*;
 		VAR obj: DTPData.ContentObject;
 		BEGIN
 			obj := ownerDoc.GetContentByName(chainNextN);
@@ -2665,7 +2665,7 @@ TYPE
 			IF obj # NIL THEN chainPrev := obj(TextObject); END;
 		END FixLinks;
 
-		PROCEDURE Store*(VAR w: Files.Writer);
+		PROCEDURE { OVERRIDE } Store*(VAR w: Files.Writer);
 		VAR tempString: ARRAY 256 OF CHAR;
 			cStyle : Texts.CharacterStyle;
 			pStyle : Texts.ParagraphStyle;
@@ -2810,12 +2810,12 @@ TYPE
 
 		END Store;
 
-		PROCEDURE Show*(x, y: SIZE);
+		PROCEDURE { OVERRIDE } Show*(x, y: SIZE);
 		BEGIN
 			props.Show(x, y);
 		END Show;
 
-		PROCEDURE Hide*;
+		PROCEDURE { OVERRIDE } Hide*;
 		VAR viewport: WMWindowManager.ViewPort;
 		BEGIN
 			viewport := WMWindowManager.GetDefaultView();
@@ -2823,7 +2823,7 @@ TYPE
 			props.Hide;
 		END Hide;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			Hide;
 		END Close;
@@ -3097,7 +3097,7 @@ TYPE
 			END;
 		END InsertImg;
 
-		PROCEDURE Close*;
+		PROCEDURE { OVERRIDE } Close*;
 		BEGIN
 			shown := FALSE;
 			Hide;

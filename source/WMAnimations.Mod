@@ -32,7 +32,7 @@ TYPE
 		state : SIGNED32;
 		timer : Kernel.Timer;
 
-		PROCEDURE &Init*;
+		PROCEDURE (* OVERRIDE *) & Init*;
 		BEGIN
 			Init^;
 			SetNameAsString(StrAnimation);
@@ -47,13 +47,13 @@ TYPE
 			NEW(timer);
 		END Init;
 
-		PROCEDURE Initialize*;
+		PROCEDURE { OVERRIDE } Initialize*;
 		BEGIN
 			Initialize^;
 			Acquire; LoadImages; Release; Invalidate;
 		END Initialize;
 
-		PROCEDURE PropertyChanged*(sender, property : ANY);
+		PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF (property = imageName) THEN
 				LoadImages; Invalidate;
@@ -93,7 +93,7 @@ TYPE
 			timer.Wakeup;
 		END LoadImages;
 
-		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		PROCEDURE { OVERRIDE } DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR  name : Strings.String;
 		BEGIN
 			DrawBackground^(canvas);
@@ -119,7 +119,7 @@ TYPE
 			END;
 		END SetState;
 
-		PROCEDURE Finalize*;
+		PROCEDURE { OVERRIDE } Finalize*;
 		BEGIN
 			Finalize^;
 			SetState(State_Terminated);
