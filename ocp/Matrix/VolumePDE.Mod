@@ -445,7 +445,7 @@ TYPE
 			wait:=FALSE; (*debug*)
 			SELF.priority:=Objects.Normal; 
 		END Init;
-		PROCEDURE compute;	
+		PROCEDURE { OVERRIDE } compute;	
 		BEGIN
 			tmp:=op(B,Nabla.centered);
 			A:=INCMUL(s,tmp);
@@ -473,7 +473,7 @@ TYPE
 			wait:=FALSE; (*debug*)
 			SELF.priority:=Objects.Normal; 
 		END Init;
-		PROCEDURE compute;	
+		PROCEDURE { OVERRIDE } compute;	
 		BEGIN
 			diffusion.SolveMultigrid(u, u1, nu, dt, ds, threshold, minsize, diffusioniterations, smoothingiterations, bounds, emphasis ); 
 		END compute;
@@ -498,7 +498,7 @@ TYPE
 			SELF.priority:=Objects.Normal; 
 			SELF.fromZ:=fromZ; SELF.toZ:=toZ;
 		END Init;
-		PROCEDURE compute;	
+		PROCEDURE { OVERRIDE } compute;	
 		BEGIN
 			Advect( a,  u, v, w, a1, dt, ds, mode, mask, fromZ,toZ );
 		END compute;

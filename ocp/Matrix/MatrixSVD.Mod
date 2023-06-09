@@ -200,7 +200,7 @@ TYPE
 			vt:=[[-cosTheta,sinTheta],[-sinTheta,-cosTheta]];
 	    END decompose2x2;
 		
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		VAR i: SIZE;
 		BEGIN
 			IF (LEN( tmp, 0 ) # LEN( w, 0 )) OR (LEN( tmp, 1 ) # LEN( w, 1 )) THEN NEW( tmp, LEN( w, 0 ), LEN( w, 1 ) );  ELSE tmp := 0 END;

@@ -92,7 +92,7 @@ TYPE Panel*= OBJECT (WMStandardComponents.ImagePanel) (*! tbd: convert some loca
 		RecacheProperties;
 	END Init;
 
-	PROCEDURE HandleInternal*(VAR x : WMMessages.Message);
+	PROCEDURE { OVERRIDE } HandleInternal*(VAR x : WMMessages.Message);
 		VAR filename: Files.FileName; f:Files.File; w:Streams.Writer; fw:Files.Writer; dw:GZip.DeflateWriter;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgSerialize) & (x.msgSubType = WMMessages.MsgSubSerializeData) THEN
@@ -116,18 +116,18 @@ TYPE Panel*= OBJECT (WMStandardComponents.ImagePanel) (*! tbd: convert some loca
 			END;
 	END HandleInternal;
 
-	PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
+	PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET);
 		BEGIN
 			mx0:=x; my0:=y;
 			PointerDown^(x,y,keys);
 		END PointerDown;
 
-	PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+	PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN
 			mx1:=x; my1:=y;
 		END PointerUp;
 
-	PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+	PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF keys={2} THEN
 				mx1:=x; my1:=y;
@@ -141,7 +141,7 @@ TYPE Panel*= OBJECT (WMStandardComponents.ImagePanel) (*! tbd: convert some loca
 			END;
 		END PointerMove;
 
-	PROCEDURE WheelMove*(dz : SIZE);
+	PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 	VAR s: ARRAY 16 OF CHAR;
 		BEGIN
 			IF DIM(data.m)=3 THEN current:=(current - dz) MOD LEN(data.m, orientation.Get()); (*! to do: fix for 3D, 2D, nD*)
@@ -160,7 +160,7 @@ TYPE Panel*= OBJECT (WMStandardComponents.ImagePanel) (*! tbd: convert some loca
 	(*The window can determine wether the key was pressed or released by examining the
 			Inputs.Release flag in flags. ucs contains the unicode equivalent of the key. Special input editors
 			send the generated unicode characters via KeyEvent.  *)
-	PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; VAR keysym : SIZE);
+	PROCEDURE { OVERRIDE } KeyEvent*(ucs : SIZE; flags : SET; VAR keysym : SIZE);
 		VAR dz: SIGNED32; s: ARRAY 32 OF CHAR; dim:SIZE;
 		BEGIN
 			IF ~(Inputs.Release IN flags )THEN
@@ -361,7 +361,7 @@ TYPE Panel*= OBJECT (WMStandardComponents.ImagePanel) (*! tbd: convert some loca
 		END;
 	END Render;
 
-	PROCEDURE PropertyChanged*(sender, property : ANY);
+	PROCEDURE { OVERRIDE } PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF property = model THEN RecacheProperties; (*implicit invalidate in RecacheProperties*)
 			ELSIF property=orientation THEN RecacheProperties;
@@ -371,14 +371,14 @@ TYPE Panel*= OBJECT (WMStandardComponents.ImagePanel) (*! tbd: convert some loca
 			END
 		END PropertyChanged;
 
-		PROCEDURE LinkChanged*(sender, link : ANY); (*TBD: there is reduncancy. ideally, only a LinkChanged message should be n*)
+		PROCEDURE { OVERRIDE } LinkChanged*(sender, link : ANY); (*TBD: there is reduncancy. ideally, only a LinkChanged message should be n*)
 		BEGIN
 			IF link = data THEN RecacheProperties;
 			ELSE	LinkChanged^(sender, link)
 			END
 		END LinkChanged;
 
-		PROCEDURE RecacheProperties*;
+		PROCEDURE { OVERRIDE } RecacheProperties*;
 		BEGIN
 			RecacheProperties^;
 			Render;

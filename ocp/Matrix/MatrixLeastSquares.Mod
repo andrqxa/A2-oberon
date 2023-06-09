@@ -18,7 +18,7 @@ TYPE
 			END;
 		END Init;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		BEGIN
 			IF qr#NIL THEN RETURN qr.Solve(b)
 			ELSIF svd#NIL THEN RETURN svd.Solve(b)
@@ -54,7 +54,7 @@ TYPE
 			IF solver = NIL THEN NEW( solver, qr.R );  ELSE solver.Init( qr.R ) END;
 		END Init;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		VAR b1: Vector;
 		BEGIN
 			b1 := qr.Q` * b;
@@ -86,7 +86,7 @@ TYPE
 			NEW( svd, A );
 		END Init;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		VAR b1: Vector;
 		BEGIN
 			b1 := svd.vt * svd.w * svd.u` * b;  (*to do: avoid temporary memory allocation here*)
@@ -116,7 +116,7 @@ TYPE TotalLeastSquares* = OBJECT  (MatrixBase.Solver) (* tested for Vector b and
 			SELF.A:=A;
 		END Init;
 
-		PROCEDURE Solve*(CONST b:Vector):Vector;
+		PROCEDURE { OVERRIDE } Solve*(CONST b:Vector):Vector;
 		VAR B,X: Matrix;
 		BEGIN
 			NEW(B,LEN(b,0),1);

@@ -66,7 +66,7 @@ TYPE
 			NEW( x, LEN( A,0 ) );
 		END Init;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		BEGIN
 			IF LEN( b, 0 ) # LEN( SysMatrix, 0 ) THEN
 				res := MatrixBase.SIZEMISMATCH;  handleError( res, 'MINRES: matrix-vector size missmatch!' );  RETURN x;
@@ -76,7 +76,7 @@ TYPE
 			RETURN MINRES( SysMatrix, b, x, Tolerance, nMaxIterations );
 		END Solve;
 
-		PROCEDURE SolveNoCopy*( VAR A: Matrix;
+		PROCEDURE { OVERRIDE } SolveNoCopy*( VAR A: Matrix;
 								CONST b: Vector ): Vector;
 		BEGIN
 			IF LEN( A ) = 0 THEN RETURN x;  END;

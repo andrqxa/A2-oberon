@@ -54,7 +54,7 @@ TYPE
 	END ComputeMMObject;
 
 	Mul* = OBJECT (ComputeMMObject)
-		PROCEDURE compute;
+		PROCEDURE { OVERRIDE } compute;
 		BEGIN
 			IF Distributed & (CService#NIL) THEN
 				CService.Request("MulMM", LEN(A,0)*LEN(A,1)*LEN(B,1), LEN(A,0)*LEN(A,1)+LEN(B,0)*LEN(B,1), LEN(A,0)*LEN(B,1), Objects.Normal); (*request a compute service with given compute complexity*)
@@ -70,14 +70,14 @@ TYPE
 	END Mul;
 
 	MulAdd* = OBJECT (ComputeMMObject)
-		PROCEDURE compute;
+		PROCEDURE { OVERRIDE } compute;
 		BEGIN
 			C:=C+A*B;
 		END compute;
 	END MulAdd;
 
 	MulSub* = OBJECT (ComputeMMObject)
-		PROCEDURE compute;
+		PROCEDURE { OVERRIDE } compute;
 		BEGIN
 			C:=C-A*B;
 		END compute;
@@ -92,7 +92,7 @@ TYPE
 		PROCEDURE Done1; BEGIN {EXCLUSIVE} done1:=TRUE END Done1;
 		PROCEDURE Done2; BEGIN {EXCLUSIVE} done2:=TRUE END Done2;
 		PROCEDURE Done12; BEGIN {EXCLUSIVE} done1:=TRUE; done2:=TRUE END Done12;
-		PROCEDURE compute;
+		PROCEDURE { OVERRIDE } compute;
 		BEGIN
 			divisor:=16 DIV SIZEOF(Datatype);
 			DEC(objects); (*do not count self if task is delegated*)
@@ -128,7 +128,7 @@ TYPE
 	END ComputeMVObject;
 
 	MulMV* = OBJECT (ComputeMVObject)
-		PROCEDURE compute;
+		PROCEDURE { OVERRIDE } compute;
 		BEGIN
 			C:=A*B;
 		END compute;
@@ -154,7 +154,7 @@ TYPE
 	END ComputeMSObject;
 
 	ScaleAddM* = OBJECT (ComputeMSObject)
-		PROCEDURE compute;
+		PROCEDURE { OVERRIDE } compute;
 		BEGIN
 			B:=B+s*A;
 		END compute;

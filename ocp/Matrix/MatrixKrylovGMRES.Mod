@@ -59,7 +59,7 @@ TYPE
 			NEW( x, LEN( A,0 ) );
 		END Init;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		VAR i: SIZE;
 		BEGIN
 			IF LEN( b, 0 ) # LEN( SysMatrix, 0 ) THEN
@@ -78,7 +78,7 @@ TYPE
 			RETURN GMRES( SysMatrix, b, x, Tolerance, nMaxIterations, nRestart );
 		END Solve;
 
-		PROCEDURE SolveNoCopy*( VAR A: Matrix;CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } SolveNoCopy*( VAR A: Matrix;CONST b: Vector ): Vector;
 		VAR i: SIZE;
 		BEGIN
 			IF LEN( A ) = 0 THEN RETURN x;  END;

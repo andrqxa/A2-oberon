@@ -51,12 +51,12 @@ TYPE
 			postsmooth:=4;
 		END Init;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;  (* generic parameterless solving *)
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;  (* generic parameterless solving *)
 		BEGIN
 			RETURN SolveNoCopy(A,b);
 		END Solve;
 
-		PROCEDURE SolveNoCopy*( VAR M:Matrix; CONST b: Vector ): Vector;  (* generic solving, no internal copy of system matrix*)
+		PROCEDURE { OVERRIDE } SolveNoCopy*( VAR M:Matrix; CONST b: Vector ): Vector;  (* generic solving, no internal copy of system matrix*)
 		VAR B:Matrix; i,j:SIGNED32;
 		BEGIN
 			IF level = 0 THEN

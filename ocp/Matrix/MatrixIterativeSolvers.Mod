@@ -39,7 +39,7 @@ TYPE
 	(*note that the sweep direction may have an important effect on convergence speed: http://www.cfd-online.com/Wiki/Gauss-Seidel_method; this is not yet used in this implementation *)
 TYPE
 	GaussSeidel* = OBJECT (IterativeSolver)
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		VAR i: SIZE;  r: Datatype;
 		BEGIN
 			IF LEN( A, 0 ) # LEN( b ) THEN res := Base.SIZEMISMATCH;  handleError( res, "GaussSeidel: matrix / vector size mismatch" );  RETURN x END;
@@ -58,7 +58,7 @@ TYPE
 			END;
 		END Solve;
 
-		PROCEDURE Step*( CONST b: Vector;  VAR x: Vector );   (*compute single step of GaussSeidel, e.g. as a smoother*)
+		PROCEDURE { OVERRIDE } Step*( CONST b: Vector;  VAR x: Vector );   (*compute single step of GaussSeidel, e.g. as a smoother*)
 		VAR i: SIZE;  r: Datatype;
 		BEGIN
 			FOR i := 0 TO LEN( x,0 ) - 1 DO r := b[i] - A[i] +* x;  x[i] := x[i] + r / A[i, i];  END;
@@ -76,7 +76,7 @@ TYPE
 			Init^( A );  omega := DefaultOmega;  x := InvDiag( A );
 		END Init;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		VAR r: Datatype;  i: SIZE;
 		BEGIN
 			IF LEN( A, 0 ) # LEN( b ) THEN res := Base.SIZEMISMATCH;  handleError( res, "GaussSeidelSOR: matrix / vector size mismatch" );  RETURN x END;
@@ -95,7 +95,7 @@ TYPE
 			END;
 		END Solve;
 
-		PROCEDURE Step*( CONST b: Vector;  VAR x: Vector );   (*compute single step of GaussSeidelSOR, e.g. as a smoother*)
+		PROCEDURE { OVERRIDE } Step*( CONST b: Vector;  VAR x: Vector );   (*compute single step of GaussSeidelSOR, e.g. as a smoother*)
 		VAR i: SIZE;  r: Datatype;
 		BEGIN
 			FOR i := 0 TO LEN( x,0 ) - 1 DO r := b[i] - A[i] +* x;  x[i] := (1 - omega) * x[i] + omega * (r / A[i, i] + x[i]);  END;
@@ -112,7 +112,7 @@ TYPE
 			Init^( A );  iDA := InvDiag( A );
 		END Init;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		BEGIN
 			iteration := 0;
 			IF LEN( A, 0 ) # LEN( b ) THEN res := Base.SIZEMISMATCH;  handleError( res, "Jacobi: matrix / vector size mismatch" );  RETURN x END;
@@ -127,7 +127,7 @@ TYPE
 			END;
 		END Solve;
 
-		PROCEDURE Step*( CONST b: Vector;  VAR x: Vector );   (*compute single step of Jacobi, e.g. as a smoother*)
+		PROCEDURE { OVERRIDE } Step*( CONST b: Vector;  VAR x: Vector );   (*compute single step of Jacobi, e.g. as a smoother*)
 		BEGIN
 			residual := A * x;  residual := b - residual;  x := x + residual .* iDA;
 		END Step;
@@ -140,7 +140,7 @@ TYPE
 	VAR p, Ap: Vector;
 		a, rTr, rTr2: Datatype;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		BEGIN
 			IF LEN( A, 0 ) # LEN( b ) THEN res := Base.SIZEMISMATCH;  handleError( res, "Jacobi: matrix / vector size mismatch" );  RETURN x END;
 			IF LEN( p ) # LEN( b ) THEN NEW( p, LEN( b,0 ) ) ELSE p := 0 END;

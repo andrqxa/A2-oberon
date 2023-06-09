@@ -66,7 +66,7 @@ TYPE
 			OUTPUT:
 				class labels for each vector from the input set (0 or 1) [nSamples]
 		*)
-		PROCEDURE EvaluateScalarN(CONST input: Matrix): Vector;
+		PROCEDURE { OVERRIDE } EvaluateScalarN(CONST input: Matrix): Vector;
 		VAR
 			i: SIZE;
 			K: Matrix;
@@ -128,7 +128,7 @@ TYPE
 				X - set of feature vectors [ nSamples x nDims ]
 				labels - label for each feature vector [ nSamples ]
 		*)
-		PROCEDURE LearnScalarN(CONST input: Matrix; CONST labels: Vector);
+		PROCEDURE { OVERRIDE } LearnScalarN(CONST input: Matrix; CONST labels: Vector);
 		VAR
 			i, n1, n2: SIZE;
 			ind: ARRAY [*] OF SIZE;

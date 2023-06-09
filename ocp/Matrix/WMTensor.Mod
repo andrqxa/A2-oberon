@@ -95,7 +95,7 @@ TYPE Window*= OBJECT (WM.BufferWindow) (* or could use WM.DoubleBufferWindow or 
 			IF (sequencer#NIL) & sequencer.Add(m) THEN END; (* Invalidate window contents when first put on display. *)
 	END PostInvalidate;
 
-	PROCEDURE Handle*(VAR x : WMMessages.Message);
+	PROCEDURE { OVERRIDE } Handle*(VAR x : WMMessages.Message);
 		VAR filename: Files.FileName; f:Files.File; w:Files.Writer;
 		BEGIN
 			IF (x.msgType = WMMessages.MsgSerialize) THEN
@@ -117,17 +117,17 @@ TYPE Window*= OBJECT (WM.BufferWindow) (* or could use WM.DoubleBufferWindow or 
 	END Handle;
 
 
-	PROCEDURE PointerDown*(x, y : SIZE; keys : SET); (* does not work ... ?? *)
+	PROCEDURE { OVERRIDE } PointerDown*(x, y : SIZE; keys : SET); (* does not work ... ?? *)
 		BEGIN
 			mx0:=x; my0:=y;
 		END PointerDown;
 
-	PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
+	PROCEDURE { OVERRIDE } PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN
 			mx1:=x; my1:=y;
 		END PointerUp;
 
-	PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
+	PROCEDURE { OVERRIDE } PointerMove*(x, y : SIZE; keys : SET);
 		BEGIN
 			IF keys={2} THEN
 				mx1:=x; my1:=y;
@@ -140,7 +140,7 @@ TYPE Window*= OBJECT (WM.BufferWindow) (* or could use WM.DoubleBufferWindow or 
 			END;
 		END PointerMove;
 
-	PROCEDURE WheelMove*(dz : SIZE);
+	PROCEDURE { OVERRIDE } WheelMove*(dz : SIZE);
 	VAR s: ARRAY 16 OF CHAR;
 		BEGIN
 			IF DIM(model.m)=3 THEN current:=(current - dz) MOD LEN(model.m,orientation); (*! to do: fix for 3D, 2D, nD*)
@@ -155,7 +155,7 @@ TYPE Window*= OBJECT (WM.BufferWindow) (* or could use WM.DoubleBufferWindow or 
 	(*The window can determine wether the key was pressed or released by examining the
 			Inputs.Release flag in flags. ucs contains the unicode equivalent of the key. Special input editors
 			send the generated unicode characters via KeyEvent.  *)
-	PROCEDURE KeyEvent(ucs : SIZE; flags : SET; keysym : SIZE);
+	PROCEDURE { OVERRIDE } KeyEvent(ucs : SIZE; flags : SET; keysym : SIZE);
 		VAR dz: SIGNED32; s: ARRAY 16 OF CHAR; dim:SIZE;
 		BEGIN
 			IF ~(Inputs.Release IN flags )THEN

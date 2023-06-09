@@ -355,7 +355,7 @@ TYPE
 			END;
 		END Inverse;
 		*)
-		PROCEDURE SolveNoCopy*( VAR A: Matrix;  CONST b: Vector ): Vector;   (* no internal matrix copying overhead; Initialize with zero size matrix for this case.  note: the matrix A is altered in this case; *)
+		PROCEDURE { OVERRIDE } SolveNoCopy*( VAR A: Matrix;  CONST b: Vector ): Vector;   (* no internal matrix copying overhead; Initialize with zero size matrix for this case.  note: the matrix A is altered in this case; *)
 		BEGIN
 			IF pivot=NONE THEN decomposeNoPivot( A );
 			ELSIF LEN(A,0)<300 THEN decompose( A )
@@ -364,7 +364,7 @@ TYPE
 			backsubstitute( A, b );  RETURN x
 		END SolveNoCopy;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;   (** Solver; needs solver initialized with matrix A  *)
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;   (** Solver; needs solver initialized with matrix A  *)
 		BEGIN
 			IF  LEN(lu,0)=0 THEN HALT(100) END;
 			backsubstitute( lu, b );  RETURN x
@@ -417,7 +417,7 @@ TYPE
 		END SwapRows;
 
 	(** Solve by Gaussian elimination algorithm  with row pivoting *) (*currently 10-20 times slower than LU. to do: avoid  explicit copying of rows by using indexing approach as in LU ?*)
-		PROCEDURE Solve*( CONST b:Vector): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b:Vector): Vector;
 			VAR 		i, j, k, m, n, maxi, u: SIZE;  val, max, Auj: Datatype;
 			BEGIN
 			IF LEN( x,0 ) # LEN( b,0 ) THEN NEW( x, LEN( b,0 ) ) ELSE x := 0;  END;
@@ -457,7 +457,7 @@ TYPE
 		END Solve;
 
 		 (* no internal matrix copying overhead;  note: the matrix A is altered in this case; *)
-		PROCEDURE SolveNoCopy*( VAR A: Matrix;  CONST b: Vector ): Vector;   (* no internal matrix copying overhead; Initialize with zero size matrix for this case.  note: the matrix A is altered in this case; *)
+		PROCEDURE { OVERRIDE } SolveNoCopy*( VAR A: Matrix;  CONST b: Vector ): Vector;   (* no internal matrix copying overhead; Initialize with zero size matrix for this case.  note: the matrix A is altered in this case; *)
 		BEGIN
 			res := OK;
 			SELF.A:= ALIAS OF A; (* this system function available only in newer compiler version *)
@@ -552,7 +552,7 @@ TYPE
 			x:=Ainv*B;
 		END backsubstitute;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		BEGIN
 			IF LEN( b,0 ) # LEN( Ainv, 0 ) THEN res := SIZEMISMATCH;  handleError( res, "Gauss-Jordan: Size mismatch " );  RETURN x END;
 			backsubstitute( b );  RETURN x;
@@ -628,13 +628,13 @@ TYPE
 			END;
 		END backsubstitute;
 
-		PROCEDURE SolveNoCopy*( VAR A: Matrix;  CONST b: Vector ): Vector;   (** no internal matrix copying overhead; Initialize with zero size matrix for this case.  note: the matrix A is altered in this case; *)
+		PROCEDURE { OVERRIDE } SolveNoCopy*( VAR A: Matrix;  CONST b: Vector ): Vector;   (** no internal matrix copying overhead; Initialize with zero size matrix for this case.  note: the matrix A is altered in this case; *)
 		BEGIN
 			Q := ALIAS OF A;
 			decompose;  backsubstitute( b );  RETURN x
 		END SolveNoCopy;
 
-		PROCEDURE Solve*( CONST b: Vector ): Vector;
+		PROCEDURE { OVERRIDE } Solve*( CONST b: Vector ): Vector;
 		BEGIN
 			IF LEN(x,0)#LEN(Q,1) THEN NEW(x,LEN(Q,1)) ELSE x:=0 END;
 			backsubstitute(b);

@@ -77,7 +77,7 @@ TYPE
 				X - set of input points [nSamples x nDims]
 				y - output given by supervisor [nSamples]
 		*)
-		PROCEDURE LearnScalarN*(CONST X: Matrix; CONST y: Vector);
+		PROCEDURE { OVERRIDE } LearnScalarN*(CONST X: Matrix; CONST y: Vector);
 		VAR
 			i: SIZE;
 			A: Matrix;
@@ -113,7 +113,7 @@ TYPE
 			OUTPUT:
 				evaluated value
 		*)
-		PROCEDURE EvaluateScalar*(CONST x: Vector): Scalar;
+		PROCEDURE { OVERRIDE } EvaluateScalar*(CONST x: Vector): Scalar;
 		VAR
 			X1: Matrix;
 			y: Vector;
@@ -132,7 +132,7 @@ TYPE
 			OUTPUT:
 				evaluated values [nSamples]
 		*)
-		PROCEDURE EvaluateScalarN*(CONST X: Matrix): Vector;
+		PROCEDURE { OVERRIDE } EvaluateScalarN*(CONST X: Matrix): Vector;
 		VAR
 			y: Vector;
 			K: Matrix;
