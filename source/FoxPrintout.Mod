@@ -775,7 +775,7 @@ TYPE
 			ELSE
 				CASE x.id OF
 				Global.New:
-					w.String("NEW ");
+					Keyword("NEW ");
 					IF x.expression # NIL THEN
 						Expression(x.expression);
 					END;

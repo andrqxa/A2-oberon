@@ -6592,7 +6592,7 @@ TYPE
 				END;
 				IF procedure.scope IS SyntaxTree.RecordScope THEN
 					record := procedure.scope(SyntaxTree.RecordScope).ownerRecord;
-					IF record.isFinal THEN procedure.SetFinal(TRUE) END;
+					IF record.isFinal & ~procedure.isConstructor & ~procedure.isFinalizer THEN procedure.SetFinal(TRUE) END;
 					procedureType.SetDelegate(TRUE);
 
 					IF (record.pointerType # NIL) & (procedureType.selfParameterInObject = NIL) THEN
