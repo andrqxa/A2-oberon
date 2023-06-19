@@ -1641,7 +1641,7 @@ END
 		END
 	END B;
 
-	PROCEDURE SplitHostPort*(VAR url, host: ARRAY OF CHAR; VAR port: SIGNED16);
+	PROCEDURE SplitHostPort*(VAR url, host: ARRAY OF CHAR; VAR port: UNSIGNED16);
 		VAR
 			i, j: SIGNED16;
 			val: SIGNED32;
@@ -1679,7 +1679,7 @@ END
 			attr, label: ARRAY 64 OF CHAR;
 			s: HyperDocs.LinkScheme;
 			key: SIGNED32;
-			port: SIGNED16;
+			port: UNSIGNED16;
 	BEGIN
 		IF on THEN
 			P := S.page;

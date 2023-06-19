@@ -944,7 +944,7 @@ END OutMsg;
 PROCEDURE Receiver(me: Oberon.Task);
 	VAR
 		rAddr,len,t: SIGNED32;
-		i, msgLen, pos, rPort: SIGNED16;
+		i, msgLen, pos: SIGNED16; rPort: UNSIGNED16;
 		src: Client;
 		curCon:Connection;
 		adr: NetSystem.IPAdr;

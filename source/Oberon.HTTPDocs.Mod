@@ -31,7 +31,7 @@ MODULE HTTPDocs IN Oberon;	(** portable *) (* ejz,  *)
 			host: ARRAY NetTools.ServerStrLen OF CHAR;
 			path: ARRAY NetTools.PathStrLen OF CHAR;
 			coded: ARRAY 64 OF CHAR;
-			port: SIGNED16;
+			port: UNSIGNED16;
 			next: Authorization
 		END;
 		Cookie = POINTER TO CookieDesc;
@@ -108,7 +108,7 @@ MODULE HTTPDocs IN Oberon;	(** portable *) (* ejz,  *)
 		dest[d] := 0X
 	END EncBase64;
 
-	PROCEDURE GetAuthorization(VAR host, path: ARRAY OF CHAR; port: SIGNED16): Authorization;
+	PROCEDURE GetAuthorization(VAR host, path: ARRAY OF CHAR; port: UNSIGNED16): Authorization;
 		VAR aut: Authorization;
 	BEGIN
 		aut := authorizations;
@@ -263,7 +263,7 @@ END ListCookies;
 			i, j: SIGNED32;
 			aut: Authorization;
 			cookie: Cookie;
-			port: SIGNED16;
+			port: UNSIGNED16;
 			ch: CHAR;
 	BEGIN
 		aut := NIL;
@@ -504,7 +504,7 @@ END ListCookies;
 			location: ARRAY NetTools.MaxLine OF CHAR;
 			host: ARRAY NetTools.ServerStrLen OF CHAR;
 			base: HyperDocs.DefURL;
-			port: SIGNED16;
+			port: UNSIGNED16;
 	BEGIN
 		status := 0; HyperDocs.RetrieveLink(key, location);
 		NetTools.SplitHostPort(location, host, port);
@@ -579,7 +579,7 @@ END ListCookies;
 			status: SIGNED32;
 			proxy: HTTPDocs0.Proxy;
 			T: Texts.Text;
-			port: SIGNED16;
+			port: UNSIGNED16;
 			useProxy: BOOLEAN;
 	BEGIN
 		WITH L: HyperDocs.LinkScheme DO

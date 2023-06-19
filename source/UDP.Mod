@@ -54,7 +54,7 @@ TYPE
 	Socket* = OBJECT
 		VAR
 			next: Socket; (* link for socket pool *)
-			lport: SIGNED32; (* local port *)
+			lport: UNSIGNED32; (* local port *)
 
 			hdr: ARRAY UDPHdrLen OF CHAR; (* UDP prototype header for sending *)
 			pseudoHdr: ARRAY MaxPseudoHdrLen OF CHAR; (* pseudo header for calculating checksum *)
@@ -70,7 +70,7 @@ TYPE
 
 
 		(** Constructor *)
-		PROCEDURE &Open*(lport: SIGNED32; VAR res: INTEGER);
+		PROCEDURE &Open*(lport: UNSIGNED32; VAR res: INTEGER);
 		BEGIN
 			open := TRUE;
 			ASSERT((lport >= 0) & (lport < 10000H));
@@ -91,7 +91,7 @@ TYPE
 
 		(** Send a UDP datagram to the foreign address specified by "fip" and "fport".
 			The data is in "data[ofs..ofs+len-1]".  In case of concurrent sends the datagrams are serialized. *)
-		PROCEDURE Send*(fip: IP.Adr; fport: SIGNED32; CONST data: ARRAY OF CHAR; ofs, len: SIZE; VAR res: INTEGER);
+		PROCEDURE Send*(fip: IP.Adr; fport: UNSIGNED32; CONST data: ARRAY OF CHAR; ofs, len: SIZE; VAR res: INTEGER);
 		VAR
 			int: IP.Interface;
 
@@ -112,7 +112,7 @@ TYPE
 
 		(** Send a broadcast UDP datagram via interface "int" to port "lport". Normally only used by DHCP.
 			The data is in "data[ofs..ofs+len-1]".  In case of concurrent sends the datagrams are serialized. *)
-		PROCEDURE SendBroadcast*(int: IP.Interface; fport: SIGNED32; CONST data: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE SendBroadcast*(int: IP.Interface; fport: UNSIGNED32; CONST data: ARRAY OF CHAR; ofs, len: SIZE);
 		BEGIN {EXCLUSIVE}
 			ASSERT((fport >= 0) & (fport < 10000H));
 			ASSERT((len >= 0) & (len <= MaxUDPDataLen));
@@ -127,7 +127,7 @@ TYPE
 		"len" returns the actual datagram size and "data[ofs..ofs+len-1]" returns the data.
 		"res" returns "Timeout" in case of a timeout and "BufferOverflow" if the received datagram was too big.
 		*)
-		PROCEDURE Receive*(VAR data: ARRAY OF CHAR; ofs, size: SIZE; ms: SIGNED32; VAR fip: IP.Adr; VAR fport: SIGNED32; VAR len: SIZE; VAR res: INTEGER);
+		PROCEDURE Receive*(VAR data: ARRAY OF CHAR; ofs, size: SIZE; ms: SIGNED32; VAR fip: IP.Adr; VAR fport: UNSIGNED32; VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			buffer: Network.Buffer;
 			fragmentBuffer: Network.Buffer;
@@ -193,7 +193,7 @@ TYPE
 
 
 		(* Internal send operation. Called from "Send" and "SendBroadcast". *)
-		PROCEDURE DoSend(int: IP.Interface; fip: IP.Adr; fport: SIGNED32; CONST data: ARRAY OF CHAR; ofs, len: SIZE);
+		PROCEDURE DoSend(int: IP.Interface; fip: IP.Adr; fport: UNSIGNED32; CONST data: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR
 			sum: SIGNED32;
 			pseudoHdrLen: SIGNED32;
@@ -260,7 +260,7 @@ TYPE
 	SocketPool = OBJECT
 		VAR
 			table: ARRAY HashTableSize OF Socket;
-			eport: SIGNED32;
+			eport: UNSIGNED32;
 
 		(* Initialize the pool. *)
 		PROCEDURE &Init*;
@@ -274,7 +274,7 @@ TYPE
 
 
 		(* Look for the specified Socket *)
-		PROCEDURE Lookup(lport: SIGNED32): Socket;
+		PROCEDURE Lookup(lport: UNSIGNED32): Socket;
 		VAR item: Socket;
 		BEGIN
 			item := table[lport MOD HashTableSize];
@@ -290,7 +290,7 @@ TYPE
 		VAR
 			ok: BOOLEAN;
 			i: SIZE;
-			sport: SIGNED32;
+			sport: UNSIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF p.lport = NilPort THEN
 				(* find an unused ephemeral port *)

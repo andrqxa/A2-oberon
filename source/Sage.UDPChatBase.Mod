@@ -84,7 +84,7 @@ TYPE
 	Client* = OBJECT
 	VAR
 		ip*: IP.Adr;
-		port*: SIGNED32;
+		port*: UNSIGNED32;
 		inSeqNum*, outSeqNum*: SIGNED16;
 		uin*: SIGNED32;
 

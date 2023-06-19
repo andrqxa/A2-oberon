@@ -40,7 +40,7 @@ TYPE
 		connection : TCP.Connection; (* control connection to the server *)
 		dataCon : TCP.Connection;
 		dataIP : IP.Adr;
-		dataPort : SIGNED32;
+		dataPort : UNSIGNED32;
 		w : Streams.Writer; (* writer oo the control connection *)
 		r : Streams.Reader; (* reader on the control connection *)
 		msg- : ARRAY 4096 OF CHAR;
@@ -58,7 +58,7 @@ TYPE
 		END Init;
 
 
-		PROCEDURE Open*(CONST host, user, password : ARRAY OF CHAR; port : SIGNED32; VAR res : INTEGER);
+		PROCEDURE Open*(CONST host, user, password : ARRAY OF CHAR; port : UNSIGNED32; VAR res : INTEGER);
 		VAR fadr : IP.Adr;
 		BEGIN {EXCLUSIVE}
 			res := 0;
@@ -148,7 +148,7 @@ TYPE
 		END IsNum;
 
 		PROCEDURE GetDataConnection( VAR res : INTEGER);
-		VAR ch : CHAR; i, j : SIZE; ipstr : ARRAY 16 OF CHAR; p0, p1, port : SIGNED32;
+		VAR ch : CHAR; i, j : SIZE; ipstr : ARRAY 16 OF CHAR; p0, p1 : SIGNED32; port : UNSIGNED32;
 			str : ARRAY 32 OF CHAR;
 
 			PROCEDURE Fail;

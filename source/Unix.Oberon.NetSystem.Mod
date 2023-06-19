@@ -357,7 +357,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		RETURN conn.Available()
 	END Available;
 
-	PROCEDURE OpenConnection* ( VAR conn: Connection; locPort: SIGNED16; remIP: IPAdr; remPort: SIGNED16;
+	PROCEDURE OpenConnection* ( VAR conn: Connection; locPort: UNSIGNED16; remIP: IPAdr; remPort: UNSIGNED16;
 													VAR res: SIGNED16 );
 	VAR r: SIGNED32;
 	BEGIN
@@ -367,7 +367,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		IF r = TCP.Ok THEN res := done  ELSE  res := error  END
 	END OpenConnection;
 
-	PROCEDURE AsyncOpenConnection* (  VAR conn: Connection; locPort: SIGNED16; remIP: IPAdr; remPort: SIGNED16;
+	PROCEDURE AsyncOpenConnection* (  VAR conn: Connection; locPort: UNSIGNED16; remIP: IPAdr; remPort: UNSIGNED16;
 																 VAR res: SIGNED16 );
 	BEGIN
 		OpenConnection( conn, locPort, remIP, remPort, res )
@@ -402,7 +402,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		END
 	END State;
 
-	PROCEDURE GetPartner* (conn:Connection; VAR remIP: IPAdr; VAR remPort: SIGNED16);
+	PROCEDURE GetPartner* (conn:Connection; VAR remIP: IPAdr; VAR remPort: UNSIGNED16);
 	BEGIN
 		remIP := conn.fip;
 		remPort := SHORT( conn.fport )
@@ -527,7 +527,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 
 (******************************** UDP **************************************)
 
-	PROCEDURE OpenSocket* ( VAR soc: Socket; locPort: SIGNED16; VAR res: SIGNED16 );
+	PROCEDURE OpenSocket* ( VAR soc: Socket; locPort: UNSIGNED16; VAR res: SIGNED16 );
 	VAR r: SIGNED32;
 	BEGIN
 		NEW( soc, LONG( locPort ) MOD 10000H, r );
@@ -544,15 +544,15 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		RETURN 0
 	END AvailableDG;
 
-	PROCEDURE SendDG* ( soc: Socket; remIP: IPAdr; remport: SIGNED16; pos, len: SIGNED32; CONST buf: ARRAY OF S.BYTE );
+	PROCEDURE SendDG* ( soc: Socket; remIP: IPAdr; remport: UNSIGNED16; pos, len: SIGNED32; CONST buf: ARRAY OF S.BYTE );
 	VAR res: INTEGER;
 	BEGIN
 		soc.Send( remIP, LONG(remport) MOD 10000H, S.VAL( Bytes, buf ), pos, len, res )
 	END SendDG;
 
-	PROCEDURE ReceiveDG* ( soc: Socket; VAR remIP: IPAdr; VAR remport: SIGNED16; 
+	PROCEDURE ReceiveDG* ( soc: Socket; VAR remIP: IPAdr; VAR remport: UNSIGNED16; 
 							pos: SIGNED32; VAR len: SIGNED32; VAR buf: ARRAY OF S.BYTE );
-	VAR res, port: SIGNED32; length: SIZE;
+	VAR res: SIGNED32; port: UNSIGNED32; length: SIZE;
 	BEGIN
 		soc.Receive( S.VAL( Bytes, buf ), pos, len, 0, remIP, port, length, res );
 		len := length(SIGNED32);

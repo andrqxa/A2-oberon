@@ -22,7 +22,7 @@ CONST
 
 TYPE
 	Adr* = RECORD
-				ipv4Adr*: SIGNED32;
+				ipv4Adr*: UNSIGNED32;
 				ipv6Adr*: ARRAY 16 OF CHAR;
 				usedProtocol*: SIGNED32;
 				data*: SIGNED32;
@@ -374,7 +374,7 @@ VAR
 			(address "a.b.c.d" is stored as [a,b,c,d])
 		*)
 	PROCEDURE ArrayToAdr*( CONST arr: ARRAY OF CHAR;  ofs, protocol: SIGNED32;  LSBfirst: BOOLEAN ): Adr;
-	VAR adr: Adr;  i, swapTemp: SIGNED32;
+	VAR adr: Adr;  i: SIGNED32; swapTemp: UNSIGNED32;
 
 	BEGIN
 		ASSERT( (protocol = 4) OR (protocol = 6) );
@@ -410,7 +410,7 @@ VAR
 			(address "a.b.c.d" is stored as [a,b,c,d])
 		*)
 	PROCEDURE AdrToArray*( adr: Adr;  VAR arr: ARRAY OF CHAR;  ofs: SIGNED32;  LSBfirst: BOOLEAN );
-	VAR tempAdr: Adr;  i, swapTemp: SIGNED32;
+	VAR tempAdr: Adr;  i: SIGNED32; swapTemp: UNSIGNED32;
 
 	BEGIN
 		tempAdr := adr;
@@ -613,7 +613,7 @@ VAR
 
 
 	(* Swap internal representation of an IP address from big to little endian or vice versa. *)
-	PROCEDURE  -SwapEndian(  VAR adr: SIGNED32 );
+	PROCEDURE  -SwapEndian(  VAR adr: UNSIGNED32 );
 	CODE
 	#IF I386 THEN
 		POP EAX

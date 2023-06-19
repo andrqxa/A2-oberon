@@ -51,7 +51,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			host*: ARRAY ServerStrLen OF CHAR;
 			path*: ARRAY PathStrLen OF CHAR;
 			label*: ARRAY 64 OF CHAR;
-			port*: SIGNED16
+			port*: UNSIGNED16
 		END;
 
 	(** Reqeuest to a link scheme object to parse link and register its normalized form in the database.

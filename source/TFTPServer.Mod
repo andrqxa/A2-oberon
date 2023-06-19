@@ -31,7 +31,7 @@ TYPE
 	TFTP = OBJECT
 		VAR socket: UDP.Socket;
 			fip: IP.Adr;
-			lport, fport: SIGNED32;
+			lport, fport: UNSIGNED32;
 			res: INTEGER;
 			dead: BOOLEAN;
 			buf: ARRAY BlockSize + 4 OF CHAR;
@@ -120,14 +120,14 @@ TYPE
 		VAR
 			ip: IP.Adr;
 			ack: ARRAY 4 OF CHAR;
-			port, wait, retries, blockNr: SIGNED32;
+			port: UNSIGNED32; wait, retries, blockNr: SIGNED32;
 			len: SIZE;
 			acked: BOOLEAN;
 			file: Files.File;
 			r: Files.Rider;
 
 		(* Init - constructor *)
-		PROCEDURE &Init*(fip: IP.Adr; fport: SIGNED32; CONST filename: Files.FileName; VAR res: INTEGER);
+		PROCEDURE &Init*(fip: IP.Adr; fport: UNSIGNED32; CONST filename: Files.FileName; VAR res: INTEGER);
 		VAR retries: SIGNED32;
 		BEGIN SELF.fip := fip; SELF.fport := fport;
 			file := Files.Old(filename);
@@ -194,14 +194,14 @@ TYPE
 	TFTPWRQ = OBJECT(TFTP)
 		VAR
 			ip: IP.Adr;
-			port, waitPacket, retries, blockNr: SIGNED32;
+			port: UNSIGNED32; waitPacket, retries, blockNr: SIGNED32;
 			len: SIZE;
 			Abort: BOOLEAN;
 			file: Files.File;
 			r: Files.Rider;
 
 		(* Init - constructor *)
-		PROCEDURE &Init*(fip: IP.Adr; fport: SIGNED32; CONST filename: Files.FileName; VAR res: INTEGER);
+		PROCEDURE &Init*(fip: IP.Adr; fport: UNSIGNED32; CONST filename: Files.FileName; VAR res: INTEGER);
 		VAR retries: SIGNED32;
 		BEGIN
 			SELF.fip := fip; SELF.fport := fport; res := 0;
@@ -300,7 +300,7 @@ TYPE
 			tftprrq: TFTPRRQ;
 			tftpwrq: TFTPWRQ;
 
-		PROCEDURE &Init*(port: SIGNED32; VAR res: INTEGER);
+		PROCEDURE &Init*(port: UNSIGNED32; VAR res: INTEGER);
 		BEGIN NEW(socket, port, res); lport := port
 		END Init;
 

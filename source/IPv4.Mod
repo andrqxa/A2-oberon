@@ -475,7 +475,7 @@ TYPE
 		PROCEDURE ARPEnter(ip:IP. Adr; ether: Network.LinkAdr; forus: BOOLEAN);
 		VAR
 			p, q: ARPEntry;
-			n: SIGNED32;
+			n: UNSIGNED32;
 
 			(* Create a new entry at the front of the hash list *)
 			PROCEDURE NewEntry;
@@ -566,7 +566,7 @@ TYPE
 
 		(* Queue an IP packet awaiting an ARP reply. *)
 		PROCEDURE ARPQueue(dst: IP.Adr; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32);
-		VAR p: ARPEntry; n: SIGNED32;
+		VAR p: ARPEntry; n: UNSIGNED32;
 		BEGIN {EXCLUSIVE}
 			ASSERT (dst.usedProtocol = 4, 2345);
 
@@ -689,7 +689,7 @@ VAR
 
 
 (* Return TRUE if "adr1" and "adr2" are in the same subnet defined by "mask". *)
-PROCEDURE SameSubnet(adr1, adr2, mask: SIGNED32): BOOLEAN;
+PROCEDURE SameSubnet(adr1, adr2, mask: UNSIGNED32): BOOLEAN;
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP + adr1]
@@ -723,7 +723,7 @@ END SameSubnet;
 
 
 (* Inline hash function for ARP hash table *)
-PROCEDURE ARPHash(ip: SIGNED32): SIGNED32;
+PROCEDURE ARPHash(ip: UNSIGNED32): UNSIGNED32;
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP + ip]

@@ -38,7 +38,7 @@ TYPE
 
 	HTTPConnection* = OBJECT
 	VAR host, referer, useragent, accept : ARRAY 128 OF CHAR;
-		port : SIGNED32;
+		port : UNSIGNED32;
 		http11 : BOOLEAN;
 		con : TCP.Connection;
 		requestHeader*: WebHTTP.RequestHeader;
@@ -74,7 +74,7 @@ TYPE
 			x : WebHTTP.AdditionalField;
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 2048 OF CHAR;
-			port : SIGNED32;
+			port : UNSIGNED32;
 			dechunk: WebHTTP.ChunkedInStream;
 			lin : WebHTTP.LimitedInStream;
 		BEGIN
@@ -133,7 +133,7 @@ TYPE
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 2048 OF CHAR;
 			buf: ARRAY 1024 OF CHAR;
-			port : SIGNED32;
+			port : UNSIGNED32;
 			dechunk: WebHTTP.ChunkedInStream;
 			lin : WebHTTP.LimitedInStream;
 			len: ARRAY 16 OF CHAR;

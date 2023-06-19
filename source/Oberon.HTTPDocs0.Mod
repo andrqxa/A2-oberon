@@ -41,7 +41,7 @@ MODULE HTTPDocs0 IN Oberon;	(** portable *)
 		Proxy* = POINTER TO ProxyDesc;
 		ProxyDesc* = RECORD
 			host*: ARRAY 64 OF CHAR;
-			port*: SIGNED16
+			port*: UNSIGNED16
 		END;
 
 	VAR
@@ -67,7 +67,7 @@ MODULE HTTPDocs0 IN Oberon;	(** portable *)
 	END StripLoc;
 
 (** Register a new http url. *)
-	PROCEDURE RegisterHTTPAdr*(VAR host, path, label: ARRAY OF CHAR; VAR port: SIGNED16): SIGNED32;
+	PROCEDURE RegisterHTTPAdr*(VAR host, path, label: ARRAY OF CHAR; VAR port: UNSIGNED16): SIGNED32;
 		VAR portS: ARRAY 8 OF CHAR;
 	BEGIN
 		buf := "http://";
@@ -91,7 +91,7 @@ MODULE HTTPDocs0 IN Oberon;	(** portable *)
 	END RegisterHTTPAdr;
 
 (** Parsing of an http url. *)
-	PROCEDURE SplitHTTPAdr*(VAR url, host, path, label: ARRAY OF CHAR; VAR port: SIGNED16): SIGNED32;
+	PROCEDURE SplitHTTPAdr*(VAR url, host, path, label: ARRAY OF CHAR; VAR port: UNSIGNED16): SIGNED32;
 		VAR
 			i, j, l: SIZE;
 			key: SIGNED32;

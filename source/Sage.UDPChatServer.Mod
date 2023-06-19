@@ -30,7 +30,8 @@ TYPE
 		running, terminated: BOOLEAN;
 		ip: IP.Adr;
 		branch, command, seqNum, messageType: SIGNED16;
-		uin, receiverUin, port, receiveBufOffset: SIGNED32;
+		uin, receiverUin, receiveBufOffset: SIGNED32;
+		port: UNSIGNED32;
 		len: SIZE; res: INTEGER;
 		user: Base.User;
 		users: Base.Users;
@@ -108,7 +109,7 @@ TYPE
 	END CheckKeepAlive;
 
 
-	PROCEDURE Server_NewUserReply (ip: IP.Adr; port: SIGNED32; uin: SIGNED32;
+	PROCEDURE Server_NewUserReply (ip: IP.Adr; port: UNSIGNED32; uin: SIGNED32;
 		seqNum: SIGNED16; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		res: INTEGER;

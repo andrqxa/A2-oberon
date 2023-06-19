@@ -48,11 +48,11 @@ TYPE
 	Tester = OBJECT
 		VAR
 			res: INTEGER;
-			c: TCP.Connection; num, num0: SIZE; port: SIGNED32; fip: IP.Adr;
+			c: TCP.Connection; num, num0: SIZE; port: UNSIGNED32; fip: IP.Adr;
 			timer: Kernel.MilliTimer; sender: Sender; server: ARRAY 64 OF CHAR;
 			total, len: SIZE; time: SIGNED64;
 
-		PROCEDURE &Init*(CONST server: ARRAY OF CHAR; num, port: SIGNED32);
+		PROCEDURE &Init*(CONST server: ARRAY OF CHAR; num: SIGNED32; port: UNSIGNED32);
 		BEGIN
 			COPY(server, SELF.server); SELF.num := num; SELF.port := port;
 			DNS.HostByName(server, fip, res);
@@ -113,7 +113,7 @@ BEGIN
 END Message;
 
 
-PROCEDURE Report(ms, port: SIGNED32; total: SIZE; CONST msg: ARRAY OF CHAR);
+PROCEDURE Report(ms: SIGNED32; port: UNSIGNED32; total: SIZE; CONST msg: ARRAY OF CHAR);
 VAR
 	realStr: ARRAY 128 OF CHAR;
 

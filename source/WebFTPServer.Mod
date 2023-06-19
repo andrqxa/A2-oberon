@@ -97,7 +97,7 @@ TYPE
 			running: BOOLEAN;
 			in: Streams.Reader;
 			out: Streams.Writer;
-			dataAdr: IP.Adr; dataPort: SIGNED32;
+			dataAdr: IP.Adr; dataPort: UNSIGNED32;
 			timeout, pasvTimeout: Objects.Timer;
 			line: ARRAY LineLen OF CHAR;
 			cmd: ARRAY CmdLen OF CHAR;
@@ -711,7 +711,7 @@ BEGIN
 	RETURN (ch >= "0") & (ch <= "9")
 END IsDigit;
 
-PROCEDURE StrToInt(str: ARRAY OF CHAR; VAR val: SIGNED32);
+PROCEDURE StrToInt(str: ARRAY OF CHAR; VAR val: UNSIGNED32);
 VAR i, d: SIGNED32; neg: BOOLEAN;
 BEGIN
 	i := 0;
@@ -729,9 +729,9 @@ BEGIN
 	IF neg THEN val := -val END
 END StrToInt;
 
-PROCEDURE StrToIntPos(VAR str: ARRAY OF CHAR; VAR i: SIGNED16): SIGNED32;
+PROCEDURE StrToIntPos(VAR str: ARRAY OF CHAR; VAR i: SIGNED32): UNSIGNED32;
 VAR noStr: ARRAY 16 OF CHAR;
-		j: SIGNED32;
+		j: SIGNED32; value: UNSIGNED32;
 BEGIN
 	WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
 	j := 0;
@@ -742,12 +742,12 @@ BEGIN
 	END;
 	WHILE IsDigit(str[i]) DO noStr[j] := str[i]; INC(j); INC(i) END;
 	noStr[j] := 0X;
-	StrToInt(noStr, j);
-	RETURN j
+	StrToInt(noStr, value);
+	RETURN value
 END StrToIntPos;
 
-PROCEDURE SplitPort(parm: ARRAY OF CHAR;  VAR adr: IP.Adr;  VAR port: SIGNED32);
-	VAR pos: SIGNED16; i, n: SIGNED32;
+PROCEDURE SplitPort(parm: ARRAY OF CHAR;  VAR adr: IP.Adr;  VAR port: UNSIGNED32);
+	VAR pos: SIGNED32; i: SIGNED32; n: UNSIGNED32;
 BEGIN
 	pos := 0;
 	FOR i := 0 TO 3 DO n := StrToIntPos(parm, pos); parm[pos] := '.'; INC(pos) END;
@@ -759,7 +759,7 @@ END SplitPort;
 
 
 (* Parses the EPRT command *)
-PROCEDURE SplitEPRT(param: ARRAY OF CHAR; VAR adr: IP.Adr; VAR port: SIGNED32);
+PROCEDURE SplitEPRT(param: ARRAY OF CHAR; VAR adr: IP.Adr; VAR port: UNSIGNED32);
 VAR
 	i: SIGNED32;
 	protocol: SIGNED32;
@@ -1238,17 +1238,18 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WebFTPServer.
 
+System.FreeDownTo WebFTPServer~
 
-Aos.Call WebFTPServer.Start ~\l:FAT:/logs/FTP.Log~
-Aos.Call WebFTPServer.Stop
+WebFTPServer.Start ~\l:FAT:/logs/FTP.Log~
+WebFTPServer.Stop
 NetTracker.CloseAll
 System.Free WebFTPServer ~
-ET.OpenAscii FTP.Log ~
+PET.Open FTP.Log ~
 
 
-Aos.Call WebFTPServer.AddUser user password -1 rwp  FAT:~
-Aos.Call WebFTPServer.AddUser anonymous none 3 rwpm FAT:/ftproot/ ~
-Aos.Call WebFTPServer.RemoveUser begger ~
-Aos.Call WebFTPServer.ListUsers
+WebFTPServer.AddUser user password -1 rwp  FAT:~
+WebFTPServer.AddUser anonymous none 3 rwpm FAT:/ftproot/ ~
+WebFTPServer.RemoveUser begger ~
+WebFTPServer.ListUsers
 
 System.DeleteFiles WebFTPUsers.dat ~  	deletes all users

@@ -98,7 +98,6 @@ TYPE
 			of the overriding constructor!
 		*)
 		PROCEDURE &Constr*(type, mtu, adrSize: SIGNED32);
-		VAR res: INTEGER;
 		BEGIN
 			ASSERT((mtu >= 0) & (mtu <= MaxPacketSize));
 			ASSERT((adrSize >= 0) & (adrSize <= MaxLinkAdrSize));
@@ -482,7 +481,7 @@ END Equal;
 
 (** Put a 32-bit host value into buf[ofs..ofs+3] *)
 
-PROCEDURE Put4*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: INTEGER);
+PROCEDURE Put4*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: UNSIGNED32);
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP+val]

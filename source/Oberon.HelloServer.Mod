@@ -14,7 +14,7 @@ MODULE HelloServer IN Oberon;
 	PROCEDURE Handle(C: NetSystem.Connection);
 		VAR
 			newC: NetSystem.Connection;
-			res, remPort: SIGNED16;
+			res: SIGNED16; remPort: UNSIGNED16;
 			remIP: NetSystem.IPAdr;
 			name: ARRAY 128 OF CHAR;
 	BEGIN
@@ -24,7 +24,7 @@ MODULE HelloServer IN Oberon;
 			NetSystem.GetName(remIP, name);
 			Texts.WriteString(W, "Connection from ");
 			Texts.WriteString(W, name); Texts.Write(W, ":");
-			Texts.WriteInt(W, LONG(remPort) MOD 10000H, 1); Texts.WriteLn(W);
+			Texts.WriteInt(W, SIGNED32(remPort) MOD 10000H, 1); Texts.WriteLn(W);
 			Texts.Append(Oberon.Log, W.buf);
 			NetSystem.WriteString(newC, "Hello World!");
 			NetSystem.CloseConnection(newC);

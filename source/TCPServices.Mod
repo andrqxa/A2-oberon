@@ -13,7 +13,7 @@ TYPE
 		VAR res: INTEGER; service, client: TCP.Connection; root, agent: Agent; new: NewAgent;
 
 		(** Start is called indirectly by OpenService. *)
-		PROCEDURE &Start*(port: SIGNED32; new: NewAgent; VAR res: INTEGER);
+		PROCEDURE &Start*(port: UNSIGNED32; new: NewAgent; VAR res: INTEGER);
 		BEGIN
 			NEW(service); service.Open(port, IP.NilAdr, TCP.NilPort, res);
 			IF res = Ok THEN
@@ -76,7 +76,7 @@ TYPE
 		VAR
 
 		(** Start is called indirectly by OpenService. *)
-		PROCEDURE &Start*(port: SIGNED32; new: NewAgent; VAR res: INTEGER);
+		PROCEDURE & Start*(port: UNSIGNED32; new: NewAgent; VAR res: INTEGER);
 			VAR
 		   certificate : ARRAY 500 OF CHAR;
 		   pHex, qHex, eHex : ARRAY 1000 OF CHAR;
