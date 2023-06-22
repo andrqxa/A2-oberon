@@ -621,11 +621,21 @@ TYPE
 			IF (cpuBits=32) & (instruction.op2.type.sizeInBits = IntermediateCode.Bits64) & (instruction.op2.type.form IN IntermediateCode.Integer) THEN
 				CASE instruction.opcode OF
 				IntermediateCode.div:
-					procedureName := "DivH"; RETURN FALSE
+					IF ( instruction.op2.type.form = IntermediateCode.UnsignedInteger) THEN
+						procedureName := "DivU64";
+					ELSE
+						procedureName := "DivH";
+					END;
+					RETURN FALSE
 				| IntermediateCode.mul:
 					procedureName := "MulH"; RETURN FALSE
 				| IntermediateCode.mod :
-					procedureName := "ModH"; RETURN FALSE
+					IF ( instruction.op2.type.form = IntermediateCode.UnsignedInteger) THEN				
+						procedureName := "ModU64";
+					ELSE
+						procedureName := "ModH";
+					END;
+					RETURN FALSE
 				| IntermediateCode.abs :
 					procedureName := "AbsH"; RETURN FALSE;
 				| IntermediateCode.shl :

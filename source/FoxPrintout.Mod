@@ -707,7 +707,7 @@ TYPE
 		PROCEDURE VisitResultDesignator*(x: SyntaxTree.ResultDesignator);
 		BEGIN
 			ASSERT(x.left = NIL);
-			w.String("RESULT");
+			IF case = Scanner.Lowercase THEN w.String("result"); ELSE w.String("RESULT"); END;
 			IF info THEN
 				BeginComment;
 				w.String("<ResultDesignator:");
