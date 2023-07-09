@@ -237,8 +237,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 	PROCEDURE IsNumber(str : ARRAY OF CHAR): BOOLEAN;
 	VAR i : SIGNED32;
 	BEGIN
-		Strings.StrToInt32(str, i);
-		IF i # 0 THEN RETURN TRUE ELSE RETURN FALSE END
+		RETURN Strings.TryParseInt32(str, i);
 	END IsNumber;
 
 BEGIN
