@@ -336,7 +336,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		SendCmd(S, "APOP", login)
 	END APOP;
 
-	PROCEDURE OpenPOP(VAR S: NetTools.Session; host, user, passwd: ARRAY OF CHAR; port: SIGNED16; apop: BOOLEAN);
+	PROCEDURE OpenPOP(VAR S: NetTools.Session; host, user, passwd: ARRAY OF CHAR; port: UNSIGNED16; apop: BOOLEAN);
 		VAR hostIP: NetSystem.IPAdr; login: BOOLEAN;
 	BEGIN
 		IF trace THEN
@@ -3012,7 +3012,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		END
 	END CloseSMTP;
 
-	PROCEDURE OpenSMTP*(VAR S: SMTPSession; host, from: ARRAY OF CHAR; port: SIGNED16);
+	PROCEDURE OpenSMTP*(VAR S: SMTPSession; host, from: ARRAY OF CHAR; port: UNSIGNED16);
 	BEGIN
 		IF trace THEN
 			Texts.WriteString(W, "--- SMTP");
