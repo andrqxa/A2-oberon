@@ -1295,11 +1295,11 @@ BEGIN
 	r.file.ReadBytes(r, x, ofs, len);
 END ReadBytes;
 
-PROCEDURE ReadSystemBytes*(VAR r: Rider; VAR x: ARRAY OF SYSTEM.BYTE; ofs, len: SIZE);
+PROCEDURE ReadSystemBytes*(VAR r: Rider; VAR x: ARRAY OF SYSTEM.BYTE; len: SIZE);
 TYPE Bytes = POINTER { UNSAFE, UNTRACED } TO ARRAY MAX(SIZE) OF CHAR;
 VAR bytes := ADDRESSOF(x[0]): Bytes;
 BEGIN
-	r.file.ReadBytes(r, bytes^, ofs, len);
+	r.file.ReadBytes(r, bytes^, 0, len);
 END ReadSystemBytes;
 
 PROCEDURE ReadSInt*(VAR r: Rider; VAR x: SIGNED8);
@@ -1418,11 +1418,11 @@ BEGIN
 	r.file.WriteBytes(r, x, ofs, len);
 END WriteBytes;
 
-PROCEDURE WriteSystemBytes*(VAR r: Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
+PROCEDURE WriteSystemBytes*(VAR r: Rider; CONST x: ARRAY OF SYSTEM.BYTE; len: SIZE);
 TYPE Bytes = POINTER { UNSAFE, UNTRACED } TO ARRAY MAX(SIZE) OF CHAR;
 VAR bytes := ADDRESSOF(x[0]): Bytes;
 BEGIN
-	r.file.WriteBytes(r, bytes^, ofs, len);
+	r.file.WriteBytes(r, bytes^, 0, len);
 END WriteSystemBytes;
 
 PROCEDURE WriteSInt*(VAR r: Rider; x: SIGNED8);
