@@ -120,7 +120,11 @@ TYPE
 					options[nofOptions].ch := ch;
 					options[nofOptions].name := name;
 					options[nofOptions].type := type;
-					options[nofOptions].description := Strings.NewString(description);
+					IF description # "" THEN
+						options[nofOptions].description := Strings.NewString(description);
+					ELSE
+						options[nofOptions].description := NIL;
+					END;
 					INC(nofOptions);
 				ELSE
 					KernelLog.String("Command implementation error: Maximum number of option declarations exceeded. Ignore option ");
