@@ -95,7 +95,7 @@ TYPE
 
 		PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size: SIZE; ms: SIGNED32;  VAR fip: IP.Adr;
 										   VAR fport: UNSIGNED32; VAR len: SIZE; VAR res: INTEGER );
-		VAR sadr: WSock32.sockaddrIn;  err: SIGNED32;  l: SIGNED32; winRes: SIGNED32;
+		VAR sadr: WSock32.sockaddrIn;  err: SIGNED32;  l: SIGNED32; winRes: UNSIGNED32;
 		ret: SIGNED32;  fdset: WSock32.FDSet; avail: BOOLEAN; time: WSock32.TimeVal;
 		BEGIN
 			ASSERT ( ofs+size <= LEN( data ) );

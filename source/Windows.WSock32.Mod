@@ -49,7 +49,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		MsgPeek* = 2;
 
 	TYPE
-		DWORD = Kernel32.DWORD;
+		DWORD = UNSIGNED32(*Kernel32.DWORD*);
 
 		TimeVal* = POINTER TO TimeValDesc;
 		TimeValDesc* = RECORD
@@ -57,11 +57,20 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		END;
 
 		WSAData* = RECORD
-			wVersion*, wHighVersion*: SIGNED16;
+			wVersion*, wHighVersion*: UNSIGNED16;
+#IF I386 THEN
 			szDescription*: ARRAY WSADescriptionLen+1 OF CHAR;
 			szSystemStatus*: ARRAY WSASysStatusLen+1 OF CHAR;
-			iMaxSockets*, iMaxUdpDg*: SIGNED16;
-			lpVendorInfo*: ADDRESS
+			iMaxSockets*,
+			iMaxUdpDg*: UNSIGNED16;
+			lpVendorInfo*: ADDRESS;
+#ELSE
+			iMaxSockets*,
+			iMaxUdpDg*: UNSIGNED16;
+			lpVendorInfo*: ADDRESS;
+			szDescription*: ARRAY WSADescriptionLen+1 OF CHAR;
+			szSystemStatus*: ARRAY WSASysStatusLen+1 OF CHAR;
+#END
 		END;
 
 		inAddr* = UNSIGNED32;
@@ -69,7 +78,8 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		PsockaddrIn* = POINTER TO sockaddrIn;
 		sockaddrIn* = RECORD
-			sinFamily*: SIGNED16; sinPort*: Port;
+			sinFamily*: SIGNED16;
+			sinPort*: Port;
 			sinAddr*: inAddr;
 			inZero: ARRAY 8 OF CHAR
 		END;
@@ -129,15 +139,15 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		(** The Windows Sockets WSAAsyncGetHostByAddr function asynchronously retrieves host information that
 			corresponds to an address. *)
-		WSAAsyncGetHostByAddr-: PROCEDURE {WINAPI} (hWnd: User32.HWND; wMsg: SIGNED32; VAR addr: ARRAY   OF SYSTEM.BYTE; len: INTEGER; type: INTEGER; VAR buf: ARRAY   OF SYSTEM.BYTE; buflen: INTEGER): Kernel32.HANDLE;
+		WSAAsyncGetHostByAddr-: PROCEDURE {WINAPI} (hWnd: User32.HWND; wMsg: UNSIGNED32; VAR addr: ARRAY   OF SYSTEM.BYTE; len: INTEGER; type: INTEGER; VAR buf: ARRAY   OF SYSTEM.BYTE; buflen: INTEGER): Kernel32.HANDLE;
 
 		(** The Windows Sockets WSAAsyncGetHostByName function asynchronously retrieves host information corresponding
 			to a host name. *)
-		WSAAsyncGetHostByName-: PROCEDURE {WINAPI} (hWnd: User32.HWND; wMsg: SIGNED32; name: ARRAY   OF CHAR; VAR buf: ARRAY   OF SYSTEM.BYTE; buflen: INTEGER): Kernel32.HANDLE;
+		WSAAsyncGetHostByName-: PROCEDURE {WINAPI} (hWnd: User32.HWND; wMsg: UNSIGNED32; name: ARRAY   OF CHAR; VAR buf: ARRAY   OF SYSTEM.BYTE; buflen: INTEGER): Kernel32.HANDLE;
 
 		(** The Windows Sockets WSAAsyncSelect function requests Windows message-based notification of network events
 			for a socket. *)
-		WSAAsyncSelect-: PROCEDURE {WINAPI} (s: Socket; hWnd: User32.HWND; wMsg: SIGNED32; lEvent: INTEGER): INTEGER;
+		WSAAsyncSelect-: PROCEDURE {WINAPI} (s: Socket; hWnd: User32.HWND; wMsg: UNSIGNED32; lEvent: INTEGER): INTEGER;
 
 		(** The Windows Sockets WSAGetLastError function gets the error status for the last operation that failed. *)
 		WSAGetLastError-: PROCEDURE {WINAPI} (): INTEGER;
@@ -146,9 +156,9 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		WSASocket-: PROCEDURE {WINAPI} (af, type, protocol: INTEGER; VAR lpProtocolInfo: WSAProtocolInfo; g: Group; dwFlags: DWORD): Socket;
 
 		(** The Windows Sockets WSAStartup function initiates use of Ws2_32.dll by a process. *)
-		WSAStartup-: PROCEDURE {WINAPI} (wVersionRequested: SIGNED16; VAR lpWSAData: WSAData): INTEGER;
+		WSAStartup-: PROCEDURE {WINAPI} (wVersionRequested: UNSIGNED16; VAR lpWSAData: WSAData): INTEGER;
 
-		WSAIoctl-: PROCEDURE {WINAPI} (s: Socket; ioControlCode:DWORD; VAR in: DWORD; inSize:DWORD;
+		WSAIoctl-: PROCEDURE {WINAPI} (s: Socket; ioControlCode:DWORD; VAR in: ARRAY OF CHAR; inSize:DWORD;
 				VAR outBuffer:ARRAY OF CHAR; outBufLen: DWORD; VAR lenReturned:DWORD;  Overlapped: ADDRESS; completionRoutine: ADDRESS): INTEGER;
 
 		(** The Windows Sockets accept function permits an incoming connection attempt on a socket. *)
@@ -188,7 +198,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		htons-: PROCEDURE {WINAPI} (x: UNSIGNED16): UNSIGNED16;
 
 		(** The Windows Sockets ioctlsocket function controls the I/O mode of a socket. *)
-		ioctlsocket-: PROCEDURE {WINAPI} (s: Socket; cmd: LONGINTEGER; VAR argp: SIGNED32): INTEGER;
+		ioctlsocket-: PROCEDURE {WINAPI} (s: Socket; cmd: SIGNED32; VAR argp: UNSIGNED32): INTEGER;
 
 		(** The Windows Sockets listen function places a socket a state where it is listening for an incoming connection. *)
 		listen-: PROCEDURE {WINAPI} (s: Socket; backlog: INTEGER): INTEGER;
