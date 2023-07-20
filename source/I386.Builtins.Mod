@@ -246,7 +246,7 @@ CODE{SYSTEM.i386}
 	; In: [EBP+l+4]:[EBP+l+0] = dividend (l)
 	; [EBP+r+4]:[EBP+r+0] = divisor (r)
 	; Out: EDX:EAX = quotient of division
-	PUSH ECX ; Save EBX as per calling convention.
+	PUSH ECX
 
 	MOV EDX, [EBP+l+4] 	    ; dividend_hi
 	MOV EAX, [EBP+l+0] 		; dividend_lo
@@ -309,7 +309,7 @@ CODE{SYSTEM.i386}
 	;
 	; Out: EDX:EAX = remainder of division
 	;
-	PUSH	ECX
+	PUSH ECX
 
 	MOV EDX, [EBP+l+4]           	; dividend-hi
 	MOV EAX, [EBP+l+0]            	; dividend-lo
