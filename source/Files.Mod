@@ -575,7 +575,11 @@ END Base;
 (** Positions a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file. A Rider cannot be positioned beyond the end of a file. *)
 PROCEDURE Set*(VAR r: Rider; f: File; pos: Position);
 BEGIN
-	f.Set(r, pos);
+	IF f # NIL THEN
+		f.Set(r, pos);
+	ELSE
+		r.file := NIL;
+	END;
 END Set;
 
 (** Returns the offset of a Rider positioned on a file. *)
@@ -1296,7 +1300,7 @@ BEGIN
 END ReadBytes;
 
 PROCEDURE ReadSystemBytes*(VAR r: Rider; VAR x: ARRAY OF SYSTEM.BYTE; len: SIZE);
-TYPE Bytes = POINTER { UNSAFE, UNTRACED } TO ARRAY MAX(SIZE) OF CHAR;
+TYPE Bytes = POINTER { UNSAFE, UNTRACED } TO ARRAY MAX(SIGNED32) OF CHAR;
 VAR bytes := ADDRESSOF(x[0]): Bytes;
 BEGIN
 	r.file.ReadBytes(r, bytes^, 0, len);
@@ -1419,7 +1423,7 @@ BEGIN
 END WriteBytes;
 
 PROCEDURE WriteSystemBytes*(VAR r: Rider; CONST x: ARRAY OF SYSTEM.BYTE; len: SIZE);
-TYPE Bytes = POINTER { UNSAFE, UNTRACED } TO ARRAY MAX(SIZE) OF CHAR;
+TYPE Bytes = POINTER { UNSAFE, UNTRACED } TO ARRAY MAX(SIGNED32) OF CHAR;
 VAR bytes := ADDRESSOF(x[0]): Bytes;
 BEGIN
 	r.file.WriteBytes(r, bytes^, 0, len);
