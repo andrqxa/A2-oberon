@@ -25,9 +25,10 @@ VAR
 		server.Close
 	END StopServer;
 
-	PROCEDURE OpenClient*(lport:SIGNED32; fadr:IP.Adr; fport: UNSIGNED32; VAR res:INTEGER);
+	PROCEDURE OpenClient*(lport: UNSIGNED32; fadr:IP.Adr; fport: UNSIGNED32; CONST fSniName: ARRAY OF CHAR; VAR res:INTEGER);
 	BEGIN
 		client := TLS.GetConnection();
+		client.SetSniName(fSniName);
 		client.Open(lport, fadr, fport, res);
 		client.AwaitStateNotEqual(TLS.ClientHandshake);
 
@@ -40,7 +41,7 @@ VAR
 	PROCEDURE StartClient*(context: Commands.Context);
 	VAR res:INTEGER;
 	BEGIN
-		OpenClient(TCP.NilPort, IP.StrToAdr("127.0.0.1"), 443, res);
+		OpenClient(TCP.NilPort, IP.StrToAdr("127.0.0.1"), 443, "", res);
 	END StartClient;
 
 	PROCEDURE StopClient*;
@@ -80,7 +81,7 @@ VAR
 				DNS.HostByName(host, fadr, res);
 				IF res = DNS.Ok THEN
 
-					OpenClient(TCP.NilPort, fadr, port, res);
+					OpenClient(TCP.NilPort, fadr, port, host, res);
 					IF res#0 THEN context.out.String("connection failed"); context.out.Ln; context.out.Update; RETURN END;
 
 					Streams.OpenWriter(w, client.Send); Streams.OpenReader(r, client.Receive);
@@ -151,6 +152,7 @@ WebHTTPServerTools.Stop ~
 TestTLS.Get https://127.0.0.1/index.html ~ (* access the local server via loopback*)
 TestTLS.Get http://127.0.0.1:80/index.html ~ (* access the local server via loopback*)
 TestTLS.Get https://www.google.com/ ~
+TestTLS.Get https://google.com/ ~ SNI
 TestTLS.Get https://discognosis.highdim.com/index.html ~
 TestTLS.Get https://discognosis.highdim.com/ ~
 TestTLS.Get http://discognosis.highdim.com/ ~
@@ -158,7 +160,9 @@ TestTLS.Get https://startpage.com ~
 TestTLS.Get https://www.archlinux.org ~
 TestTLS.Get https://www.ethz.ch/de.html ~
 TestTLS.Get https://www.duckduckgo.com ~
-TestTLS.Get https://127.0.0.1:4433/
+TestTLS.Get https://127.0.0.1:443/ ~
+TestTLS.Get https://habr.com/ru/all/ ~
+
 
 TestTLS.StartClient ~
 TestTLS.StopClient ~

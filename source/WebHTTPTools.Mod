@@ -213,6 +213,10 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WebHTTPTools.
 
+WebHTTPTools.Get https://www.google.com/ google.html ~
+WebHTTPTools.Get https://google.com/ google2.html ~ SNI
+WebHTTPTools.Get https://habr.com/ru/all/ habr.html ~
+
 WebHTTPTools.Get http://www.enigon.com/ test.html~
 WebHTTPTools.Get http://212.254.73.92/ test.html~
 WebHTTPTools.Get http://www.nzz.ch/ test.html~

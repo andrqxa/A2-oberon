@@ -593,6 +593,7 @@ TYPE
 			currentWriteState, pendingWriteState, currentReadState, pendingReadState: ConnectionState;
 			version -: ARRAY 2 OF CHAR;
 			client, trapped: BOOLEAN;
+			sniName-: ARRAY 256 OF CHAR;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -606,6 +607,7 @@ TYPE
 			NEW( pendingWriteState );	NEW( currentWriteState );
 			NEW( pendingReadState );	NEW( currentReadState );
 			NEW( pendingSecurityParameters );
+			sniName := "";
 		END Init;
 
 
@@ -682,6 +684,11 @@ TYPE
 			IF client THEN Connect END;
 			ASSERT( conn # NIL )
 		END Open;
+
+		PROCEDURE SetSniName*(CONST name: ARRAY OF CHAR);
+		BEGIN
+			COPY(name, sniName);
+		END SetSniName;
 
 		PROCEDURE SetDefaultPolicy*;
 		VAR ctx:Context;
@@ -1347,6 +1354,48 @@ TYPE
 			data[ pos ] := 0X;
 			INC( pos );
 
+			IF Trace THEN TRACE(sniName); END;
+			IF (sniName # "") & IP.IsNilAdr(IP.StrToAdr(sniName)) THEN
+				VAR sniLen := Strings.Length(sniName) + 9;
+				(*writing extension SNI. Need for correct certificate on virtual hosts*)
+
+				(*extensions length*)
+				data[pos] := CHR(sniLen DIV 256);
+				data[pos + 1] := CHR(sniLen MOD 256);
+				INC(pos, 2);
+
+				(*SNI type*)
+				data[pos] := 0X;
+				data[pos+1] := 0X;	(*00  = Type: server_name*)
+				INC(pos, 2);
+
+				(*SNI length*)
+				sniLen := sniLen - 4;
+				data[pos] := CHR(sniLen DIV 256);
+				data[pos + 1] := CHR(sniLen MOD 256);
+				INC(pos, 2);
+
+				(*server name list length*)
+				sniLen := sniLen - 2;
+				data[pos] := CHR(sniLen DIV 256);
+				data[pos + 1] := CHR(sniLen MOD 256);
+				INC(pos, 2);
+
+				(*server name type*)
+				data[pos] := 0X;
+				INC(pos, 1);
+
+				(*server name length*)
+				sniLen := sniLen - 3;
+				data[pos] := CHR(sniLen DIV 256);
+				data[pos + 1] := CHR(sniLen MOD 256);
+				INC(pos, 2);
+				(*server name*)
+				FOR i := 0 TO sniLen - 1 DO
+					data[pos + i] := sniName[i]
+				END;
+				INC(pos, sniLen);
+			END;
 			SendHandshake( data, ClientHello, ofs - 4, pos - ofs)
 		END SendClientHello;
 
@@ -1979,3 +2028,5 @@ VAR
 BEGIN
 	InitDefaults
 END TLS.
+
+Release.Rebuild -b Win64 TLS.Mod~
