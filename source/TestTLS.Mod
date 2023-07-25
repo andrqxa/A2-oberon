@@ -25,7 +25,7 @@ VAR
 		server.Close
 	END StopServer;
 
-	PROCEDURE OpenClient*(lport:SIGNED32; fadr:IP.Adr; fport:SIGNED32; VAR res:INTEGER);
+	PROCEDURE OpenClient*(lport:SIGNED32; fadr:IP.Adr; fport: UNSIGNED32; VAR res:INTEGER);
 	BEGIN
 		client := TLS.GetConnection();
 		client.Open(lport, fadr, fport, res);
@@ -60,7 +60,7 @@ VAR
 			x : WebHTTP.AdditionalField;
 			host : ARRAY 128 OF CHAR;
 			url, path : ARRAY 2048 OF CHAR;
-			port : SIGNED32;
+			port : UNSIGNED32;
 			fadr: IP.Adr;
 			dechunk: WebHTTP.ChunkedInStream;
 			lin : WebHTTP.LimitedInStream;
