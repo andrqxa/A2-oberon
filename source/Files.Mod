@@ -105,6 +105,11 @@ TYPE
 			received := pos; (* this effects that Streams.Reader.Pos() returns the correct location in the file *)
 		END SetPos;
 
+		PROCEDURE Base*(): File;
+		BEGIN
+			RETURN file;
+		END Base;
+
 		PROCEDURE &InitFileReader*(file : File; pos: Position);
 		BEGIN
 			ASSERT(file # NIL);
@@ -148,6 +153,11 @@ TYPE
 			Update;
 			RETURN file.Pos(r)
 		END Pos;
+
+		PROCEDURE Base*(): File;
+		BEGIN
+			RETURN file;
+		END Base;
 
 		PROCEDURE &InitFileWriter*(file: File; pos: Position);
 		BEGIN
@@ -462,6 +472,29 @@ TYPE
 			(* abstract, potentially empty *)
 		END Close;
 
+		PROCEDURE NewReader*(old := NIL: Reader; pos := 0: Position): Reader;
+		BEGIN
+			IF (old # NIL) THEN
+				RESULT := old;
+				RESULT.InitFileReader(SELF, pos);
+			ELSE
+				NEW(RESULT, SELF, pos);
+			END;
+			RETURN RESULT;
+		END NewReader;
+
+		PROCEDURE NewWriter*(old := NIL: Writer; pos := 0: Position): Writer;
+		BEGIN
+			ASSERT(~(ReadOnly IN flags));
+			IF (old # NIL) THEN
+				RESULT := old;
+				RESULT.InitFileWriter(SELF, pos);
+			ELSE
+				NEW(RESULT, SELF, pos);
+			END;
+			RETURN RESULT;
+		END NewWriter;
+
 	END File;
 
 TYPE
@@ -629,21 +662,11 @@ BEGIN
 	END;
 END OpenReader;
 
-PROCEDURE NewReader*(f: File; pos: Position): Reader;
-BEGIN
-	RETURN NEW Reader(f, pos)
-END NewReader;
-
 (** Open a writer on a file at the specified position.  Remember to call Streams.Update before registering or closing the file! *)
 PROCEDURE OpenWriter*(VAR b: Writer; f: File; pos: Position);
 BEGIN
 	NEW(b, f, pos)
 END OpenWriter;
-
-PROCEDURE NewWriter*(f: File; pos: Position): Writer;
-BEGIN
-	RETURN NEW Writer(f, pos)
-END NewWriter;
 
 (** File name prefix support. *)
 
@@ -1191,21 +1214,21 @@ PROCEDURE Enumerate(CONST mask: ARRAY OF CHAR; flags: SET; enum: Enumerator);
 VAR
 	fs: FileSystem; ft: FileSystemTable; i: SIZE;
 	prefix: Prefix; fmask: FileName;
-BEGIN
+	BEGIN
 	SplitName(mask, prefix, fmask);
-	IF prefix = "" THEN
-		GetList(ft);
-		IF ft # NIL THEN
-				(* FIX: deadlock possible if fs containing anonymous file does not allow concurrent Enumerate and Write *)
-			FOR i := 0 TO LEN(ft^)-1 DO
-				IF ~(NeedsPrefix IN ft[i].flags) THEN
-					ft[i].Enumerate0(fmask, flags, enum)
-				END;
-			END
-		END
-	ELSE
-		fs := This(prefix);
-		IF fs # NIL THEN fs.Enumerate0(fmask, flags, enum) END
+			IF prefix = "" THEN
+				GetList(ft);
+				IF ft # NIL THEN
+						(* FIX: deadlock possible if fs containing anonymous file does not allow concurrent Enumerate and Write *)
+					FOR i := 0 TO LEN(ft^)-1 DO
+						IF ~(NeedsPrefix IN ft[i].flags) THEN
+							ft[i].Enumerate0(fmask, flags, enum)
+						END;
+					END
+				END
+			ELSE
+				fs := This(prefix);
+				IF fs # NIL THEN fs.Enumerate0(fmask, flags, enum) END
 	END
 END Enumerate;
 
