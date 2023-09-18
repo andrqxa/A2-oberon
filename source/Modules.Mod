@@ -9,6 +9,8 @@ IMPORT SYSTEM, Trace, Machine, Heaps;
 CONST
 	Ok* = 0;
 
+	PackageDelimiter* = "-";
+
 	AddressSize = SIZEOF (ADDRESS);	(* architecture dependent size of addresses in bytes *)
 
 	MaxTags* = 16;	(* in type descriptor *)
@@ -206,6 +208,14 @@ BEGIN
 	to[j] := 0X
 END Append;
 
+PROCEDURE PackagePath*(CONST package, name: ARRAY OF CHAR; VAR to: ARRAY OF CHAR);
+BEGIN
+	IF (package # "") & (package # "A2") THEN
+		Append(package, to);
+		Append(PackageDelimiter, to);
+	END;
+	Append(name, to);
+END PackagePath;
 
 (** Add a module to the pool of accessible modules, or return named module. *)
 PROCEDURE Publish*(VAR m: Module; VAR new: BOOLEAN);
@@ -323,6 +333,13 @@ END Initialize;
 	END Initialize0;
 
 	(** Return the named module or NIL if it is not loaded yet. *)
+	PROCEDURE Find*(CONST package, name: ARRAY OF CHAR): Module;
+	VAR path := "": ARRAY 256 OF CHAR;
+	BEGIN
+		PackagePath(package, name, path);
+		RETURN ModuleByName(path);
+	END Find;
+
 	PROCEDURE ModuleByName*(CONST name: ARRAY OF CHAR): Module;
 	VAR m: Module;
 	BEGIN
@@ -435,6 +452,13 @@ END Initialize;
 	END SortExceptionTable;
 
 (** Load the module if it is not already loaded. *)	(* Algorithm J. Templ, ETHZ, 1994 *)
+PROCEDURE This*(CONST package, name: ARRAY OF CHAR; VAR res: INTEGER; VAR msg: ARRAY OF CHAR): Module;
+VAR path := "": ARRAY 256 OF CHAR;
+BEGIN
+	PackagePath(package, name, path);
+	RETURN ThisModule(path, res, msg);
+END This;
+
 PROCEDURE ThisModule*(CONST name: ARRAY OF CHAR; VAR res: INTEGER; VAR msg: ARRAY OF CHAR): Module;
 VAR m: Module; fileName: Name; i: SIZE; registered: BOOLEAN;
 BEGIN
@@ -632,6 +656,13 @@ BEGIN
 END InstallTermHandler;
 
 (** Free a module. The module's termination handler, if any, is called first. Then all objects that have finalizers in this module are finalized (even if they are still reachable). Then the module's data and code are invalidated. *)
+PROCEDURE Free*(CONST package, name: ARRAY OF CHAR; VAR res: INTEGER; VAR msg: ARRAY OF CHAR);
+VAR path := "": ARRAY 256 OF CHAR;
+BEGIN
+	PackagePath(package, name, path);
+	FreeModule(path, res, msg);
+END Free;
+
 PROCEDURE FreeModule*(CONST name: ARRAY OF CHAR; VAR res: INTEGER; VAR msg: ARRAY OF CHAR);
 VAR p, m: Module; term: TerminationHandler; i: SIZE;
 BEGIN
