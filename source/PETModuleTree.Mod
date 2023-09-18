@@ -770,9 +770,8 @@ TYPE
 					AddPostfixToCaption(p, record.super.ident.name);
 					AddPostfixToCaption(p, Strings.NewString(")"));
 				END;
-				AddFieldDecl(p, record.fieldList);
-				IF record.procDecl # NIL THEN
-					AddProcDecl(parent, record.procDecl);
+				IF record.declSeq # NIL THEN
+					AddDeclSeq(p, record.declSeq);
 				END;
 			END;
 		END AddRecord;
@@ -781,21 +780,6 @@ TYPE
 		BEGIN
 			AddConstDecl(parent, enumeration.enumeratorList);
 		END AddEnumeration;
-
-		PROCEDURE AddFieldDecl(parent: WMTrees.TreeNode; fieldDecl: ModuleParser.FieldDecl);
-		VAR newNode: WMTrees.TreeNode; n, l: ModuleParser.NodeList;
-		BEGIN
-			n := fieldDecl;
-			WHILE n # NIL DO
-				l := n(ModuleParser.FieldDecl).identList;
-				WHILE l # NIL DO
-					newNode := AddIdentDef(parent, l, l(ModuleParser.IdentList).identDef, SortIgnore, treeView.clTextDefault.Get(), {});
-					AddType(newNode, n(ModuleParser.FieldDecl).type, FALSE);
-					l := l.next;
-				END;
-				n := n.next;
-			END;
-		END AddFieldDecl;
 
 		PROCEDURE AddPointer(parent: WMTrees.TreeNode; pointer: ModuleParser.Pointer);
 		VAR newNode: WMTrees.TreeNode;
