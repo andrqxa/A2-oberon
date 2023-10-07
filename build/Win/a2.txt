@@ -1,5 +1,5 @@
 System.DoFile oberon.ini ~
-Display.Install ~
+Display.Install --dpiAwareness ~
 WindowManager.Install ~
 Clipboard.Install ~
 Autostart.Run~
