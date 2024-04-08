@@ -284,7 +284,7 @@ TYPE
 				IF Trace THEN D.String(">>> MarkAsReachable "); Basic.WriteSegmentedName(D.Log, section.name); D.Ln END;
 				section.SetReachability(TRUE);
 				prefix := section.name; Basic.RemoveSuffix(prefix);
-				MarkAsReachableStartingWith(prefix, {Sections.InitCodeSection});
+				MarkAsReachableStartingWith(prefix, {Sections.InitCodeSection, Sections.EntryCodeSection, Sections.ExitCodeSection});
 				ASSERT(section IS IntermediateCode.Section);
 				intermediateCodeSection := section(IntermediateCode.Section);
 				(* go through all instructions in the section *)
@@ -894,15 +894,15 @@ TYPE
 		IF (instructionMemorySize > 0) & (instructionMemorySize < code.SizeInBits() DIV system.codeUnit) THEN
 			Basic.Error(diagnostics, instanceName, Basic.invalidPosition, "specified instruction memory size too small");
 			error := TRUE;
-		ELSIF instructionMemorySize = 0 THEN
+		ELSE
 			instructionMemorySize := code.SizeInBits() DIV system.codeUnit;
 		END;
-
-		dataMemorySize := MAX(data.SizeInBits() DIV system.dataUnit, dataMemorySize);
-
-		IF (dataMemorySize - data.SizeInBits() DIV system.dataUnit) < MinimalStackSize THEN
+		
+		IF (dataMemorySize > 0) & (dataMemorySize - data.SizeInBits() DIV system.dataUnit < MinimalStackSize) THEN
 			Basic.Error(diagnostics, instanceName,Basic.invalidPosition, "specified data memory size too small");
 			error := TRUE;
+		ELSE
+			dataMemorySize := MinimalStackSize + data.SizeInBits() DIV system.dataUnit;
 		END;
 
 		Files.JoinExtension(instanceName,codeFileExtension,codeFileName);
@@ -1021,10 +1021,14 @@ TYPE
 			IF defaultBackend # NIL THEN defaultBackend.GetOptions (options) END;
 			IF objectFileFormat # NIL THEN objectFileFormat.GetOptions(options) END;
 		END;
-
-		IF ~options.GetString("extension",extension) THEN extension := "" END;
+		
+		defaultBackend.Initialize(diagnostics, NIL, {}, NIL, defaultBackend.GetSystem());
 
 		NEW(linker, diagnostics, defaultBackend);
+		
+		IF options.GetString("extension",extension) THEN
+			linker.objectFile.SetExtension(extension);
+		END;
 
 		IF Basic.GetStringParameter(input, typeName) & Basic.GetStringParameter(input, instanceName) THEN
 			IF linker.LinkPrefixed(typeName) THEN
@@ -1033,8 +1037,18 @@ TYPE
 					context.out.String("generated "); context.out.String(instanceName);
 					context.out.String(objectFileFormat.extension);
 					context.out.Ln;
+					VAR instructionMemorySize, dataMemorySize: SIZE;
+					IF ~WriteCodeAndDataFiles(instanceName,"code","data",objectFileFormat, instructionMemorySize, dataMemorySize, defaultBackend, diagnostics, context.out) THEN
+						Error("failed to generate code and data"); context.result := Commands.CommandError; RETURN;
+					END;
+				ELSE
+					Error("failed to generate object file"); context.result := Commands.CommandError; RETURN;
 				END;
+			ELSE
+				Error("failed to link IR code for the specified type name"); context.result := Commands.CommandError; RETURN;
 			END;
+		ELSE
+			Error("type name and name of the instance must be specified"); context.result := Commands.CommandError; RETURN;
 		END;
 
 		(*
