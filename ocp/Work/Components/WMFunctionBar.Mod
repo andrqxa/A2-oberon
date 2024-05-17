@@ -1,4 +1,4 @@
-MODULE WMFunctionBar; (** AUTHOR "BohdanT"; PURPOSE "functional key bar"; *)
+MODULE WMFunctionBar; (** AUTHOR "BohdanT"; PURPOSE "functional key bar";  *)
 
 IMPORT
 	Strings, XML, WMGraphics, WMProperties, WMComponents, WMEvents, WMRectangles, Inputs;
