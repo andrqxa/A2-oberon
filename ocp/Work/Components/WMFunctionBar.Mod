@@ -1,4 +1,4 @@
-MODULE WMFunctionBar; (** AUTHOR "BohdanT"; PURPOSE "functional key bar";  *)
+MODULE WMFunctionBar; (** AUTHOR "BohdanT"; PURPOSE "functional key bar"; *)
 
 IMPORT
 	Strings, XML, WMGraphics, WMProperties, WMComponents, WMEvents, WMRectangles, Inputs;
@@ -19,7 +19,8 @@ TYPE
 		textColor- : WMProperties.ColorProperty;
 		funcArr* : FuncArr;
 		curflags : SIZE;
-
+		clickRect : WMRectangles.Rectangle;
+		curfunc : SIZE;
 		PROCEDURE SetFunc*(shiftkey,key:SIZE;CONST caption:ARRAY 16 OF CHAR;CONST onClick:EventSource);
 		BEGIN
 			funcArr[shiftkey,key].caption:=caption;
@@ -29,6 +30,7 @@ TYPE
 		PROCEDURE &Init;
 		BEGIN
 			Init^;
+			curfunc:=0; curflags :=0;
 			SetNameAsString(StrFunctionBar);
 			NEW(textColor, NIL, NIL, NIL); properties.Add(textColor);
 		END Init;
@@ -88,6 +90,30 @@ TYPE
 			END;
 			Release;
 		END DrawBackground;
+		
+		PROCEDURE PointerDown*(x, y: SIZE; keys : SET); (** PROTECTED *)
+		VAR
+			w:SIZE;
+		BEGIN
+			IF enabled.Get() THEN 
+					w := bounds.GetWidth() DIV 12;
+					IF w#0 THEN
+						curfunc:=x DIV w;
+						clickRect:=WMRectangles.MakeRect(curfunc*w,0,(curfunc+1)*w,bounds.GetHeight());
+					END;
+			END;
+			PointerDown^(x, y, keys)
+		END PointerDown;
+		PROCEDURE PointerUp*(x, y : SIZE; keys : SET); (** PROTECTED *)
+		BEGIN
+			IF WMRectangles.PointInRect(x, y, clickRect) THEN
+					IF funcArr[curflags,curfunc+1].onClick#NIL THEN 
+						funcArr[curflags,curfunc+1].onClick(NIL,NIL);
+					END;
+
+			END;
+			PointerUp^(x, y, keys)
+		END PointerUp;
 
 		PROCEDURE GetFlagsString(flags : SET):SIZE;
 		BEGIN
@@ -128,6 +154,7 @@ TYPE
 			END;
 			RETURN FALSE;
 		END HandleShortcut;
+
 
 	END FunctionBar;
 
