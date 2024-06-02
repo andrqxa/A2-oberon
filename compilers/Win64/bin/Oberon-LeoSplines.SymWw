@@ -1,0 +1,49 @@
+MODULE LeoSplines IN Oberon;
+	IMPORT Files, Math IN A2, Objects, Attributes, Gadgets, GfxMatrix, GfxPaths, Gfx, Leonardo, LeoPaths, LeoPens;
+CONST 
+TYPE 
+	Spline* = POINTER TO SplineDesc; 
+
+	SplineDesc* = RECORD (LeoPaths.SegmentDesc)
+		dx0*, dy0*: FLOAT32; 
+	END; 
+
+	BoxData = RECORD (GfxPaths.EnumData)
+		llx, lly, urx, ury: FLOAT32; 
+		dx0, dy0: FLOAT32; 
+		cx, cy: FLOAT32; 
+	END; 
+
+	DrawData = RECORD (GfxPaths.EnumData)
+		ctxt: Gfx.Context; 
+		pen: LeoPens.Pen; 
+	END; 
+
+	ProjectData = RECORD (GfxPaths.EnumData)
+		llx, lly, urx, ury: FLOAT32; 
+		qx, qy, px, py: FLOAT32; 
+		cx, cy: FLOAT32; 
+		hit: BOOLEAN; 
+	END; 
+
+	PROCEDURE ^ GetCoords(s: Spline; VAR xc, yc: ARRAY OF FLOAT32; VAR n: SIGNED16); 
+	PROCEDURE ^ IncludeElem(VAR data: GfxPaths.EnumData); 
+	PROCEDURE ^ CalcBox(s: Spline; VAR mat: GfxMatrix.Matrix); 
+	PROCEDURE ^ Control(s: Spline; VAR msg: Leonardo.ControlMsg); 
+	PROCEDURE ^ Validate(s: Spline; VAR msg: Leonardo.ValidateMsg); 
+	PROCEDURE ^ DrawElem(VAR data: GfxPaths.EnumData); 
+	PROCEDURE ^ Draw(s: Spline; pen: LeoPens.Pen); 
+	PROCEDURE ^ DragElem(VAR data: GfxPaths.EnumData); 
+	PROCEDURE ^ Drag(s: Spline; ctxt: Gfx.Context); 
+	PROCEDURE ^ Render(s: Spline; VAR msg: Leonardo.RenderMsg); 
+	PROCEDURE ^ ProjectElem(VAR data: GfxPaths.EnumData); 
+	PROCEDURE ^ Project(s: Spline; x, y, llx, lly, urx, ury: FLOAT32; VAR px, py: FLOAT32): BOOLEAN; 
+	PROCEDURE ^ Locate(s: Spline; VAR msg: Leonardo.LocateMsg); 
+	PROCEDURE ^ Copy*(VAR msg: Objects.CopyMsg; from, to: Spline); 
+	PROCEDURE ^ Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg); 
+	PROCEDURE ^ Init*(s: Spline; bottom, top: LeoPaths.Point; closed: BOOLEAN; pen: LeoPens.Pen); 
+	PROCEDURE ^ New*; 
+	PROCEDURE ^ HandleSpline(obj: Objects.Object; VAR msg: Objects.ObjMsg); 
+	PROCEDURE ^ NewSpline*; 
+BEGIN
+END LeoSplines.

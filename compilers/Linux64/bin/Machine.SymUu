@@ -1,0 +1,186 @@
+MODULE Machine;
+	IMPORT S := SYSTEM, Trace, Unix, Glue;
+CONST 
+	DefaultConfig = \"Color 0  StackSize 128"\; 
+	Version = \"A2 Gen. 64-bit, "\; 
+	DefaultObjectFileExtension* = \".GofUu"\; 
+	Second* = 1000; 
+	MTTR* = 12; 
+	MMX* = 23; 
+	AddressSize = SIZEOF(ADDRESS); 
+	StaticBlockSize = (8 * AddressSize); 
+	MemBlockSize* = ((64 * 1024) * 1024); 
+	TraceOutput* = 0; 
+	Memory* = 1; 
+	X11* = 2; 
+	Heaps* = 3; 
+	Interrupts* = 4; 
+	Modules* = 5; 
+	Objects* = 6; 
+	Processors* = 7; 
+	KernelLog* = 8; 
+	MaxLocks* = 9; 
+	MaxCPU* = 4; 
+	StrongChecks = TRUE; 
+TYPE 
+	Vendor* = ARRAY 13 OF CHAR; 
+
+	MemoryBlock* = POINTER {UNSAFE, UNTRACED} TO MemoryBlockDesc; 
+
+	MemoryBlockDesc* = RECORD 
+		next-: MemoryBlock; 
+		startAdr-: ADDRESS; 
+		size-: SIZE; 
+		beginBlockAdr-, endBlockAdr-: ADDRESS; 
+	END; 
+
+	State* = RECORD 
+		PC*, BP*, SP*: ADDRESS; 
+	END; 
+VAR 
+	mtx: ARRAY MaxLocks OF Unix.Mutex_t; 
+	taken: ARRAY MaxLocks OF ADDRESS; 
+	version-: ARRAY 64 OF CHAR; 
+	features-, features2: SET; 
+	MMXSupport-: BOOLEAN; 
+	SSESupport-: BOOLEAN; 
+	SSE2Support-: BOOLEAN; 
+	SSE3Support-: BOOLEAN; 
+	SSSE3Support-: BOOLEAN; 
+	SSE41Support-: BOOLEAN; 
+	SSE42Support-: BOOLEAN; 
+	SSE5Support-: BOOLEAN; 
+	AVXSupport-: BOOLEAN; 
+	ticks-: SIGNED32; 
+	prioLow-, prioHigh-: INTEGER; 
+	fcr-: SET; 
+	timerFrequency-: SIGNED64; 
+	gcThreshold-: SIZE; 
+	memBlockHead-{UNTRACED} , memBlockTail-{UNTRACED} : MemoryBlock; 
+	config: ARRAY 2048 OF CHAR; 
+	logname: ARRAY 32 OF CHAR; 
+	logfile: INTEGER; 
+	traceHeap: BOOLEAN; 
+	timer0: SIGNED64; 
+
+	PROCEDURE ^ ID*(): SIGNED32; 
+	PROCEDURE ^ FlushDCacheRange*(adr: ADDRESS; len: SIZE); 
+	PROCEDURE ^ InvalidateDCacheRange*(adr: ADDRESS; len: SIZE); 
+	PROCEDURE ^ InvalidateICacheRange*(adr: ADDRESS; len: SIZE); 
+	PROCEDURE ^ InsertMemoryBlock(memBlock: MemoryBlock); 
+	PROCEDURE ^ FreeMemBlock*(memBlock: MemoryBlock); 
+	PROCEDURE ^ ExpandHeap*(dummy: SIGNED32; size: SIZE; VAR memoryBlock: MemoryBlock; VAR beginBlockAdr, endBlockAdr: ADDRESS); 
+	PROCEDURE ^ SetMemoryBlockEndAddress*(memBlock: MemoryBlock; endBlockAdr: ADDRESS); 
+	PROCEDURE ^ TraceHeap(new: MemoryBlock); 
+	PROCEDURE ^ GetStaticHeap*(VAR beginBlockAdr, endBlockAdr, freeBlockAdr: ADDRESS); 
+	PROCEDURE ^ ValidHeapAddress*(p: ADDRESS): BOOLEAN; 
+	PROCEDURE ^ GetFreeK*(VAR total, lowFree, highFree: SIZE); 
+	PROCEDURE ^ Fill32*(destAdr: ADDRESS; size: SIZE; filler: SIGNED32); 
+	PROCEDURE ^ Portin8*(port: SIGNED32; VAR val: CHAR); 
+	PROCEDURE ^ Portin16*(port: SIGNED32; VAR val: SIGNED16); 
+	PROCEDURE ^ Portin32*(port: SIGNED32; VAR val: SIGNED32); 
+	PROCEDURE ^ Portout8*(port: SIGNED32; val: CHAR); 
+	PROCEDURE ^ Portout16*(port: SIGNED32; val: SIGNED16); 
+	PROCEDURE ^ Portout32*(port: SIGNED32; val: SIGNED32); 
+	PROCEDURE {Fingerprint(8896812235857205744)}  - AtomicInc*(VAR x: SIGNED32);
+	CODE
+
+	POP RAX
+	LOCK
+	INC DWORD [RAX]
+
+
+	END AtomicInc; 
+	PROCEDURE {Fingerprint(8896812235852052984)}  - AtomicDec*(VAR x: SIGNED32);
+	CODE
+
+	POP RAX
+	LOCK
+	DEC DWORD [RAX]
+
+
+	END AtomicDec; 
+	PROCEDURE {Fingerprint(-8278068833601498723)}  - AtomicAdd*(VAR x: SIGNED32; y: SIGNED32);
+	CODE
+
+	POP RBX
+	POP RAX
+	LOCK
+	ADD DWORD [RAX], EBX
+
+
+	END AtomicAdd; 
+	PROCEDURE {Fingerprint(7521546277042004411)}  - AtomicTestSet*(VAR x: BOOLEAN): BOOLEAN;
+	CODE
+
+	POP RBX
+	MOV AL, 1
+	XCHG [RBX], AL
+
+
+	END AtomicTestSet; 
+	PROCEDURE {Fingerprint(-1301654632009957655)}  - AtomicCAS*(VAR x: SIGNED32; old, new: SIGNED32): SIGNED32;
+	CODE
+
+	POP RBX		; new
+	POP RAX		; old
+	POP RCX		; address of x
+	LOCK CMPXCHG [RCX], EBX	; atomicly compare x with old and set it to new if equal
+
+
+	END AtomicCAS; 
+	PROCEDURE {Fingerprint(7628482207854476747)}  - SpinHint*;
+	CODE
+
+	PAUSE
+
+
+	END SpinHint; 
+	PROCEDURE ^ CurrentPC*(): ADDRESS; 
+	PROCEDURE {Fingerprint(6112430532310118778)}  - GetTimer*(): SIGNED64;
+	CODE
+	XOR RAX, RAX
+	RDTSC	; set EDX:EAX
+	SHL RDX, 32
+	OR RAX, RDX
+
+	END GetTimer; 
+	PROCEDURE ^ GetConfig*(CONST name: ARRAY OF CHAR; VAR val: ARRAY OF CHAR); 
+	PROCEDURE ^ StrToInt*(VAR i: SIZE; CONST s: ARRAY OF CHAR): SIGNED32; 
+	PROCEDURE ^ NumberOfProcessors*(): SIZE; 
+	PROCEDURE ^ SetNumberOfProcessors*(num: SIGNED32); 
+	PROCEDURE ^ ChangeByteOrder*(n: SIGNED32): SIGNED32; 
+	PROCEDURE ^ TraceChar*(c: CHAR); 
+	PROCEDURE ^ CPUID*(VAR vendor: Vendor; VAR version: SIGNED32; VAR features1, features2: SET); 
+	PROCEDURE ^ CpuIdSupported(): BOOLEAN; 
+	PROCEDURE ^ SetupSSE2Ext; 
+	PROCEDURE {Fingerprint(5082109869366590970)}  - SetFCR(s: SET);
+	CODE
+	END SetFCR; 
+	PROCEDURE {Fingerprint(5376736950748288)}  - FCR(): SET;
+	CODE
+	END FCR; 
+	PROCEDURE {Fingerprint(7631660203431244919)}  - InitFPU;
+	CODE
+	END InitFPU; 
+	PROCEDURE ^ SetupFPU*; 
+	PROCEDURE ^ InitLocks; 
+	PROCEDURE ^ CleanupLocks*; 
+	PROCEDURE ^ Acquire*(level: SIGNED32); 
+	PROCEDURE ^ Release*(level: SIGNED32); 
+	PROCEDURE ^ Shutdown*(reboot: BOOLEAN); 
+	PROCEDURE ^ SetGCParams*; 
+	PROCEDURE ^ InitConfig; 
+	PROCEDURE ^ UpdateTicks*; 
+	PROCEDURE ^ InitThreads; 
+	PROCEDURE ^ CPUSpeed; 
+	PROCEDURE ^ Log(c: CHAR); 
+	PROCEDURE ^ LogFileOnly(c: CHAR); 
+	PROCEDURE ^ InitLog; 
+	PROCEDURE ^ SilentLog*; 
+	PROCEDURE ^ VerboseLog*; 
+	PROCEDURE ^ Append(VAR a: ARRAY OF CHAR; CONST this: ARRAY OF CHAR); 
+	PROCEDURE ^ Init; 
+	PROCEDURE ^ Init0*; 
+BEGIN
+END Machine.

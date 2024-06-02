@@ -1,0 +1,35 @@
+MODULE GZWriters IN Oberon;
+	IMPORT Files, ZlibWriters;
+CONST 
+	Ok* = ZlibWriters.Ok; 
+	StreamEnd* = ZlibWriters.StreamEnd; 
+	FileError* =  -1; 
+	StreamError* = ZlibWriters.StreamError; 
+	DataError* = ZlibWriters.DataError; 
+	BufError* = ZlibWriters.BufError; 
+	DefaultCompression* = ZlibWriters.DefaultCompression; 
+	NoCompression* = ZlibWriters.NoCompression; 
+	BestSpeed* = ZlibWriters.BestSpeed; 
+	BestCompression* = ZlibWriters.BestCompression; 
+	DefaultStrategy* = ZlibWriters.DefaultStrategy; 
+	Filtered* = ZlibWriters.Filtered; 
+	HuffmanOnly* = ZlibWriters.HuffmanOnly; 
+	DeflateMethod = 8; 
+TYPE 
+	Writer* = RECORD 
+		file-: Files.File; 
+		res-: SIGNED32; 
+		start: SIGNED32; 
+		pos: SIGNED32; 
+		zw: ZlibWriters.Writer; 
+	END; 
+
+	PROCEDURE ^ WriteHeader(VAR w: Writer; VAR r: Files.Rider); 
+	PROCEDURE ^ SetParams*(VAR w: Writer; level, strategy: SIGNED8); 
+	PROCEDURE ^ Open*(VAR w: Writer; level, strategy: SIGNED8; file: Files.File); 
+	PROCEDURE ^ WriteBytes*(VAR w: Writer; VAR buf: ARRAY OF CHAR; offset, len: SIGNED32; VAR written: SIGNED32); 
+	PROCEDURE ^ Write*(VAR w: Writer; ch: CHAR); 
+	PROCEDURE ^ Close*(VAR w: Writer); 
+	PROCEDURE ^ Pos*(VAR w: Writer): SIGNED32; 
+BEGIN
+END GZWriters.

@@ -1,0 +1,42 @@
+MODULE LeoCaptionEditors IN Oberon;
+	IMPORT Objects, Display, Input, Fonts, Texts, Oberon, Attributes, Links, Display3, Effects, Gadgets, GfxMatrix, GfxFonts, Gfx, Leonardo, LeoCaptions, LeoFrames, LeoTools, LeoPanels;
+CONST 
+TYPE 
+	; 
+VAR 
+	Cursor: Oberon.Marker; 
+	CursorFG, CursorBG: Display.Pattern; 
+	Focus: RECORD 
+		frame: LeoFrames.Frame; 
+		fig: Leonardo.Figure; 
+		shape: Leonardo.Shape; 
+		px, py: FLOAT32; 
+		x, y: SIGNED16; 
+		visible: BOOLEAN; 
+	END; 
+	Font, Size, Color: Objects.Object; 
+
+	PROCEDURE ^ InspectSel*; 
+	PROCEDURE ^ ApplySel*; 
+	PROCEDURE ^ RevertTool(editor: LeoPanels.Editor); 
+	PROCEDURE ^ ApplyTool(editor: LeoPanels.Editor); 
+	PROCEDURE ^ DrawCursor(x, y: SIGNED16); 
+	PROCEDURE ^ FadeCursor(x, y: SIGNED16); 
+	PROCEDURE ^ InitCursor; 
+	PROCEDURE ^ FlipCaret(fx, fy: SIGNED16; mask: Display3.Mask); 
+	PROCEDURE ^ ShowCaret(fx, fy: SIGNED16; mask: Display3.Mask); 
+	PROCEDURE ^ HideCaret(fx, fy: SIGNED16; mask: Display3.Mask); 
+	PROCEDURE ^ Show(frame: LeoFrames.Frame; VAR msg: Display.FrameMsg); 
+	PROCEDURE ^ Hide(frame: LeoFrames.Frame; VAR msg: Display.FrameMsg); 
+	PROCEDURE ^ GetText(text: Texts.Text; beg, end: SIGNED32; VAR s: ARRAY OF CHAR); 
+	PROCEDURE ^ ConsumeText(fig: Leonardo.Figure; text: Texts.Text; beg, end: SIGNED32); 
+	PROCEDURE ^ SetFocus(frame: LeoFrames.Frame; x, y: FLOAT32): BOOLEAN; 
+	PROCEDURE ^ Integrate(frame: LeoFrames.Frame; CONST s: ARRAY OF CHAR); 
+	PROCEDURE ^ Track(frame: LeoFrames.Frame; VAR msg: Oberon.InputMsg); 
+	PROCEDURE ^ Handle(obj: Objects.Object; VAR msg: Objects.ObjMsg); 
+	PROCEDURE ^ Activate*; 
+	PROCEDURE ^ Revert(editor: LeoPanels.Editor); 
+	PROCEDURE ^ Apply(editor: LeoPanels.Editor); 
+	PROCEDURE ^ New*; 
+BEGIN
+END LeoCaptionEditors.

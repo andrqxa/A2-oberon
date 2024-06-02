@@ -1,0 +1,2 @@
+KbdMouse.DisableMouseEmulation ~
+DisplayRefresher.Install~
