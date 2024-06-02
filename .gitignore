@@ -1,0 +1,6 @@
+target
+**/*.bak
+**/*.log
+**/*.Log
+**/*.Test.Diff
+**/TesterInput.txt
