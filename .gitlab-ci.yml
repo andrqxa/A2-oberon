@@ -1,4 +1,3 @@
-
 stages:
   - build
   - test
@@ -6,58 +5,51 @@ stages:
 default:
   image: debian:latest
   before_script:
-    - echo "before script"
-    - apt-get update
-    - apt-get install zip -y
+    - echo "Before script"
+    - apt update
+    - apt install make -y
+
 buildLinuxARM:
   stage: build
   script:
-    - unzip Linux64.zip
-    - cd build
-    - ./build.sh LinuxARM
+    - make LinuxARM
   cache:
     paths:
+      - target/LinuxARM
   artifacts:
     paths:
-      - LinuxARM.zip
+      - target/LinuxARM
 
 buildLinuxAMD:
   stage: build
   script:
-    - unzip Linux64.zip
-    - cd build
-    - ./build.sh Linux32
-    - ./build.sh Linux64
+    - make Linux32
+    - make Linux64
   cache:
     paths:
+      - target/Linux32
+      - target/Linux64
   artifacts:
     paths:
-      - Linux32.zip
-      - Linux64.zip
+      - target/Linux32
+      - target/Linux64
 
 buildWinAMD:
   stage: build
   script:
-    - unzip Linux64.zip
-    - cd build
-    - ./build.sh Win32
-    - ./build.sh Win64
+    - make Win32
+    - make Win64
   cache:
     paths:
+      - target/Win32
+      - target/Win64
   artifacts:
     paths:
-      - Win32.zip
-      - Win64.zip
+      - target/Win32
+      - target/Win64
 
 test:
   stage: test
   script:
-      - echo "Artifacts generated:"
-      - ls -la *.zip
-      - unzip -q Linux64.zip
-      - cd Linux64
-      - ./oberon do "
-        System.DoFile oberon.ini ~ 
-        FoxTest.Compile -l=Test.Log  Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~
-        FoxTest.Compile	-l=Test.Log Oberon.Execution.Test Oberon.Execution.AMD64TestDiff ~
-        "
+    - echo "Tests are starting:"
+    - make test
