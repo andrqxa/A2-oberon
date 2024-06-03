@@ -3,6 +3,7 @@ TARGETS := Linux64 Linux32 LinuxARM Win32 Win64
 CURRENT_DIR := $(shell pwd)
 CONFIGS := $(CURRENT_DIR)/configs
 DATA := $(CURRENT_DIR)/data
+# RES := $(CURRENT_DIR)/resources
 SRC := $(CURRENT_DIR)/source
 
 # Define default value for binary files
@@ -49,26 +50,26 @@ $(TARGETS): %: dirs
 		echo './oberon run a2.txt' > $(BUILD_DIR)/$@/a2.sh; \
 		chmod +x $(BUILD_DIR)/$@/a2.sh; \
 		cat $(CONFIGS)/a2General.txt $(CONFIGS)/a2LinuxSpecific.txt > $(BUILD_DIR)/$@/a2.txt; \
-		cp $(CONFIGS)/oberonGeneral.ini $(BUILD_DIR)/$@/oberon.ini; \
+		cat $(CONFIGS)/oberonGeneral.ini $(CONFIGS)/oberonResources.ini $(CONFIGS)/oberonGeneralLast.ini > $(BUILD_DIR)/$@/oberon.ini; \
 	elif [ "$@" = "Win32" ] || [ "$@" = "Win64" ]; then \
 		echo 'oberon run a2.txt' > $(BUILD_DIR)/$@/a2.bat; \
 		cp $(CONFIGS)/a2General.txt $(BUILD_DIR)/$@/a2.txt; \
-		cat $(CONFIGS)/oberonGeneral.ini $(CONFIGS)/oberonWindowsSpecific.ini > $(BUILD_DIR)/$@/oberon.ini; \
+		cat $(CONFIGS)/oberonGeneral.ini $(CONFIGS)/oberonResources.ini $(CONFIGS)/oberonGeneralLast.ini $(CONFIGS)/oberonWindowsSpecific.ini > $(BUILD_DIR)/$@/oberon.ini; \
 	fi
 
 	@mkdir -p $(BUILD_DIR)/$@/work
 	@mkdir -p $(BUILD_DIR)/$@/bin
 
 	# Create oberon.ini for compilation
-	@echo Files.AddSearchPath $(BIN)~ > oberon.ini
-	@echo Heaps.SetMetaData~ >> oberon.ini
-	@echo Files.AddSearchPath $(DATA)~ >> oberon.ini
-	@echo Files.AddSearchPath $(SRC)~ >> oberon.ini
-	@echo Configuration.Init~ >> oberon.ini
+	@echo Heaps.SetMetaData~ > $(BUILD_DIR)/$@/oberonCompile.ini
+	@echo Files.AddSearchPath $(BIN)~ >> $(BUILD_DIR)/$@/oberonCompile.ini
+	@cat $(CONFIGS)/oberonResources.ini >> $(BUILD_DIR)/$@/oberonCompile.ini
+	@echo Configuration.Init~ >> $(BUILD_DIR)/$@/oberonCompile.ini
 
 	# Compile new architecture
+	@cd $(BUILD_DIR)/$@; \
 	$(COMPILER) do " \
-		System.DoFile oberon.ini ~ \
+		System.DoFile oberonCompile.ini ~ \
 		Files.SetWorkPath $(BUILD_DIR)/$@ ~ \
 		System.DoFile $(BUILD_DIR)/$@/combined.txt ~ \
 	"
@@ -83,9 +84,11 @@ $(TARGETS): %: dirs
 		echo "Build not successful!!!"; \
 		exit 1; \
 	fi
-
+	
+# Removed generated files
 	@rm -f $(BUILD_DIR)/$@/dynamic.txt
 	@rm -f $(BUILD_DIR)/$@/combined.txt
+	@rm -f $(BUILD_DIR)/$@/oberonCompile.ini
 
 # Remove all generated files
 .PHONY: clean
