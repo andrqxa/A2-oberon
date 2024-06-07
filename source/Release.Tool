@@ -211,6 +211,7 @@ BUILDS
 		INCLUDE "LINUX UNIX I386"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "-p=Unix32"
+		PATH "./NewAos/"
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
@@ -226,14 +227,8 @@ BUILDS
 		INCLUDE "LINUX UNIX AMD64"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "-p=Unix64"
+		PATH "./NewAos/"
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
-		DISABLED "FALSE"
-	}
-	LinuxARM {
-		INCLUDE "LINUX UNIX ARM"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "-p=UnixARM"
-		EXCLUDEPACKAGES "EFI Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
 	Linux64C {
@@ -284,9 +279,9 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 
 	License.Text
 	OBEMBR.BIN												# MBR
-	BootManagerMBR.Bin BootManagerTail.Bin			# Boot manager
+	BootManagerMBR.Bin BootManagerTail.Bin					# Boot manager
 	BootManager.Bin BootManager.Text
-	OBL.Bin OBL.Text OBLUnreal.Bin						# Boot loader
+	OBL.Bin OBL.Text											# Boot loader
 	Setup.Text													# Documentation
 
 # Active Oberon run-time
@@ -301,13 +296,13 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	RPI & COOP { RPI.CPU.Mod }
 	ZYNQ & COOP { Zynq.CPU.Mod }
 
-	NATIVE & ARM & ~COOP { ARM.Initializer.Mod }
+	ARM & ~COOP { ARM.Initializer.Mod }
 	ZYNQ & ~COOP { Zynq.ARM.Platform.Mod }
 
 	# Low-level trace output
 	Trace.Mod
 
-	NATIVE & ARM & ~COOP { ARM.BootConfig.Mod }
+	ARM & ~COOP { ARM.BootConfig.Mod }
 
 	WIN & ~COOP { Windows.Kernel32.Mod }
 
@@ -334,7 +329,7 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	BIOS & AMD64 & ~COOP { BIOS.AMD64.Machine.Mod }
 	WIN & ~COOP { Windows.Machine.Mod }
 	COOP & ~ARM { Mutexes.Mod Coop.Machine.Mod }
-  COOP & ARM { Mutexes.Mod Coop.ARM.Machine.Mod }
+	COOP & ARM { Mutexes.Mod Coop.ARM.Machine.Mod }
 	UNIX & ~COOP { Unix.Machine.Mod }
 	ZYNQ & ~COOP { Zynq.PsUartMin.Mod Zynq.TraceDevice.Mod Zynq.PrivateWatchdog.Mod ARM.Machine.Mod }
 
@@ -347,14 +342,11 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	WIN & ~COOP { Windows.Objects.Mod Windows.Kernel.Mod }
 	UNIX & ~COOP { Unix.Objects.Mod Unix.Kernel.Mod }
 	COOP { Coop.Objects.Mod Coop.Kernel.Mod }
-	NATIVE & ARM & ~COOP { ARM.Objects.Mod ARM.Kernel.Mod }
+	ARM & ~COOP { ARM.Objects.Mod ARM.Kernel.Mod }
 
 END
 
 PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
-# low-level utility modules
-	RealConversions.Mod
-	Strings.Mod UTF8Strings.Mod
 
 # kernel extensions
 
@@ -362,7 +354,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	KernelLog.Mod
 
 	# Services and device drivers
-	Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod
+	Plugins.Mod RealConversions.Mod Streams.Mod Pipes.Mod Commands.Mod
 	In.Mod Out.Mod
 
 	I386 { I386.Reals.Mod }
@@ -375,7 +367,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	UNIX { Unix.StdIO.Mod }
 	BIOS & I386 & ~COOP { BIOS.I386.Traps.Mod }
 	BIOS & AMD64 & ~COOP { BIOS.AMD64.Traps.Mod }
-	NATIVE & ARM & ~COOP { ARM.Traps.Mod }
+	ARM & ~COOP { ARM.Traps.Mod }
 	WIN & ~COOP { Windows.Traps.Mod }
 	UNIX & ~COOP { Unix.Traps.Mod }
 	COOP { Coop.Traps.Mod }
@@ -403,10 +395,8 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	Files.Mod
 
-	Dates.Mod  # low-level utility modules
-
-	# Command line option parser
-	Options.Mod
+	Dates.Mod Strings.Mod # low-level utility modules
+	UTF8Strings.Mod
 
 	FileTrapWriter.Mod
 
@@ -435,6 +425,9 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	# input drivers
 	Inputs.Mod
+
+	# Command line option parser
+	Options.Mod
 
 	# system event logging
 	Events.Mod
@@ -494,12 +487,10 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	# TV card interface
 	TVDriver.Mod
-
+	
 	# Generics
 	GenericCollections.Mod
 
-	WIN { Windows.HostLibs.Mod }
-	UNIX { Unix.HostLibs.Mod }
 END
 
 PACKAGE Drivers ARCHIVE "Drivers.zip" SOURCE "DriversSrc.zip" DESCRIPTION "Device Drivers"
@@ -519,9 +510,8 @@ PACKAGE Drivers ARCHIVE "Drivers.zip" SOURCE "DriversSrc.zip" DESCRIPTION "Devic
 
 	NATIVE & ~BIOS { Beep.Mod }
 
-	# Pseudo sound driver for LinuxA2 and WinA2
-
-	UNIX, WIN { OpenAL.Mod OpenALSound.Mod }
+	# Pseudo sound driver for UnixAos
+	UNIX { Unix.OpenAL.Mod OpenALSound.Mod }
 
 	WIN { Windows.WinDisks.Mod } # direct windows disk access, implements Disks interface
 
@@ -775,8 +765,8 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 	System.Mod
 	Reboot.Mod # Tool to reboot machine after delay (and write system reboot time to file)
 
-	WIN { Windows.PrecisionTimer.Mod Windows.WinApplications.Mod }
-	UNIX { Unix.PrecisionTimer.Mod }
+	WIN { Windows.PrecisionTimer.Mod Windows.HostLibs.Mod Windows.WinApplications.Mod }
+	UNIX { Unix.PrecisionTimer.Mod Unix.HostLibs.Mod }
 	UNIX, WIN { Stopwatch.Mod }
 
 	NATIVE {
@@ -1077,9 +1067,7 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 	WMRestorable.Mod Release.Auto.dsk
 	WMApplications.Mod
 
-	WMDialogs.Mod
-	WMColorPicker.Mod WMColorPicker.zip
-	WMTerminator.Mod
+	WMDialogs.Mod WMTerminator.Mod
 	WMDocumentEditor.Mod
 
 	WMErrors.Mod
@@ -1204,9 +1192,9 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 
 	# ssh
 	SSH.Tool  SSH.Configuration.Text
-	SSHGlobals.Mod  SSHPackets.Mod  SSHKeys.Mod
-	SSHTransport.Mod  SSHAuthorize.Mod  SSHChannels.Mod
-	SSHTerminal.Mod  SSH.Mod
+	SSHGlobals.Mod  SSHPackets.Mod  SSHKeys.Mod  
+	SSHTransport.Mod  SSHAuthorize.Mod  SSHChannels.Mod   
+	SSHTerminal.Mod  SSH.Mod 
 END
 
 PACKAGE GuiApplications ARCHIVE "GuiApplications.zip" SOURCE "GuiApplicationsSrc.zip" DESCRIPTION "Window Manager and Graphical Applications"
@@ -1240,7 +1228,7 @@ PACKAGE GuiApplications ARCHIVE "GuiApplications.zip" SOURCE "GuiApplicationsSrc
 	# Skins
 	BluePlastic.skin
 	reptile.skin pklook.skin redlook.skin traditional.skin
-	winxp.skin aqua.skin xmas.skin glass.skin stijn.skin stijnbw.skin xpe.skin
+	winxp.skin aqua.skin xmas.skin glass.skin stijn.skin stijnbw.skin
 
 	SkinEditor.Mod SkinTutorial.Text
 
@@ -1462,8 +1450,8 @@ PACKAGE Build ARCHIVE "Build.zip" SOURCE "BuildSrc.zip" DESCRIPTION "Build Tools
 	IsoImages.Mod
 	ReleaseThreadPool.Mod Release.Mod Release.Tool	# Build release tool
 	PETReleaseTree.Mod
-	OBEMBR4.ASM BootManager.Asm OBL.Asm OBLUnreal.Asm	# Asm
-	BootManager.Mod BootManager.Tool	# Splits up BootManager.Bin into BootManagerMBR.Bin and BootManagerTail.Bin
+	OBEMBR4.ASM BootManager.Asm OBL.Asm # Asm
+	BootManager.Mod BootManager.Tool # Splits up BootManager.Bin into BootManagerMBR.Bin and BootManagerTail.Bin
 END
 
 PACKAGE EFI ARCHIVE "EFI.zip" SOURCE "EFISrc.zip" DESCRIPTION "EFI Boot Loader and API"
@@ -1496,19 +1484,15 @@ PACKAGE Contributions ARCHIVE "Contributions.zip" SOURCE "ContributionsSrc.zip" 
 	# SMB client & server
 	SambaClient.Mod SambaServer.Mod
 
-	~ARM {
 	srRenderTools.Text srReadMe.Text	# Realtime Fractal-Voxel Raytracer (Soren Renner)
 	srBase.Mod srRayEngine.Mod srMath.Mod
-	}
 	I386, AMD64 { srE.Mod }
-	~ARM {
 	srGL.Mod srHex.Mod srImage.Mod
 	srVoxel.Mod srVoxel2.Mod srVoxel3.Mod srVolShader.Mod srVoxel4.Mod srVoxel5.Mod
 	srM2Space.Mod srM3Space.Mod srM5Space.Mod srM6Space.Mod srRastermovie.Mod
 	srTexVox.Mod srThermoCell.Mod srTree.Mod sr3DTexture.Mod srLifeVox.Mod
 	srRotaVox.Mod srvoxels.Mod srRender.Mod
 	recticle.png
-	}
 
 	MenuPages.Mod # generate MenuPageXX.XML files
 
@@ -2086,20 +2070,6 @@ PACKAGE TrueTypeFonts ARCHIVE "TrueTypeFonts.zip" SOURCE "" DESCRIPTION "True-ty
 	IBMPlexMono_bd.ttf IBMPlexMono_bi.ttf
 	IBMPlexSansCondensed.ttf IBMPlexSansCondensed_i.ttf
 	IBMPlexSansCondensed_bd.ttf IBMPlexSansCondensed_bi.ttf
-	LiberationMono.ttf LiberationMono_bd.ttf LiberationMono_bi.ttf LiberationMono_i.ttf
-	LiberationSans.ttf LiberationSans_bd.ttf LiberationSans_bi.ttf LiberationSans_i.ttf
-	LiberationSerif.ttf LiberationSerif_bd.ttf LiberationSerif_bi.ttf LiberationSerif_i.ttf
-	LiberationFontsLicense.txt
-
-	PTAstraSans.ttf PTAstraSans_bd.ttf PTAstraSans_bi.ttf PTAstraSans_i.ttf
-	PTAstraSerif.ttf PTAstraSerif_bd.ttf PTAstraSerif_bi.ttf PTAstraSerif_i.ttf
-	PTMono.ttf PTMono_bd.ttf
-	PTSans.ttf PTSans_bd.ttf PTSans_bi.ttf PTSans_i.ttf
-	PTSansCaption.ttf PTSansCaption_bd.ttf
-	PTSansNarrow.ttf PTSansNarrow_bd.ttf
-	PTSerif.ttf PTSerif_bd.ttf PTSerif_bi.ttf PTSerif_i.ttf
-	PTSerifCaption.ttf PTSerifCaption_i.ttf
-	PTFreeFontOFL.txt
 END
 
 PACKAGE CjkFonts ARCHIVE "CjkFonts.zip" SOURCE "" DESCRIPTION "Chinese, Japanese and Korean Fonts"
