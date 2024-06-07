@@ -1,0 +1,6 @@
+Linux32.zip filter=lfs diff=lfs merge=lfs -text
+Linux64.zip filter=lfs diff=lfs merge=lfs -text
+LinuxARM.zip filter=lfs diff=lfs merge=lfs -text
+Win32.zip filter=lfs diff=lfs merge=lfs -text
+Win64.zip filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
