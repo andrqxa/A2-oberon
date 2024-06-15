@@ -1628,7 +1628,13 @@ TYPE
 				IF IsLink(p) THEN
 				ELSIF p IS XML.Chars THEN
 					s := p(XML.Chars).GetStr();
-					IF s # NIL THEN Strings.HexStrToInt(s^, value, res) END; NotDefault
+					VAR pos := SIZE(0), color := UNSIGNED32(0);
+					IF (s # NIL) THEN
+						IF ~Strings.TryScanUInt32At(pos, s^, 16, color, res) THEN
+							TRACE("invalid color format", s^);
+						END;
+					END;
+					value := WMGraphics.Color(color); NotDefault
 				END
 			END;
 			Stamp;

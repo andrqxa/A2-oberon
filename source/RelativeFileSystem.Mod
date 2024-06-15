@@ -22,8 +22,11 @@ TYPE PathName=ARRAY 272 OF CHAR;
 				RemovePrefix(relTo);
 			END;
 
-			IF fs.Has(relTo,full,flags) THEN
-				COPY(full,SELF.relTo);
+			IF fs.Has(relTo, full, flags) THEN
+				IF fs.prefix # "" THEN
+					RemovePrefix(full);
+				END;
+				COPY(full, SELF.relTo);
 			ELSE (* should never happen, but as a fallback: *)
 				COPY(relTo, SELF.relTo);
 			END;
@@ -40,7 +43,8 @@ TYPE PathName=ARRAY 272 OF CHAR;
 		PROCEDURE New0* (CONST name: ARRAY OF CHAR): Files.File;
 		VAR new: PathName;
 		BEGIN
-			MakeRel(name,new); RETURN fs.New0(new);
+			MakeRel(name,new);
+			RETURN fs.New0(new);
 		END New0;
 
 		PROCEDURE Old0* (CONST name: ARRAY OF CHAR): Files.File;
@@ -55,13 +59,15 @@ TYPE PathName=ARRAY 272 OF CHAR;
 		PROCEDURE CreateDirectory0* (CONST name: ARRAY OF CHAR;     VAR res: INTEGER);
 		VAR new: PathName;
 		BEGIN
-			MakeRel(name,new); fs.CreateDirectory0(new,res);
+			MakeRel(name,new);
+			fs.CreateDirectory0(new,res);
 		END CreateDirectory0;
 
 		PROCEDURE Delete0* (CONST name: ARRAY OF CHAR;     VAR key: SIGNED32; VAR res: INTEGER);
 		VAR new: PathName;
 		BEGIN
-			MakeRel(name,new); fs.Delete0(new,key,res);
+			MakeRel(name,new);
+			fs.Delete0(new,key,res);
 		END Delete0;
 
 		PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR;     flags: SET;     enum: Files.Enumerator);
@@ -97,7 +103,7 @@ TYPE PathName=ARRAY 272 OF CHAR;
 	PROCEDURE RemovePrefix(VAR name: ARRAY OF CHAR);
 	VAR i,j: SIZE;
 	BEGIN
-		WHILE(name[i] # 0X) & (name[i] # ":") DO
+		WHILE (name[i] # 0X) & (name[i] # ":") DO
 			INC(i);
 		END;
 		IF name[i] = ":" THEN
@@ -111,10 +117,13 @@ TYPE PathName=ARRAY 272 OF CHAR;
 
 	(** NewFS - Create a new filesystem relative to a Windows path. does not protect paths higher than relTo! (xyz:/../../.. could be used) *)
 	PROCEDURE NewFS*(context : Files.Parameters);
-	VAR str,prefix,name, full: ARRAY 256 OF CHAR; fs: FileSystem; rel: Files.FileSystem; ft: Files.FileSystemTable; flags:SET;
+	VAR str, prefix, name, full: ARRAY 256 OF CHAR; fs: FileSystem; rel: Files.FileSystem; ft: Files.FileSystemTable; flags:SET;
 	BEGIN
 		IF context.arg.GetString(str) THEN
 			Files.SplitName(str,prefix,name);
+#IF WIN THEN
+			IF LEN(prefix) = 1 THEN prefix[0] := CAP(prefix[0]); END;
+#END
 			IF prefix # "" THEN
 				rel := Files.This(prefix);
 			ELSE
@@ -122,8 +131,8 @@ TYPE PathName=ARRAY 272 OF CHAR;
 				rel := ft[0];
 			END;
 			IF rel # NIL THEN
-				IF rel.Has(str,full,flags) THEN
-					NEW(fs,str,rel);
+				IF rel.Has(name, full, flags) THEN
+					NEW(fs, str, rel);
 					Files.Add(fs, context.prefix);
 				ELSE
 					context.error.String("file system does not contain "); context.error.String(str); context.error.Ln;

@@ -534,7 +534,7 @@ TYPE
 		stopped : BOOLEAN;
 		init : VNCService;
 
-		PROCEDURE &Open*(port: SIGNED32; vncInfo : VNCInfo; init : VNCService; VAR res: INTEGER);
+		PROCEDURE &Open*(port: UNSIGNED32; vncInfo : VNCInfo; init : VNCService; VAR res: INTEGER);
 		BEGIN
 			stopped := FALSE; SELF.vncInfo := vncInfo; SELF.init := init;
 			NEW(service); service.Open(port, IP.NilAdr, TCP.NilPort, res);
@@ -785,7 +785,7 @@ BEGIN
 	END
 END SendHextile;
 
-PROCEDURE OpenServer*(port : SIGNED32; img : Raster.Image; name, password : ARRAY OF CHAR; ml : VNCMouseListener;
+PROCEDURE OpenServer*(port : UNSIGNED32; img : Raster.Image; name, password : ARRAY OF CHAR; ml : VNCMouseListener;
 										kl : VNCKeyboardListener; cl : VNCClipboardListener; ncal : VNCNofClientsActiveListener) : Server;
 VAR server : Server;
 	 vncInfo : VNCInfo; res : INTEGER;
@@ -802,7 +802,7 @@ BEGIN
 	RETURN server;
 END OpenServer;
 
-PROCEDURE OpenService*(port : SIGNED32; init : VNCService) : Server;
+PROCEDURE OpenService*(port : UNSIGNED32; init : VNCService) : Server;
 VAR server : Server; res : INTEGER;
 BEGIN
 	NEW(server, port, NIL, init, res);
