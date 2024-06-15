@@ -238,6 +238,144 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	RETURN res
 END ModH;
 
+PROCEDURE DivU(l,r: UNSIGNED64): UNSIGNED64;
+CODE{SYSTEM.i386}
+	; taken from "Software Optimization Guide for AMD64 Processors"
+	; divides two unsigned 64-bit integers and returns the quotient.
+	;
+	; In: [EBP+l+4]:[EBP+l+0] = dividend (l)
+	; [EBP+r+4]:[EBP+r+0] = divisor (r)
+	; Out: EDX:EAX = quotient of division
+	PUSH ECX ; Save EBX as per calling convention.
+
+	MOV EDX, [EBP+l+4] 	    ; dividend_hi
+	MOV EAX, [EBP+l+0] 		; dividend_lo
+	MOV ECX, [EBP+r+4] 	    ; divisor_hi
+	MOV EBX, [EBP+r+0] 	    ; divisor_lo
+
+	TEST ECX, ECX ; divisor > (2^32 – 1)?
+	JNZ BIGDIVISOR ; Yes, divisor > 2^32 – 1.
+	CMP EDX, EBX ; Only one division needed (ECX = 0)?
+	JAE TWODIVS ; Need two divisions.
+	DIV EBX ; EAX = quotient_lo
+	MOV EDX, ECX ; EDX = quotient_hi = 0 (quotient in EDX:EAX)
+	JMP DONE
+
+TWODIVS:
+	MOV ECX, EAX ; Save dividend_lo in ECX.
+	MOV EAX, EDX ; Get dividend_hi.
+	XOR EDX, EDX ; Zero-extend it into EDX:EAX.
+	DIV EBX ; quotient_hi in EAX
+	XCHG EAX, ECX ; ECX = quotient_hi, EAX = dividend_lo
+	DIV EBX ; EAX = quotient_lo
+	MOV EDX, ECX ; EDX = quotient_hi (quotient in EDX:EAX)
+	JMP DONE
+
+BIGDIVISOR:
+	MOV EDI, ECX ; Save divisor_hi.
+	SHR EDX, 1 ; Shift both divisor and dividend right
+	RCR EAX, 1 ; by 1 bit.
+	ROR EDI, 1
+	RCR EBX, 1
+	BSR ECX, ECX ; ECX = number of remaining shifts
+	SHRD EBX, EDI, CL ; Scale down divisor and dividend
+	SHRD EAX, EDX, CL ; such that divisor is less than
+	SHR EDX, CL ; 2^32 (that is, it fits in EBX).
+	ROL EDI, 1 ; Restore original divisor_hi.
+	DIV EBX ; Compute quotient.
+	MOV EBX, [EBP+l+0] ; dividend_lo
+	MOV ECX, EAX ; Save quotient.
+	IMUL EDI, EAX ; quotient * divisor high word (low only)
+	MUL [EBP+r+0] ; quotient * divisor low word
+	ADD EDX, EDI ; EDX:EAX = quotient * divisor
+	SUB EBX, EAX ; dividend_lo – (quot.*divisor)_lo
+	MOV EAX, ECX ; Get quotient.
+	MOV ECX, [EBP+l+4] ; dividend_hi
+	SBB ECX, EDX ; Subtract (divisor * quot.) from dividend.
+	SBB EAX, 0 ; Adjust quotient if remainder negative.
+	XOR EDX, EDX ; Clear high word of quot. (EAX<=FFFFFFFFh).
+
+DONE:
+	POP ECX
+END DivU;
+
+PROCEDURE DivU64*(l,r: UNSIGNED64): UNSIGNED64;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	RETURN DivU(l,r);
+END DivU64;
+
+PROCEDURE ModU(l, r: UNSIGNED64): UNSIGNED64;
+CODE{SYSTEM.i386}
+	; taken from "Software Optimization Guide for AMD64 Processors"
+	; divides two unsigned 64-bit integers and returns the remainder.
+	;
+	; In: [EBP+l+4]:[EBP+l+0] = dividend (l)
+	; [EBP+r+4]:[EBP+r+0] = divisor (r)
+	;
+	; Out: EDX:EAX = remainder of division
+	;
+	PUSH	ECX
+
+	MOV EDX, [EBP+l+4]           	; dividend-hi
+	MOV EAX, [EBP+l+0]            	; dividend-lo
+	MOV ECX, [EBP+r+4]           	; divisor-hi
+	MOV EBX, [EBP+r+0]           	; divisor-lo
+
+	TEST ECX, ECX ; divisor > 2^32 - 1?
+	JNZ RBIGDIVISOR ; Yes, divisor > 32^32 - 1.
+	CMP EDX, EBX ; Only one division needed (ECX = 0)?
+	JAE RTWODIVS ; Need two divisions.
+	DIV EBX ; EAX = quotient_lo
+	MOV EAX, EDX ; EAX = remainder_lo
+	MOV EDX, ECX ; EDX = remainder_hi = 0
+	JMP DONE
+
+RTWODIVS:
+	MOV ECX, EAX ; Save dividend_lo in ECX.
+	MOV EAX, EDX ; Get dividend_hi.
+	XOR EDX, EDX ; Zero-extend it into EDX:EAX.
+	DIV EBX ; EAX = quotient_hi, EDX = intermediate remainder
+	MOV EAX, ECX ; EAX = dividend_lo
+	DIV EBX ; EAX = quotient_lo
+	MOV EAX, EDX ; EAX = remainder_lo
+	XOR EDX, EDX ; EDX = remainder_hi = 0
+	JMP DONE
+
+RBIGDIVISOR:
+	MOV EDI, ECX ; Save divisor_hi.
+	SHR EDX, 1 ; Shift both divisor and dividend right
+	RCR EAX, 1 ; by 1 bit.
+	ROR EDI, 1
+	RCR EBX, 1
+	BSR ECX, ECX ; ECX = number of remaining shifts
+	SHRD EBX, EDI, CL ; Scale down divisor and dividend such
+	SHRD EAX, EDX, CL ; that divisor is less than 2^32
+	SHR EDX, CL ; (that is, it fits in EBX).
+	ROL EDI, 1 ; Restore original divisor (EDI:ESI).
+	DIV EBX ; Compute quotient.
+	MOV EBX, [EBP+l+0] ; dividend low word
+	MOV ECX, EAX ; Save quotient.
+	IMUL EDI, EAX ; quotient * divisor high word (low only)
+	MUL DWORD [EBP+r+0] ; quotient * divisor low word
+	ADD EDX, EDI ; EDX:EAX = quotient * divisor
+	SUB EBX, EAX ; dividend_lo – (quot.*divisor)_lo
+	MOV ECX, [EBP+l+4] ; dividend_hi
+	MOV EAX, [EBP+r+0] ; divisor_lo
+	SBB ECX, EDX ; Subtract divisor * quot. from dividend.
+	SBB EDX, EDX ; (remainder < 0) ? 0xFFFFFFFF : 0
+	AND EAX, EDX ; (remainder < 0) ? divisor_lo : 0
+	AND EDX, [EBP+r+4] ; (remainder < 0) ? divisor_hi : 0
+	ADD EAX, EBX ; remainder += (remainder < 0) ? divisor : 0
+
+DONE:
+	POP	ECX
+END ModU;
+
+PROCEDURE ModU64*(l, r: UNSIGNED64): UNSIGNED64;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	RETURN ModU(l, r);
+END ModU64;
+
 PROCEDURE AbsH*(l: SIGNED64): SIGNED64;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF l< 0 THEN RETURN -l ELSE RETURN l END;
