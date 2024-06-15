@@ -21,12 +21,12 @@ TYPE
 	Socket* = OBJECT
 			VAR
 				socket: SIGNED32;
-				lport: SIGNED32;   (* local port *)
+				lport: UNSIGNED32;   (* local port *)
 				open: BOOLEAN;
 
 
 				(** Constructor *)
-				PROCEDURE & Open*( lport: SIGNED32;  VAR res: INTEGER );
+				PROCEDURE & Open*( lport: UNSIGNED32;  VAR res: INTEGER );
 				VAR laddr: Sockets.SocketAdr;
 				BEGIN
 					ASSERT( (lport >= 0) & (lport < 10000H) );
@@ -53,7 +53,7 @@ TYPE
 					   The data is in "data[ofs..ofs+len-1]".  In case of concurrent sends the datagrams are serialized.
 					*)
 				PROCEDURE Send*( fip: IP.Adr;
-								   fport: SIGNED32;
+								   fport: UNSIGNED32;
 								   CONST data: ARRAY OF CHAR;  ofs, len: SIZE;
 								   VAR res: INTEGER );
 				VAR addr: Sockets.SocketAdr;
@@ -68,7 +68,7 @@ TYPE
 				(** Send a broadcast UDP datagram via interface "int" to port "lport". Normally only used by DHCP.
 					   The data is in "data[ofs..ofs+len-1]".  In case of concurrent sends the datagrams are serialized.
 					*)
-				PROCEDURE SendBroadcast*( int: IP.Interface;  fport: SIGNED32;
+				PROCEDURE SendBroadcast*( int: IP.Interface;  fport: UNSIGNED32;
 										      CONST data: ARRAY OF CHAR;  ofs, len: SIZE );
 				BEGIN (*{EXCLUSIVE}*)
 					ASSERT( (fport >= 0) & (fport < 10000H) );  ASSERT( (len >= 0) & (len <= MaxUDPDataLen) );
@@ -85,7 +85,7 @@ TYPE
 					too big.
 				*)
 				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size: SIZE; ms: SIGNED32;
-									 VAR fip: IP.Adr;  VAR fport: SIGNED32; VAR len: SIZE; VAR res: INTEGER );
+									 VAR fip: IP.Adr;  VAR fport: UNSIGNED32; VAR len: SIZE; VAR res: INTEGER );
 				VAR
 					addr: Sockets.SocketAdr; i: SIZE;
 				BEGIN {EXCLUSIVE}

@@ -25,7 +25,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 	VAR
 		W: Texts.Writer;
 		proxyHost: ARRAY NetTools.ServerStrLen OF CHAR;
-		proxyPort: SIGNED16;
+		proxyPort: UNSIGNED16;
 		proxy: BOOLEAN;
 
 	PROCEDURE TextDoc(D: Documents.Document; C: NetSystem.Connection);

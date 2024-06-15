@@ -65,9 +65,9 @@ TYPE
 			VAR
 				int-	: IP.Interface;	(*! Unix port: dummy, only 'int.localAdr' contains valid data *)
 
-				lport-	: SIGNED32;
+				lport-	: UNSIGNED32;
 				fip-	: IP.Adr;  (* foreign protocol address *)
-				fport-	: SIGNED32;
+				fport-	: UNSIGNED32;
 				state*	: SIGNED8;   (* TCP state *)
 
 				socket	: SIGNED32;
@@ -91,7 +91,7 @@ TYPE
 
 				(** Open a TCP connection (only use once per Connection instance).
 					Use TCP.NilPort for lport to automatically assign an unused local port.*)
-				PROCEDURE Open*( lport: SIGNED32;  fip: IP.Adr;  fport: SIGNED32;  VAR res: INTEGER );
+				PROCEDURE Open*( lport: UNSIGNED32;  fip: IP.Adr;  fport: UNSIGNED32;  VAR res: INTEGER );
 				VAR
 					localAdr, foreignAdr: Sockets.SocketAdr; af: INTEGER; 
 				BEGIN {EXCLUSIVE}

@@ -93,7 +93,7 @@ TYPE
 
 	RequestHeader* = RECORD
 		fadr* : IP.Adr;
-		fport* : SIGNED32;
+		fport* : UNSIGNED32;
 		method* : SIGNED32;
 		maj*, min* : SIGNED32;
 		uri* : ARRAY 4096 OF CHAR;
@@ -817,7 +817,7 @@ BEGIN
 	END
 END GetPath;
 
-PROCEDURE SplitHTTPAdr*(url : ARRAY OF CHAR; VAR host, path: ARRAY OF CHAR; VAR port: SIGNED32): BOOLEAN;
+PROCEDURE SplitHTTPAdr*(url : ARRAY OF CHAR; VAR host, path: ARRAY OF CHAR; VAR port: UNSIGNED32): BOOLEAN;
 VAR i, j : SIGNED32;
 BEGIN
 	(*assuming HTTP or HTTPS*)

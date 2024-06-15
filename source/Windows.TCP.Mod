@@ -5,7 +5,7 @@
 MODULE TCP;   (** AUTHOR "pjm, mvt"; PURPOSE "TCP protocol"; *)
 
 IMPORT
-	WSock32, Modules, Kernel, Streams, IP, Objects, KernelLog,SYSTEM;
+	WSock32, Modules, Kernel, Streams, IP, Objects, KernelLog;
 
 CONST
 	Trace = FALSE;
@@ -41,10 +41,10 @@ TYPE
 		(* assigned interface *)
 		int-: IP.Interface;
 		(* local protocol address *)
-		lport-: SIGNED32;
+		lport-: UNSIGNED32;
 		(* foreign protocol address *)
 		fip-: IP.Adr;
-		fport-: SIGNED32;
+		fport-: UNSIGNED32;
 		state*: SIGNED8;   (* TCP state *)
 		(* send sequence *)
 		sndnxt-: SIGNED32;   (* send next *)
@@ -76,7 +76,7 @@ TYPE
 	(** Open a TCP connection (only use once per Connection instance).
 				Use TCP.NilPort for lport to automatically assign an unused local port.
 			*)
-		PROCEDURE Open*( lport: SIGNED32;  fip: IP.Adr;  fport: SIGNED32;  VAR res: INTEGER );
+		PROCEDURE Open*( lport: UNSIGNED32;  fip: IP.Adr;  fport: UNSIGNED32;  VAR res: INTEGER );
 		VAR adr: WSock32.sockaddrIn;  err: SIGNED32; str: ARRAY 64 OF CHAR;
 		BEGIN {EXCLUSIVE}
 			IF Trace THEN
@@ -105,7 +105,7 @@ TYPE
 
 				IF lport # NilPort THEN
 					adr.sinFamily := WSock32.PFINet;  adr.sinAddr := 0;
-					adr.sinPort := WSock32.htons( SHORT( lport ) );
+					adr.sinPort := WSock32.htons( lport(WSock32.Port) );
 					err := WSock32.bind( socket, adr, SIZEOF( WSock32.sockaddrIn ) );
 					IF err # 0 THEN
 						res := NotConnected;  state := Closed;  WSock32.DispError;
@@ -114,7 +114,7 @@ TYPE
 				END;
 
 				adr.sinFamily := WSock32.PFINet;   (* SYSTEM.MOVE( ADDRESSOF( fip ), ADDRESSOF( adr.sinAddr ), 4 ); *)
-				adr.sinAddr := (fip.ipv4Adr);  adr.sinPort := WSock32.htons( SHORT( fport ) );
+				adr.sinAddr := (fip.ipv4Adr);  adr.sinPort := WSock32.htons( fport(WSock32.Port) );
 				err := WSock32.connect( socket, adr, SIZEOF( WSock32.sockaddrIn ) );
 				IF err # 0 THEN
 					res := NotConnected;  WSock32.DispError;  state := Closed;
@@ -128,7 +128,7 @@ TYPE
 				ASSERT ( (fport = NilPort) & IP.IsNilAdr(fip));
 				SELF.int := NIL;  SELF.lport := lport;  SELF.fip := IP.NilAdr;
 				SELF.fport := NilPort;  adr.sinFamily := WSock32.PFINet;
-				adr.sinAddr := 0;  adr.sinPort := WSock32.htons( SHORT( lport ) );
+				adr.sinAddr := 0;  adr.sinPort := WSock32.htons( lport(WSock32.Port ) );
 				err := WSock32.bind( socket, adr, SIZEOF( WSock32.sockaddrIn ) );
 				IF err = 0 THEN err := WSock32.listen( socket, WSock32.SOMaxConn ) END;
 				IF err # 0 THEN

@@ -660,7 +660,7 @@ TYPE
 
 		(** open a TLS connection (only use once per Connection instance). Use IP.NilPort for lport to automatically assign
 		an unused local port. Use IP.NilAdr for fip to open a passive connection. *)
-		PROCEDURE Open*(  lport: SIGNED32; fip: IP.Adr; fport: SIGNED32; VAR res: INTEGER );
+		PROCEDURE Open*(  lport: UNSIGNED32; fip: IP.Adr; fport: UNSIGNED32; VAR res: INTEGER );
 		BEGIN
 			(*ASSERT( IP.IsNilAdr(fip) );	(* only server-side is implemented *)*)
 			(*ASSERT( context # NIL );*)	(* context must be set before calling Open *)

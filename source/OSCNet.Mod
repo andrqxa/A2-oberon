@@ -83,7 +83,7 @@ TYPE
 	OSCUDPData = OBJECT
 		VAR
 			fip*: IP.Adr;
-			fport*: SIGNED32;
+			fport*: UNSIGNED32;
 	END OSCUDPData;
 
 	(* UDP Client *)
@@ -91,7 +91,7 @@ TYPE
 		VAR
 			s: UDP.Socket;
 			fip: IP.Adr;
-			fport: SIGNED32;
+			fport: UNSIGNED32;
 
 		(* Creates a new UDPClient which sends packets to fip:fport.
 			Supply UDP.NilPort for lport, if you don't want to specify a fixed local port for communication.
@@ -115,7 +115,7 @@ TYPE
 			Returns Ok, ParseError or an UDP returncode (eg:. UDP.Timeout) *)
 		PROCEDURE Recieve*(VAR p: OSC.OSCPacket; timeout (* in ms *): SIGNED32): INTEGER;
 		VAR
-			fip2: IP.Adr; fport2: SIGNED32;
+			fip2: IP.Adr; fport2: UNSIGNED32;
 			size: SIZE;
 			buffer: Strings.String;
 			got: SIZE;
@@ -162,7 +162,7 @@ TYPE
 			newPacket: OSC.OSCPacket;
 			newUDPData: OSCUDPData;
 			buffer: OSC.String; (* ARRAY MaxUDPPacketLength OF CHAR; *)
-			receivefip: IP.Adr; receivefport: SIGNED32;
+			receivefip: IP.Adr; receivefport: UNSIGNED32;
 			got: SIZE;
 			res: INTEGER;
 
@@ -383,7 +383,7 @@ TYPE
 		RETURN Ok;
 	END ReceiveTCP;
 
-	PROCEDURE SendUDP(s: UDP.Socket; fip: IP.Adr; fport: SIGNED32; p: OSC.OSCPacket): INTEGER;
+	PROCEDURE SendUDP(s: UDP.Socket; fip: IP.Adr; fport: UNSIGNED32; p: OSC.OSCPacket): INTEGER;
 	VAR
 		buffer: OSC.String;
 		res: INTEGER;

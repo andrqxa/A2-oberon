@@ -385,7 +385,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END ReadResponse;
 
 (** Open a new session to nntp-host host on ort port. *)
-	PROCEDURE Open*(VAR S: Session; host: ARRAY OF CHAR; port: SIGNED16);
+	PROCEDURE Open*(VAR S: Session; host: ARRAY OF CHAR; port: UNSIGNED16);
 	BEGIN
 		NEW(S);
 		IF NetTools.Connect(S.C, port, host, FALSE) THEN
@@ -413,7 +413,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE Connect(VAR S: Session): BOOLEAN;
 		VAR
 			NNTPHost: ARRAY 64 OF CHAR;
-			NNTPPort: SIGNED16;
+			NNTPPort: UNSIGNED16;
 	BEGIN
 		NetTools.GetHostPort("NNTP", NNTPHost, NNTPPort, DefPort);
 		IF NNTPHost # "" THEN

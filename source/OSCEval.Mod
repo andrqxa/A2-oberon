@@ -26,7 +26,7 @@ TYPE
 			s: UDP.Socket;
 			buffer: POINTER TO ARRAY OF CHAR;
 			receivefip: IP.Adr;
-			receivefport: SIGNED32;
+			receivefport: UNSIGNED32;
 			got: SIZE;
 			res: INTEGER;
 			fip: IP.Adr;

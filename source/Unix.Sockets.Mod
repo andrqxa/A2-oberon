@@ -20,11 +20,11 @@ CONST
 TYPE
 	SocketAdr* = POINTER TO RECORD
 		family*		: SIGNED16;
-		port*		: SIGNED16;	(* in network byte order! *)
+		port*		: UNSIGNED16;	(* in network byte order! *)
 	END;
 
 	SocketAdrV4* = POINTER TO RECORD (SocketAdr)
-		v4Adr*		: SIGNED32;
+		v4Adr*		: UNSIGNED32;
 		zero*		: ARRAY 8 OF CHAR
 	END;
 
@@ -72,7 +72,7 @@ VAR
 	ntohl	: PROCEDURE {C} ( netlong	: UNSIGNED32 ): UNSIGNED32;
 	ntohs	: PROCEDURE {C} ( netshort	: UNSIGNED16 ): UNSIGNED16;
 
-	PROCEDURE NewSocketAdr*( ip: IP.Adr; port: SIGNED32 ): SocketAdr;
+	PROCEDURE NewSocketAdr*( ip: IP.Adr; port: UNSIGNED32 ): SocketAdr;
 	VAR sadr4: SocketAdrV4;  sadr6: SocketAdrV6; i: SIZE;
 	BEGIN
 		CASE ip.usedProtocol OF
@@ -366,12 +366,12 @@ VAR
 		RETURN err = 0
 	END NoDelay;
 
-	PROCEDURE NetToInt* (x: SIGNED16): SIGNED16;
+	PROCEDURE NetToInt* (x: UNSIGNED16): UNSIGNED16;
 	BEGIN
 		RETURN SIGNED16(ntohs(x))
 	END NetToInt;
 
-	PROCEDURE IntToNet* (x: SIGNED16): SIGNED16;
+	PROCEDURE IntToNet* (x: UNSIGNED16): UNSIGNED16;
 	BEGIN
 		RETURN SIGNED16(htons(x))
 	END IntToNet;

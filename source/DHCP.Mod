@@ -171,7 +171,7 @@ PROCEDURE InitDHCP(int: IP.Interface; VAR localAdr, maskAdr, gatewayAdr: IP.Adr;
 		VAR dns: ARRAY OF IP.Adr; VAR domain: ARRAY OF CHAR; VAR res: INTEGER);
 VAR
 	p: UDP.Socket;
-	fport, time, start, offerDelay, requestDelay: SIGNED32;
+	fport: UNSIGNED32; time, start, offerDelay, requestDelay: SIGNED32;
 	i, len: SIZE;
 	fip, serverIP: IP.Adr;
 	msgType: CHAR;

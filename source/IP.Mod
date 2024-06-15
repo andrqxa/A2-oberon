@@ -48,7 +48,7 @@ CONST
 
 TYPE
 	Adr* = RECORD
-		ipv4Adr*: SIGNED32;
+		ipv4Adr*: UNSIGNED32;
 		ipv6Adr*: ARRAY 16 OF CHAR;
 		usedProtocol*: SIGNED32;
 		data*: SIGNED32;
@@ -776,7 +776,7 @@ END AdrToStr;
 PROCEDURE ArrayToAdr*(CONST array: ARRAY OF CHAR; ofs, protocol: SIGNED32; LSBfirst: BOOLEAN): Adr;
 VAR
 	adr: Adr;
-	i, swapTemp: SIGNED32;
+	i: SIGNED32; swapTemp: UNSIGNED32;
 BEGIN
 	ASSERT((protocol = 4) OR (protocol = 6));
 
@@ -827,7 +827,7 @@ END ArrayToAdr;
 PROCEDURE AdrToArray*(adr: Adr; VAR array: ARRAY OF CHAR; ofs: SIGNED32; LSBfirst: BOOLEAN);
 VAR
 	tempAdr: Adr;
-	i, swapTemp: SIGNED32;
+	i: SIGNED32; swapTemp: UNSIGNED32;
 
 BEGIN
 	tempAdr := adr;
@@ -927,7 +927,7 @@ END DestAdrFromBuffer;
 
 
 (* Swap internal representation of an IP address from big to little endian or vice versa. *)
-PROCEDURE -SwapEndian(VAR adr: SIGNED32);
+PROCEDURE -SwapEndian(VAR adr: UNSIGNED32);
 CODE
 #IF I386 THEN
 	POP EAX
@@ -1173,7 +1173,7 @@ END Checksum2;
 
 
 (* Return TRUE if "adr1" and "adr2" are in the same subnet defined by "mask". Only for IPv4 *)
-PROCEDURE SameSubnetv4(adr1, adr2, mask: SIGNED32): BOOLEAN;
+PROCEDURE SameSubnetv4(adr1, adr2, mask: UNSIGNED32): BOOLEAN;
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP + adr1]

@@ -70,7 +70,7 @@ PROCEDURE Head*(CONST url : ARRAY OF CHAR; VAR con : TCP.Connection; VAR header:
 VAR
 	host : ARRAY 128 OF CHAR;
 	path : ARRAY 256 OF CHAR;
-	port : SIGNED32;
+	port : UNSIGNED32;
 	fadr : IP.Adr;
 	w : Streams.Writer;
 	r : Streams.Reader;
@@ -102,7 +102,7 @@ PROCEDURE Get*(CONST url : ARRAY OF CHAR; VAR rHeader : WebHTTP.RequestHeader;
 VAR
 	host : ARRAY 128 OF CHAR;
 	path : ARRAY 256 OF CHAR;
-	port : SIGNED32;
+	port : UNSIGNED32;
 	fadr : IP.Adr;
 	w : Streams.Writer;
 	x : WebHTTP.AdditionalField;

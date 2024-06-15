@@ -64,11 +64,12 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 			lpVendorInfo*: ADDRESS
 		END;
 
-		inAddr* = SIGNED32;
+		inAddr* = UNSIGNED32;
+		Port* = UNSIGNED16;
 
 		PsockaddrIn* = POINTER TO sockaddrIn;
 		sockaddrIn* = RECORD
-			sinFamily*, sinPort*: SIGNED16;
+			sinFamily*: SIGNED16; sinPort*: Port;
 			sinAddr*: inAddr;
 			inZero: ARRAY 8 OF CHAR
 		END;
@@ -88,7 +89,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		Group* = SIGNED32;
 
 		FDSet*=RECORD
-			fdcount*: SIGNED32;
+			fdcount*: UNSIGNED32;
 			socket*: ARRAY 64 OF Socket (*SIGNED32*);
 		END;
 
@@ -180,11 +181,11 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		(** The Windows Sockets htonl function converts a u_long from host to TCP/IP network byte order
 			(which is big-endian). *)
-		htonl-: PROCEDURE {WINAPI} (x: SIGNED32): SIGNED32;
+		htonl-: PROCEDURE {WINAPI} (x: UNSIGNED32): UNSIGNED32;
 
 		(** The Windows Sockets htons function converts a u_short from host to TCP/IP network byte order
 			(which is big-endian). *)
-		htons-: PROCEDURE {WINAPI} (x: SIGNED16): SIGNED16;
+		htons-: PROCEDURE {WINAPI} (x: UNSIGNED16): UNSIGNED16;
 
 		(** The Windows Sockets ioctlsocket function controls the I/O mode of a socket. *)
 		ioctlsocket-: PROCEDURE {WINAPI} (s: Socket; cmd: LONGINTEGER; VAR argp: SIGNED32): INTEGER;
@@ -194,11 +195,11 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		(** The Windows Sockets ntohl function converts a u_long from TCP/IP network order to host byte order
 			(which is little-endian on Intel processors). *)
-		ntohl-: PROCEDURE {WINAPI} (x: SIGNED32): SIGNED32;
+		ntohl-: PROCEDURE {WINAPI} (x: UNSIGNED32): UNSIGNED32;
 
 		(** The Windows Sockets ntohs function converts a u_short from TCP/IP network byte order to host byte order
 			(which is little-endian on Intel processors). *)
-		ntohs-: PROCEDURE {WINAPI} (x: SIGNED16): SIGNED16;
+		ntohs-: PROCEDURE {WINAPI} (x: UNSIGNED16): UNSIGNED16;
 
 		(** The Windows Sockets recv function receives data from a connected socket. *)
 		recv-: PROCEDURE {WINAPI} (s: Socket; VAR buf: ARRAY   OF SYSTEM.BYTE; len: INTEGER; flags: INTEGERSET): INTEGER;

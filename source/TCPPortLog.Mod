@@ -36,7 +36,7 @@ BEGIN
 END TimeDateToStr;
 
 PROCEDURE DumpListener(fip: IP.Adr; buffer: Network.Buffer);
-VAR fport, lport, flags: SIGNED32; time: TimeDate; adrStr, timeStr: ARRAY 32 OF CHAR;
+VAR fport, lport: UNSIGNED32; flags: SIGNED32; time: TimeDate; adrStr, timeStr: ARRAY 32 OF CHAR;
 BEGIN
 	GetTime(time); TimeDateToStr(time, timeStr);
 	fport := Network.GetNet2(buffer.data, buffer.ofs);

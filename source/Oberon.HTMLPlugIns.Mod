@@ -266,7 +266,7 @@ MODULE HTMLPlugIns IN Oberon; (** portable *)	(* ejz  *)
 	PROCEDURE install(VAR V: View; create: BOOLEAN): BOOLEAN;
 		VAR
 			url: PlugIns.URLStr; plugin: PlugIns.PlugIn; s: HyperDocs.LinkScheme;
-			label: ARRAY 64 OF CHAR; port: SIGNED16; F: Files.File;
+			label: ARRAY 64 OF CHAR; port: UNSIGNED16; F: Files.File;
 			i: SIGNED32; R: Texts.Reader; ch, end: CHAR;
 	BEGIN
 		Texts.OpenReader(R, Oberon.Par.text, Oberon.Par.pos);

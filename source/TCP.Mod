@@ -301,10 +301,10 @@ TYPE
 			(* assigned interface *)
 			int-: IP.Interface;
 			(* local protocol address *)
-			lport-: SIGNED32;
+			lport-: UNSIGNED32;
 			(* foreign protocol address *)
 			fip-: IP.Adr;
-			fport-: SIGNED32;
+			fport-: UNSIGNED32;
 			state*: SIGNED8;	(* TCP state *)
 			timer: ARRAY NumTimers OF SIGNED32;
 			rxtshift-: SIGNED32;	(* log(2) of rexmt exponential backoff *)
@@ -370,7 +370,7 @@ TYPE
 		(** Open a TCP connection (only use once per Connection instance).
 			Use TCP.NilPort for lport to automatically assign an unused local port.
 		*)
-		PROCEDURE Open*(lport: SIGNED32; fip: IP.Adr; fport: SIGNED32; VAR res: INTEGER);
+		PROCEDURE Open*(lport: UNSIGNED32; fip: IP.Adr; fport: UNSIGNED32; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			ASSERT((state = Unused) & (lport >= 0) & (lport < 10000H) & (fport >= 0) & (fport < 10000H));
 			IF timeSource # NIL THEN
@@ -857,7 +857,7 @@ TYPE
 
 	ConnectionPool* = OBJECT
 		VAR
-			eport: SIGNED32;
+			eport: UNSIGNED32;
 			table: ARRAY HashTableSize OF Connection;
 
 		(* Initialization for internal use only. *)
@@ -885,7 +885,7 @@ TYPE
 
 		(* Look for the specified Connection. *)
 
-		PROCEDURE Lookup(lport, fport: SIGNED32; fip: IP.Adr): Connection;
+		PROCEDURE Lookup(lport, fport: UNSIGNED32; fip: IP.Adr): Connection;
 		VAR
 			item: Connection;
 
@@ -923,8 +923,8 @@ TYPE
 			ELSE an active open is assumed.
 			IF (lport = NilPort), an ephemeral port is assigned.
 		*)
-		PROCEDURE Add(p: Connection; lport, fport: SIGNED32; VAR res: INTEGER);
-		VAR i, sport: SIGNED32;
+		PROCEDURE Add(p: Connection; lport, fport: UNSIGNED32; VAR res: INTEGER);
+		VAR i: SIGNED32; sport: UNSIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF ((fport # NilPort) & (IP.IsNilAdr(p.fip))) OR (* workaround for XOR *)
 				((fport = NilPort) & (~IP.IsNilAdr(p.fip))) THEN
@@ -1094,10 +1094,10 @@ END Invariant;
 
 
 (* Hash function for ConnectionPool *)
-PROCEDURE HashPool(lport, fport: SIGNED32; fip:IP.Adr): SIGNED32;
+PROCEDURE HashPool(lport, fport: UNSIGNED32; fip:IP.Adr): SIGNED32;
 VAR
 	i: SIGNED32;
-	hash: SIGNED32;
+	hash: UNSIGNED32;
 BEGIN
 	(* hash := (lport + fport + fip) MOD HashTableSize; *)
 	hash := lport + fport;
@@ -1115,7 +1115,7 @@ BEGIN
 
 	END;
 
-	RETURN hash MOD HashTableSize;
+	RETURN SIGNED32(hash MOD HashTableSize);
 
 END HashPool;
 
@@ -1674,7 +1674,7 @@ END SetMSS;
 (* Process a received TCP segment. *)
 PROCEDURE Input(int: IP.Interface; type: SIGNED32; fip, lip: IP.Adr; buffer: Network.Buffer);
 VAR
-	lport, fport, hdrLen: SIGNED32;
+	lport, fport: UNSIGNED32; hdrLen: SIGNED32;
 	p: Connection;
 BEGIN
 	ASSERT(type = IPTypeTCP);
@@ -2544,7 +2544,7 @@ END Cleanup;
 
 BEGIN
 	ASSERT(~DoRFC1323 OR (ProcOptions & GenOptions)); (* constants should make sense *)
-	ASSERT(SYSTEM.VAL(SIGNED32, {Fin}) = 1);	(* bit order for flags cast in Input, Output and Respond *)
+	ASSERT(SIGNED32({Fin}) = 1);	(* bit order for flags cast in Input, Output and Respond *)
 	ASSERT((TimerPeriod MOD FastPeriod = 0) & (TimerPeriod MOD SlowPeriod = 0));
 	trace := FALSE;
 	Init();

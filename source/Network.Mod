@@ -624,7 +624,7 @@ END Equal;
 
 (** Put a 32-bit host value into buf[ofs..ofs+3] *)
 
-PROCEDURE Put4*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: INTEGER);
+PROCEDURE Put4*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: UNSIGNED32);
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP+val]
@@ -659,7 +659,7 @@ END Put4;
 
 (** Put a 16-bit host value into buf[ofs..ofs+1] *)
 
-PROCEDURE Put2*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: INTEGER);
+PROCEDURE Put2*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: UNSIGNED32);
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP+val]
@@ -794,7 +794,7 @@ END PutNet4;
 
 (** Put a 16-bit host value into buf[ofs..ofs+1] in network byte order *)
 
-PROCEDURE PutNet2*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: INTEGER);
+PROCEDURE PutNet2*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: UNSIGNED32);
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP+val]

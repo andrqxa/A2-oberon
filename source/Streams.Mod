@@ -874,12 +874,11 @@ TYPE
 
 		(** -- Read formatted data (uses Peek for one character lookahead) -- *)
 
-	 (** Read an integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
-		PROCEDURE Int*( VAR x: SIGNED32;  hex: BOOLEAN );
-		VAR vd, vh: SIGNED32; sgn, d: INTEGER;  ch: CHAR;  ok: BOOLEAN;
+	 (** Read an unsigned integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
+		PROCEDURE UInt32*( VAR x: UNSIGNED32;  hex: BOOLEAN );
+		VAR vd, vh: UNSIGNED32; d: INTEGER;  ch: CHAR;  ok: BOOLEAN;
 		BEGIN
-			vd := 0;  vh := 0;  sgn := 1;  ok := FALSE;
-			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
+			vd := 0;  vh := 0;  ok := FALSE;
 			LOOP
 				ch := Peek();
 				IF (ch >= "0") & (ch <= "9") THEN d := ORD( ch ) - ORD( "0" )
@@ -893,8 +892,18 @@ TYPE
 				vd := vh;   (* use the hex value *)
 				ch := Get()
 			END;
-			x := sgn * vd;
+			x := vd;
 			IF (res = 0) & ~ok THEN res := FormatError END
+		END UInt32;
+
+	 (** Read an integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
+		PROCEDURE Int*( VAR x: SIGNED32;  hex: BOOLEAN );
+		VAR try: UNSIGNED32; sgn: INTEGER; ch: CHAR; ok: BOOLEAN;
+		BEGIN
+			sgn := 1;
+			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
+			UInt32(try, hex);
+			x := sgn * SIGNED32(try);
 		END Int;
 
 	 (** Read a huge integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)

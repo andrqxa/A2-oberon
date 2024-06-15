@@ -199,7 +199,7 @@ TYPE
 
 		PROCEDURE Connect;
 		VAR user, pass, host, temp : ARRAY 64 OF CHAR;
-			port: SIGNED32; res: INTEGER;
+			port: UNSIGNED32; res: INTEGER;
 		BEGIN
 			IF ftp # NIL THEN
 				KernelLog.String("Already open"); KernelLog.Ln; RETURN
@@ -210,7 +210,7 @@ TYPE
 				IF WMDialogs.QueryPassword("Enter Password", pass) = WMDialogs.ResOk THEN
 					address.GetAsString(host);
 					IF (host = "") THEN RETURN END; (* check addy *)
-					SELF.port.GetAsString(temp); Strings.StrToInt32(temp, port);
+					SELF.port.GetAsString(temp); Strings.StrToUInt32(temp, port);
 
 					NEW(ftp);
 					ftp.Open(host, user, pass, port, res);

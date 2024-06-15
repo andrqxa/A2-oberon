@@ -21,7 +21,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 		ProxyMsg* = RECORD (HyperDocs.LinkSchemeMsg)
 			host*: ARRAY ServerStrLen OF CHAR;
 			D*: Documents.Document;
-			port*: SIGNED16
+			port*: UNSIGNED16
 		END;
 	(** Session with an TCP server, e.g.: FTP, POP, ... *)
 		Session* = POINTER TO SessionDesc;
@@ -82,7 +82,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 
 (** Open a new connection C to host on port. Switch logging of error-messages with log on or off.
 		If the connection could be established TRUE is returned. *)
-	PROCEDURE Connect*(VAR C: NetSystem.Connection; port: SIGNED16; host: ARRAY OF CHAR; log: BOOLEAN): BOOLEAN;
+	PROCEDURE Connect*(VAR C: NetSystem.Connection; port: UNSIGNED16; host: ARRAY OF CHAR; log: BOOLEAN): BOOLEAN;
 		VAR
 			adr: NetSystem.IPAdr;
 			res: SIGNED16;
@@ -118,7 +118,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 
 (** Start opening a new connection C to host on port. Switch logging of error-messages with log on or off.
 		If the connection could be established TRUE is returned. *)
-	PROCEDURE AsyncConnect*(VAR C: NetSystem.Connection; port: SIGNED16; host: ARRAY OF CHAR; log: BOOLEAN): BOOLEAN;
+	PROCEDURE AsyncConnect*(VAR C: NetSystem.Connection; port: UNSIGNED16; host: ARRAY OF CHAR; log: BOOLEAN): BOOLEAN;
 	BEGIN
 		RETURN Connect(C, -port, host, log)
 	END AsyncConnect;
@@ -317,7 +317,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 	END QueryString;
 
 (** Get host and port of the Registry entry key in section NetSystem. *)
-	PROCEDURE GetHostPort*(key: ARRAY OF CHAR; VAR host: ARRAY OF CHAR; VAR port: SIGNED16; defPort: SIGNED16);
+	PROCEDURE GetHostPort*(key: ARRAY OF CHAR; VAR host: ARRAY OF CHAR; VAR port: UNSIGNED16; defPort: UNSIGNED16);
 		VAR
 			val: SIGNED32;
 			i: SIGNED16;
@@ -357,7 +357,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 	END QueryBool;
 
 (** Get host and port of an url link. *)
-	PROCEDURE SplitHostPort*(VAR url, host: ARRAY OF CHAR; VAR port: SIGNED16);
+	PROCEDURE SplitHostPort*(VAR url, host: ARRAY OF CHAR; VAR port: UNSIGNED16);
 		VAR
 			i, j: SIGNED16;
 			val: SIGNED32;

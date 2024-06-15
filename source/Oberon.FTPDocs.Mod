@@ -48,11 +48,11 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 			dataC: NetSystem.Connection;
 			log: Texts.Text;
 			curDir: ARRAY NetTools.PathStrLen OF CHAR;
-			system, dataPort: SIGNED16;
+			system : SIGNED16; dataPort : UNSIGNED16;
 			dataIP: NetSystem.IPAdr;
 			portIPAddress: ARRAY 64 OF CHAR;
 			usr, passw, host: ARRAY NetTools.ServerStrLen OF CHAR;
-			port: SIGNED16;
+			port: UNSIGNED16;
 			ack, bin: BOOLEAN
 		END;
 		EnumProc* = PROCEDURE (entry: ARRAY OF CHAR);
@@ -69,7 +69,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 		curF: Frame;
 		message: BOOLEAN;
 		proxyHost: ARRAY NetTools.ServerStrLen OF CHAR;
-		proxyPort, dataPort: SIGNED16;
+		proxyPort, dataPort: UNSIGNED16;
 		proxy: BOOLEAN;
 
 	PROCEDURE ReadResponse(S: Session; VAR sline: ARRAY OF CHAR);
@@ -205,7 +205,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 		NotReady: the server is busy, retry later
 		NotConnected: server not found
 		Failed: NetSystem.hostIP not set *)
-	PROCEDURE Open*(server, user, passwd: ARRAY OF CHAR; port: SIGNED16; log: Texts.Text; VAR S: Session);
+	PROCEDURE Open*(server, user, passwd: ARRAY OF CHAR; port: UNSIGNED16; log: Texts.Text; VAR S: Session);
 	BEGIN
 		NEW(S); S.dataC := NIL;
 		COPY(server, S.host); S.port := port; S.dataPort := -1;
@@ -777,7 +777,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 	END DocHandler;
 
 (** Register a ftp URL and get a unique key for it. *)
-	PROCEDURE RegisterFTPAdr*(host, path, user, passwd: ARRAY OF CHAR; type: CHAR; port: SIGNED16): SIGNED32;
+	PROCEDURE RegisterFTPAdr*(host, path, user, passwd: ARRAY OF CHAR; type: CHAR; port: UNSIGNED16): SIGNED32;
 		VAR
 			portS: ARRAY 8 OF CHAR;
 			key: SIGNED32;
@@ -808,7 +808,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 	END RegisterFTPAdr;
 
 (** Parsing of an ftp url. *)
-	PROCEDURE SplitFTPAdr*(VAR url, host, path, user, passwd: ARRAY OF CHAR; VAR type: CHAR; VAR port: SIGNED16): SIGNED32;
+	PROCEDURE SplitFTPAdr*(VAR url, host, path, user, passwd: ARRAY OF CHAR; VAR type: CHAR; VAR port: UNSIGNED16): SIGNED32;
 		VAR
 			key: SIGNED32;
 			i, j, l: SIZE;
@@ -954,7 +954,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 		VAR
 			usr, passw, host: ARRAY NetTools.ServerStrLen OF CHAR;
 			path: ARRAY NetTools.PathStrLen OF CHAR;
-			port: SIGNED16;
+			port: UNSIGNED16;
 			type: CHAR;
 	BEGIN
 		WITH L: HyperDocs.LinkScheme DO
@@ -1622,7 +1622,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 			D2: Documents.Document;
 			T: Texts.Text;
 			new: HyperDocs.Node;
-			port: SIGNED16;
+			port: UNSIGNED16;
 			P: NetTools.ProxyMsg;
 			S: HyperDocs.LinkScheme;
 			type: CHAR;

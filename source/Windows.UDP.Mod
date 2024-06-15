@@ -22,7 +22,7 @@ TYPE
 		(* Initialize the Socket (only use once per instance).
 	Opens a socket which is dedicated to datagram services. lport is registered to receive datagrams
 	from any port and any host. *)
-		PROCEDURE & Open*( lport: SIGNED32;  VAR res: INTEGER );
+		PROCEDURE & Open*( lport: UNSIGNED32;  VAR res: INTEGER );
 		VAR
 			sadr: WSock32.sockaddrIn;
 			err: SIGNED32; winRes: SIGNED32;
@@ -62,7 +62,7 @@ TYPE
 					 In case of concurrent sends the datagrams are serialized.
 	Sends len bytes of data (beginning at pos in buf) to the host specified by remIP and remPort. *)
 
-		PROCEDURE Send*( fip: IP.Adr;  fport: SIGNED32;  CONST data: ARRAY OF CHAR;  ofs, len: SIZE; VAR res: INTEGER );
+		PROCEDURE Send*( fip: IP.Adr;  fport: UNSIGNED32;  CONST data: ARRAY OF CHAR;  ofs, len: SIZE; VAR res: INTEGER );
 		VAR sadr: WSock32.sockaddrIn;  err: SIGNED32; winRes: SIGNED32;
 		BEGIN
 			ASSERT ( LEN( data ) >= (ofs + len) );
@@ -94,7 +94,7 @@ TYPE
 	Stores an entire datagram in buf beginning at pos. On success (S.res = done), remIP and remPort indicate the sender, len indicate the length of valid data. *)
 
 		PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size: SIZE; ms: SIGNED32;  VAR fip: IP.Adr;
-										   VAR fport: SIGNED32; VAR len: SIZE; VAR res: INTEGER );
+										   VAR fport: UNSIGNED32; VAR len: SIZE; VAR res: INTEGER );
 		VAR sadr: WSock32.sockaddrIn;  err: SIGNED32;  l: SIGNED32; winRes: SIGNED32;
 		ret: SIGNED32;  fdset: WSock32.FDSet; avail: BOOLEAN; time: WSock32.TimeVal;
 		BEGIN

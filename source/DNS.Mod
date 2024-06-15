@@ -383,7 +383,7 @@ BEGIN
 END SendQuery;
 
 PROCEDURE ReceiveReply(pcb: UDP.Socket; VAR buf: ARRAY OF CHAR; VAR len: SIZE; VAR res: INTEGER);
-VAR radr: IP.Adr; rport: SIGNED32;
+VAR radr: IP.Adr; rport: UNSIGNED32;
 BEGIN
 	REPEAT
 		pcb.Receive(buf, 0, LEN(buf), UDPTimeout, radr, rport, len, res)

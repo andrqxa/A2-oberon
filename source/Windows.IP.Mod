@@ -34,7 +34,7 @@ CONST
 TYPE
 
 	Adr* = RECORD
-		ipv4Adr*: SIGNED32;
+		ipv4Adr*: UNSIGNED32;
 		ipv6Adr*: ARRAY 16 OF CHAR;
 		usedProtocol*: SIGNED32;
 		data*: SIGNED32;
@@ -320,7 +320,7 @@ END AdrToStr;
 PROCEDURE ArrayToAdr*(CONST  array: ARRAY OF CHAR; ofs, protocol: SIGNED32; LSBfirst: BOOLEAN): Adr;
 VAR
 	adr: Adr;
-	i, swapTemp: SIGNED32;
+	i: SIGNED32; swapTemp: UNSIGNED32;
 BEGIN
 	ASSERT((protocol = 4) OR (protocol = 6));
 
@@ -367,7 +367,7 @@ END ArrayToAdr;
 PROCEDURE AdrToArray*(adr: Adr; CONST array: ARRAY OF CHAR; ofs: SIGNED32; LSBfirst: BOOLEAN);
 VAR
 	tempAdr: Adr;
-	i, swapTemp: SIGNED32;
+	i: SIGNED32; swapTemp: UNSIGNED32;
 
 BEGIN
 	tempAdr := adr;
@@ -409,7 +409,7 @@ END InterfaceByDstIP;
 		(* Find MULTIPLE IP address of the specified host. *)
 PROCEDURE InitInterfaces( hostname: ARRAY OF CHAR; VAR res: INTEGER );
 	VAR hostent: WSock32.PHostent; str: ARRAY 64 OF CHAR;
-		adr, adr2: Adr;
+		adr: Adr;
 		int0, int:Interface; i:SIGNED32;
 		addr: ADDRESS;
 	BEGIN
@@ -457,7 +457,7 @@ BEGIN
 END Init;
 
 (* Swap internal representation of an IP address from big to little endian or vice versa. *)
-PROCEDURE -SwapEndian(VAR adr: SIGNED32);
+PROCEDURE -SwapEndian(VAR adr: UNSIGNED32);
 CODE
 #IF I386 THEN
 	POP EAX

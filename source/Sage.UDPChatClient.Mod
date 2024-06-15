@@ -57,7 +57,8 @@ TYPE
 		str1, str2: ARRAY 256 OF CHAR;
 
 		branch, command, seqNum, messageType, inSeqNum, outSeqNum: SIGNED16;
-		senderUin, receiverUin, port, receiveBufOffset: SIGNED32;
+		senderUin, receiverUin, receiveBufOffset: SIGNED32;
+		port: UNSIGNED32;
 		len: SIZE;
 		sendBuf-: Base.Buffer;
 

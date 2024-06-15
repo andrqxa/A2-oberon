@@ -111,7 +111,7 @@ END GetName;
 
 (** OpenConnection opens a connection. locPort, remPort, remIP are contained in the quadrupel <locIP, remIP, locPort, remPort> which determines a connection uniquely. As locIP is always the current machine, it is omitted. If remPort is equal to anyport or remIP is equal to anyIP, a passive connection will be opened. After execution, C is a brand new connection. res indicates any error. *)
 
-PROCEDURE OpenConnection* (VAR C: Connection; locPort: SIGNED16; remIP: IPAdr; remPort: SIGNED16; VAR res: SIGNED16);
+PROCEDURE OpenConnection* (VAR C: Connection; locPort: UNSIGNED16; remIP: IPAdr; remPort: UNSIGNED16; VAR res: SIGNED16);
 BEGIN
 	AsyncOpenConnection(C, locPort, remIP, remPort, res);
 	IF res = done THEN

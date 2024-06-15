@@ -27,7 +27,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 			reply: ARRAY MaxLine OF CHAR;
 			usr, passw, host, portIPAddress: ARRAY 64 OF CHAR;
 			dataIP: NetSystem.IPAdr;
-			dataPort, status, system, res: SIGNED16;
+			dataPort: UNSIGNED16; status, system, res: SIGNED16;
 			ack: BOOLEAN
 		END;
 		EnumProc = PROCEDURE (entry: ARRAY OF CHAR);
@@ -39,7 +39,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 		line: ARRAY MaxLine OF CHAR;
 		buffer: ARRAY BufLen OF CHAR;
 		timeOut: SIGNED32;
-		dataPort, col: SIGNED16;
+		dataPort: UNSIGNED16; col: SIGNED16;
 
 	PROCEDURE Connected(C: NetSystem.Connection; mode: SIGNED16): BOOLEAN;
 		VAR state: SIGNED16;
@@ -56,7 +56,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 		C := NIL
 	END Disconnect;
 
-	PROCEDURE Connect(VAR C: NetSystem.Connection; port: SIGNED16; host: ARRAY OF CHAR): BOOLEAN;
+	PROCEDURE Connect(VAR C: NetSystem.Connection; port: UNSIGNED16; host: ARRAY OF CHAR): BOOLEAN;
 		VAR
 			adr: NetSystem.IPAdr;
 			res: SIGNED16;
@@ -228,7 +228,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 		END
 	END GetLogin;
 
-	PROCEDURE OpenS(server, user, passwd: ARRAY OF CHAR; port: SIGNED16; VAR S: Session);
+	PROCEDURE OpenS(server, user, passwd: ARRAY OF CHAR; port: UNSIGNED16; VAR S: Session);
 	BEGIN
 		NEW(S); S.dataC := NIL;
 		COPY(server, S.host); S.dataPort := -1;
@@ -789,7 +789,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 		END
 	END OpenScanner;
 
-	PROCEDURE SplitFTPAdr(VAR url, host, path, user, passwd: ARRAY OF CHAR; VAR type: CHAR; VAR port: SIGNED16): BOOLEAN;
+	PROCEDURE SplitFTPAdr(VAR url, host, path, user, passwd: ARRAY OF CHAR; VAR type: CHAR; VAR port: UNSIGNED16): BOOLEAN;
 		VAR i, j, l: SIZE; service: ARRAY 8 OF CHAR;
 		PROCEDURE Blanks;
 		BEGIN
@@ -906,7 +906,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 		VAR
 			Sc: Texts.Scanner;
 			host, path, user, passwd: ARRAY 64 OF CHAR;
-			port: SIGNED16;
+			port: UNSIGNED16;
 			type: CHAR;
 	BEGIN
 		IF S = NIL THEN
