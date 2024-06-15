@@ -3,10 +3,13 @@ Refer to the general ETH Oberon System license contract available at: http://www
 
 MODULE KbdMouse;   (* g.f.	9.7.07 *)
 
+(*	22.1.23  removed calls of X11.RebindKeysym which didn't work in newer Xwindows implementations
+	( Fedora >= 37,  macOS (Xquartz > 2.8.2) )
+*)
 
 (* replacement for the keyboard and mouse drivers in the Unix ports *)
 
-IMPORT Machine, S := SYSTEM, Inputs, Plugins, X11, Displays, XDisplay, Commands, Objects;
+IMPORT Machine, S := SYSTEM, Inputs, Plugins, X11, Displays, XDisplay, Commands, Objects, Trace;
 
 #IF COOP THEN
 	IMPORT Environment;
@@ -30,6 +33,7 @@ VAR
 
 TYPE
 	Poll = OBJECT
+
 		BEGIN {ACTIVE, SAFE,PRIORITY(Objects.High - 1)}
 			LOOP
 				Objects.Sleep( 15 );  PollXQueue;
@@ -40,7 +44,8 @@ TYPE
 		END Poll;
 
 VAR
-	poll: Poll; keySymbol: ARRAY 256 OF SIGNED32;
+	poll: Poll; 
+	keySymbol: ARRAY 256 OF SIGNED32;
 
 	PROCEDURE TerminateA2;
 	VAR
@@ -77,6 +82,7 @@ VAR
 		Inputs.keyboard.Handle( km );
 		Machine.Acquire( Machine.X11 );
 	END SendKeyboardMsg;
+	
 
 	PROCEDURE PollXQueue;
 	CONST bufsize = 20;
@@ -106,23 +112,26 @@ VAR
 					X11.lastEventTime := kp.time;
 					keycount := X11.LookupString( kp, buffer, bufsize, keysym, compstatus );
 					X11.QueryPointer( xd, event.window, rw, cw, xr, yr, x, y, newxbuttons );
-
 					IF keycount = 0 THEN
 						bdiff := newxbuttons / xbuttons;  xbuttons := newxbuttons;
 						km.ch := 0X;
-						IF X11.ShiftMask IN bdiff THEN km.keysym := Inputs.KsShiftL
+						IF X11.ShiftMask IN bdiff THEN 
+							km.keysym := Inputs.KsShiftL
 						ELSIF X11.ControlMask IN bdiff THEN
-							km.keysym := Inputs.KsControlL;
+							km.keysym := Inputs.KsControlL; 
 							IF ~MMseen THEN  SendMouseMsg( x, y, 0, xbuttons )  END
 						ELSIF X11.Mod1Mask IN bdiff THEN
 							km.keysym := Inputs.KsAltL;
 							IF ~MRseen THEN SendMouseMsg( x, y, 0, xbuttons )  END
-						ELSIF MetaMask*bdiff # {} THEN km.keysym := Inputs.KsMetaL
+						ELSIF MetaMask*bdiff # {} THEN 
+							km.keysym := Inputs.KsMetaL
 						ELSIF X11.Mod5Mask IN bdiff THEN km.keysym := Inputs.KsAltR
 						ELSIF keysym = 0FE20H THEN  (* handle Shift-Tab key *)
 							km.keysym := Inputs.KsTab; km.ch :=09X
+						ELSIF keysym = 0FF7FH THEN (* NumLock *)
+							km.keysym := Inputs.KsNumLock
 						ELSE
-							km.keysym := SIGNED32(keysym);
+							km.keysym := MapKeysym( keysym );
 						END;
 						km.flags := KeyState( );
 						SendKeyboardMsg( km )
@@ -135,10 +144,7 @@ VAR
 							xbuttons := newxbuttons;  i := 0;
 							WHILE i < keycount DO
 								km.ch := buffer[i];
-								IF km.ch = 0F1X THEN  km.ch := 0A4X
-								ELSIF km.ch = 0F2X THEN km.ch := 0A5X
-								END;
-								km.keysym := keySymbol[ORD( km.ch )];
+								km.keysym := MapKeysym( ORD( km.ch ) );
 								km.flags := KeyState( );
 								SendKeyboardMsg( km );
 								INC( i )
@@ -153,12 +159,13 @@ VAR
 						km.ch := 0X;
 						IF X11.ShiftMask IN bdiff THEN km.keysym := Inputs.KsShiftL
 						ELSIF X11.ControlMask IN bdiff THEN
-							km.keysym := Inputs.KsControlL;
-							IF ~MMseen THEN  SendMouseMsg( x, y, 0, xbuttons )  END
+							km.keysym := Inputs.KsControlL;	
+							IF ~MMseen THEN  SendMouseMsg( x, y, 0, xbuttons )  END 
 						ELSIF X11.Mod1Mask IN bdiff THEN
 							km.keysym := Inputs.KsAltL;
 							IF ~MRseen THEN SendMouseMsg( x, y, 0, xbuttons )  END
-						ELSIF MetaMask*bdiff # {} THEN km.keysym := Inputs.KsMetaL
+						ELSIF MetaMask*bdiff # {} THEN 
+							km.keysym := Inputs.KsMetaL
 						ELSIF X11.Mod5Mask IN bdiff THEN km.keysym := Inputs.KsAltR
 						END;
 						km.flags := KeyState( ) + {Inputs.Release};
@@ -231,7 +238,8 @@ VAR
 			Machine.Release( Machine.X11 );
 		END;
 	END PollXQueue;
-
+	
+	
 	(* Returns wether key (SHIFT, CTRL or ALT) is pressed *)
 	PROCEDURE KeyState( ): SET;
 	VAR keys: SET;
@@ -246,159 +254,66 @@ VAR
 	END KeyState;
 
 
-	PROCEDURE Keysym( CONST str: ARRAY OF CHAR ): X11.KeySym;
-	BEGIN
-		RETURN X11.StringToKeysym( ADDRESSOF( str ) )
-	END Keysym;
-
 	PROCEDURE DisableMouseEmulation*;
 	BEGIN
 		MMseen := TRUE; MRseen := TRUE;
+		Trace.StringLn( "Mouse emulation disabled" )
 	END DisableMouseEmulation;
 
-
+	
 	PROCEDURE Init*;
-	VAR FK: ARRAY 8 OF CHAR;
-		n, i, k: SIGNED32;  modifiers: X11.Modifiers;
-		shift, control, meta, alt, capslock, numlock: X11.KeySym;
-
-
-		PROCEDURE Rebind( CONST keystr: ARRAY OF CHAR;  nofmod: SIGNED32;  key: CHAR );
-		VAR newkeystr: ARRAY 8 OF CHAR;
-			oldkeysym: X11.KeySym;
-		BEGIN
-			Machine.Acquire( Machine.X11 );
-			oldkeysym := Keysym( keystr );
-			newkeystr[0] := key;  newkeystr[1] := 0X;
-			X11.RebindKeysym( disp.xdisp, oldkeysym, modifiers, nofmod, ADDRESSOF( newkeystr ), 1 );
-			Machine.Release( Machine.X11 )
-		END Rebind;
-
-		PROCEDURE Rebind4( CONST keyString: ARRAY OF CHAR;  n: SIGNED32;  key: CHAR );
-		BEGIN
-			Rebind( keyString, n, key );
-			modifiers[n] := shift;  Rebind( keyString, n + 1, key );
-			modifiers[n] := control;  Rebind( keyString, n + 1, key );
-			modifiers[n + 1] := shift;  Rebind( keyString, n + 2, key );
-		END Rebind4;
-
-	BEGIN
-		MMseen := FALSE;  MRseen := FALSE;
-
+	VAR  val: ARRAY 8 OF CHAR;
+	BEGIN		
+		Machine.GetConfig( "MB", val );
+		IF (val = "3") OR (val = "") THEN
+			DisableMouseEmulation
+		ELSE
+			MMseen := FALSE;  MRseen := FALSE
+		END;
 
 		Machine.Acquire( Machine.X11 );
 		X11.SelectInput( disp.xdisp, disp.primary,
 						  X11.ExposureMask + X11.ButtonPressMask + X11.OwnerGrabButtonMask +
 						  X11.ButtonReleaseMask + X11.PointerMotionHintMask + X11.PointerMotionMask +
 						  X11.KeyPressMask + X11.KeyReleaseMask + X11.StructureNotifyMask );
-	 	shift := Keysym( "Shift_L" );  control := Keysym( "Control_L" );
-		meta := Keysym( "Meta-L" );  alt := Keysym( "Alt_L" );
-		capslock := Keysym( "Caps_Lock" );  numlock := Keysym( "Num_Lock" );
 		Machine.Release( Machine.X11 );
 
-		modifiers[0] := shift;
-		Rebind( "Pause", 1, 0ADX );   (* SHIFT-BREAK *)
-
-		modifiers[0] := control;	Rebind( "Return", 1, 0AX );
-		   modifiers[1] := numlock;	Rebind( "Return", 2, 0AX );
-		   modifiers[1] := capslock;	Rebind( "Return", 2, 0AX );
-			modifiers[2] := numlock;	Rebind( "Return", 3, 0AX );
-
-
-		FOR k := 0 TO 4 DO
-			CASE k OF
-			| 0:   n := 0;
-			| 1:   modifiers[0] := meta;  n := 1;
-			| 2:   modifiers[0] := capslock;  n := 1
-			| 3:   modifiers[0] := numlock;  n := 1
-			| 4:   modifiers[0] := capslock;  modifiers[1] := numlock;  n := 2
-			END;
-			i := 0;  FK := "F0";
-			WHILE i < 10 DO FK[1] := CHR( ORD( "0" ) + i );  Rebind4( FK, n, CHR( 0F0H + i ) );  INC( i ) END;
-			i := 10;  FK := "F10";
-			WHILE i <= 12 DO FK[2] := CHR( ORD( "0" ) + i - 10 );  Rebind4( FK, n, CHR( 0F0H + i ) );  INC( i ) END;
-
-			Rebind4( "BackSpace", n, 7FX );
-			Rebind4( "Delete", n, 0A1X );
-			Rebind4( "Escape", n, 1BX );
-			Rebind4( "Up", n, 0C1X );  Rebind4( "Down", n, 0C2X );
-			Rebind4( "Left", n, 0C4X );  Rebind4( "Right", n, 0C3X );
-			IF k < 3 THEN
-				(* do not for NumLock on *)
-				Rebind4( "KP_Up", n, 0C1X );  Rebind4( "KP_Down", n, 0C2X );
-				Rebind4( "KP_Left", n, 0C4X );  Rebind4( "KP_Right", n, 0C3X );
-			END;
-			Rebind4( "Prior", n, 0A2X );  Rebind4( "KP_Prior", n, 0A2X );
-			Rebind4( "Next", n, 0A3X );  Rebind4( "KP_Next", n, 0A3X );
-			Rebind4( "Insert", n, 0A0X );
-			Rebind4( "Home", n, 0A8X );  Rebind4( "KP_Home", n, 0A8X );
-			Rebind4( "End", n, 0A9X );  Rebind4( "KP_End", n, 0A9X );
-		END;
-
-
-		(* special keyboard: *)
-		modifiers[0] := shift;  modifiers[1] := meta;
-		FOR i := 0 TO 2 DO
-			Rebind( "aacute", i, 094X );
-			Rebind( "agrave", i, 08BX );
-			Rebind( "Adiaeresis", i, 080X );		Rebind( "adiaeresis", i, 083X );
-			Rebind( "acircumflex", i, 086X );
-			Rebind( "eacute", i, 090X );
-			Rebind( "egrave", i, 08CX );
-			Rebind( "ediaeresis", i, 091X );
-			Rebind( "ecircumflex", i, 087X );
-			Rebind( "igrave", i, 08DX );
-			Rebind( "idiaeresis", i, 092X );
-			Rebind( "icircumflex", i, 088X );
-			Rebind( "ograve", i, 08EX );
-			Rebind( "Odiaeresis", i, 081X );		Rebind( "odiaeresis", i, 084X );
-			Rebind( "ocircumflex", i, 089X );
-			Rebind( "ugrave", i, 08FX );
-			Rebind( "Udiaeresis", i, 082X );		Rebind( "udiaeresis", i, 085X );
-			Rebind( "ucircumflex", i, 08AX );
-			Rebind( "ccedilla", i, 093X );
-			Rebind( "ntilde", i, 095X );
-			Rebind( "ssharp", i, 096X );
-
-			Rebind( "idotless", i, 0FDX);
-			Rebind( "Iabovedot", i, 0DDX);
-			Rebind( "gbreve", i, 0F0X );
-			Rebind( "Gbreve", i, 0D0X );
-			Rebind( "scedilla", i, 0FEX );
-			Rebind( "Scedilla", i, 0DEX );
-		END;
-
 		InitKeysym;
-
+		
 		NEW( poll );
 	END Init;
+	
+	PROCEDURE MapKeysym( ks: X11.KeySym ): SIGNED32;
+	VAR sym: SIGNED32;
+	BEGIN
+		sym := keySymbol[ks MOD 100H];
+		IF (ks > 100H) & (sym < 100H) THEN  sym := sym + 0FF00H  END;
+		RETURN sym
+	END MapKeysym;
+	
 
 	PROCEDURE InitKeysym;
 	VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 255 DO keySymbol[i] := i END;
-		keySymbol[07FH] := Inputs.KsBackSpace;
+		keySymbol[008H] := Inputs.KsBackSpace;
+		keySymbol[07FH] := Inputs.KsDelete;
 		keySymbol[009H] := Inputs.KsTab;
 		keySymbol[00AH] := Inputs.KsReturn;
 		keySymbol[00DH] := Inputs.KsReturn;
 
-		keySymbol[0C1H] := Inputs.KsUp;
-		keySymbol[0C2H] := Inputs.KsDown;
-		keySymbol[0C3H] := Inputs.KsRight;
-		keySymbol[0C4H] := Inputs.KsLeft;
-
-		keySymbol[0A0H] := Inputs.KsInsert;
-		keySymbol[0A1H] := Inputs.KsDelete;
-		keySymbol[0A2H] := Inputs.KsPageUp;
-		keySymbol[0A3H] := Inputs.KsPageDown;
-		keySymbol[0A8H] := Inputs.KsHome;
-		keySymbol[0A9H] := Inputs.KsEnd;
-		keySymbol[01BH] := Inputs.KsEscape;
-
-		FOR i := 0F1H TO 0FCH DO keySymbol[i] := 0FFBEH + (i - 0F1H) END;
-		keySymbol[0A4H] := Inputs.KsF1;
-		keySymbol[0A5H] := Inputs.KsF2;
+		keySymbol[097H] := Inputs.KsUp;
+		keySymbol[099H] := Inputs.KsDown;
+		keySymbol[098H] := Inputs.KsRight;
+		keySymbol[096H] := Inputs.KsLeft;
+		keySymbol[09AH] := Inputs.KsPageUp;
+		keySymbol[09BH] := Inputs.KsPageDown;
+		keySymbol[095H] := Inputs.KsHome;
+		keySymbol[09CH] := Inputs.KsEnd;
+		keySymbol[09EH] := Inputs.KsInsert;
+		keySymbol[09FH] := Inputs.KsDelete;
 	END InitKeysym;
+
 
 	PROCEDURE GetXDisplay;
 	VAR p: Plugins.Plugin;
@@ -412,27 +327,4 @@ BEGIN
 END KbdMouse.
 
 
-(** Remark:
 
-1. Keyboard character codes correspond to the ASCII character set. Some other important codes are:
-
-	SHIFT-BREAK	0ADX
-	BREAK	0ACX
-	F1 ... F12	0F1X ... 0FCX
-	UP ARROW	0C1X
-	RIGHT ARROW	0C3X
-	DOWN ARROW	0C2X
-	LEFT ARROW	0C4X
-	INSERT	0A0X
-	DELETE	0A1X
-	PAGE-UP	0A2X
-	PAGE-DOWN	0A3X
-
-	some none ascii character get mapped to UTF8:
-	ä, Ä	131, 128
-	ö, Ö	132, 129
-	ü, Ü	133, 130
-	ß	150
-	. . .
-
-*)

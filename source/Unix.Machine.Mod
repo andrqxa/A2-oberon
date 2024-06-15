@@ -582,38 +582,36 @@ END GetTimer;
 
 	(** Return the value of the configuration string specified by parameter name in parameter val. Returns val = "" if the string was not found, or has an empty value. *)
 	PROCEDURE GetConfig* (CONST name: ARRAY OF CHAR; VAR val: ARRAY OF CHAR);
-	VAR i, src: SIGNED32; ch: CHAR;
+	VAR i, ic: SIGNED32; ch: CHAR;
+		
+		PROCEDURE NextChar;
+		BEGIN
+			IF ch # 0X THEN  ch := config[ic];  INC( ic )  END
+		END NextChar;
+		
+		PROCEDURE SkipSpaces;
+		BEGIN
+			WHILE (ch # 0X) & (ch <= ' ') DO  NextChar  END
+		END SkipSpaces;
+		
 	BEGIN
-		ASSERT (name[0] # "=");	(* no longer supported, use GetInit instead *)
-
-		src := -1;  val := "";
+		ch := config[0];  ic := 1;  val := "";
 		LOOP
-			REPEAT
-				INC( src );  ch := config[src];
-				IF ch = 0X THEN EXIT END;
-			UNTIL ch > ' ';
+			SkipSpaces;
+			IF ch = 0X THEN  EXIT  END;
 			i := 0;
-			LOOP
-				ch := config[src];
-				IF (ch # name[i]) OR (name[i] = 0X) THEN EXIT END;
-				INC (i); INC (src)
-			END;
+			WHILE (ch = name[i]) & (name[i] # 0X) DO  NextChar;  INC( i )  END;
 			IF (ch <= ' ') & (name[i] = 0X) THEN	(* found *)
-				i := 0;
-				REPEAT
-					INC (src); ch := config[src]; val[i] := ch; INC (i);
-					IF i = LEN(val) THEN val[i - 1] := 0X; RETURN END	(* val too short *)
-				UNTIL ch <= ' ';
-				IF ch = ' ' THEN val[i -1] := 0X END;
-				RETURN
-			ELSE
-				WHILE ch > ' ' DO	(* skip to end of name *)
-					INC (src); ch := config[src]
+				SkipSpaces;  i := 0;
+				WHILE ch > ' ' DO
+					IF i < LEN( val ) - 1 THEN  val[i] := ch;  INC( i )  END;
+					NextChar
 				END;
-				INC (src);
-				REPEAT	(* skip to end of value *)
-					ch := config[src]; INC (src)
-				UNTIL ch <= ' '
+				val[i] := 0X;  EXIT
+			ELSE
+				WHILE ch > ' ' DO  NextChar  END;	(* skip to end of name *)
+				SkipSpaces;
+				WHILE ch > ' ' DO  NextChar  END;	(* skip to end of value *)
 			END
 		END;
 		IF (name = "ObjectFileExtension") & (val = "") THEN
