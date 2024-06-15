@@ -421,7 +421,7 @@ TYPE
 					out.String(" RECORD");
 				ELSIF type.any IS ModuleParser.AnyObject THEN
 					out.String(" OBJECT");
-				END;				
+				END;
 			END;
 		END Type;
 
@@ -481,20 +481,6 @@ TYPE
 			END;
 		END ProcDecl;
 
-		PROCEDURE FieldDecl(fieldDecl : ModuleParser.FieldDecl);
-		BEGIN
-			WHILE (fieldDecl # NIL) DO
-				IF (fieldDecl.identList # NIL) & (fieldDecl.type # NIL) THEN
-					Variable(fieldDecl.identList, fieldDecl.type);
-				END;
-				IF (fieldDecl.next # NIL) THEN
-					fieldDecl := fieldDecl.next (ModuleParser.FieldDecl);
-				ELSE
-					fieldDecl := NIL;
-				END;
-			END;
-		END FieldDecl;
-
 		PROCEDURE TypeDecl(typeDecl : ModuleParser.TypeDecl; indent : SIGNED32);
 		BEGIN
 			ASSERT(typeDecl # NIL);
@@ -521,9 +507,9 @@ TYPE
 							out.String("|");
 							IF (variables # None) THEN
 								IF (typeDecl.type.record # NIL) THEN
-									FieldDecl(typeDecl.type.record.fieldList);
+									VarDecl(typeDecl.type.record.declSeq.varDecl);
 								ELSE
-									FieldDecl(typeDecl.type.pointer.type.record.fieldList);
+									VarDecl(typeDecl.type.pointer.type.record.declSeq.varDecl);
 								END;
 							END;
 						END;
@@ -553,7 +539,7 @@ TYPE
 							out.String(" RECORD");
 						ELSIF typeDecl.type.any IS ModuleParser.AnyObject THEN
 							out.String(" OBJECT");
-						END;						
+						END;
 					END;
 					out.String('}"'); out.Ln;
 					Indent(indent + 4); out.String("]"); out.Ln;
@@ -673,24 +659,27 @@ TYPE
 			END GenerateObjectFieldEdges;
 
 			PROCEDURE GenerateRecordFieldEdges(record : ModuleParser.Record; entry : ModuleEntry);
-			VAR fieldDecl : ModuleParser.FieldDecl; name : Strings.String;
+			VAR varDecl : ModuleParser.VarDecl; name : Strings.String; fullname : ARRAY 128 OF CHAR;
 			BEGIN
 				ASSERT(record # NIL);
-				fieldDecl := record.fieldList;
-				WHILE (fieldDecl # NIL) DO
-					IF (fieldDecl.type # NIL) & (fieldDecl.type.qualident # NIL) & ((hasA = All) OR AtLeastOneIdentIsPublic(fieldDecl.identList)) THEN
-						name := GetTargetNodeName(fieldDecl.type.qualident.ident.name^, entry);
-						IF (name # NIL) THEN
-							hasAEdges.Add(typeDecl.identDef.ident.name^, name^);
-						ELSIF ~IsBasicType(fieldDecl.type.qualident.ident.name^) THEN
-							KernelLog.String("Record type not found: "); KernelLog.String(fieldDecl.type.qualident.ident.name^);
-							KernelLog.Ln;
+				IF (record.declSeq # NIL) THEN
+					varDecl := record.declSeq.varDecl;
+					WHILE (varDecl # NIL) DO
+						IF (varDecl.type # NIL) & (varDecl.type.qualident # NIL) & ((hasA = All) OR AtLeastOneIdentIsPublic(varDecl.identList)) THEN
+							FixTypeName(entry.module, varDecl.type.qualident.ident.name^, fullname);
+							name := GetTargetNodeName(fullname, entry);
+							IF (name # NIL) THEN
+								hasAEdges.Add(typeDecl.identDef.ident.name^, name^);
+							ELSIF ~IsBasicType(varDecl.type.qualident.ident.name^) THEN
+								KernelLog.String("Record type not found: "); KernelLog.String(varDecl.type.qualident.ident.name^);
+								KernelLog.Ln;
+							END;
 						END;
-					END;
-					IF (fieldDecl.next # NIL) THEN
-						fieldDecl := fieldDecl.next (ModuleParser.FieldDecl);
-					ELSE
-						fieldDecl := NIL;
+						IF (varDecl.next # NIL) THEN
+							varDecl := varDecl.next (ModuleParser.VarDecl);
+						ELSE
+							varDecl := NIL;
+						END;
 					END;
 				END;
 			END GenerateRecordFieldEdges;

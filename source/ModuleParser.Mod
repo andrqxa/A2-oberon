@@ -124,31 +124,18 @@ TYPE
 	VAR
 		super*: Qualident;
 		superPtr* : Record;
-		fieldList*: FieldDecl;
-		procDecl*: ProcDecl;
+		declSeq*: DeclSeq;
 
 		PROCEDURE FindProcDecl*(CONST name : ARRAY OF CHAR) : ProcDecl;
-		VAR pd : ProcDecl;
+		VAR procDecl := NIL : ProcDecl;
 		BEGIN
-			pd := procDecl;
-			WHILE (pd # NIL) & (pd.head.identDef.ident.name^ # name) DO
-				IF (pd.next # NIL) THEN
-					pd := pd.next (ProcDecl);
-				ELSE
-					pd := NIL;
-				END;
+			IF (declSeq # NIL) THEN
+				procDecl := declSeq.FindProcDecl(name);
 			END;
-			ASSERT((pd = NIL) OR (pd.head.identDef.ident.name^ = name));
-			RETURN pd;
+			RETURN procDecl;
 		END FindProcDecl;
 
 	END Record;
-
-	FieldDecl* = OBJECT (NodeList)
-	VAR
-		identList*: IdentList;
-		type*: Type;
-	END FieldDecl;
 
 	Pointer* = OBJECT(Node)
 	VAR
@@ -774,7 +761,7 @@ TYPE
 			PROCEDURE CheckEndOrSemicolon;
 			BEGIN
 				IF token.symbol # FoxScanner.End THEN
-					REPEAT Check(FoxScanner.Semicolon) UNTIL token.symbol # FoxScanner.Semicolon
+					WHILE token.symbol = FoxScanner.Semicolon DO NextToken END;
 				END;
 			END CheckEndOrSemicolon;
 
@@ -880,7 +867,7 @@ TYPE
 					NextToken;
 					NEW(identDef.initializer);
 					ConstExprP(FoxScanner.Colon, FoxScanner.Comma, identList.identDef.initializer);
-				END;				
+				END;
 				NEW(identList, var);
 				identList.identDef := identDef;
 				AppendLast(var.identList, identList);
@@ -923,7 +910,7 @@ TYPE
 		BEGIN
 			ProcedureModifierP(head);
 			(*SysFlag;*)
-			
+
 			IF token.symbol = FoxScanner.Const THEN (* a method with CONST modifier *)
 				NextToken;
 			END;
@@ -938,7 +925,7 @@ TYPE
 			| FoxScanner.Number: IF token.numberType = FoxScanner.Character THEN head.operator := TRUE END;
 			ELSE
 			END;
-			
+
 			IF token.symbol = FoxScanner.LeftParenthesis THEN (* Oberon-2 *)
 					NextToken;
 					NEW(fpSection,NIL);
@@ -1139,7 +1126,7 @@ TYPE
 		END AnyP;
 
 		PROCEDURE RecordP(record: Record);
-		VAR procDecl: ProcDecl;
+		VAR procDecl: ProcDecl; declSeq: DeclSeq; varDecl: VarDecl;
 		BEGIN
 			SysFlag;
 			IF token.symbol = FoxScanner.LeftParenthesis THEN
@@ -1148,66 +1135,39 @@ TYPE
 				QualidentP(record.super);
 				Check(FoxScanner.RightParenthesis);
 			END;
+
+			NEW(declSeq, record);
+			IF record.declSeq = NIL THEN record.declSeq := declSeq;
+			ELSE AppendLast(record.declSeq, declSeq);
+			END;
 			WHILE token.symbol = FoxScanner.Semicolon DO NextToken END;
-			IF token.symbol = FoxScanner.Identifier THEN
-				NEW(record.fieldList, record);
-				FieldListP(record.fieldList);
+
+			WHILE token.symbol = FoxScanner.Identifier DO
+				NEW(varDecl, declSeq);
+				VarDeclP(varDecl);
+				IF declSeq.varDecl = NIL THEN declSeq.varDecl := varDecl;
+				ELSE AppendLast(declSeq.varDecl, varDecl);
+				END;
+				WHILE token.symbol = FoxScanner.Semicolon DO NextToken END;
 			END;
 
 			WHILE (token.symbol = FoxScanner.Procedure) OR (token.symbol = FoxScanner.Operator) DO
 				NextToken;
-				NEW(procDecl, record);
+				NEW(procDecl, declSeq);
 				ProcDeclP(procDecl);
 				IF procDecl.head = NIL THEN
 					procDecl := NIL
 				ELSE
-					IF record.procDecl = NIL THEN record.procDecl := procDecl;
-					ELSE AppendLast(record.procDecl, procDecl);
+					IF declSeq.procDecl = NIL THEN declSeq.procDecl := procDecl;
+					ELSE AppendLast(declSeq.procDecl, procDecl);
 					END;
 				END;
 				IF token.symbol # FoxScanner.End THEN
-					REPEAT Check(FoxScanner.Semicolon) UNTIL token.symbol # FoxScanner.Semicolon
+					WHILE token.symbol = FoxScanner.Semicolon DO NextToken END;
 				END;
 			END;
 			Check(FoxScanner.End);
 		END RecordP;
-
-		PROCEDURE FieldListP(fieldList: FieldDecl);
-		VAR fieldDecl: FieldDecl;
-		BEGIN
-			FieldDeclP(fieldList);
-			WHILE token.symbol = FoxScanner.Semicolon DO
-				NextToken;
-				NEW(fieldDecl, fieldList);
-				FieldDeclP(fieldDecl);
-				AppendLast(fieldList, fieldDecl);
-			END;
-		END FieldListP;
-
-		PROCEDURE FieldDeclP(fieldDecl: FieldDecl);
-		VAR
-			identDef: IdentDef;
-			identList: IdentList;
-		BEGIN
-			IF token.symbol = FoxScanner.Identifier THEN
-				NEW(fieldDecl.identList, fieldDecl);
-				NEW(fieldDecl.identList.identDef);
-				IdentDefP(fieldDecl.identList.identDef);
-				SysFlag;
-				WHILE token.symbol = FoxScanner.Comma DO
-					NextToken;
-					NEW(identDef);
-					IdentDefP(identDef);
-					SysFlag;
-					NEW(identList, identList);
-					identList.identDef := identDef;
-					AppendLast(fieldDecl.identList, identList);
-				END;
-				Check(FoxScanner.Colon);
-				NEW(fieldDecl.type, fieldDecl);
-				TypeP(fieldDecl.type);
-			END;
-		END FieldDeclP;
 
 		PROCEDURE PointerP(pointer: Pointer);
 		BEGIN
@@ -1862,7 +1822,7 @@ BEGIN
 					END;
 				END;
 			ELSIF (typeDecl.type.record # NIL) THEN
-				method := typeDecl.type.record.procDecl;
+				method := typeDecl.type.record.declSeq.procDecl;
 
 				WHILE (method # NIL) DO
 					superRecord := typeDecl.type.record.superPtr;
@@ -1938,6 +1898,7 @@ BEGIN
 	invalidIdentifier := Strings.NewString("<?>");
 END ModuleParser.
 
+Release.Rebuild -b Win64 ModuleParser.Mod ~
 PC.Compile \s ModuleParser.Mod ~
 Builder.Compile \s  ModuleParser.Mod ~
 System.DeleteFiles ModuleParser.Obx ~
