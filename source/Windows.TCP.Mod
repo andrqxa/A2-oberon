@@ -353,7 +353,7 @@ TYPE
 		END Requested;
 
 		PROCEDURE Available*( ): SIGNED32;
-		VAR ret, res: SIGNED32;  fdset: WSock32.FDSet;
+		VAR ret: SIGNED32; res: UNSIGNED32;  fdset: WSock32.FDSet;
 			data: ARRAY 256 OF CHAR;
 		BEGIN  (* {EXCLUSIVE} *)
 			(* IF Trace THEN KernelLog.String("available: "); KernelLog.Int(receiver.Available(),1); KernelLog.Ln END; *)
@@ -387,7 +387,7 @@ TYPE
 					END;
 				END;
 			END;
-			RETURN res;
+			RETURN SIGNED32(res);
 		END Available;
 
 	(* Finalize the Connection object *)

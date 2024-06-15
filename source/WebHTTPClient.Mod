@@ -118,6 +118,7 @@ BEGIN
 				ELSE
 					NEW(tls);
 					con := tls;
+					tls.SetSniName(host);
 				END;
 				con.Open(TCP.NilPort, fadr, port, res);
 			END;
