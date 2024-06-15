@@ -17,7 +17,7 @@ MODULE JPEG2000Decoder;
 		- Optimization: Inline procedures Renormd, LpsExchange and MpsExchange of MQDecoder.
 	*)
 
-	IMPORT SYSTEM, KernelLog, Streams, J2KCS := JPEG2000DecoderCS, J2KU := JPEG2000DecoderUtil,
+	IMPORT SYSTEM, KernelLog, Strings, Streams, J2KCS := JPEG2000DecoderCS, J2KU := JPEG2000DecoderUtil,
 			Codecs, Raster, Machine;
 
 	CONST
@@ -6961,7 +6961,7 @@ MODULE JPEG2000Decoder;
 					ELSE
 						context.arg.String(decResStr);
 						decRes := -1;
-						Strings.StrToInt(decResStr, decRes);
+						Strings.StrToInt32(decResStr, decRes);
 
 						IF (decRes < 0) OR (decRes > 32) THEN
 							context.error.String("Invalid resolution decrease value");
@@ -6981,7 +6981,7 @@ MODULE JPEG2000Decoder;
 					ELSE
 						context.arg.String(decLayStr);
 						decLay := -1;
-						Strings.StrToInt(decLayStr, decLay);
+						Strings.StrToInt32(decLayStr, decLay);
 
 						IF (decLay < 0) OR (decLay > 65535) THEN
 							context.error.String("Invalid layer decrease value");
@@ -7002,7 +7002,7 @@ MODULE JPEG2000Decoder;
 
 					context.arg.String(bmpFormatStr);
 					bmpFormat := -1;
-					Strings.StrToInt(bmpFormatStr, bmpFormat);
+					Strings.StrToInt32(bmpFormatStr, bmpFormat);
 
 					IF bmpFormat = 16 THEN
 						bmpRasterFormat := Raster.BGR565;
@@ -7109,7 +7109,7 @@ MODULE JPEG2000Decoder;
 			(* Display the image if the "view" option has been set, or the "output-to-file" option is not set *)
 			IF view OR ~bmpOut THEN
 				NEW(window, imgWidth, imgHeight, FALSE);
-				window.SetTitle(WM.NewString(fileName));
+				window.SetTitle(Strings.NewString(fileName));
 				WM.DefaultAddWindow(window);
 				NEW(rasterImgAdapt, window.img);
 				imgConsumerArr[nconsumer] := rasterImgAdapt;

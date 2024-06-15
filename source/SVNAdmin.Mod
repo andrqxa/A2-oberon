@@ -384,7 +384,7 @@ TYPE
 			r.Ln ( adminDir.NodeKind ); (* 3 *)
 			r.Ln ( tmp ); (* 4 *)
 			IF tmp # "" THEN
-				Strings.StrToInt ( tmp, adminDir.Revision ); (* 4 *)
+				Strings.StrToInt32 ( tmp, adminDir.Revision ); (* 4 *)
 			END;
 			r.Ln ( adminDir.Url ); (* 5 *)
 			COPY ( adminDir.Url, adminDir.UrlConst );
@@ -398,7 +398,7 @@ TYPE
 			r.Ln ( adminDir.LastChangedDate ); (* 10 *)
 			r.Ln ( tmp ); (* 11 *)
 			IF tmp # "" THEN
-				Strings.StrToInt ( tmp, adminDir.LastChangedRevision ); (* 11 *)
+				Strings.StrToInt32 ( tmp, adminDir.LastChangedRevision ); (* 11 *)
 			END;
 			r.Ln ( adminDir.LastChangedAuthor ); (* 12 *)
 			r.SkipLn; (* 13 *)
@@ -450,7 +450,7 @@ TYPE
 			IF r.Peek() # CHR(12) THEN
 				r.Ln ( tmp ); (* 4*)
 				IF tmp # "" THEN
-					Strings.StrToInt ( tmp, adminDir.Revision );
+					Strings.StrToInt32 ( tmp, adminDir.Revision );
 				END;
 
 				r.SkipLn; r.SkipLn; (* 5-6 *)
@@ -461,7 +461,7 @@ TYPE
 					r.Ln ( adminDir.LastChangedDate ); (* 10 *)
 					r.Ln ( tmp ); (* 11 *)
 					IF tmp # "" THEN
-						Strings.StrToInt ( tmp, adminDir.LastChangedRevision );
+						Strings.StrToInt32 ( tmp, adminDir.LastChangedRevision );
 					ELSE
 						res := SVNOutput.ResNOTVERSIONED;
 						RETURN;

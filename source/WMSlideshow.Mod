@@ -993,7 +993,7 @@ END SlideshowWindow;
 					IF (DEBUG) THEN KernelLog.String("Error in LoadSlides(): s(key) = NIL"); END;
 					RETURN FALSE;
 				END;
-				Strings.StrToInt(s^, i);
+				Strings.StrToInt32(s^, i);
 				IF (i<=0) & (i>WMTrans.duration) THEN KernelLog.String("Error: wrong index in XML"); RETURN FALSE; END;
 			*)
 			(* **
@@ -1031,7 +1031,7 @@ END SlideshowWindow;
 				RETURN FALSE;
 			END;
 			durStr := Strings.NewString(s^);
-			Strings.StrToInt(durStr^, dur);
+			Strings.StrToInt32(durStr^, dur);
 			(** 4. try to read 'description' attribut **)
 			s := e.GetAttributeValue("description");
 			IF (s = NIL) THEN

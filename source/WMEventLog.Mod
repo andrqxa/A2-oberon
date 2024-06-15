@@ -118,17 +118,17 @@ TYPE
 
 			classEdit.GetAsString(string);
 			IF (string # "") & (string # "*") THEN
-				Strings.StrToInt(string, value); IF event.class # value THEN discard := TRUE; RETURN; END;
+				Strings.StrToInt32(string, value); IF event.class # value THEN discard := TRUE; RETURN; END;
 			END;
 
 			subclassEdit.GetAsString(string);
 			IF (string # "") & (string # "*") THEN
-				Strings.StrToInt(string, value); IF event.subclass # value THEN discard := TRUE; RETURN; END;
+				Strings.StrToInt32(string, value); IF event.subclass # value THEN discard := TRUE; RETURN; END;
 			END;
 
 			codeEdit.GetAsString(string);
 			IF (string # "") & (string # "*") THEN
-				Strings.StrToInt(string, value); IF event.code # value THEN discard := TRUE; RETURN; END;
+				Strings.StrToInt32(string, value); IF event.code # value THEN discard := TRUE; RETURN; END;
 			END;
 		END FilterClassification;
 

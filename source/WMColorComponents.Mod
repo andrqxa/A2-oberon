@@ -128,7 +128,7 @@ TYPE
 			IF ~IsNumber(buf) THEN
 				RecacheProperties
 			ELSE
-				Strings.StrToInt(buf, new);
+				Strings.StrToInt32(buf, new);
 				IF (new # value.Get()) THEN
 					IF (new >= min.Get()) & (new <= max.Get()) THEN
 						value.Set(new);

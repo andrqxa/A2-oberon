@@ -1315,8 +1315,8 @@ TYPE
 				Strings.TrimWS(value);
 				strings := Strings.Split(value, "X");
 				IF LEN(strings) = 2 THEN
-					Strings.StrToInt(strings[0]^, width);
-					Strings.StrToInt(strings[1]^, height);
+					Strings.StrToInt32(strings[0]^, width);
+					Strings.StrToInt32(strings[1]^, height);
 				END;
 			END;
 		END GetStartupSize;

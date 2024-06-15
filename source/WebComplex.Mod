@@ -69,7 +69,7 @@ TYPE
 			IF (elem # NIL) THEN
 				oidStr := WebStd.GetXMLCharContent(elem);
 				IF (oidStr # NIL) THEN
-					Strings.StrToInt(oidStr^, oidNr);
+					Strings.StrToInt32(oidStr^, oidNr);
 					persObj := PrevalenceSystem.GetPersistentObject(oidNr);
 					IF ((persObj # NIL) & (persObj IS WebStd.PersistentDataContainer)) THEN
 						subEntries := persObj(WebStd.PersistentDataContainer)
@@ -84,7 +84,7 @@ TYPE
 			IF (elem # NIL) THEN
 				oidStr := WebStd.GetXMLCharContent(elem);
 				IF (oidStr # NIL) THEN
-					Strings.StrToInt(oidStr^, oidNr);
+					Strings.StrToInt32(oidStr^, oidNr);
 					persObj := PrevalenceSystem.GetPersistentObject(oidNr);
 					IF ((persObj # NIL) & (persObj IS WebForumEntry)) THEN
 						superEntry := persObj(WebForumEntry)
@@ -453,7 +453,7 @@ TYPE
 				IF (paging # NIL) THEN
 					pagingSizeStr := paging.GetAttributeValue("size");
 					IF (pagingSizeStr # NIL) THEN
-						Strings.StrToInt(pagingSizeStr^, pagingSize)
+						Strings.StrToInt32(pagingSizeStr^, pagingSize)
 					END
 				ELSE
 					pagingSize := MAX(SIGNED32)
@@ -902,7 +902,7 @@ TYPE
 			state := WebForumOverviewState; (* user could have pushed the back button in the browsers navigation bar *)
 			posString := params.GetParameterValueByName("pos");
 			IF (posString # NIL) THEN
-				Strings.StrToInt(posString^, pos);
+				Strings.StrToInt32(posString^, pos);
 				OnPositionChanged(pos, request)
 			ELSE
 				KernelLog.String("WebComplex:WebForum - event handler 'SetPos' has parameter 'pos'.");
@@ -917,7 +917,7 @@ TYPE
 			oidString := params.GetParameterValueByName("oid");
 			IF (oidString # NIL) THEN
 				state := WebForumDetailViewState;
-				Strings.StrToInt(oidString^, entryOid);
+				Strings.StrToInt32(oidString^, entryOid);
 				OnDetailViewActivated(entryOid, request);
 			ELSE
 				KernelLog.String("WebComplex:WebForum - event handler 'SetDetailView' has parameter 'oid'.");
@@ -932,7 +932,7 @@ TYPE
 			IF (allowInsert) THEN
 				parentStr := params.GetParameterValueByName("oid");
 				IF (parentStr # NIL) THEN
-					Strings.StrToInt(parentStr^, superEntryOid);
+					Strings.StrToInt32(parentStr^, superEntryOid);
 					OnInsertViewActivated(superEntryOid, request)
 				ELSE
 					superEntryOid := 0
@@ -948,7 +948,7 @@ TYPE
 			oidString := params.GetParameterValueByName("oid");
 			IF (allowEdit & (oidString # NIL)) THEN
 				state := WebForumEditViewState;
-				Strings.StrToInt(oidString^, entryOid);
+				Strings.StrToInt32(oidString^, entryOid);
 				OnEditViewActivated(entryOid, request)
 			ELSIF (oidString # NIL) THEN
 				KernelLog.String("WebComplex:WebForum - event handler 'SetEditView' has parameter 'oid'.");
@@ -963,7 +963,7 @@ TYPE
 			state := WebForumOverviewState; (* user could have pushed the back button in the browsers navigation bar *)
 			tableNoString := params.GetParameterValueByName("tableno");
 			IF (tableNoString # NIL) THEN
-				Strings.StrToInt(tableNoString^, tableNo);
+				Strings.StrToInt32(tableNoString^, tableNo);
 				headerRow := GetTableHeader(request);
 				IF ((headerRow # NIL) & (tableNo >= 0) & (tableNo < LEN(headerRow))) THEN
 					compareFunct := headerRow[tableNo].compareFunction;
@@ -998,7 +998,7 @@ TYPE
 			state := WebForumOverviewState; (* user could have pushed the back button in the browsers navigation bar *)
 			oidString := params.GetParameterValueByName("oid");
 			IF (allowDelete & (oidString # NIL)) THEN
-				Strings.StrToInt(oidString^, oid);
+				Strings.StrToInt32(oidString^, oid);
 				IF (containerName # NIL) THEN
 					persCont := WebStd.GetPersistentDataContainer(prevSys, containerName^);
 					IF (persCont # NIL) THEN
@@ -1066,7 +1066,7 @@ TYPE
 			ELSE
 				oidString := params.GetParameterValueByName("oid");
 				IF (allowEdit & (oidString # NIL)) THEN
-					Strings.StrToInt(oidString^, oid);
+					Strings.StrToInt32(oidString^, oid);
 					IF (containerName # NIL) THEN
 						persCont := WebStd.GetPersistentDataContainer(prevSys, containerName^);
 						IF (persCont # NIL) THEN

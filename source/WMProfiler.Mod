@@ -164,11 +164,11 @@ TYPE
 		BEGIN
 			type := HierarchicalProfiler.Hierarchical;
 			typeEdit.GetAsString(string);
-			Strings.StrToInt(string, type);
+			Strings.StrToInt32(string, type);
 
 			info := HierarchicalProfiler.None;
 			infoEdit.GetAsString(string);
-			Strings.StrToInt(string, info);
+			Strings.StrToInt32(string, info);
 		END GetTypeAndInfo;
 
 		PROCEDURE GetFilterMask(VAR mask : ARRAY OF CHAR; VAR minPercent : SIGNED32);
@@ -176,7 +176,7 @@ TYPE
 		BEGIN
 			filterMaskEdit.GetAsString(mask);
 			filterCountEdit.GetAsString(number);
-			Strings.StrToInt(number, minPercent);
+			Strings.StrToInt32(number, minPercent);
 		END GetFilterMask;
 
 		PROCEDURE HandleButtons(sender, data : ANY);
@@ -190,7 +190,7 @@ TYPE
 			IF (sender = startBtn) THEN
 				time := 0;
 				timeEdit.GetAsString(timeStr);
-				Strings.StrToInt(timeStr, time);
+				Strings.StrToInt32(timeStr, time);
 				IF (time > 0) THEN
 					HierarchicalProfiler.StartProfiling(time, res);
 					IF (res # HierarchicalProfiler.Ok) THEN WMErrors.Show(res); END;

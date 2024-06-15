@@ -186,8 +186,8 @@ END SetPos;
 
 BEGIN
 	StrDebugComponent := Strings.NewString("DebugComponent");
-	NEW(prototypeColor, NIL, WMStandardComponents.NewString("Color"),
-		WMStandardComponents.NewString("toggle debugging color"));
+	NEW(prototypeColor, NIL, Strings.NewString("Color"),
+		Strings.NewString("toggle debugging color"));
 
 
 END PositionDebugging.

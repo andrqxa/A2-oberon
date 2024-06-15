@@ -124,7 +124,7 @@ TYPE
 
 			(* open the window *)
 			manager := WM.GetDefaultManager();
-			SetTitle(WM.NewString("TV Remote Control"));
+			SetTitle(Strings.NewString("TV Remote Control"));
 			manager.Add(770, 100, SELF, {WM.FlagFrame});
 			next := window;
 			window := SELF;
@@ -301,7 +301,7 @@ BEGIN
 		s := xml.GetAttributeValue("device");
 		IF s # NIL THEN
 			(* Read device number *)
-			Strings.StrToInt(s^, devNr);
+			Strings.StrToInt32(s^, devNr);
 			IF devNr = -1 THEN
 				vcd := TVDriver.GetDefaultDevice()
 			ELSE

@@ -117,7 +117,7 @@ TYPE
 					r.Ln(temp); Strings.Append(reply, temp); tcode[0] := CHR(10); tcode[1] := 0X;
 					Strings.Append(reply, tcode);
 					tcode[0] := temp[0]; tcode[1] := temp[1]; tcode[2] := temp[2]; tcode[3] := 0X;
-					Strings.StrToInt(tcode, t);
+					Strings.StrToInt32(tcode, t);
 					IF (t = code) & (temp[3] # "-") THEN stop := TRUE END;
 				UNTIL stop OR (r.res # 0)
 			ELSE

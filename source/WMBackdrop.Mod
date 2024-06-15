@@ -93,7 +93,7 @@ TYPE
 				str := "300";
 				res := WMDialogs.QueryString("Interval (in sec.)", str);
 				IF res= WMDialogs.ResOk THEN
-					Strings.StrToInt(str, value);
+					Strings.StrToInt32(str, value);
 					IF value > 0 THEN
 						interval := value * 1000;
 					ELSE
@@ -434,7 +434,7 @@ BEGIN
 		s := xml.GetAttributeValue("ChangeInterval");
 		IF (s # NIL) & (w # NIL) THEN
 			IF s^ # "0" THEN
-				Strings.StrToInt(s^, w.interval);
+				Strings.StrToInt32(s^, w.interval);
 				IF w.interval > 500 THEN
 					w.SetChangeable(TRUE);
 				END;

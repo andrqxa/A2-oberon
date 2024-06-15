@@ -122,7 +122,7 @@ TYPE
 				ELSE
 					response.statuscode := WebHTTP.OK;
 					IF WebHTTP.GetAdditionalFieldValue(request.additionalFields, "Content-Length", s) THEN
-						Strings.StrToInt(s, len);
+						Strings.StrToInt32(s, len);
 						Con2FileNew(in, len, f); (* Asynch with timeout *)
 						Files.Register(f);
 					END;
@@ -131,7 +131,7 @@ TYPE
 				(* TODO: Flush buffer. Perhaps close connection ? DAV* dev0 ?*)
 				f := Files.New("");
 				IF WebHTTP.GetAdditionalFieldValue(request.additionalFields, "Content-Length", s) THEN
-					Strings.StrToInt(s, len);
+					Strings.StrToInt32(s, len);
 					Con2FileNew(in, len, f); (* Asynch with timeout *)
 				END;
 				response.statuscode := WebHTTP.Conflict;
@@ -205,7 +205,7 @@ TYPE
 				depth := "";
 			END;
 			IF WebHTTP.GetAdditionalFieldValue(request.additionalFields, "Content-Length", body) THEN
-				Strings.StrToInt(body, contentLength);
+				Strings.StrToInt32(body, contentLength);
 				IF contentLength > 0 THEN (* cadaver *)
 					(*xmlFile := Files.New("");
 					Con2FileNew(in, contentLength, xmlFile); (* Asynch with timeout *)
@@ -277,7 +277,7 @@ TYPE
 				depth := "0";
 			END;
 			IF WebHTTP.GetAdditionalFieldValue(request.additionalFields, "Content-Length", body) THEN
-				Strings.StrToInt(body, contentLength);
+				Strings.StrToInt32(body, contentLength);
 				IF contentLength > 0 THEN (* cadaver *)
 					(*
 					xmlFile := Files.New("");
@@ -1314,7 +1314,7 @@ VAR pp : PostTestPlugin;
 
 					IF WebHTTP.GetAdditionalFieldValue(request.additionalFields, "Content-Length", s)
 
-					THEN Strings.StrToInt(s, length);
+					THEN Strings.StrToInt32(s, length);
 
 					ELSE length := -1;
 

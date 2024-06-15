@@ -102,8 +102,8 @@ TYPE
 
 		PROCEDURE &Init*;
 		BEGIN
-			NEW(onChanged, SELF, WMComponents.NewString("TreeModelChanged"), NIL, NIL);
-			NEW(beforeExpand, SELF, WMComponents.NewString("BeforeExpand"), NIL, NIL);
+			NEW(onChanged, SELF, Strings.NewString("TreeModelChanged"), NIL, NIL);
+			NEW(beforeExpand, SELF, Strings.NewString("BeforeExpand"), NIL, NIL);
 			lockLevel :=0
 		END Init;
 

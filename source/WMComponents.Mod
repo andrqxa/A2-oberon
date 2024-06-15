@@ -553,7 +553,7 @@ TYPE
 			ELSE target := FindByPath(id, 0);
 				IF target  = NIL THEN KernelLog.String("StringToEvent : Path target not found: "); KernelLog.String(id); KernelLog.Ln; END
 			END;
-			IF target # NIL THEN RETURN target.eventListeners.GetHandlerByName(NewString(name))
+			IF target # NIL THEN RETURN target.eventListeners.GetHandlerByName(Strings.NewString(name))
 			ELSE RETURN NIL
 			END
 		END StringToCompCommand;
@@ -2258,7 +2258,7 @@ TYPE
 					IF c#NIL THEN form.RemoveContent(c) END; (* avoid duplicates. will be added in a systematic way below in AddContent *)
 				ELSE
 					NEW(form, SELF); (* includes new sequencer; initialized=FALSE *)
-					form.uid.Set(NewString("form"));
+					form.uid.Set(Strings.NewString("form"));
 					c:=x;
 				END;
 				IF (c#NIL) & (c IS VisualComponent) THEN
@@ -2513,7 +2513,7 @@ TYPE
 		VAR new : PropertyListEntry;
 		BEGIN {EXCLUSIVE}
 			RemoveInternal(name);
-			NEW(new); new.name := NewString(name); new.list := pl; new.next := first; first := new
+			NEW(new); new.name := Strings.NewString(name); new.list := pl; new.next := first; first := new
 		END Add;
 
 		PROCEDURE Enumerate*() : ListArray;
@@ -3407,10 +3407,10 @@ BEGIN
 		winx:=xml(XML.Element);
 		string:=winx.GetName();
 		IF string^="FormWindow" THEN
-			string:=winx.GetAttributeValue("l"); Strings.StrToInt(string^,l);
-			string:=winx.GetAttributeValue("t"); Strings.StrToInt(string^,t);
-			string:=winx.GetAttributeValue("r"); Strings.StrToInt(string^,r);
-			string:=winx.GetAttributeValue("b"); Strings.StrToInt(string^,b);
+			string:=winx.GetAttributeValue("l"); Strings.StrToInt32(string^,l);
+			string:=winx.GetAttributeValue("t"); Strings.StrToInt32(string^,t);
+			string:=winx.GetAttributeValue("r"); Strings.StrToInt32(string^,r);
+			string:=winx.GetAttributeValue("b"); Strings.StrToInt32(string^,b);
 			NEW(window, r-l, b-t, TRUE);
 			name:=winx.GetAttributeValue("name"); window.SetTitle(name);
 			window.bounds.r:=r; window.bounds.l:=l; window.bounds.t:=t; window.bounds.b:=b;
@@ -3519,62 +3519,56 @@ BEGIN {EXCLUSIVE}
 	END;
 END LoadStyle;
 
-PROCEDURE NewString*(CONST x : ARRAY OF CHAR) : Strings.String;
-VAR t : Strings.String;
-BEGIN
-	NEW(t, LEN(x)); COPY(x, t^); RETURN t
-END NewString;
-
 PROCEDURE InitStrings;
 BEGIN
-	StrComponent := NewString("Component");
-	StrVisualComponent := NewString("VisualComponent");
-	StrForm := NewString("Form");
-	StrFormWindow := NewString("FormWindow");
-	GSonStartDrag := NewString("onStartDrag");
-	GSonStartDragInfo := NewString("Event generated whenever a drag is started");
-	StrModel := NewString("Model");
-	StrModelInfo := NewString("Model used by component");
+	StrComponent := Strings.NewString("Component");
+	StrVisualComponent := Strings.NewString("VisualComponent");
+	StrForm := Strings.NewString("Form");
+	StrFormWindow := Strings.NewString("FormWindow");
+	GSonStartDrag := Strings.NewString("onStartDrag");
+	GSonStartDragInfo := Strings.NewString("Event generated whenever a drag is started");
+	StrModel := Strings.NewString("Model");
+	StrModelInfo := Strings.NewString("Model used by component");
 END InitStrings;
 
 PROCEDURE InitPrototypes;
 BEGIN
 	(* General component properties *)
-	NEW(PrototypeID, NIL, NewString("ID"),
-		NewString("identifier of the component"));
-	NEW(PrototypeUID, NIL, NewString("UID"),
-		NewString("unique identifier of the component"));
-	NEW(PrototypeEnabled, NIL, NewString("Enabled"),
-		NewString("defines if the component is enabled"));
+	NEW(PrototypeID, NIL, Strings.NewString("ID"),
+		Strings.NewString("identifier of the component"));
+	NEW(PrototypeUID, NIL, Strings.NewString("UID"),
+		Strings.NewString("unique identifier of the component"));
+	NEW(PrototypeEnabled, NIL, Strings.NewString("Enabled"),
+		Strings.NewString("defines if the component is enabled"));
 	PrototypeEnabled.Set(TRUE);
 	(* Visual component properties *)
-	NEW(PrototypeBounds, NIL, NewString("Bounds"),
-		NewString("the bounding box of the component in parent coordinates"));
-	NEW(PrototypeBoundsRelative, NIL, NewString("RelBounds"),
-		NewString("the bounding box of the component in relative parent coordinates"));
-	NEW(PrototypeBearing, NIL, NewString("Bearing"),
-		NewString("the bearing (empty space) aroung the component if auto aligned"));
-	NEW(PrototypeFillColor, NIL, NewString("FillColor"),
-		NewString("the main fill color of the component. i.e. background"));
-	NEW(PrototypeAlignment, NIL, NewString("Alignment"),
-		NewString("defines the alignment none, left, right, top, bottom or client"));
+	NEW(PrototypeBounds, NIL, Strings.NewString("Bounds"),
+		Strings.NewString("the bounding box of the component in parent coordinates"));
+	NEW(PrototypeBoundsRelative, NIL, Strings.NewString("RelBounds"),
+		Strings.NewString("the bounding box of the component in relative parent coordinates"));
+	NEW(PrototypeBearing, NIL, Strings.NewString("Bearing"),
+		Strings.NewString("the bearing (empty space) aroung the component if auto aligned"));
+	NEW(PrototypeFillColor, NIL, Strings.NewString("FillColor"),
+		Strings.NewString("the main fill color of the component. i.e. background"));
+	NEW(PrototypeAlignment, NIL, Strings.NewString("Alignment"),
+		Strings.NewString("defines the alignment none, left, right, top, bottom or client"));
 	PrototypeAlignment.Set(0);
 
-	NEW(PrototypeVisible, NIL, NewString("Visible"),
-		NewString("defines if the component is visible"));
+	NEW(PrototypeVisible, NIL, Strings.NewString("Visible"),
+		Strings.NewString("defines if the component is visible"));
 	PrototypeVisible.Set(TRUE);
 
-	NEW(PrototypeTakesFocus, NIL, NewString("TakesFocus"),
-		NewString("defines if the component takes the keyboard focus"));
-	NEW(PrototypeNeedsTab, NIL, NewString("NeedsTab"),
-		NewString("defines if the component handles the tabulator key"));
-	NEW(PrototypeFocusPrevious, NIL, NewString("FocusPrevious"), NewString("Previous focus component ID"));
+	NEW(PrototypeTakesFocus, NIL, Strings.NewString("TakesFocus"),
+		Strings.NewString("defines if the component takes the keyboard focus"));
+	NEW(PrototypeNeedsTab, NIL, Strings.NewString("NeedsTab"),
+		Strings.NewString("defines if the component handles the tabulator key"));
+	NEW(PrototypeFocusPrevious, NIL, Strings.NewString("FocusPrevious"), Strings.NewString("Previous focus component ID"));
 	PrototypeFocusPrevious.Set(NIL);
-	NEW(PrototypeFocusNext, NIL, NewString("FocusNext"), NewString("Next focus component ID"));
+	NEW(PrototypeFocusNext, NIL, Strings.NewString("FocusNext"), Strings.NewString("Next focus component ID"));
 	PrototypeFocusNext.Set(NIL);
-	NEW(PrototypeEditMode, NIL, NewString("EditMode"), NewString("defines if the contents of the component can be edited"));
+	NEW(PrototypeEditMode, NIL, Strings.NewString("EditMode"), Strings.NewString("defines if the contents of the component can be edited"));
 	PrototypeEditMode.Set(FALSE);
-	NEW(PrototypeFont, NIL, NewString("Font"), NewString("Font"));
+	NEW(PrototypeFont, NIL, Strings.NewString("Font"), Strings.NewString("Font"));
 	PrototypeFont.Set(WMGraphics.GetDefaultFont());
 	NEW(PrototypeScaleFont, NIL, Strings.NewString("ScaleFont"), Strings.NewString("percentage that fonts scales with height (0=none)"));
 	NEW(ModelPrototype, NIL, StrModel, StrModelInfo);

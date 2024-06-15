@@ -207,7 +207,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 				sizes := 0;
 				WHILE IsNumber(temp) DO
 					ASSERT(sizes < LEN(size));
-					Strings.StrToInt(temp, tempInt);
+					Strings.StrToInt32(temp, tempInt);
 					size[sizes] := tempInt; INC(sizes);
 					context.arg.SkipWhitespace(); context.arg.Token(temp);
 				END;
@@ -237,7 +237,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 	PROCEDURE IsNumber(str : ARRAY OF CHAR): BOOLEAN;
 	VAR i : SIGNED32;
 	BEGIN
-		Strings.StrToInt(str, i);
+		Strings.StrToInt32(str, i);
 		IF i # 0 THEN RETURN TRUE ELSE RETURN FALSE END
 	END IsNumber;
 

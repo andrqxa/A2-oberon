@@ -113,19 +113,19 @@ TYPE
 				Class.String: string := Strings.NewString(s)
 				|Class.Name: COPY(s, name);
 				|Class.Boolean: boolean := (s="true") OR (s="1") OR (s="yes") OR (s="TRUE");
-				|Class.Integer: Strings.StrToInt(s, int); integer := int;
+				|Class.Integer: Strings.StrToInt32(s, int); integer := int;
 				|Class.Float: Strings.StrToFloat(s, float);
-				|Class.Enum:  Strings.StrToInt(s, int); integer := int;
+				|Class.Enum:  Strings.StrToInt32(s, int); integer := int;
 				|Class.Range:
 					split := Strings.Split(s, ":");
-					Strings.StrToInt(split[0]^, first);
+					Strings.StrToInt32(split[0]^, first);
 					IF (LEN(split) > 1) & (split[1]^ # "") THEN
-						Strings.StrToInt(split[1]^, last)
+						Strings.StrToInt32(split[1]^, last)
 					ELSE
 						last := MAX(SIGNED32)
 					END;
 					IF (LEN(split) >2) & (split[2]^ # "") THEN
-						Strings.StrToInt(split[2]^, step)
+						Strings.StrToInt32(split[2]^, step)
 					ELSE
 						step := 1
 					END;
@@ -143,19 +143,19 @@ TYPE
 				Class.String: RETURN (string # NIL) & (string^ = s)
 				|Class.Name: RETURN (s = name)
 				|Class.Boolean: RETURN boolean = (s="true") OR (s="1") OR (s="yes") OR (s="TRUE");
-				|Class.Integer: Strings.StrToInt(s, int); RETURN integer = int
+				|Class.Integer: Strings.StrToInt32(s, int); RETURN integer = int
 				|Class.Float: Strings.StrToFloat(s, flt); RETURN float = flt
-				|Class.Enum:  Strings.StrToInt(s, int); RETURN integer = int
+				|Class.Enum:  Strings.StrToInt32(s, int); RETURN integer = int
 				|Class.Range:
 					split := Strings.Split(s, ":");
-					Strings.StrToInt(split[0]^, first);
+					Strings.StrToInt32(split[0]^, first);
 					IF (LEN(split) > 1) & (split[1]^ # "") THEN
-						Strings.StrToInt(split[1]^, last)
+						Strings.StrToInt32(split[1]^, last)
 					ELSE
 						last := MAX(SIGNED32)
 					END;
 					IF (LEN(split) >2) & (split[2]^ # "") THEN
-						Strings.StrToInt(split[2]^, step)
+						Strings.StrToInt32(split[2]^, step)
 					ELSE
 						step := 1
 					END;
@@ -621,7 +621,7 @@ TYPE
 		PROCEDURE IntegerAttribute*(CONST name: ARRAY OF CHAR; VAR value: SIGNED64): BOOLEAN;
 		VAR s: ARRAY 64 OF CHAR; v: SIGNED32;
 		BEGIN
-			IF NameAttribute(name, s) THEN Strings.StrToInt(s, v); value := v; RETURN TRUE ELSE RETURN FALSE END;
+			IF NameAttribute(name, s) THEN Strings.StrToInt32(s, v); value := v; RETURN TRUE ELSE RETURN FALSE END;
 		END IntegerAttribute;
 
 		PROCEDURE FloatAttribute*(CONST name: ARRAY OF CHAR; VAR value: FLOAT64): BOOLEAN;
@@ -646,14 +646,14 @@ TYPE
 		BEGIN
 			IF NameAttribute(name, str) THEN
 				split := Strings.Split(str, ":");
-				Strings.StrToInt(split[0]^, first);
+				Strings.StrToInt32(split[0]^, first);
 				IF (LEN(split) > 1) & (split[1]^ # "") THEN
-					Strings.StrToInt(split[1]^, last)
+					Strings.StrToInt32(split[1]^, last)
 				ELSE
 					last := MAX(SIGNED32)
 				END;
 				IF (LEN(split) >2) & (split[2]^ # "") THEN
-					Strings.StrToInt(split[2]^, step)
+					Strings.StrToInt32(split[2]^, step)
 				ELSE
 					step := 1
 				END;

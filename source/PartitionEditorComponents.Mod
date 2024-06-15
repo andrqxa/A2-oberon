@@ -36,10 +36,10 @@ TYPE
 		PROCEDURE Get() : PartitionTable.Block;
 		VAR block : PartitionTable.Block; nbr : ARRAY 16 OF CHAR;
 		BEGIN
-			lbaEditor.GetAsString(nbr); Strings.StrToInt(nbr, block.lba);
-			cylinderEditor.GetAsString(nbr); Strings.StrToInt(nbr, block.cylinder);
-			headEditor.GetAsString(nbr); Strings.StrToInt(nbr, block.head);
-			sectorEditor.GetAsString(nbr); Strings.StrToInt(nbr, block.sector);
+			lbaEditor.GetAsString(nbr); Strings.StrToInt32(nbr, block.lba);
+			cylinderEditor.GetAsString(nbr); Strings.StrToInt32(nbr, block.cylinder);
+			headEditor.GetAsString(nbr); Strings.StrToInt32(nbr, block.head);
+			sectorEditor.GetAsString(nbr); Strings.StrToInt32(nbr, block.sector);
 			RETURN block;
 		END Get;
 
@@ -116,11 +116,11 @@ TYPE
 		PROCEDURE Get() : PartitionTable.Partition;
 		VAR partition : PartitionTable.Partition ;nbr : ARRAY 16 OF CHAR; value : SIGNED32;
 		BEGIN
-			typeEditor.GetAsString(nbr); Strings.StrToInt(nbr, partition.type);
-			flagEditor.GetAsString(nbr); Strings.StrToInt(nbr, value); partition.flag := CHR(value);
+			typeEditor.GetAsString(nbr); Strings.StrToInt32(nbr, partition.type);
+			flagEditor.GetAsString(nbr); Strings.StrToInt32(nbr, value); partition.flag := CHR(value);
 			partition.start := startBlock.Get();
 			partition.end := endBlock.Get();
-			sizeEditor.GetAsString(nbr); Strings.StrToInt(nbr, partition.size);
+			sizeEditor.GetAsString(nbr); Strings.StrToInt32(nbr, partition.size);
 			RETURN partition;
 		END Get;
 

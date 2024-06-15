@@ -508,7 +508,7 @@ TYPE
 			int32 := SELF.int32;
 			IF (int32 # NIL) THEN
 				editor.GetAsString(string);
-				Strings.StrToInt(string, value);
+				Strings.StrToInt32(string, value);
 				IF force OR (value # int32.Get()) THEN
 					int32.Set(value);
 				ELSE
@@ -1392,7 +1392,7 @@ TYPE
 			font := SELF.font;
 			IF (font # NIL) THEN
 				editName.GetAsString(name);
-				editSize.GetAsString(temp); Strings.StrToInt(temp, size);
+				editSize.GetAsString(temp); Strings.StrToInt32(temp, size);
 				editStyle.GetAsString(temp); Strings.StrToSet(temp, style);
 				f := WMGraphics.GetFont(name, size, style);
 				IF (f = NIL) THEN f := WMGraphics.GetDefaultFont(); END;

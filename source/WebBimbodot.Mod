@@ -712,7 +712,7 @@ BEGIN
 		var := r.GetVariableByName("version");
 		IF var = NIL THEN RETURN article.current
 		ELSE
-			Strings.StrToInt(var.value, vNr);
+			Strings.StrToInt32(var.value, vNr);
 			RETURN article.GetVersion(vNr)
 		END
 	ELSE
@@ -948,7 +948,7 @@ BEGIN
 			var := r.GetVariableByName("version");
 			IF var = NIL THEN version := article.current
 			ELSE
-				Strings.StrToInt(var.value, vNr);
+				Strings.StrToInt32(var.value, vNr);
 				version := article.GetVersion(vNr)
 			END;
 

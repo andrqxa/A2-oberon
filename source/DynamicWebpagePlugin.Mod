@@ -335,11 +335,11 @@ TYPE
 		httpVar := request.GetVariableByName(DynamicWebpage.StateCounterVariable);
 		httpCounter := 0;
 		IF (httpVar # NIL) THEN
-			Strings.StrToInt(httpVar.value, httpCounter);
+			Strings.StrToInt32(httpVar.value, httpCounter);
 			p := session.GetVariableValue(DynamicWebpage.StateCounterVariable);
 			IF ((p # NIL) & (p IS DynamicStrings.DynamicString)) THEN
 				dynStr := p(DynamicStrings.DynamicString); str := dynStr.ToArrOfChar(); (* str # NIL *)
-				Strings.StrToInt(str^, sessionCounter);
+				Strings.StrToInt32(str^, sessionCounter);
 				IF (httpCounter < sessionCounter) THEN
 					RETURN TRUE
 				END

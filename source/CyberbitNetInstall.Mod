@@ -60,7 +60,7 @@ TYPE
 				INC(j)
 			END;
 			temp[j] := 0X;
-			Strings.StrToInt(temp, size);
+			Strings.StrToInt32(temp, size);
 			(* open the local file *)
 			res := -1;
 			IF (Files.Old(file) = NIL) OR (WMDialogs.Confirmation("Confirm overwriting", file) = WMDialogs.ResYes) THEN

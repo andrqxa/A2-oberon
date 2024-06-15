@@ -372,7 +372,7 @@ TYPE
 			WHILE j < count DO
 				entP := list.GetItem(j);
 				ent := entP(IMAP.Entry);
-				Strings.StrToInt(ent.data^, number);
+				Strings.StrToInt32(ent.data^, number);
 				searchResult[j] := number-1;
 				INC(j);
 			END;
@@ -526,11 +526,11 @@ TYPE
 				ELSIF ent.data^ = "RFC822.SIZE" THEN
 					entP := list.GetItem(j+1);
 					ent := entP(IMAP.Entry);
-					Strings.StrToInt(ent.data^,message.size);
+					Strings.StrToInt32(ent.data^,message.size);
 				ELSIF ent.data^ = "UID" THEN
 					entP := list.GetItem(j+1);
 					ent := entP(IMAP.Entry);
-					Strings.StrToInt(ent.data^,message.uID);
+					Strings.StrToInt32(ent.data^,message.uID);
 				ELSIF ent.data^ = "ENVELOPE" THEN
 					NEW(header);
 					message.header := header;
@@ -1602,7 +1602,7 @@ TYPE
 					END;
 				ELSIF command= "LARGER" THEN
 					GetString(string);
-					Strings.StrToInt(string^, value);
+					Strings.StrToInt32(string^, value);
 					FOR i := 0 TO currentFolder.messages.GetCount()-1 BY 1 DO
 						p := currentFolder.messages.GetItem(i);
 						message := p(Message);
@@ -1612,7 +1612,7 @@ TYPE
 					END;
 				ELSIF command= "SMALLER" THEN
 					GetString(string);
-					Strings.StrToInt(string^, value);
+					Strings.StrToInt32(string^, value);
 					FOR i := 0 TO currentFolder.messages.GetCount()-1 BY 1 DO
 						p := currentFolder.messages.GetItem(i);
 						message := p(Message);
@@ -2204,10 +2204,10 @@ TYPE
 								message.internalDate := cdata.GetStr();
 							ELSIF elementName^ = "size" THEN
 								string := cdata.GetStr();
-								Strings.StrToInt(string^, message.size);
+								Strings.StrToInt32(string^, message.size);
 							ELSIF elementName^ = "uid" THEN
 								string := cdata.GetStr();
-								Strings.StrToInt(string^, message.uID);
+								Strings.StrToInt32(string^, message.uID);
 							ELSIF elementName^ = "text" THEN
 								message.message := cdata.GetStr();
 							ELSIF elementName^ = "bodystructureType" THEN
@@ -2257,8 +2257,8 @@ TYPE
 						END;
 					END;
 
-					string := subElem.GetAttributeValue("size"); Strings.StrToInt(string^, i); message.size := i;
-					string := subElem.GetAttributeValue("uid"); Strings.StrToInt(string^, i); message.uID := i;
+					string := subElem.GetAttributeValue("size"); Strings.StrToInt32(string^, i); message.size := i;
+					string := subElem.GetAttributeValue("uid"); Strings.StrToInt32(string^, i); message.uID := i;
 
 					NEW(flag);
 					string := subElem.GetAttributeValue("Answered"); IF string^ = "TRUE" THEN flag.answered := TRUE; ELSE flag.answered := FALSE; END;
@@ -2594,7 +2594,7 @@ TYPE
 			ELSE
 
 			END;
-			Strings.StrToInt(d, day);
+			Strings.StrToInt32(d, day);
 			IF m = "Jan" THEN
 				month := 1;
 			ELSIF m = "Feb" THEN
@@ -2620,7 +2620,7 @@ TYPE
 			ELSIF m = "Dec" THEN
 				month := 12;
 			END;
-			Strings.StrToInt(y, year);
+			Strings.StrToInt32(y, year);
 		END FromInternalDate;
 
 	END Date;
@@ -2664,9 +2664,9 @@ TYPE
 			Strings.Copy(string^, 12, 2, h);
 			Strings.Copy(string^, 15, 2, m);
 			Strings.Copy(string^, 18, 2, s);
-			Strings.StrToInt(h, hour);
-			Strings.StrToInt(m, minute);
-			Strings.StrToInt(s, second);
+			Strings.StrToInt32(h, hour);
+			Strings.StrToInt32(m, minute);
+			Strings.StrToInt32(s, second);
 		END FromInternalDate;
 
 	END Time;

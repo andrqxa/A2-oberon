@@ -3,6 +3,7 @@ MODULE WMModuleState;
 
 IMPORT
 	SYSTEM,
+	Strings,
 	Streams,
 	Modules,
 	TextUtilities,
@@ -104,7 +105,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 		Init(panel.bounds.GetWidth(), panel.bounds.GetHeight(), FALSE);
 		SetContent(panel);
 		manager := WMWindowManager.GetDefaultManager();
-		SetTitle(WMComponents.NewString(title));
+		SetTitle(Strings.NewString(title));
 
 		WMWindowManager.DefaultAddWindow(SELF);
 		NEW(tw, out.text);

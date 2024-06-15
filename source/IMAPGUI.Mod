@@ -1122,7 +1122,7 @@ TYPE
 			END;
 			IMAPUtilities.TextToStr(minSize.text, string);
 			IF IMAPUtilities.StringLength(string^) > 0 THEN
-				Strings.StrToInt(string^, i);
+				Strings.StrToInt32(string^, i);
 				Strings.IntToStr(i-1, string^);
 				writer.String("LARGER ");
 				writer.String(string^);
@@ -1130,7 +1130,7 @@ TYPE
 			END;
 			IMAPUtilities.TextToStr(maxSize.text, string);
 			IF IMAPUtilities.StringLength(string^) > 0 THEN
-				Strings.StrToInt(string^,i);
+				Strings.StrToInt32(string^,i);
 				Strings.IntToStr(i+1, string^);
 				writer.String("SMALLER ");
 				writer.String(string^);
@@ -1158,7 +1158,7 @@ TYPE
 
 				IMAPUtilities.TextToStr(day.text, string);
 				IF IMAPUtilities.StringLength(string^) > 0 THEN
-					Strings.StrToInt(string^,i);
+					Strings.StrToInt32(string^,i);
 					IF (i < 1) OR (i > 31) THEN
 						valid := FALSE;
 						COPY("Day should be between 1 and 31", errorString);
@@ -1169,7 +1169,7 @@ TYPE
 				END;
 				IMAPUtilities.TextToStr(month.text, string);
 				IF IMAPUtilities.StringLength(string^) > 0 THEN
-					Strings.StrToInt(string^,i);
+					Strings.StrToInt32(string^,i);
 					IF (i < 1) OR (i > 12) THEN
 						valid := FALSE;
 						COPY("Month should be between 1 and 12", errorString);
@@ -1182,7 +1182,7 @@ TYPE
 				END;
 				IMAPUtilities.TextToStr(year.text, string);
 				IF IMAPUtilities.StringLength(string^) > 0 THEN
-					Strings.StrToInt(string^,i);
+					Strings.StrToInt32(string^,i);
 					Strings.IntToStr(i, string^);
 					IF IMAPUtilities.StringLength(string^) # 4 THEN
 						valid := FALSE;

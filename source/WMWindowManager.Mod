@@ -1133,12 +1133,6 @@ BEGIN
 	info.vc.generator := NIL;
 END ClearInfo;
 
-PROCEDURE NewString*(CONST x : ARRAY OF CHAR) : String;
-VAR t : String;
-BEGIN
-	NEW(t, LEN(x)); COPY(x, t^); RETURN t
-END NewString;
-
 PROCEDURE LoadCursor*(CONST name : ARRAY OF CHAR; hx, hy : SIGNED32; VAR pi : PointerInfo);
 BEGIN
 	IF pi = NIL THEN NEW(pi) END;

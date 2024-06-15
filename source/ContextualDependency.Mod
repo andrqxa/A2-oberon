@@ -887,7 +887,7 @@ TYPE
 
 															(* get the distance of the farthest context rule *)
 															sizeAttribute := rangeElement.GetAttributeValue(SizeAttribute);
-															Strings.StrToInt(sizeAttribute^,genericRangeSize);
+															Strings.StrToInt32(sizeAttribute^,genericRangeSize);
 															NEW(newContext.wholeLastRanges,genericRangeSize);
 															genericBeforeElements := rangeElement.GetContents();
 
@@ -905,7 +905,7 @@ TYPE
 																		ELSE
 																			neg := TRUE;
 																		END;
-																		Strings.StrToInt(offsetAttribute^,offset);
+																		Strings.StrToInt32(offsetAttribute^,offset);
 																		IF offset < 1 THEN offset := 1; END;
 																		NEW(beforeRanges);
 																		ParseRangeString(rangeAttribute,base16,neg,beforeRanges);
@@ -920,7 +920,7 @@ TYPE
 
 															(* get the distance of the farthest context rule *)
 															sizeAttribute := rangeElement.GetAttributeValue(SizeAttribute);
-															Strings.StrToInt(sizeAttribute^,genericRangeSize);
+															Strings.StrToInt32(sizeAttribute^,genericRangeSize);
 															NEW(newContext.wholeNextRanges,genericRangeSize);
 															genericAfterElements := rangeElement.GetContents();
 
@@ -938,7 +938,7 @@ TYPE
 																		ELSE
 																			neg := TRUE;
 																		END;
-																		Strings.StrToInt(offsetAttribute^,offset);
+																		Strings.StrToInt32(offsetAttribute^,offset);
 																		IF offset < 1 THEN offset := 1; END;
 																		NEW(afterRanges);
 																		ParseRangeString(rangeAttribute,base16,neg,afterRanges);
@@ -1070,7 +1070,7 @@ TYPE
 					IF base16 THEN
 						Strings.HexStrToInt(tempString^,range.lowerBound,res);
 					ELSE
-						Strings.StrToInt(tempString^,range.lowerBound);
+						Strings.StrToInt32(tempString^,range.lowerBound);
 					END;
 					j := 0;
 
@@ -1086,7 +1086,7 @@ TYPE
 						IF base16 THEN
 							Strings.HexStrToInt(tempString^,range.upperBound,res);
 						ELSE
-							Strings.StrToInt(tempString^,range.upperBound);
+							Strings.StrToInt32(tempString^,range.upperBound);
 						END;
 
 						(* if the no lower bound has been defined for this range, the range is defined of but one character *)
@@ -1121,7 +1121,7 @@ TYPE
 				IF base16 THEN
 					Strings.HexStrToInt(tempString^,range.upperBound,res);
 				ELSE
-					Strings.StrToInt(tempString^,range.upperBound);
+					Strings.StrToInt32(tempString^,range.upperBound);
 				END;
 				IF range.lowerBound < 0 THEN
 					range.lowerBound := range.upperBound;
@@ -1322,8 +1322,8 @@ BEGIN
 										Strings.HexStrToInt(tempRangeLow^,rangeLow,res);
 										Strings.HexStrToInt(tempRangeHigh^,rangeHigh,res);
 									ELSE
-										Strings.StrToInt(tempRangeLow^,rangeLow);
-										Strings.StrToInt(tempRangeHigh^,rangeHigh);
+										Strings.StrToInt32(tempRangeLow^,rangeLow);
+										Strings.StrToInt32(tempRangeHigh^,rangeHigh);
 									END;
 
 								(* Get the range mode, that defines how big the considered contexts can be. *)

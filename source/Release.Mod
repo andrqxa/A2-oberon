@@ -2126,8 +2126,8 @@ TYPE
 			BEGIN
 				strings := Strings.Split(string, ".");
 				IF (LEN(strings) = 2) THEN
-					Strings.StrToInt(strings[0]^, builds.version.major);
-					Strings.StrToInt(strings[1]^, builds.version.minor);
+					Strings.StrToInt32(strings[0]^, builds.version.major);
+					Strings.StrToInt32(strings[1]^, builds.version.minor);
 					RETURN TRUE;
 				ELSE
 					Error(scanner.pos, "Expected version string major.minor, found #", string, "");

@@ -1406,7 +1406,7 @@ BEGIN
 		IF (ORD(digits[j]) - ORD("0")) > 9 THEN RETURN FALSE END;
 		INC (j);
 	END;
-	Strings.StrToInt (digits, ipNr);
+	Strings.StrToInt32 (digits, ipNr);
 	IF ipNr > 255 THEN RETURN FALSE END;
 
 	(* Class B *)
@@ -1426,7 +1426,7 @@ BEGIN
 		IF (ORD(digits[j]) - ORD("0")) > 9 THEN RETURN FALSE END;
 		INC (j);
 	END;
-	Strings.StrToInt (digits, ipNr);
+	Strings.StrToInt32 (digits, ipNr);
 	IF ipNr > 255 THEN RETURN FALSE END;
 
 	(* Class C *)
@@ -1446,7 +1446,7 @@ BEGIN
 		IF (ORD(digits[j]) - ORD("0")) > 9 THEN RETURN FALSE END;
 		INC (j);
 	END;
-	Strings.StrToInt (digits, ipNr);
+	Strings.StrToInt32 (digits, ipNr);
 	IF ipNr > 255 THEN RETURN FALSE END;
 
 	(* Class D *)
@@ -1464,7 +1464,7 @@ BEGIN
 		IF (ORD(digits[j]) - ORD("0")) > 9 THEN RETURN FALSE END;
 		INC (j);
 	END;
-	Strings.StrToInt (digits, ipNr);
+	Strings.StrToInt32 (digits, ipNr);
 	IF ipNr > 255 THEN RETURN FALSE END;
 
 	RETURN TRUE;

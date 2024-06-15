@@ -2,7 +2,7 @@ MODULE DynamicStrings;	(** Stefan Walthert  *)
 (** AUTHOR "swalthert"; PURPOSE "Dynamic strings"; *)
 
 IMPORT
-	SYSTEM, Streams, Strings;
+	Streams, Strings;
 
 CONST
 	CR* = 0DX; (** the Oberon end of line character *)
@@ -390,81 +390,6 @@ BEGIN
 	END;
 	RETURN ch
 END LowerCh;
-
-PROCEDURE IntToStr*(val: SIGNED32; VAR str: ARRAY OF CHAR);
-	VAR
-		i, j: SIZE;
-		digits: ARRAY 16 OF CHAR;
-BEGIN
-	IF val = MIN(SIGNED32) THEN
-		COPY("-2147483648", str);
-		RETURN
-	END;
-	IF val < 0 THEN
-		val := -val; str[0] := "-"; j := 1
-	ELSE
-		j := 0
-	END;
-	i := 0;
-	REPEAT
-		digits[i] := CHR (val MOD 10 + ORD("0")); INC(i); val := val DIV 10
-	UNTIL val = 0;
-	DEC(i);
-	WHILE i >= 0 DO
-		str[j] := digits[i]; INC(j); DEC(i)
-	END;
-	str[j] := 0X
-END IntToStr;
-
-PROCEDURE StrToInt*(CONST str: ARRAY OF CHAR): SIGNED32;
-	VAR val, d: SIGNED32; i: SIZE; ch: CHAR; neg: BOOLEAN;
-BEGIN
-	val := 0; i := 0; ch := str[0];
-	WHILE (ch # 0X) & (ch <= " ") DO
-		INC(i); ch := str[i]
-	END;
-	neg := FALSE; IF ch = "+" THEN INC(i); ch := str[i] END;
-	IF ch = "-" THEN neg := TRUE; INC(i); ch := str[i] END;
-	WHILE (ch # 0X) & (ch <= " ") DO
-		INC(i); ch := str[i]
-	END;
-	val := 0;
-	WHILE (ch >= "0") & (ch <= "9") DO
-		d := ORD(ch)-ORD("0");
-		INC(i); ch := str[i];
-		IF val <= ((MAX(SIGNED32)-d) DIV 10) THEN
-			val := 10*val+d
-		ELSIF neg & (val = 214748364) & (d = 8) & ((ch < "0") OR (ch > "9")) THEN
-			val := MIN(SIGNED32); neg := FALSE
-		ELSE
-			HALT(99)
-		END
-	END;
-	IF neg THEN val := -val END;
-	RETURN val
-END StrToInt;
-
-PROCEDURE HexStrToInt*(CONST str: ARRAY OF CHAR): SIGNED32;
-VAR val, d: SIGNED32; i: SIZE; ch: CHAR;
-BEGIN
-	i := 0; ch := str[0];
-	WHILE (ch # 0X) & (ch <= " ") DO
-		INC(i); ch := str[i]
-	END;
-	val := 0;
-	WHILE (("0" <= ch) & (ch <= "9")) OR (("A" <= ch) & (ch <= "F")) DO
-		IF (("0" <= ch) & (ch <= "9")) THEN d := ORD(ch)-ORD("0")
-		ELSE d := ORD(ch) - ORD("A") + 10
-		END;
-		INC(i); ch := str[i];
-		IF val <= ((MAX(SIGNED32)-d) DIV 10H) THEN
-			val := 10H*val+d
-		ELSE
-			HALT(99)
-		END
-	END;
-	RETURN val
-END HexStrToInt;
 
 PROCEDURE Search*(CONST pat, src: ARRAY OF CHAR; VAR pos: SIZE);
 	CONST MaxPat = 128;

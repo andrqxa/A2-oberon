@@ -189,7 +189,7 @@ TYPE
 				WHILE (i < len) & IsDigit(data[i]) DO
 					str[j] := ch; INC(j); INC(i); ch := data[i]
 				END;
-				str[j] := 0X; Strings.StrToInt(str, size)
+				str[j] := 0X; Strings.StrToInt32(str, size)
 			END
 		END YHeader;
 
@@ -375,7 +375,7 @@ CONST
 			END;
 
 			IF m < LEN(str) THEN
-				str[m] := 0X; Strings.StrToInt(str,fileLength);
+				str[m] := 0X; Strings.StrToInt32(str,fileLength);
 				TRACE(str,fileLength);
 			END;
 
@@ -671,7 +671,7 @@ PROCEDURE GetPars(context :Commands.Context; VAR name: ARRAY OF CHAR; VAR port, 
 BEGIN
 	port := 0; bps := 115200; parity := Serials.ParNo; stop := Serials.Stop1;
 	IF context.arg.GetString(name) & IsDigit(name[0]) THEN
-		Strings.StrToInt(name, port);
+		Strings.StrToInt32(name, port);
 		context.arg.SkipWhitespace; context.arg.Int(bps, FALSE);
 		context.arg.SkipWhitespace; context.arg.String(name);
 		IF name = "odd" THEN

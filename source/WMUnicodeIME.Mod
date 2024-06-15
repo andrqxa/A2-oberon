@@ -154,7 +154,7 @@ TYPE
 				uniChar.caption.SetAOC("overflow");
 			ELSE
 				uniChar.caption.SetAOC("");
-				Strings.StrToInt(curEditStr, ch);
+				Strings.StrToInt32(curEditStr, ch);
 
 				no := 0;
 				IF UTF8Strings.EncodeChar(ch, charString, no) THEN

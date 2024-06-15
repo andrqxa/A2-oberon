@@ -220,7 +220,7 @@ VAR
 							nameStr := nameAttr.GetValue();
 							valueStr := valueAttr.GetValue();
 							IF nameStr^ = settingName THEN
-								Strings.StrToInt(valueStr^, int);
+								Strings.StrToInt32(valueStr^, int);
 								settingFound := TRUE;
 							END;
 						END;

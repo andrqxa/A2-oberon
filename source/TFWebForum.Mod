@@ -251,7 +251,7 @@ TYPE
 					IF (s # NIL) & (s^ = "Entry") THEN
 						s := content(XML.Element).GetAttributeValue("id");
 						IF s # NIL THEN
-							Strings.StrToInt(s^, t);
+							Strings.StrToInt32(s^, t);
 							IF t > id THEN id := t END;
 						END
 					END

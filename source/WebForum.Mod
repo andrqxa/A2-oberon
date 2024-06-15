@@ -302,7 +302,7 @@ CONST
 			IF (elem # NIL) THEN
 				str := elem.GetAttributeValue("number");
 				IF (str # NIL) THEN
-					Strings.StrToInt(str^, maxPrio)
+					Strings.StrToInt32(str^, maxPrio)
 				END
 			ELSE
 				maxPrio := DefaultMaxPriority
@@ -468,7 +468,7 @@ CONST
 			IF ((titleText # NIL) & (titleText^ # "")) THEN
 				NEW(obj); obj.author := author; obj.titleText := titleText; obj.detailText := detailText;
 				IF (priorityStr # NIL) THEN
-					Strings.StrToInt(priorityStr^, obj.priority)
+					Strings.StrToInt32(priorityStr^, obj.priority)
 				ELSE
 					obj.priority := 0
 				END;
@@ -522,7 +522,7 @@ CONST
 					feature.BeginModification;
 					feature.author := author; feature.titleText := titleText; feature.detailText := detailText;
 					IF (priorityStr # NIL) THEN
-						Strings.StrToInt(priorityStr^, feature.priority)
+						Strings.StrToInt32(priorityStr^, feature.priority)
 					ELSE
 						feature.priority := 0
 					END;

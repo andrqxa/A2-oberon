@@ -115,7 +115,7 @@ TYPE
 			audio := vcd.GetAudio();
 			audio.SetAudioIntern();
 			Init(640, 480, FALSE);
-			SetTitle(WM.NewString("TV"));
+			SetTitle(Strings.NewString("TV"));
 			NEW(chnlSeeker, tuner, audio);
 			vcd.VideoOpen();
 			vcd.InstallNotificationHandler(SELF.NewImage);
@@ -293,7 +293,7 @@ TYPE
 			ELSE
 				Strings.Append (title, " - unregistered channel")
 			END;
-			SetTitle (WM.NewString (title));
+			SetTitle (Strings.NewString (title));
 			(* Redirect VBI output to the appropriate channel *)
 			IF vbi # NIL THEN
 				(* Get rid of the VBI data of the old TV channel *)
@@ -658,7 +658,7 @@ BEGIN
 			(* Read the device number *)
 			s := xml.GetAttributeValue("device");
 			IF s # NIL THEN
-				Strings.StrToInt(s^, i);
+				Strings.StrToInt32(s^, i);
 				IF i = -1 THEN
 					vcd := TVDriver.GetDefaultDevice()
 				ELSE
@@ -674,7 +674,7 @@ BEGIN
 			s := xml.GetAttributeValue("freq");
 			IF (s # NIL) & (vcd # NIL) THEN
 				tuner := vcd.GetTuner();
-				Strings.StrToInt(s^, i);
+				Strings.StrToInt32(s^, i);
 				tuner.SetTVFrequency(i)
 			END;
 			(* Read the autoswitch setting *)

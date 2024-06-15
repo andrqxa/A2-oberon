@@ -201,9 +201,9 @@ TYPE
 		PROCEDURE GetSampleParameters(VAR ui, bs, si : SIGNED32);
 		VAR string : ARRAY 16 OF CHAR;
 		BEGIN
-			sampleIntervalEditor.GetAsString(string); Strings.StrToInt(string, ui);
-			screenIntervalEditor .GetAsString(string); Strings.StrToInt(string, si);
-			sampleBufferSizeEditor.GetAsString(string); Strings.StrToInt(string, bs);
+			sampleIntervalEditor.GetAsString(string); Strings.StrToInt32(string, ui);
+			screenIntervalEditor .GetAsString(string); Strings.StrToInt32(string, si);
+			sampleBufferSizeEditor.GetAsString(string); Strings.StrToInt32(string, bs);
 		END GetSampleParameters;
 
 		PROCEDURE SetSampleParameters(ui, bs, si : SIGNED32);

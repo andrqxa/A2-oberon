@@ -550,7 +550,7 @@ TYPE
 						code := 550; COPY(NoPermissionMsg, str)
 					END
 				ELSIF cmd = "REST" THEN
-					Strings.StrToInt(param, restMarker);	(* traps on invalid strings *)
+					Strings.StrToInt32(param, restMarker);	(* traps on invalid strings *)
 					IF (restMarker < 0) THEN restMarker := 0 END;
 					state := REST;
 					code := 350; COPY(Msg350, str)

@@ -444,7 +444,7 @@ CONST
 										oidString := elem.GetAttributeValue(XMLAttrOidName);
 										savingCounterString := elem.GetAttributeValue(XMLAttrSavingCounter);
 										IF ((oidString # NIL) & (savingCounterString # NIL)) THEN
-											Strings.StrToInt(oidString^, oid); Strings.StrToInt(savingCounterString^, savingCounter);
+											Strings.StrToInt32(oidString^, oid); Strings.StrToInt32(savingCounterString^, savingCounter);
 											wrapper := GetRegisteredWrapperByOid(oid);
 											IF (((wrapper # NIL) & (savingCounter < wrapper.savingCounter)) OR (wrapper = NIL)) THEN
 												(* either the savingCounter for the log entry is stale or the object has been removed *)
@@ -588,7 +588,7 @@ CONST
 								IF (oldElemName^ = XMLInstanceElemName) THEN
 									oidValue := oldElem.GetAttributeValue(XMLAttrOidName);
 									IF (oidValue # NIL) THEN
-										Strings.StrToInt(oidValue^, oldOid);
+										Strings.StrToInt32(oidValue^, oldOid);
 										IF (oldOid = oid) THEN
 											RETURN oldElem
 										END
@@ -897,7 +897,7 @@ CONST
 							 isRootString := elem.GetAttributeValue(XMLAttrIsRootName);
 
 							 IF ((moduleName # NIL) & (objectName # NIL) & (oidString # NIL) & (savingCounterString # NIL)) THEN
-							 	Strings.StrToInt(oidString^, oid); Strings.StrToInt(savingCounterString^, savingCounter);
+							 	Strings.StrToInt32(oidString^, oid); Strings.StrToInt32(savingCounterString^, savingCounter);
 
 							 	IF ((isRootString # NIL) & (isRootString^ = "true")) THEN
 							 		isRoot := TRUE
@@ -946,7 +946,7 @@ CONST
 					IF (snapShotRootName^ = XMLRootElemName) THEN
 						oidCounterString := snapShotRoot.GetAttributeValue(XMLOidCounterAttrName);
 						IF (oidCounterString # NIL) THEN
-							Strings.StrToInt(oidCounterString^, oidCounter);
+							Strings.StrToInt32(oidCounterString^, oidCounter);
 							AllocatePersistentObjects(snapShotRoot)
 						ELSE
 							snapShotRoot := NIL;
@@ -1004,7 +1004,7 @@ CONST
 						IF (elemName^ = XMLInstanceElemName) THEN
 							oidString := elem.GetAttributeValue(XMLAttrOidName);
 							IF (oidString # NIL) THEN
-								Strings.StrToInt(oidString^, oid);
+								Strings.StrToInt32(oidString^, oid);
 								(* the savingCounter and isRoot are consistent, since the object was created by the information
 								 * of the snapshot file and savingCounter and isRoot were not overwritten by the log file until now *)
 								RestorePersistentObject
@@ -1034,7 +1034,7 @@ CONST
 
 
 							IF ((oidString # NIL) & (savingCounterString # NIL)) THEN
-								Strings.StrToInt(oidString^, oid); Strings.StrToInt(savingCounterString^, savingCounter);
+								Strings.StrToInt32(oidString^, oid); Strings.StrToInt32(savingCounterString^, savingCounter);
 								objWrapper := GetRegisteredWrapperByOid(oid); (* objWrapper # NIL since they were previously created *)
 
 								IF ((objWrapper # NIL) & (elemName^ = XMLInstanceElemName)) THEN

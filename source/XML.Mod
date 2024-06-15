@@ -932,7 +932,7 @@ TYPE
 		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32);
 		VAR codeArray: ARRAY 16 OF CHAR; codeStr: String;
 		BEGIN
-			DynamicStrings.IntToStr(code, codeArray);
+			Strings.IntToStr(code, codeArray);
 			codeStr := NewString(codeArray);
 			w.String('&#'); w.String(codeStr^); w.Char(';')
 		END Write;

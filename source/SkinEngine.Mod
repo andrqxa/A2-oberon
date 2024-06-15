@@ -38,9 +38,9 @@ VAR en: Objects.Enumerator; p : ANY; x : XML.Element; s : String;
 				IF s^ = "Bitmap" THEN
 					bitmap := GetCharContent(y)
 				ELSIF s^ = "HotX" THEN
-					s := GetCharContent(y); Strings.StrToInt(s^, hotX)
+					s := GetCharContent(y); Strings.StrToInt32(s^, hotX)
 				ELSIF s^ = "HotY" THEN
-					s := GetCharContent(y); Strings.StrToInt(s^, hotY)
+					s := GetCharContent(y); Strings.StrToInt32(s^, hotY)
 				END
 			END
 		END;
@@ -199,16 +199,16 @@ BEGIN
 
 						ELSIF ss^ = "ActiveTopMargin" THEN
 							ts := GetCharContent(y);
-							IF ts # NIL THEN Strings.StrToInt(ts^, desc.atextY) END
+							IF ts # NIL THEN Strings.StrToInt32(ts^, desc.atextY) END
 						ELSIF ss^ = "InactiveTopMargin" THEN
 							ts := GetCharContent(y);
-							IF ts = NIL THEN desc.itextY := desc.atextY ELSE Strings.StrToInt(ts^, desc.itextY) END
+							IF ts = NIL THEN desc.itextY := desc.atextY ELSE Strings.StrToInt32(ts^, desc.itextY) END
 						ELSIF ss^ = "ActiveLeftMargin" THEN
 							ts := GetCharContent(y);
-							IF ts # NIL THEN Strings.StrToInt(ts^, desc.atextX) END;
+							IF ts # NIL THEN Strings.StrToInt32(ts^, desc.atextX) END;
 						ELSIF ss^ = "InactiveLeftMargin" THEN
 							ts := GetCharContent(y);
-							IF ts = NIL THEN desc.itextY := desc.atextY ELSE Strings.StrToInt(ts^, desc.itextX) END
+							IF ts = NIL THEN desc.itextY := desc.atextY ELSE Strings.StrToInt32(ts^, desc.itextX) END
 
 						ELSIF ss^ = "ActiveColor" THEN
 							ts := GetCharContent(y);
@@ -219,19 +219,19 @@ BEGIN
 
 						ELSIF ss^ = "MinimizeOffset" THEN
 							ts := GetCharContent(y);
-							IF (ts = NIL) THEN desc.minimizeOffset := 0; ELSE Strings.StrToInt(ts^, desc.minimizeOffset); END;
+							IF (ts = NIL) THEN desc.minimizeOffset := 0; ELSE Strings.StrToInt32(ts^, desc.minimizeOffset); END;
 						ELSIF ss^ = "SpaceBetweenButtons" THEN
 							ts := GetCharContent(y);
-							IF (ts = NIL) THEN desc.spaceBetweenButtons:= 0; ELSE Strings.StrToInt(ts^, desc.spaceBetweenButtons); END;
+							IF (ts = NIL) THEN desc.spaceBetweenButtons:= 0; ELSE Strings.StrToInt32(ts^, desc.spaceBetweenButtons); END;
 						ELSIF ss^ = "ButtonLeftMargin" THEN
 							ts := GetCharContent(y);
-							IF (ts = NIL) THEN desc.buttonLeftMargin:= 0; ELSE Strings.StrToInt(ts^, desc.buttonLeftMargin); END;
+							IF (ts = NIL) THEN desc.buttonLeftMargin:= 0; ELSE Strings.StrToInt32(ts^, desc.buttonLeftMargin); END;
 						ELSIF ss^ = "ButtonTopMargin" THEN
 							ts := GetCharContent(y);
-							IF (ts = NIL) THEN desc.buttonTopMargin:= 0; ELSE Strings.StrToInt(ts^, desc.buttonTopMargin); END;
+							IF (ts = NIL) THEN desc.buttonTopMargin:= 0; ELSE Strings.StrToInt32(ts^, desc.buttonTopMargin); END;
 						ELSIF ss^ = "ButtonRightMargin" THEN
 							ts := GetCharContent(y);
-							IF (ts = NIL) THEN desc.buttonRightMargin := 0; ELSE Strings.StrToInt(ts^, desc.buttonRightMargin); END;
+							IF (ts = NIL) THEN desc.buttonRightMargin := 0; ELSE Strings.StrToInt32(ts^, desc.buttonRightMargin); END;
 						ELSIF s^ = "ButtonAlignedToTop" THEN
 							ts := GetCharContent(y);
 							IF (ts # NIL) THEN
@@ -274,9 +274,9 @@ BEGIN
 						ELSIF ss^ = "InactiveRight" THEN
 							ts := GetCharContent(y); IF ts = NIL THEN desc.tic := desc.tac ELSE LoadImg(ts^, desc.tic) END
 						ELSIF ss^ = "FocusThreshold" THEN
-							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt(ts^, desc.topFocusThreshold) END
+							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt32(ts^, desc.topFocusThreshold) END
 						ELSIF ss^ = "Threshold" THEN
-							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt(ts^, desc.topThreshold) END
+							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt32(ts^, desc.topThreshold) END
 						END
 					END
 				END
@@ -300,9 +300,9 @@ BEGIN
 						ELSIF ss^ = "InactiveBottom" THEN
 							ts := GetCharContent(y); IF ts # NIL THEN LoadImg(ts^, desc.lic) END;
 						ELSIF ss^ = "FocusThreshold" THEN
-							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt(ts^, desc.leftFocusThreshold) END
+							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt32(ts^, desc.leftFocusThreshold) END
 						ELSIF ss^ = "Threshold" THEN
-							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt(ts^, desc.leftThreshold) END
+							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt32(ts^, desc.leftThreshold) END
 						END
 					END
 				END
@@ -326,9 +326,9 @@ BEGIN
 						ELSIF ss^ = "InactiveBottom" THEN
 							ts := GetCharContent(y); IF ts # NIL THEN LoadImg(ts^, desc.ric) END;
 						ELSIF ss^ = "FocusThreshold" THEN
-							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt(ts^, desc.rightFocusThreshold) END
+							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt32(ts^, desc.rightFocusThreshold) END
 						ELSIF ss^ = "Threshold" THEN
-							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt(ts^, desc.rightThreshold) END
+							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt32(ts^, desc.rightThreshold) END
 						END
 					END
 				END
@@ -352,9 +352,9 @@ BEGIN
 						ELSIF ss^ = "InactiveRight" THEN
 							ts := GetCharContent(y); IF ts = NIL THEN desc.bic := desc.bac ELSE LoadImg(ts^, desc.bic) END;
 						ELSIF ss^ = "FocusThreshold" THEN
-							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt(ts^, desc.bottomFocusThreshold) END
+							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt32(ts^, desc.bottomFocusThreshold) END
 						ELSIF ss^ = "Threshold" THEN
-							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt(ts^, desc.bottomThreshold) END
+							ts := GetCharContent(y); 	IF ts # NIL THEN Strings.StrToInt32(ts^, desc.bottomThreshold) END
 						END
 					END
 				END
@@ -449,7 +449,7 @@ BEGIN
 			LowerCase(s);
 			IF s^ = "version" THEN
 				ts := GetCharContent(el(XML.Element));
-				IF ts # NIL THEN Strings.StrToInt(ts^, version);END;
+				IF ts # NIL THEN Strings.StrToInt32(ts^, version);END;
 			ELSIF s^ = "window" THEN
 				(* default window frame *)
 				desc := LoadWindow(el(XML.Element));

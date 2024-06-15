@@ -382,7 +382,7 @@ TYPE
 				IF match THEN
 					temp := ""; j := 0; i := LEN(default)-1;
 					WHILE i < LEN(prefix) DO temp[j] := prefix[i]; INC(j); INC(i); END;
-					Strings.StrToInt(temp, result);
+					Strings.StrToInt32(temp, result);
 					IF (result < 0) OR (result >= LEN(prefixUsed)) THEN result := -1; END;
 				END;
 			END;
@@ -395,7 +395,7 @@ TYPE
 		BEGIN
 			volPar := "";
 			IF parForceRW THEN Strings.Append(volPar, " ,X"); END;
-			cacheSizeEditor.GetAsString(string); Strings.StrToInt(string, cachesize);
+			cacheSizeEditor.GetAsString(string); Strings.StrToInt32(string, cachesize);
 			IF (cachesize > 0) THEN
 				cachesize := (1024 * cachesize) DIV PartitionsLib.BS; (* cachesize in 512B blocks *)
 				IF parEnableWB THEN cachesize := -cachesize; END;
@@ -2443,7 +2443,7 @@ TYPE
 						IF string # "" THEN
 							parameters[i].valid := TRUE;
 							IF parameters[i].type = ParInteger THEN
-								Strings.StrToInt(string, parameters[i].resInteger);
+								Strings.StrToInt32(string, parameters[i].resInteger);
 							ELSIF parameters[i].type = ParString THEN
 								parameters[i].resString := ""; Strings.Append(parameters[i].resString, string);
 							END;

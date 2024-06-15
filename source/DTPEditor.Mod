@@ -344,9 +344,9 @@ TYPE
 				WMRestorable.AddByContext(SELF, c);
 				IF c.appData # NIL THEN
 				(*	xml := c.appData(XML.Element);
-					s := xml.GetAttributeValue("fileFormat");	IF s # NIL THEN Strings.StrToInt(s^, fileFormat) END;
-					s := xml.GetAttributeValue("firstLine");IF s # NIL THEN Strings.StrToInt(s^, fl) END;
-					s := xml.GetAttributeValue("cursorPos");IF s # NIL THEN Strings.StrToInt(s^, cp) END;
+					s := xml.GetAttributeValue("fileFormat");	IF s # NIL THEN Strings.StrToInt32(s^, fileFormat) END;
+					s := xml.GetAttributeValue("firstLine");IF s # NIL THEN Strings.StrToInt32(s^, fl) END;
+					s := xml.GetAttributeValue("cursorPos");IF s # NIL THEN Strings.StrToInt32(s^, cp) END;
 					s := xml.GetAttributeValue("file");
 					IF s # NIL THEN Load(s^, fileFormat) END;
 					editor.tv.firstLine.Set(fl);
@@ -876,7 +876,7 @@ TYPE
 					ELSIF (str # NIL) & (str^ = "paragraph-style") THEN				(* paragraph styles *)
 						NEW(pStyle);
 						str := ptr(XML.Element).GetAttributeValue("name"); IF str # NIL THEN COPY(str^, pStyle.name) END;
-						str := ptr(XML.Element).GetAttributeValue("alignment"); IF str # NIL THEN Strings.StrToInt(str^, pStyle.alignment) END;
+						str := ptr(XML.Element).GetAttributeValue("alignment"); IF str # NIL THEN Strings.StrToInt32(str^, pStyle.alignment) END;
 						str := ptr(XML.Element).GetAttributeValue("first-indent"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); pStyle.firstIndent := SHORT(tempReal); END;
 						str := ptr(XML.Element).GetAttributeValue("left-indent"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); pStyle.leftIndent := SHORT(tempReal); END;
 						str := ptr(XML.Element).GetAttributeValue("right-indent"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); pStyle.rightIndent := SHORT(tempReal); END;
@@ -993,7 +993,7 @@ TYPE
 									str := ptr(XML.Element).GetAttributeValue("twrap-left");  IF (str # NIL) THEN Strings.StrToFloat(str^, tempReal); ml := SHORT(tempReal); ELSE ml := 0 END;
 									str := ptr(XML.Element).GetAttributeValue("twrap-right"); IF (str # NIL) THEN Strings.StrToFloat(str^, tempReal); mr := SHORT(tempReal); ELSE mr := 0 END;
 									frame.SetWrapSize(mt, mb, ml, mr);
-									str := ptr(XML.Element).GetAttributeValue("z-index"); IF str # NIL THEN Strings.StrToInt(str^, tempInt); END; (* not yet implemented *)
+									str := ptr(XML.Element).GetAttributeValue("z-index"); IF str # NIL THEN Strings.StrToInt32(str^, tempInt); END; (* not yet implemented *)
 									str := ptr(XML.Element).GetAttributeValue("frame-content");
 									IF str # NIL THEN
 										content := built.GetContentByName(str^);
@@ -1037,7 +1037,7 @@ TYPE
 									str := ptr(XML.Element).GetAttributeValue("twrap-left");  IF (str # NIL) THEN Strings.StrToFloat(str^, tempReal); ml := SHORT(tempReal); ELSE ml := 0 END;
 									str := ptr(XML.Element).GetAttributeValue("twrap-right"); IF (str # NIL) THEN Strings.StrToFloat(str^, tempReal); mr := SHORT(tempReal); ELSE mr := 0 END;
 									frame.SetWrapSize(mt, mb, ml, mr);
-									str := ptr(XML.Element).GetAttributeValue("z-index"); IF str # NIL THEN Strings.StrToInt(str^, tempInt); END; (* not yet implemented *)
+									str := ptr(XML.Element).GetAttributeValue("z-index"); IF str # NIL THEN Strings.StrToInt32(str^, tempInt); END; (* not yet implemented *)
 									str := ptr(XML.Element).GetAttributeValue("frame-content");
 									IF str # NIL THEN
 										content := built.GetContentByName(str^);
@@ -1734,7 +1734,7 @@ TYPE
 		BEGIN
 			IF currentDocument # NIL THEN
 				pageNumber.GetAsString(gotoPage);
-				Strings.StrToInt(gotoPage, gPage);
+				Strings.StrToInt32(gotoPage, gPage);
 				IF masterON THEN
 					IF gPage > currentDocument.nofMPages THEN
 						gPage := currentDocument.nofMPages;

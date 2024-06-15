@@ -29,7 +29,7 @@ TYPE
 
 		PROCEDURE &New*;
 		BEGIN
-			NEW(onChanged, SELF, WMComponents.NewString("DataPointModelChanged"), NIL, NIL);
+			NEW(onChanged, SELF, Strings.NewString("DataPointModelChanged"), NIL, NIL);
 			lockLevel := 0;
 		END New;
 

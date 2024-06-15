@@ -273,7 +273,7 @@ TYPE
 			grid.Release;
 			IF (wrapper # NIL) & (wrapper.repository # NIL) & (wrapper.element # NIL) THEN
 				string := wrapper.element.GetAttributeValue("id");
-				IF (string # NIL) THEN Strings.StrToInt(string^, id); ELSE id := 0; END;
+				IF (string # NIL) THEN Strings.StrToInt32(string^, id); ELSE id := 0; END;
 				string := wrapper.element.GetAttributeValue("name");
 				IF (string # NIL) THEN
 					component := wrapper.repository.GetComponent(string^, id);

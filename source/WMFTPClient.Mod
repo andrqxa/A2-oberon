@@ -210,7 +210,7 @@ TYPE
 				IF WMDialogs.QueryPassword("Enter Password", pass) = WMDialogs.ResOk THEN
 					address.GetAsString(host);
 					IF (host = "") THEN RETURN END; (* check addy *)
-					SELF.port.GetAsString(temp); Strings.StrToInt(temp, port);
+					SELF.port.GetAsString(temp); Strings.StrToInt32(temp, port);
 
 					NEW(ftp);
 					ftp.Open(host, user, pass, port, res);

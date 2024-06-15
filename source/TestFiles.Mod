@@ -177,7 +177,7 @@ TYPE
 				Strings.Delete(variable, 0, 1);
 				variable[Strings.Length(variable)-1] := 0X;
 				IF IsNumber(variable) THEN
-					Strings.StrToInt(variable, index);
+					Strings.StrToInt32(variable, index);
 					RETURN TRUE;
 				ELSE
 					log.String("Parse error: Expected integer as index in "); log.String(string);
