@@ -47,7 +47,6 @@ VolumeBase.Mod
 VolumeFFT.Mod
 VolumeNabla.Mod
 VolumeTransform.Mod 
-VolumePDE.Mod
 VolumeMoments.Mod
 
 HypercubeBase.Mod  
@@ -79,6 +78,8 @@ MatrixActive.Mod
 MatrixComputeObjects.Mod
 MatrixBlockSolvers.Mod
 
+VolumePDE.Mod
+
 MatrixFigures.Mod
 MatrixAVI.Mod
 WMMatrix.Mod
@@ -107,6 +108,7 @@ StatisticsHistograms.Mod
 StatisticsFunctions.Mod
 StatisticsLinearRegression.Mod
 StatisticsCombinatorics.Mod
+StatisticsMoments.Mod
 
 PlanarEdgeDetectors.Mod
 PlanarBlobDetectors.Mod
@@ -118,6 +120,7 @@ TestVolumePDE.Mod
 TestPlanarWavelets.Mod
 LinpackBenchmark.Mod
 
+MatrixOpticalFlow.Mod
 MatrixWarp.Mod
 ~
 not ready yet:
