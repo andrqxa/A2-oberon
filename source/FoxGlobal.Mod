@@ -30,6 +30,7 @@ CONST
 	StringDisposable*="DISPOSABLE";
 	StringUnchecked*="UNCHECKED";
 	StringUncooperative*="UNCOOPERATIVE";
+	StringOverride* = "OVERRIDE";
 
 	(* block modifier flag names *)
 	StringExclusive* = "EXCLUSIVE";
@@ -197,7 +198,7 @@ VAR
 	A2Name-,ArrayBaseName-, ComplexNumbersName-, RecordBodyName-,ModuleBodyName-,
 	NameWinAPI-,NameC-,NamePlatformCC-,NameMovable-,NameUntraced-, NameUntracked-, NameDelegate-,NameInterrupt-, NamePcOffset-, NameOpening-, NameClosing-, NameOffset-, NameAligned-,NameStackAligned-,
 	NameExclusive-,NameActive-,NamePriority-,NameSafe-,NameRealtime-, NameDynamic-, NameFingerprint-, NameDataMemorySize-, NameCodeMemorySize-
-	, NameChannelWidth-, NameChannelDepth-, NameChannelModule-, NameVector-, NameFloatingPoint-, NameNoMul-,NameNonBlockingIO-, NameTRM-, NameTRMS-, NameEngine-, NameFinal-, NameTest-, NameAbstract-,
+	, NameChannelWidth-, NameChannelDepth-, NameChannelModule-, NameVector-, NameFloatingPoint-, NameNoMul-,NameNonBlockingIO-, NameTRM-, NameTRMS-, NameEngine-, NameFinal-, NameTest-, NameAbstract-, NameOverride-,
 	NameBackend-, NameRuntime-, NameFrequencyDivider-, NameRegister-,NameNoReturn-,NamePlain-,NameUnsafe-,NameDisposable-,NameUnchecked-,NameUncooperative-: SyntaxTree.Identifier;
 	NameGlobal-, Nameglobal: SyntaxTree.Identifier;
 	identifiers: ARRAY 2 OF ARRAY end OF SyntaxTree.Identifier;
@@ -1811,6 +1812,8 @@ TYPE
 		NameUnchecked := SyntaxTree.NewIdentifier(StringUnchecked);
 		NameUncooperative := SyntaxTree.NewIdentifier(StringUncooperative);
 		NameFingerprint := SyntaxTree.NewIdentifier(StringFingerprint);
+		NameOverride := SyntaxTree.NewIdentifier(StringOverride);
+		
 
 		NameGlobal := SyntaxTree.NewIdentifier("@GLOBAL");
 		Nameglobal := SyntaxTree.NewIdentifier("@global");

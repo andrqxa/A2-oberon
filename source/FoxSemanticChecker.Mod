@@ -6523,6 +6523,7 @@ TYPE
 						procedureType.SetStackAlignment(value(SIZE));
 					END;
 				END;
+				IF ~(procedure IS SyntaxTree.Operator) & HasFlag(modifiers,Global.NameOverride,position) THEN procedure.SetOverride(TRUE) END;
 				IF HasFlag(modifiers,Global.NameRealtime,position) THEN procedureType.SetRealtime(TRUE) END;
 				IF HasFlag(modifiers,Global.NameFinal,position) THEN procedure.SetFinal(TRUE)
 				ELSIF HasFlag(modifiers,Global.NameAbstract,position) THEN procedure.SetAbstract(TRUE)
@@ -6567,6 +6568,10 @@ TYPE
 					IF (procedureType.returnType # NIL) THEN
 						Error(procedure.position, "forbidden test procedure with return type");
 					END;
+				END;
+
+				IF procedure.isOverride & ~(procedure.scope IS SyntaxTree.RecordScope) THEN
+					Error(procedure.position, "overriden procedure or operator not in record scope");
 				END;
 
 				procedure.SetState(SyntaxTree.Resolved);
@@ -6658,6 +6663,14 @@ TYPE
 						END;
 					END;
 					super := FindSuperProcedure(record.recordScope, procedure);
+					IF (super = NIL) & procedure.isOverride THEN
+						Error(procedure.position,"the new procedure/operator cannot be marked as overridden");
+					ELSIF (super # NIL) & ~procedure.isOverride & ~procedure.isConstructor & ~procedure.isFinalizer THEN
+						Warning(procedure.position, "the inherited procedure/operator is hidden; use the {override} modifier");
+						procedure.SetOverride(TRUE); (*!*)
+					ELSIF (super # NIL) & super.isFinal & procedure.isOverride THEN
+						Error(procedure.position, "cannot override final method");
+					END;
 					IF (super # NIL) & SignatureCompatible(procedure.position,procedureType,super.type.resolvedType(SyntaxTree.ProcedureType)) THEN
 						IF (super.isConstructor) & ~(procedure.isConstructor) THEN
 							Error(procedure.position,"incompatible signature: non-constructor extends constructor");
@@ -6769,6 +6782,7 @@ TYPE
 
 			modifiers := procedureType.modifiers;
 			IF HasFlag(modifiers, Global.NameDynamic, position) THEN operator.SetDynamic(TRUE) END;
+			IF HasFlag(modifiers,Global.NameOverride,position) THEN operator.SetOverride(TRUE) END;
 			CheckModifiers(modifiers, TRUE);
 
 			ResolveProcedure(operator);
