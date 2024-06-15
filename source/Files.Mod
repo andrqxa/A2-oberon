@@ -567,6 +567,51 @@ VAR
 	seacher: FileSearcher;	(* enumerator shared by various procedures, protected with module EXCLUSIVE *)
 	fileClipboard : File; (* contains the pointer to the file in the clipboard opened with Copy *)
 
+PROCEDURE Base*(VAR r: Rider): File;
+BEGIN
+	RETURN r.file
+END Base;
+
+(** Positions a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file. A Rider cannot be positioned beyond the end of a file. *)
+PROCEDURE Set*(VAR r: Rider; f: File; pos: Position);
+BEGIN
+	f.Set(r, pos);
+END Set;
+
+(** Returns the offset of a Rider positioned on a file. *)
+PROCEDURE Pos*(VAR r: Rider): Position;
+BEGIN
+	RETURN r.file.Pos(r)
+END Pos;
+
+(** Returns the current length of a file. *)
+PROCEDURE Length*(f: File): Position;
+BEGIN
+	RETURN f.Length();
+END Length;
+
+(** Returns the time (t) and date (d) when a file was last modified. *)
+PROCEDURE GetDate*(f: File; VAR t, d: SIGNED32);
+BEGIN
+	f.GetDate(t, d)
+END GetDate;
+
+(** Sets the modification time (t) and date (d) of a file. *)
+PROCEDURE SetDate*(f: File; t, d: SIGNED32);
+BEGIN
+	f.SetDate(t, d)
+END SetDate;
+
+PROCEDURE GetName*(f: File; VAR name: ARRAY OF CHAR);
+BEGIN
+	f.GetName(name)
+END GetName;
+
+PROCEDURE Update*(f: File);
+BEGIN
+	f.Update();
+END Update;
+
 (** Buffered reading and writing. *)
 
 (** Open a reader on a file at the specified position. *)
@@ -1225,6 +1270,11 @@ END FindOpenFile;
 
 (** Portable routines to read the standard Oberon types.  DEPRECATED, use Streams instead. *)
 
+PROCEDURE ReadSystemByte*(VAR r: Rider; VAR x: SYSTEM.BYTE);
+BEGIN
+	r.file.Read(r, SYSTEM.VAL(CHAR, x))
+END ReadSystemByte;
+
 PROCEDURE Read*(VAR r: Rider; VAR x: CHAR);
 BEGIN
 	r.file.Read(r, x)
@@ -1244,6 +1294,13 @@ PROCEDURE ReadBytes*(VAR r: Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 BEGIN
 	r.file.ReadBytes(r, x, ofs, len);
 END ReadBytes;
+
+PROCEDURE ReadSystemBytes*(VAR r: Rider; VAR x: ARRAY OF SYSTEM.BYTE; len: SIZE);
+TYPE Bytes = POINTER { UNSAFE, UNTRACED } TO ARRAY MAX(SIZE) OF CHAR;
+VAR bytes := ADDRESSOF(x[0]): Bytes;
+BEGIN
+	r.file.ReadBytes(r, bytes^, 0, len);
+END ReadSystemBytes;
 
 PROCEDURE ReadSInt*(VAR r: Rider; VAR x: SIGNED8);
 BEGIN
@@ -1271,6 +1328,11 @@ TYPE Bytes = ARRAY Size OF CHAR;
 BEGIN
 	r.file.ReadBytes(r, SYSTEM.VAL(Bytes, x), 0, Size)
 END ReadSet;
+
+PROCEDURE ReadSet32*(VAR r: Rider; VAR x: SET32);
+BEGIN
+	r.file.ReadBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
+END ReadSet32;
 
 PROCEDURE ReadBool*(VAR r: Rider; VAR x: BOOLEAN);
 VAR ch: CHAR;
@@ -1331,6 +1393,11 @@ END ReadSize;
 
 (** Portable routines to write the standard Oberon types. DEPRECATED, used Streams instead. *)
 
+PROCEDURE WriteSystemByte*(VAR r: Rider; x: SYSTEM.BYTE);
+BEGIN
+	r.file.Write(r, SYSTEM.VAL(CHAR, x))
+END WriteSystemByte;
+
 PROCEDURE Write*(VAR r: Rider; x: CHAR);
 BEGIN
 	r.file.Write(r, x)
@@ -1350,6 +1417,13 @@ PROCEDURE WriteBytes*(VAR r: Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 BEGIN
 	r.file.WriteBytes(r, x, ofs, len);
 END WriteBytes;
+
+PROCEDURE WriteSystemBytes*(VAR r: Rider; CONST x: ARRAY OF SYSTEM.BYTE; len: SIZE);
+TYPE Bytes = POINTER { UNSAFE, UNTRACED } TO ARRAY MAX(SIZE) OF CHAR;
+VAR bytes := ADDRESSOF(x[0]): Bytes;
+BEGIN
+	r.file.WriteBytes(r, bytes^, 0, len);
+END WriteSystemBytes;
 
 PROCEDURE WriteSInt*(VAR r: Rider; x: SIGNED8);
 BEGIN
@@ -1377,6 +1451,11 @@ TYPE Bytes = ARRAY Size OF CHAR;
 BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes, x), 0, Size)
 END WriteSet;
+
+PROCEDURE WriteSet32*(VAR r: Rider; x: SET32);
+BEGIN
+	r.file.WriteBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
+END WriteSet32;
 
 PROCEDURE WriteBool*(VAR r: Rider; x: BOOLEAN);
 BEGIN

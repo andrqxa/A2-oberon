@@ -130,7 +130,7 @@ END OpenConnection;
 
 (** Like OpenConnection, but this procedure may return immediately and delay the actual opening of the connection.  In this case State() should be checked to wait for the connection status to change from waitCon. *)
 
-PROCEDURE AsyncOpenConnection*(VAR C: Connection; locPort: SIGNED16; remIP: IPAdr; remPort:SIGNED16; VAR res: SIGNED16);
+PROCEDURE AsyncOpenConnection*(VAR C: Connection; locPort: UNSIGNED16; remIP: IPAdr; remPort: UNSIGNED16; VAR res: SIGNED16);
 VAR err: SIGNED32;
 BEGIN
 	NEW(C); NEW(C.pcb);
@@ -335,7 +335,7 @@ END WriteString;
 
 (** Procedure delivers the ip-number and port number of a connection's remote partner. *)
 
-PROCEDURE GetPartner* (C: Connection; VAR remIP: IPAdr; VAR remPort: SIGNED16);
+PROCEDURE GetPartner* (C: Connection; VAR remIP: IPAdr; VAR remPort: UNSIGNED16);
 BEGIN
 	IF C.pcb # NIL THEN
 		remIP := C.pcb.fip; remPort := SHORT(C.pcb.fport)
@@ -350,7 +350,7 @@ END GetPartner;
 
 (** Opens a socket which is dedicated to datagram services. locPort is registered to receive datagrams from any port and any host. *)
 
-PROCEDURE OpenSocket* (VAR S: Socket; locPort: SIGNED16; VAR res: SIGNED16);
+PROCEDURE OpenSocket* (VAR S: Socket; locPort: UNSIGNED16; VAR res: SIGNED16);
 VAR err: SIGNED32;
 BEGIN
 	NEW(S); NEW(S.pcb, LONG(locPort) MOD 10000H, err);
@@ -368,7 +368,7 @@ END CloseSocket;
 
 (** Sends len bytes of data (beginning at pos in buf) to the host specified by remIP and remPort. *)
 
-PROCEDURE SendDG* (S: Socket; remIP: IPAdr; remPort: SIGNED16; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
+PROCEDURE SendDG* (S: Socket; remIP: IPAdr; remPort: UNSIGNED16; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
 VAR res: INTEGER;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));	(* index check *)
@@ -378,7 +378,7 @@ END SendDG;
 
 (** Stores an entire datagram in buf beginning at pos. On success (S.res = done), remIP and remPort indicate the sender, 	len indicates the length of valid data. *)
 
-PROCEDURE ReceiveDG*(S: Socket; VAR remIP: IPAdr; VAR remPort: SIGNED16; pos: SIGNED32; VAR len: SIGNED32;
+PROCEDURE ReceiveDG*(S: Socket; VAR remIP: IPAdr; VAR remPort: UNSIGNED16; pos: SIGNED32; VAR len: SIGNED32;
 	VAR buf: ARRAY OF SYSTEM.BYTE);
 VAR res, fport: SIGNED32;
 BEGIN

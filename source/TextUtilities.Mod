@@ -233,8 +233,8 @@ TYPE
 		BEGIN
 			reader.text.AcquireRead;
 			reader.SetPosition(pos(SIZE)); (* pos is clipped *)
-			received := reader.GetPosition(); (* this effects that Streams.Reader.Pos() returns the correct location in the text *)
 			Reset;
+			received := reader.GetPosition(); (* this effects that Streams.Reader.Pos() returns the correct location in the text *)
 			remainder := 0;
 			reader.text.ReleaseRead;
 		END SetPos;

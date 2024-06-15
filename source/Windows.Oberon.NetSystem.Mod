@@ -356,7 +356,7 @@ END GetPartner;
 
 (** Opens a socket which is dedicated to datagram services. locPort is registered to receive datagrams from any port and any host. *)
 
-PROCEDURE OpenSocket* (VAR S: Socket; locPort: SIGNED16; VAR res: SIGNED16);
+PROCEDURE OpenSocket* (VAR S: Socket; locPort: UNSIGNED16; VAR res: SIGNED16);
 VAR err: SIGNED32;
 BEGIN
 	NEW(S); NEW(S.pcb, LONG(locPort) MOD 10000H, err);
@@ -374,7 +374,7 @@ END CloseSocket;
 
 (** Sends len bytes of data (beginning at pos in buf) to the host specified by remIP and remPort. *)
 
-PROCEDURE SendDG* (S: Socket; remIP: IPAdr; remPort: SIGNED16; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
+PROCEDURE SendDG* (S: Socket; remIP: IPAdr; remPort: UNSIGNED16; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
 VAR res: INTEGER;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));	(* index check *)

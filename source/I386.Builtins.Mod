@@ -238,7 +238,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	RETURN res
 END ModH;
 
-PROCEDURE DivU(l,r: UNSIGNED64): UNSIGNED64;
+PROCEDURE DivU64*(l,r: UNSIGNED64): UNSIGNED64;
 CODE{SYSTEM.i386}
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	; divides two unsigned 64-bit integers and returns the quotient.
@@ -297,14 +297,9 @@ BIGDIVISOR:
 
 DONE:
 	POP ECX
-END DivU;
-
-PROCEDURE DivU64*(l,r: UNSIGNED64): UNSIGNED64;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	RETURN DivU(l,r);
 END DivU64;
 
-PROCEDURE ModU(l, r: UNSIGNED64): UNSIGNED64;
+PROCEDURE ModU64*(l, r: UNSIGNED64): UNSIGNED64;
 CODE{SYSTEM.i386}
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	; divides two unsigned 64-bit integers and returns the remainder.
@@ -369,11 +364,6 @@ RBIGDIVISOR:
 
 DONE:
 	POP	ECX
-END ModU;
-
-PROCEDURE ModU64*(l, r: UNSIGNED64): UNSIGNED64;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	RETURN ModU(l, r);
 END ModU64;
 
 PROCEDURE AbsH*(l: SIGNED64): SIGNED64;
