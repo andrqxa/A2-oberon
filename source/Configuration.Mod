@@ -181,7 +181,9 @@ TYPE
 			Get(key, string, res);
 			IF (res = Ok) THEN
 				Strings.TrimWS(string);
-				Strings.StrToInt(string, value);
+				IF ~Strings.TryParseInt32(string, value) THEN
+					res := Error;
+				END;
 			END;
 		END GetInteger;
 
@@ -191,7 +193,9 @@ TYPE
 			Get(key, string, res);
 			IF (res = Ok) THEN
 				Strings.TrimWS(string);
-				Strings.StrToHInt(string, value);
+				IF ~Strings.TryParseInt64(string, value) THEN
+					res := Error;
+				END;
 			END;
 		END GetInteger64;
 

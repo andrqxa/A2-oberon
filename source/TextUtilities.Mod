@@ -1738,7 +1738,7 @@ TYPE
 				IF ((ch >= 48) & (ch <= 57)) OR ((ch >= 65) & (ch <= 70)) OR ((ch >= 97) & (ch <= 102)) THEN
 					byte[j] := CHR(ch); INC(j);
 				END;
-				IF (j = 2) THEN j := 0; Strings.HexStrToInt(byte, ch(SIGNED32), k); out.Char(CHR(ch)); END;
+				IF (j = 2) THEN j := 0; UTF8Strings.HexStrToChar32(byte, ch, k); out.Char(CHR(ch)); END;
 			END;
 			out.Update;
 

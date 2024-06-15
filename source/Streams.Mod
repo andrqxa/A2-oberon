@@ -198,6 +198,12 @@ TYPE
 			Net32(SIGNED32( x MOD 100000000H ));
 		END Net64;
 
+		PROCEDURE UNet64*( x: UNSIGNED64 );
+		BEGIN
+			UNet32(SIGNED32( x DIV 100000000H MOD 100000000H ));
+			UNet32(SIGNED32( x MOD 100000000H ));
+		END UNet64;
+
 	(** Write a 32 bit value in network byte order (most significant byte first) *)
 		PROCEDURE Net32*( x: SIGNED32 );
 		BEGIN
@@ -205,17 +211,33 @@ TYPE
 			Char( CHR( x MOD 100H ) )
 		END Net32;
 
+		PROCEDURE UNet32*( x: UNSIGNED32 );
+		BEGIN
+			Char( CHR( x DIV 1000000H MOD 100H ) );  Char( CHR( x DIV 10000H MOD 100H ) );  Char( CHR( x DIV 100H MOD 100H ) );
+			Char( CHR( x MOD 100H ) )
+		END UNet32;
+
 	(** Write a 16 bit value in network byte order (most significant byte first) *)
 		PROCEDURE Net16*( x: SIGNED32 );
 		BEGIN
 			Char( CHR( x DIV 100H MOD 100H ) );  Char( CHR( x MOD 100H ) )
 		END Net16;
 
+		PROCEDURE UNet16*( x: UNSIGNED16 );
+		BEGIN
+			Char( CHR( x DIV 100H MOD 100H ) );  Char( CHR( x MOD 100H ) )
+		END UNet16;
+
 	(** write unsigned byte *)
 		PROCEDURE Net8*( x: SIGNED32 );
 		BEGIN
 			Char( CHR( x MOD 100H ) )
 		END Net8;
+
+		PROCEDURE UNet8*( x: UNSIGNED8 );
+		BEGIN
+			Char( CHR( x ) )
+		END UNet8;
 
 	(** Write a SET. *)
 		PROCEDURE RawSet* ( x: SET ); (*! note: in case of -bits=64 only 32 bits are written ! *)
@@ -733,11 +755,21 @@ TYPE
 			RETURN Net32() * 100000000H + Net32()
 		END Net64;
 
+		PROCEDURE UNet64*( ): UNSIGNED64;
+		BEGIN
+			RETURN UNet32() * 100000000H + UNet32()
+		END UNet64;
+
 	(** Read a 32 bit value in network byte order (most significant byte first) *)
 		PROCEDURE Net32*( ): SIGNED32;
 		BEGIN
 			RETURN LONG( ORD( Get() ) ) * 1000000H + LONG( ORD( Get() ) ) * 10000H + LONG( ORD( Get() ) ) * 100H + LONG( ORD( Get() ) )
 		END Net32;
+
+		PROCEDURE UNet32*( ): UNSIGNED32;
+		BEGIN
+			RETURN UNSIGNED32( ORD32( Get() ) ) * 1000000H + UNSIGNED32( ORD32( Get() ) ) * 10000H + UNSIGNED32( ORD32( Get() ) ) * 100H + UNSIGNED32( ORD32( Get() ) )
+		END UNet32;
 
 	(** Read an unsigned 16bit value in network byte order (most significant byte first) *)
 		PROCEDURE Net16*( ): SIGNED32;
@@ -745,11 +777,21 @@ TYPE
 			RETURN LONG( ORD( Get() ) ) * 100H + LONG( ORD( Get() ) )
 		END Net16;
 
+		PROCEDURE UNet16*( ): UNSIGNED16;
+		BEGIN
+			RETURN UNSIGNED16( ORD( Get() ) ) * 100H + UNSIGNED16( ORD( Get() ) )
+		END UNet16;
+
 	(** Read an unsigned byte *)
 		PROCEDURE Net8*( ): SIGNED32;
 		BEGIN
 			RETURN LONG( ORD( Get() ) )
 		END Net8;
+
+		PROCEDURE UNet8*( ): UNSIGNED8;
+		BEGIN
+			RETURN SYSTEM.VAL( UNSIGNED8, Get() )
+		END UNet8;
 
 	(** Read a SET. *)
 		PROCEDURE RawSet* ( VAR x: SET ); (*! note: in case of -bits=64 only 32 bits are read ! *)

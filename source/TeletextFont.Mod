@@ -294,8 +294,8 @@ TYPE
 			Files.WriteLInt(w, nofGlyphRanges);
 			(* write ranges *)
 			FOR i := 0 TO nofGlyphRanges - 1 DO
-				Files.WriteLInt(w, glyphRanges[i].firstCode(SIGNED32));
-				Files.WriteLInt(w, glyphRanges[i].lastCode(SIGNED32));
+				Files.WriteChar32(w, glyphRanges[i].firstCode);
+				Files.WriteChar32(w, glyphRanges[i].lastCode);
 			END;
 			fixup := f.Pos(w);
 
@@ -384,8 +384,8 @@ TYPE
 			(* read ranges *)
 			NEW(glyphRanges, nofGlyphRanges);
 			FOR i := 0 TO nofGlyphRanges - 1 DO
-				Files.ReadLInt(r, glyphRanges[i].firstCode(SIGNED32));
-				Files.ReadLInt(r, glyphRanges[i].lastCode(SIGNED32));
+				Files.ReadChar32(r, glyphRanges[i].firstCode);
+				Files.ReadChar32(r, glyphRanges[i].lastCode);
 				notenoughregisters := SIGNED32(glyphRanges[i].lastCode - glyphRanges[i].firstCode);
 				NEW(glyphRanges[i].glyphs, notenoughregisters + 1)
 			END;

@@ -490,6 +490,20 @@ BEGIN
 	END
 END FindDiff;
 
+PROCEDURE HexStrToChar32*(CONST string: ARRAY OF CHAR; VAR val: Char32; VAR res: INTEGER);
+VAR u32: UNSIGNED32;
+BEGIN
+  Strings.HexStrToUInt32(string, u32, res);
+  val := Char32(u32);
+END HexStrToChar32;
+
+PROCEDURE StrToChar32*(CONST str: ARRAY OF CHAR; VAR val: Char32);
+VAR u32: UNSIGNED32;
+BEGIN
+  Strings.StrToUInt32(str, u32);
+  val := Char32(u32);
+END StrToChar32;
+
 BEGIN
 		(* 0000 0000-0000 007F  0xxxxxxx *)
 	FOR init := 0 TO 7FH DO CodeLength[init] := 1X END;

@@ -1,7 +1,7 @@
 MODULE UnicodeProperties; (** AUTHOR "gubsermi"; PURPOSE "Reading the Unicode.txt file and interpreting the properties"; *)
 
 IMPORT
-	Texts, Codecs, Files, Streams, KernelLog, Strings;
+	Texts, Codecs, Files, Streams, KernelLog, Strings, UTF8Strings;
 
 CONST
 	NUL*	= 00H;
@@ -389,7 +389,7 @@ TYPE
 					(* the character's code has been found *)
 					ELSIF (i = 0) THEN
 						res[j-1] := CHR(0H);
-						Strings.HexStrToInt(res,thisInt(SIGNED32), dummyVal);
+						UTF8Strings.HexStrToChar32(res, thisInt, dummyVal);
 
 						(* carry on if the this was not the wanted character yet *)
 						IF (thisInt < char) THEN
@@ -487,7 +487,7 @@ TYPE
 			(* if the character was terminated by a ';' it is assumed to be valid and is converted into an integer *)
 			IF (tempChar = ORD(';')) THEN
 				sourceString[i] := CHR(0H);
-				Strings.HexStrToInt(sourceString,sourceInt(SIGNED32),res);
+				UTF8Strings.HexStrToChar32(sourceString,sourceInt,res);
 			END;
 
 			RETURN sourceInt;
@@ -518,7 +518,7 @@ TYPE
 
 			(* terminate the result string and convert it into an integer *)
 			targetString[i] := CHR(0H);
-			Strings.HexStrToInt(targetString,targetInt(SIGNED32),res);
+			UTF8Strings.HexStrToChar32(targetString,targetInt,res);
 
 			RETURN targetInt;
 		END GetTargetChar;

@@ -6494,6 +6494,17 @@ TYPE
 				RestoreRegisters(saved);
 			END Integer;
 
+			PROCEDURE Unsigned(op: IntermediateCode.Operand);
+			BEGIN
+				SaveRegisters();ReleaseUsedRegisters(saved);
+				IF GetProcedure("UInt") THEN
+					Emit(Push(position,op));
+					Emit(Push(position,IntermediateCode.Immediate(int32,1)));
+					CallProcedure;
+				END;
+				RestoreRegisters(saved);
+			END Unsigned;
+
 			PROCEDURE Float(op: IntermediateCode.Operand);
 			BEGIN
 				SaveRegisters();ReleaseUsedRegisters(saved);
@@ -6620,10 +6631,17 @@ TYPE
 					ELSE
 						Evaluate(expression,res);
 						IF expression.type.resolvedType IS SyntaxTree.IntegerType THEN
-							IF res.op.type.sizeInBits < IntermediateCode.Bits64 THEN
-								Convert(res.op,int64);
+							IF expression.type.resolvedType(SyntaxTree.IntegerType).signed THEN
+								IF res.op.type.sizeInBits < IntermediateCode.Bits64 THEN
+									Convert(res.op,int64);
+								END;
+								Integer(res.op);
+							ELSE
+								IF res.op.type.sizeInBits < IntermediateCode.Bits64 THEN
+									Convert(res.op,uint64);
+								END;
+								Unsigned(res.op);
 							END;
-							Integer(res.op);
 						ELSIF expression.type.resolvedType IS SyntaxTree.BooleanType THEN
 							Boolean(res.op);
 						ELSIF expression.type.resolvedType IS SyntaxTree.SetType THEN
