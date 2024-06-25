@@ -87,8 +87,8 @@ $(TARGETS): %: dirs
 	
 # Removed generated files
 	@rm -f $(BUILD_DIR)/$@/dynamic.txt
-	@rm -f $(BUILD_DIR)/$@/combined.txt
-	@rm -f $(BUILD_DIR)/$@/oberonCompile.ini
+	# @rm -f $(BUILD_DIR)/$@/combined.txt
+	# @rm -f $(BUILD_DIR)/$@/oberonCompile.ini
 
 # Remove all generated files
 .PHONY: clean
@@ -110,11 +110,14 @@ dirs:
 # Test rule
 .PHONY: test
 test:
-	@echo "Test started:"
+	@echo "Tests started:"
 	@cd $(BUILD_DIR)/Linux64; \
 	./oberon do " \
 		System.DoFile oberon.ini ~ \
-		Files.SetWorkPath $(BUILD_DIR)/Linux64 ~ \
-		FoxTest.Compile -l=Test.Log Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~ \
-		FoxTest.Compile -l=Test.Log Oberon.Execution.Test Oberon.Execution.AMD64TestDiff ~ \
+		FoxTest.Compile -l=TestCompilation.Log Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~ \
+		FoxTest.Compile -l=TestExecution.Log Oberon.Execution.Test Oberon.Execution.AMD64TestDiff ~ \
 	"
+	@rm -f $(BUILD_DIR)/Linux64/work/*.SymUu
+	@rm -f $(BUILD_DIR)/Linux64/work/*.GofUu
+	@rm -f $(BUILD_DIR)/Linux64/work/*.txt
+	@echo "Compilation Test finished"
