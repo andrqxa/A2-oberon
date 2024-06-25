@@ -110,14 +110,14 @@ dirs:
 # Test rule
 .PHONY: test
 test:
-	@echo "Tests started:"
+	@echo "Tests have started:"
 	@cd $(BUILD_DIR)/Linux64; \
 	./oberon do " \
 		System.DoFile oberon.ini ~ \
-		FoxTest.Compile -l=TestCompilation.Log Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~ \
-		FoxTest.Compile -l=TestExecution.Log Oberon.Execution.Test Oberon.Execution.AMD64TestDiff ~ \
+		FoxTest.Compile --verbose -l=TestCompilation.Log Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~ \
+		FoxTest.Compile --verbose -l=TestExecution.Log Oberon.Execution.Test Oberon.Execution.AMD64TestDiff ~ \
 	"
 	@rm -f $(BUILD_DIR)/Linux64/work/*.SymUu
 	@rm -f $(BUILD_DIR)/Linux64/work/*.GofUu
 	@rm -f $(BUILD_DIR)/Linux64/work/*.txt
-	@echo "Compilation Test finished"
+	@echo "All Tests have finished"
