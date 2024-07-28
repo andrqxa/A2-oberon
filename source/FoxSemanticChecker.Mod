@@ -1821,7 +1821,12 @@ TYPE
 					result := SyntaxTree.NewIntegerValue(position,int);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.FloatType) THEN
-					result := SyntaxTree.NewRealValue(expression.position,int,Scanner.None);
+					IF type.sizeInBits = 64 THEN
+						result := SyntaxTree.NewRealValue(expression.position,SYSTEM.VAL(FLOAT64, SIGNED64(int)),Scanner.Longreal);
+					ELSIF type.sizeInBits = 32 THEN
+						result := SyntaxTree.NewRealValue(expression.position,SYSTEM.VAL(FLOAT32, SIGNED32(int)),Scanner.Real);
+					ELSE HALT(100);
+					END;
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.ComplexType) THEN
 					result := SyntaxTree.NewComplexValue(expression.position, int, 0, Scanner.None);
