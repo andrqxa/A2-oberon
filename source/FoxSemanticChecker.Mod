@@ -1805,8 +1805,10 @@ TYPE
 			RETURN result
 		END MathArrayConversion;
 
-		PROCEDURE ConvertValue(position: Position; expression: SyntaxTree.Value; type: SyntaxTree.Type): SyntaxTree.Expression;
+		PROCEDURE ConvertValue(position: Position; expression: SyntaxTree.Value; type: SyntaxTree.Type; systemVal := FALSE: BOOLEAN): SyntaxTree.Expression;
 		VAR result: SyntaxTree.Expression; int: Basic.Integer; real, imaginary: FLOAT64; set: Basic.Set; char: CHAR; string: Scanner.StringType;
+			f64: RECORD f: FLOAT64; i{OFFSET=0}: SIGNED64; END;
+			f32: RECORD f: FLOAT32; i{OFFSET=0}: SIGNED32; END;
 		BEGIN
 			result := expression; type := type.resolvedType;
 			IF (type IS SyntaxTree.ArrayType) & (type(SyntaxTree.ArrayType).arrayBase.resolvedType IS SyntaxTree.ByteType) THEN
@@ -1822,9 +1824,11 @@ TYPE
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.FloatType) THEN
 					IF type.sizeInBits = 64 THEN
-						result := SyntaxTree.NewRealValue(expression.position,SYSTEM.VAL(FLOAT64, SIGNED64(int)),Scanner.Longreal);
+						IF systemVal THEN f64.i := SIGNED64(int); ELSE f64.f := int; END;
+						result := SyntaxTree.NewRealValue(expression.position,f64.f,Scanner.Longreal);
 					ELSIF type.sizeInBits = 32 THEN
-						result := SyntaxTree.NewRealValue(expression.position,SYSTEM.VAL(FLOAT32, SIGNED32(int)),Scanner.Real);
+						IF systemVal THEN f32.i := SIGNED32(int); ELSE f32.f := int; END;
+						result := SyntaxTree.NewRealValue(expression.position,f32.f,Scanner.Real);
 					ELSE HALT(100);
 					END;
 					result.SetType(type);
@@ -5436,7 +5440,7 @@ TYPE
 								Warning(parameter[0].position,"types do not have the same size");
 							END;
 							IF (parameter[1].resolved # NIL) THEN
-								parameter[0] := ConvertValue(parameter[1].position,parameter[1].resolved,type);
+								parameter[0] := ConvertValue(parameter[1].position,parameter[1].resolved,type,TRUE);
 								IF (parameter[0] # NIL) & (parameter[0] IS SyntaxTree.Value) THEN
 									result.SetResolved(parameter[0](SyntaxTree.Value));
 								END;
