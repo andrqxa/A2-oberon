@@ -30,6 +30,8 @@ TYPE
 		value* : BOOLEAN;
 	END;
 
+	Color* = Integer;
+
 	Integer* = RECORD(Any)
 		value* : SIGNED32;
 	END;
@@ -40,6 +42,14 @@ TYPE
 
 	Size* = RECORD(Any)
 		value* : SIZE;
+	END;
+
+	UInt32* = RECORD(Any)
+		value*: UNSIGNED32;
+	END;
+
+	UInt64* = RECORD(Any)
+		value*: UNSIGNED64;
 	END;
 
 	Real* = RECORD(Any)
@@ -182,6 +192,14 @@ BEGIN
 		value := source(Hugeint).value(SIGNED32);
 	ELSIF (source IS Size) THEN
 		value := source(Size).value(SIGNED32);
+	ELSIF (source IS UInt32) THEN
+		VAR u32 := source(Integer).value;
+		ASSERT( u32 <= MAX(SIGNED32));
+		value := SIGNED32(u32);
+	ELSIF (source IS UInt64) THEN
+		VAR u64 := source(Hugeint).value;
+		ASSERT( u64 <= MAX(SIGNED32));
+		value := SIGNED32(u64);
 	ELSIF (source IS Real) THEN
 		value := ENTIER(source(Real).value);
 	ELSIF (source IS Longreal) THEN
@@ -222,6 +240,12 @@ BEGIN
 		target(Hugeint).value := value;
 	ELSIF (target IS Size) THEN
 		target(Size).value := value;
+	ELSIF (target IS UInt32) THEN
+		ASSERT(value >= 0);
+		target(UInt32).value := value;
+	ELSIF (target IS UInt64) THEN
+		ASSERT(value >= 0);
+		target(UInt64).value := value;
 	ELSIF (target IS Real) THEN
 		target(Real).value := value;
 	ELSIF (target IS Longreal) THEN
@@ -256,7 +280,7 @@ BEGIN
 END SetInteger;
 
 PROCEDURE GetHugeint*(CONST source : Any; VAR value : SIGNED64; VAR res : INTEGER);
-VAR hugeint : Hugeint;
+VAR hugeint : Hugeint; u64: UNSIGNED64;
 BEGIN
 	res := Ok;
 	IF (source IS Integer) THEN
@@ -265,10 +289,17 @@ BEGIN
 		value := source(Hugeint).value;
 	ELSIF (source IS Size) THEN
 		value := source(Size).value;
+	ELSIF (source IS UInt32) THEN
+		u64 := source(UInt32).value;
+		value := SIGNED64(u64);
+	ELSIF (source IS UInt64) THEN
+		u64 := source(UInt64).value;
+		ASSERT(u64 <= MAX(SIGNED64));
+		value := SIGNED64(u64);
 	ELSIF (source IS Real) THEN
-		value := ENTIER(source(Real).value);
+		value := ENTIERH(source(Real).value);
 	ELSIF (source IS Longreal) THEN
-		value := ENTIER(source(Longreal).value);
+		value := ENTIERH(source(Longreal).value);
 	ELSIF (source IS String) THEN
 		IF (source(String).value # NIL) THEN
 			Strings.StrToInt64(source(String).value^, value);
@@ -305,6 +336,12 @@ BEGIN
 		target(Hugeint).value := value;
 	ELSIF (target IS Size) THEN
 		target(Size).value := value(SIZE);
+	ELSIF (target IS UInt32) THEN
+		ASSERT(UNSIGNED64(value) <= MAX(SIGNED32));
+		target(UInt32).value := UNSIGNED32(value);
+	ELSIF (target IS UInt64) THEN
+		ASSERT(value >= 0);
+		target(UInt64).value := value;
 	ELSIF (target IS Real) THEN
 		target(Real).value := value;
 	ELSIF (target IS Longreal) THEN
@@ -337,6 +374,202 @@ BEGIN
 		res := CannotConvert;
 	END;
 END SetHugeint;
+
+PROCEDURE GetUInt32*(CONST source : Any; VAR value : UNSIGNED32; VAR res : INTEGER);
+VAR unsigned : UInt32; i64: SIGNED64;
+BEGIN
+	res := Ok;
+	IF (source IS Integer) THEN
+		i64 := source(Integer).value;
+		ASSERT(i64 >= 0);
+		value := UNSIGNED32(i64);
+	ELSIF (source IS Hugeint) THEN
+		i64 := source(Hugeint).value;
+		ASSERT(UNSIGNED64(i64) <= MAX(UNSIGNED32));
+		value := UNSIGNED32(i64);
+	ELSIF (source IS Size) THEN
+		i64 := source(Size).value;
+		ASSERT(UNSIGNED64(i64) <= MAX(SIGNED32));
+		value := UNSIGNED32(i64);
+	ELSIF (source IS UInt32) THEN
+		value := source(UInt32).value;
+	ELSIF (source IS UInt64) THEN
+		value := source(UInt64).value(UNSIGNED32);
+	ELSIF (source IS Real) THEN
+		i64 := ENTIERH(source(Real).value);
+		ASSERT(UNSIGNED64(i64) <= MAX(UNSIGNED32));
+		value := UNSIGNED32(i64);
+	ELSIF (source IS Longreal) THEN
+		i64 := ENTIERH(source(Longreal).value);
+		ASSERT(UNSIGNED64(i64) <= MAX(UNSIGNED32));
+		value := UNSIGNED32(i64);
+	ELSIF (source IS String) THEN
+		IF (source(String).value # NIL) THEN
+			Strings.StrToUInt32(source(String).value^, value);
+		ELSE
+			res := ConversionError;
+		END;
+	ELSIF (source IS DynamicString) THEN
+		Strings.StrToUInt32(source(DynamicString).value^, value);
+	ELSIF (source IS String32) THEN
+		Strings.StrToUInt32(source(String32).value, value);
+	ELSIF (source IS String256) THEN
+		Strings.StrToUInt32(source(String256).value, value);
+	ELSIF (source IS Generic) THEN
+		IF (source(Generic).Get # NIL) THEN
+			source(Generic).Get(source(Generic), unsigned, res);
+			IF (res = Ok) THEN
+				value := unsigned.value;
+			END;
+		ELSE
+			res := CannotRead;
+		END;
+	ELSE
+		res := CannotConvert;
+	END;
+END GetUInt32;
+
+PROCEDURE SetUInt32*(VAR target : Any; value : UNSIGNED32;  VAR res : INTEGER);
+VAR unsigned : UInt32;
+BEGIN
+	res := Ok;
+	IF (target IS Integer) THEN
+		ASSERT(value <= MAX(SIGNED32));
+		target(Integer).value := SIGNED32(value);
+	ELSIF (target IS Hugeint) THEN
+		target(Hugeint).value := SIGNED64(value);
+	ELSIF (target IS Size) THEN
+		ASSERT(value <= MAX(SIZE));
+		target(Size).value := SIZE(value);
+	ELSIF (target IS UInt32) THEN
+		target(UInt32).value := value;
+	ELSIF (target IS UInt64) THEN
+		target(UInt64).value := value;
+	ELSIF (target IS Real) THEN
+		target(Real).value := SIGNED64(UNSIGNED64(value));
+	ELSIF (target IS Longreal) THEN
+		target(Longreal).value := SIGNED64(UNSIGNED64(value));
+	ELSIF (target IS String) THEN
+		EnsureStringLength(target(String).value, 11);
+		Strings.UIntToStr(value, target(String).value^);
+	ELSIF (target IS DynamicString) THEN
+		EnsureLength(target(DynamicString), 11);
+		Strings.UIntToStr(value, target(DynamicString).value^);
+	ELSIF (target IS String32) THEN
+		Strings.UIntToStr(value, target(String32).value);
+	ELSIF (target IS String256) THEN
+		Strings.UIntToStr(value, target(String256).value);
+	ELSIF (target IS Generic) THEN
+		IF (target(Generic).Set # NIL) THEN
+			unsigned.value := value;
+			target(Generic).Set(target(Generic), unsigned, res);
+		ELSE
+			res := CannotWrite;
+		END;
+	ELSE
+		res := CannotConvert;
+	END;
+END SetUInt32;
+
+PROCEDURE GetUInt64*(CONST source : Any; VAR value : UNSIGNED64; VAR res : INTEGER);
+VAR i64: SIGNED64;
+BEGIN
+	res := Ok;
+	IF (source IS Integer) THEN
+		i64 := source(Integer).value;
+		ASSERT(i64 >= 0);
+		value := i64;
+	ELSIF (source IS Hugeint) THEN
+		i64 := source(Hugeint).value;
+		ASSERT(i64 >= 0);
+		value := i64;
+	ELSIF (source IS Size) THEN
+		i64 := source(Hugeint).value;
+		ASSERT(i64 >= 0);
+		value := source(Size).value;
+	ELSIF (source IS UInt32) THEN
+		value := source(UInt32).value(UNSIGNED32);
+	ELSIF (source IS UInt64) THEN
+		value := source(UInt64).value;
+	ELSIF (source IS Real) THEN
+		i64 := ENTIERH(source(Real).value);
+		ASSERT(i64 >= 0);
+		value := i64;
+	ELSIF (source IS Longreal) THEN
+		i64 := ENTIERH(source(Longreal).value);
+		ASSERT(i64 >= 0);
+		value := i64;
+	ELSIF (source IS String) THEN
+		IF (source(String).value # NIL) THEN
+			Strings.StrToUInt64(source(String).value^, value);
+		ELSE
+			res := ConversionError;
+		END;
+	ELSIF (source IS DynamicString) THEN
+		Strings.StrToUInt64(source(DynamicString).value^, value);
+	ELSIF (source IS String32) THEN
+		Strings.StrToUInt64(source(String32).value, value);
+	ELSIF (source IS String256) THEN
+		Strings.StrToUInt64(source(String256).value, value);
+	ELSIF (source IS Generic) THEN
+		IF (source(Generic).Get # NIL) THEN
+			VAR unsigned : UInt64;
+			source(Generic).Get(source(Generic), unsigned, res);
+			IF (res = Ok) THEN
+				value := unsigned.value;
+			END;
+		ELSE
+			res := CannotRead;
+		END;
+	ELSE
+		res := CannotConvert;
+	END;
+END GetUInt64;
+
+PROCEDURE SetUInt64*(VAR target : Any; value : UNSIGNED64;  VAR res : INTEGER);
+BEGIN
+	res := Ok;
+	IF (target IS Integer) THEN
+		ASSERT(value <= MAX(SIGNED32));
+		target(Integer).value := SIGNED32(value);
+	ELSIF (target IS Hugeint) THEN
+		ASSERT(value <= MAX(SIGNED64));
+		target(Hugeint).value := SIGNED64(value);
+	ELSIF (target IS Size) THEN
+		ASSERT(value <= MAX(SIZE));
+		target(Size).value := SIZE(value);
+	ELSIF (target IS UInt32) THEN
+		target(UInt32).value := value(UNSIGNED32);
+	ELSIF (target IS UInt64) THEN
+		target(UInt64).value := value;
+	ELSIF (target IS Real) THEN
+		ASSERT(SIGNED64(value) >= 0);
+		target(Real).value := SIGNED64(value);
+	ELSIF (target IS Longreal) THEN
+		ASSERT(SIGNED64(value) >= 0);
+		target(Longreal).value := SIGNED64(value);
+	ELSIF (target IS String) THEN
+		EnsureStringLength(target(String).value, 21);
+		Strings.UIntToStr(value, target(String).value^);
+	ELSIF (target IS DynamicString) THEN
+		EnsureLength(target(DynamicString), 21);
+		Strings.UIntToStr(value, target(DynamicString).value^);
+	ELSIF (target IS String32) THEN
+		Strings.UIntToStr(value, target(String32).value);
+	ELSIF (target IS String256) THEN
+		Strings.UIntToStr(value, target(String256).value);
+	ELSIF (target IS Generic) THEN
+		IF (target(Generic).Set # NIL) THEN
+			VAR unsigned : UInt64;
+			unsigned.value := value;
+			target(Generic).Set(target(Generic), unsigned, res);
+		ELSE
+			res := CannotWrite;
+		END;
+	ELSE
+		res := CannotConvert;
+	END;
+END SetUInt64;
 
 PROCEDURE GetSize*(CONST source : Any; VAR value : SIZE; VAR res : INTEGER);
 VAR size : Size;
@@ -422,7 +655,7 @@ BEGIN
 END SetSize;
 
 PROCEDURE GetReal*(CONST source : Any; VAR value : FLOAT32; VAR res : INTEGER);
-VAR longreal : FLOAT64; real : Real;
+VAR longreal : FLOAT64; real : Real; u64: UNSIGNED64;
 BEGIN
 	res := Ok;
 	IF (source IS Real) THEN
@@ -433,6 +666,14 @@ BEGIN
 		value := source(Integer).value;
 	ELSIF (source IS Hugeint) THEN
 		value := source(Hugeint).value;
+	ELSIF (source IS UInt32) THEN
+		u64 := source(UInt32).value;
+		ASSERT(SIGNED64(u64) >= 0);
+		value := SIGNED64(u64);
+	ELSIF (source IS UInt64) THEN
+		u64 := source(UInt64).value;
+		ASSERT(SIGNED64(u64) >= 0);
+		value := SIGNED64(u64);
 	ELSIF (source IS Size) THEN
 		value := source(Size).value;
 	ELSIF (source IS String) THEN
@@ -466,7 +707,7 @@ BEGIN
 END GetReal;
 
 PROCEDURE SetReal*(VAR target : Any; value : FLOAT32; VAR res : INTEGER);
-VAR real : Real; w:Streams.StringWriter;
+VAR real : Real; w:Streams.StringWriter; i64: SIGNED64;
 BEGIN
 	res := Ok;
 	IF (target IS Real) THEN
@@ -477,6 +718,14 @@ BEGIN
 		target(Integer).value := ENTIER(value);
 	ELSIF (target IS Hugeint) THEN
 		target(Hugeint).value := ENTIER(value);
+	ELSIF (target IS UInt32) THEN
+		i64 := ENTIER(value);
+		ASSERT(i64 >= 0);
+		target(UInt32).value := i64(UNSIGNED32);
+	ELSIF (target IS UInt64) THEN
+		i64 := ENTIER(value);
+		ASSERT(i64 >= 0);
+		target(UInt64).value := i64;
 	ELSIF (target IS Size) THEN
 		target(Size).value := ENTIER(value);
 	ELSIF (target IS String) THEN
@@ -510,7 +759,7 @@ BEGIN
 END SetReal;
 
 PROCEDURE GetLongreal*(CONST source : Any; VAR value : FLOAT64; VAR res : INTEGER);
-VAR longreal : Longreal;
+VAR longreal : Longreal; u64: UNSIGNED64;
 BEGIN
 	res := Ok;
 	IF (source IS Longreal) THEN
@@ -521,6 +770,14 @@ BEGIN
 		value := source(Integer).value;
 	ELSIF (source IS Hugeint) THEN
 		value := source(Hugeint).value;
+	ELSIF (source IS UInt32) THEN
+		u64 := source(UInt32).value;
+		ASSERT(SIGNED64(u64) >= 0);
+		value := SIGNED64(u64);
+	ELSIF (source IS UInt64) THEN
+		u64 := source(UInt64).value;
+		ASSERT(SIGNED64(u64) >= 0);
+		value := SIGNED64(u64);
 	ELSIF (source IS Size) THEN
 		value := source(Size).value;
 	ELSIF (source IS String) THEN
@@ -550,7 +807,7 @@ BEGIN
 END GetLongreal;
 
 PROCEDURE SetLongreal*(VAR target : Any; value : FLOAT64; VAR res : INTEGER);
-VAR longreal : Longreal; w:Streams.StringWriter;
+VAR longreal : Longreal; w:Streams.StringWriter; i64: SIGNED64;
 BEGIN
 	res := Ok;
 	IF (target IS Longreal) THEN
@@ -561,6 +818,14 @@ BEGIN
 		target(Integer).value := ENTIER(value);
 	ELSIF (target IS Hugeint) THEN
 		target(Hugeint).value := ENTIER(value);
+	ELSIF (target IS Integer) THEN
+		i64 := ENTIER(value);
+		ASSERT(i64 >= 0);
+		target(UInt32).value := i64(UNSIGNED32);
+	ELSIF (target IS Hugeint) THEN
+		i64 := ENTIER(value);
+		ASSERT(i64 >= 0);
+		target(UInt64).value := i64;
 	ELSIF (target IS Size) THEN
 		target(Size).value := ENTIER(value);
 	ELSIF (target IS String) THEN
@@ -693,6 +958,10 @@ BEGIN
 		Strings.IntToStr(source(Integer).value, value);
 	ELSIF (source IS Hugeint) THEN
 		Strings.IntToStr(source(Hugeint).value, value);
+	ELSIF (source IS UInt32) THEN
+		Strings.UIntToStr(source(UInt32).value, value);
+	ELSIF (source IS UInt64) THEN
+		Strings.UIntToStr(source(UInt64).value, value);
 	ELSIF (source IS Size) THEN
 		Strings.IntToStr(source(Size).value, value);
 	ELSIF (source IS Real) THEN
@@ -754,6 +1023,10 @@ BEGIN
 		Strings.StrToInt32(value, target(Integer).value);
 	ELSIF (target IS Hugeint) THEN
 		Strings.StrToInt64(value, target(Hugeint).value);
+	ELSIF (target IS UInt32) THEN
+		Strings.StrToUInt32(value, target(UInt32).value);
+	ELSIF (target IS UInt64) THEN
+		Strings.StrToUInt64(value, target(UInt64).value);
 	ELSIF (target IS Size) THEN
 		Strings.StrToSize(value, target(Size).value);
 	ELSIF (target IS Real) THEN
@@ -798,6 +1071,10 @@ BEGIN
 		Strings.IntToStr(source(Integer).value, value);
 	ELSIF (source IS Hugeint) THEN
 		Strings.IntToStr(source(Hugeint).value, value);
+	ELSIF (source IS UInt32) THEN
+		Strings.UIntToStr(source(UInt32).value, value);
+	ELSIF (source IS UInt64) THEN
+		Strings.UIntToStr(source(UInt64).value, value);
 	ELSIF (source IS Size) THEN
 		Strings.IntToStr(source(Size).value, value);
 	ELSIF (source IS Real) THEN
@@ -938,6 +1215,13 @@ BEGIN
 		SetAsString(temp);
 	ELSIF (source IS Hugeint) THEN
 		Strings.IntToStr(source(Hugeint).value, temp);
+		SetAsString(temp);
+	ELSIF (source IS UInt32) THEN
+		Strings.UIntToStr(source(UInt32).value, temp);
+		SetAsString(temp);
+	ELSIF (source IS UInt64) THEN
+		Strings.UIntToStr(source(UInt64).value, temp);
+		SetAsString(temp);
 	ELSIF (source IS Size) THEN
 		Strings.IntToStr(source(Size).value, temp);
 		SetAsString(temp);
@@ -1001,6 +1285,12 @@ BEGIN
 	ELSIF (target IS Hugeint) THEN
 		TextUtilities.TextToStr(value, temp);
 		Strings.StrToInt64(temp, target(Hugeint).value);
+	ELSIF (target IS UInt32) THEN
+		TextUtilities.TextToStr(value, temp);
+		Strings.StrToUInt32(temp, target(UInt32).value);
+	ELSIF (target IS UInt64) THEN
+		TextUtilities.TextToStr(value, temp);
+		Strings.StrToUInt64(temp, target(UInt64).value);
 	ELSIF (target IS Size) THEN
 		TextUtilities.TextToStr(value, temp);
 		Strings.StrToSize(temp, target(Size).value);
@@ -1097,6 +1387,10 @@ BEGIN
 		SetInteger(to, from(Integer).value, res);
 	ELSIF (from IS Hugeint) THEN
 		SetHugeint(to, from(Hugeint).value, res);
+	ELSIF (from IS UInt32) THEN
+		SetUInt32(to, from(UInt32).value, res);
+	ELSIF (from IS UInt64) THEN
+		SetUInt64(to, from(UInt64).value, res);
 	ELSIF (from IS Size) THEN
 		SetSize(to, from(Size).value, res);
 	ELSIF (from IS Real) THEN

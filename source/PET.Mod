@@ -428,7 +428,7 @@ TYPE
 			Init^;
 			SetNameAsString(StrScratchPanel);
 			NEW(label); label.alignment.Set(WMComponents.AlignTop); label.bounds.SetHeight(20);
-			label.fillColor.Set(0CCCCCCFFH); label.caption.SetAOC(" Scratch Text");
+			label.fillColor.Set(WMGraphics.Color(0CCCCCCFFH)); label.caption.SetAOC(" Scratch Text");
 			AddContent(label);
 
 			NEW(editor); editor.alignment.Set(WMComponents.AlignClient);
@@ -648,7 +648,7 @@ TYPE
 
 			NEW(resizerV);
 			resizerV.bounds.SetHeight(5); resizerV.alignment.Set(WMComponents.AlignTop);
-			resizerV.fillColor.Set(0808080FFH);
+			resizerV.fillColor.Set(WMGraphics.Color(0808080FFH));
 			splitPanel.AddContent(resizerV);
 
 			NEW(splitEditor); splitEditor.alignment.Set(WMComponents.AlignClient); splitEditor.tv.showBorder.Set(TRUE);
@@ -1186,7 +1186,7 @@ TYPE
 
 				NEW(filenameEdit); filenameEdit.alignment.Set(WMComponents.AlignClient);
 				filenameEdit.multiLine.Set(FALSE); filenameEdit.bounds.SetWidth(200);
-				filenameEdit.fillColor.Set(0FFFFFFFFH);
+				filenameEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 				filenameEdit.tv.showBorder.Set(TRUE);
 				filenameEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 				filenameEdit.tv.commandCaller := SELF;
@@ -1243,7 +1243,7 @@ TYPE
 				NEW(optionsEdit); optionsEdit.tv.showBorder.Set(TRUE); optionsEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 				optionsEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 				optionsEdit.alignment.Set(WMComponents.AlignClient); optionsEdit.multiLine.Set(FALSE);
-				optionsEdit.bounds.SetWidth(80); optionsEdit.fillColor.Set(0FFFFFFFFH);
+				optionsEdit.bounds.SetWidth(80); optionsEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 				optionsEdit.SetAsString(settings.defaultCompilerOptions);
 				toolbar.AddContent(optionsEdit);
 
@@ -1253,7 +1253,7 @@ TYPE
 			PROCEDURE CreateStatusbar() : WMComponents.VisualComponent;
 			VAR statusbar : WMStandardComponents.Panel;
 			BEGIN
-				NEW(statusbar); statusbar.bounds.SetHeight(20); statusbar.alignment.Set(WMComponents.AlignBottom); statusbar.fillColor.Set(0CCCCCCFFH);
+				NEW(statusbar); statusbar.bounds.SetHeight(20); statusbar.alignment.Set(WMComponents.AlignBottom); statusbar.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 
 				NEW(posLabel); posLabel.caption.SetAOC(" Position: "); posLabel.bounds.SetWidth(60); posLabel.alignment.Set(WMComponents.AlignLeft);
 				statusbar.AddContent(posLabel); posLabel.textColor.Set(0000000FFH);
@@ -1261,7 +1261,7 @@ TYPE
 				NEW(positionEdit); positionEdit.tv.showBorder.Set(TRUE); positionEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 
 				positionEdit.alignment.Set(WMComponents.AlignLeft); positionEdit.multiLine.Set(FALSE);
-				positionEdit.bounds.SetWidth(80); positionEdit.fillColor.Set(0FFFFFFFFH); positionEdit.onEnter.Add(PositionHandler);
+				positionEdit.bounds.SetWidth(80); positionEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); positionEdit.onEnter.Add(PositionHandler);
 				positionEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 				statusbar.AddContent(positionEdit);
 
@@ -1309,7 +1309,7 @@ TYPE
 		BEGIN
 			(* -- Main Panel holding the tabs, toolbar and tabcontents (instance of PETPanel) *)
 			NEW(panel); panel.alignment.Set(WMComponents.AlignClient);
-			panel.fillColor.Set(0FFFFFFFFH);
+			panel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			panel.takesFocus.Set(TRUE);
 
 			(* -- Tabs for the PETPanels *)
@@ -1321,7 +1321,7 @@ TYPE
 			panel.AddContent(CreateStatusbar());
 
 			(* -- Page holding the PETPanel *)
-			NEW(page); page.fillColor.Set(0CCCCCCFFH); page.alignment.Set(WMComponents.AlignClient);
+			NEW(page); page.fillColor.Set(WMGraphics.Color(0CCCCCCFFH)); page.alignment.Set(WMComponents.AlignClient);
 			panel.AddContent(page);
 
 			RETURN panel;
@@ -1382,7 +1382,7 @@ TYPE
 		BEGIN
 			IF nrUndos = 0 THEN
 				undoBtn.enabled.Set(FALSE);
-				undoBtn.clDefault.Set(999999FFH);
+				undoBtn.clDefault.Set(WMGraphics.Color(999999FFH));
 			ELSE
 				undoBtn.enabled.Set(TRUE);
 				undoBtn.clDefault.Reset;
@@ -1395,7 +1395,7 @@ TYPE
 
 			IF nrRedos = 0 THEN
 				redoBtn.enabled.Set(FALSE);
-				redoBtn.clDefault.Set(999999FFH);
+				redoBtn.clDefault.Set(WMGraphics.Color(999999FFH));
 			ELSE
 				redoBtn.enabled.Set(TRUE);
 				redoBtn.clDefault.Reset;

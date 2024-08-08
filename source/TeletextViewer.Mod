@@ -331,7 +331,7 @@ TYPE
 			(* refresh mode label *)
 			NEW(refreshLabel); refreshLabel.bounds.SetHeight(25); refreshLabel.alignment.Set(Base.AlignLeft);
 			refreshLabel.bounds.SetWidth(125); refreshLabel.caption.SetAOC(CaptionNoRefresh);
-			refreshLabel.fillColor.Set(053FFH); refreshLabel.textColor.Set(0FFFF00FFH);
+			refreshLabel.fillColor.Set(053FFH); refreshLabel.textColor.Set(Graphics.Color(0FFFF00FFH));
 			refreshLabel.alignH.Set(Graphics.AlignCenter);
 			navi.AddContent(refreshLabel);
 
@@ -538,9 +538,9 @@ TYPE
 				(* Set the window opaque *)
 				transparent.caption.SetAOC("Transparent");
 				FOR i := 0 TO 7 DO
-					mag[i].clDefault.Set(009933AFH);
-					mag[i].clTextDefault.Set(0FFFF00FFH);
-					mag[i].clTextHover.Set(0FFFF00FFH);
+					mag[i].clDefault.Set(Graphics.Color(009933AFH));
+					mag[i].clTextDefault.Set(Graphics.Color(0FFFF00FFH));
+					mag[i].clTextHover.Set(Graphics.Color(0FFFF00FFH));
 				END;
 				panel.fillColor.Set(0FFH);
 				timer.Stop(sender, data)

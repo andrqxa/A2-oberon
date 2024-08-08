@@ -79,7 +79,7 @@ TYPE
 			ready := FALSE;
 			document := NIL;
 			(* default values *)
-			fillColor.Set(0888888FFH);
+			fillColor.Set(WMGraphics.Color(0888888FFH));
 			docOriginX := 30; docOriginY := 30;
 			propsX := 820; propsY := 350;
 			showGrid := TRUE; snapToGrid := FALSE; gridDistance := 50; gridDivision := 10;
@@ -1979,7 +1979,7 @@ TYPE
 			label.SetCaption(" X:"); label.textColor.Set(0000000FFH);
 			leftPanel.AddContent(label);
 			NEW(efx); efx.bounds.SetHeight(20); efx.alignment.Set(WMComponents.AlignTop);
-			efx.tv.showBorder.Set(TRUE); efx.multiLine.Set(FALSE); efx.fillColor.Set(0FFFFFFFFH);
+			efx.tv.showBorder.Set(TRUE); efx.multiLine.Set(FALSE); efx.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efx.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efx.onEnter.Add(SetValueHandler); efx.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			rightPanel.AddContent(efx);
@@ -1988,7 +1988,7 @@ TYPE
 			label.SetCaption(" Y:"); label.textColor.Set(0000000FFH);
 			leftPanel.AddContent(label);
 			NEW(efy); efy.bounds.SetHeight(20); efy.alignment.Set(WMComponents.AlignTop);
-			efy.tv.showBorder.Set(TRUE); efy.multiLine.Set(FALSE); efy.fillColor.Set(0FFFFFFFFH);
+			efy.tv.showBorder.Set(TRUE); efy.multiLine.Set(FALSE); efy.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efy.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efy.onEnter.Add(SetValueHandler); efy.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			rightPanel.AddContent(efy);
@@ -1997,7 +1997,7 @@ TYPE
 			label.SetCaption(" Width:"); label.textColor.Set(0000000FFH);
 			leftPanel.AddContent(label);
 			NEW(efw); efw.bounds.SetHeight(20); efw.alignment.Set(WMComponents.AlignTop);
-			efw.tv.showBorder.Set(TRUE); efw.multiLine.Set(FALSE); efw.fillColor.Set(0FFFFFFFFH);
+			efw.tv.showBorder.Set(TRUE); efw.multiLine.Set(FALSE); efw.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efw.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efw.onEnter.Add(SetValueHandler); efw.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			rightPanel.AddContent(efw);
@@ -2006,7 +2006,7 @@ TYPE
 			label.SetCaption(" Height:"); label.textColor.Set(0000000FFH);
 			leftPanel.AddContent(label);
 			NEW(efh); efh.bounds.SetHeight(20); efh.alignment.Set(WMComponents.AlignTop);
-			efh.tv.showBorder.Set(TRUE); efh.multiLine.Set(FALSE); efh.fillColor.Set(0FFFFFFFFH);
+			efh.tv.showBorder.Set(TRUE); efh.multiLine.Set(FALSE); efh.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efh.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efh.onEnter.Add(SetValueHandler); efh.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			rightPanel.AddContent(efh);
@@ -2023,7 +2023,7 @@ TYPE
 			label.SetCaption(" Name:"); label.textColor.Set(0000000FFH);
 			leftPanel.AddContent(label);
 			NEW(efn); efn.bounds.SetHeight(20); efn.alignment.Set(WMComponents.AlignTop);
-			efn.tv.showBorder.Set(TRUE); efn.multiLine.Set(FALSE); efn.fillColor.Set(0FFFFFFFFH);
+			efn.tv.showBorder.Set(TRUE); efn.multiLine.Set(FALSE); efn.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efn.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efn.onEnter.Add(SetValueHandler); efn.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			rightPanel.AddContent(efn);
@@ -2032,7 +2032,7 @@ TYPE
 			label.SetCaption(" Style:"); label.textColor.Set(0000000FFH);
 			(* leftPanel.AddContent(label); *)
 			NEW(efs); efs.bounds.SetHeight(20); efs.alignment.Set(WMComponents.AlignTop);
-			efs.tv.showBorder.Set(TRUE); efs.multiLine.Set(FALSE); efs.fillColor.Set(0FFFFFFFFH);
+			efs.tv.showBorder.Set(TRUE); efs.multiLine.Set(FALSE); efs.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efs.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efs.onEnter.Add(SetValueHandler); efs.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			(* rightPanel.AddContent(efs); *)
@@ -2041,7 +2041,7 @@ TYPE
 			label.SetCaption(" TextWrapON:"); label.textColor.Set(0000000FFH);
 			(* leftPanel.AddContent(label); *)
 			NEW(eftw); eftw.bounds.SetHeight(20); eftw.alignment.Set(WMComponents.AlignTop);
-			eftw.tv.showBorder.Set(TRUE); eftw.multiLine.Set(FALSE); eftw.fillColor.Set(0FFFFFFFFH);
+			eftw.tv.showBorder.Set(TRUE); eftw.multiLine.Set(FALSE); eftw.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			eftw.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			eftw.onEnter.Add(SetValueHandler); eftw.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			(* rightPanel.AddContent(eftw);	*)
@@ -2050,7 +2050,7 @@ TYPE
 			label.SetCaption(" TWTop:"); label.textColor.Set(0000000FFH);
 			(* leftPanel.AddContent(label); *)
 			NEW(efwt); efwt.bounds.SetHeight(20); efwt.alignment.Set(WMComponents.AlignTop);
-			efwt.tv.showBorder.Set(TRUE); efwt.multiLine.Set(FALSE); efwt.fillColor.Set(0FFFFFFFFH);
+			efwt.tv.showBorder.Set(TRUE); efwt.multiLine.Set(FALSE); efwt.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efwt.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efwt.onEnter.Add(SetValueHandler); efwt.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			(* rightPanel.AddContent(efwt); *)
@@ -2059,7 +2059,7 @@ TYPE
 			label.SetCaption(" TWBottom:"); label.textColor.Set(0000000FFH);
 			(* leftPanel.AddContent(label); *)
 			NEW(efwb); efwb.bounds.SetHeight(20); efwb.alignment.Set(WMComponents.AlignTop);
-			efwb.tv.showBorder.Set(TRUE); efwb.multiLine.Set(FALSE); efwb.fillColor.Set(0FFFFFFFFH);
+			efwb.tv.showBorder.Set(TRUE); efwb.multiLine.Set(FALSE); efwb.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efwb.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efwb.onEnter.Add(SetValueHandler); efwb.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			(* rightPanel.AddContent(efwb); *)
@@ -2068,7 +2068,7 @@ TYPE
 			label.SetCaption(" TWLeft:"); label.textColor.Set(0000000FFH);
 			(* leftPanel.AddContent(label); *)
 			NEW(efwl); efwl.bounds.SetHeight(20); efwl.alignment.Set(WMComponents.AlignTop);
-			efwl.tv.showBorder.Set(TRUE); efwl.multiLine.Set(FALSE); efwl.fillColor.Set(0FFFFFFFFH);
+			efwl.tv.showBorder.Set(TRUE); efwl.multiLine.Set(FALSE); efwl.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efwl.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efwl.onEnter.Add(SetValueHandler); efwl.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			(* rightPanel.AddContent(efwl); *)
@@ -2077,7 +2077,7 @@ TYPE
 			label.SetCaption(" TWRight:"); label.textColor.Set(0000000FFH);
 			(* leftPanel.AddContent(label); *)
 			NEW(efwr); efwr.bounds.SetHeight(20); efwr.alignment.Set(WMComponents.AlignTop);
-			efwr.tv.showBorder.Set(TRUE); efwr.multiLine.Set(FALSE); efwr.fillColor.Set(0FFFFFFFFH);
+			efwr.tv.showBorder.Set(TRUE); efwr.multiLine.Set(FALSE); efwr.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			efwr.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			efwr.onEnter.Add(SetValueHandler); efwr.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			(* rightPanel.AddContent(efwr); *)
@@ -2106,17 +2106,17 @@ TYPE
 		BEGIN
 			IF ~activeALL THEN
 				rightPanel.takesFocus.Set(TRUE); (* make field NONEDITABLE? *)
-				efx.fillColor.Set(0FFFFFFFFH); efx.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efy.fillColor.Set(0FFFFFFFFH); efy.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efw.fillColor.Set(0FFFFFFFFH); efw.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efh.fillColor.Set(0FFFFFFFFH); efh.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efn.fillColor.Set(0FFFFFFFFH); efn.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efs.fillColor.Set(0FFFFFFFFH); efs.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				eftw.fillColor.Set(0FFFFFFFFH); eftw.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efwt.fillColor.Set(0FFFFFFFFH); efwt.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efwb.fillColor.Set(0FFFFFFFFH); efwb.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efwl.fillColor.Set(0FFFFFFFFH); efwl.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efwr.fillColor.Set(0FFFFFFFFH); efwr.tv.defaultTextBgColor.Set(0FFFFFFFFH);
+				efx.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efx.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efy.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efy.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efw.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efw.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efh.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efh.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efn.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efn.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efs.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efs.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				eftw.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); eftw.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efwt.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efwt.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efwb.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efwb.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efwl.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efwl.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efwr.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efwr.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
 				rightPanel.Invalidate;
 				activeALL := TRUE;
 			END;
@@ -2126,10 +2126,10 @@ TYPE
 		BEGIN
 			IF ~active THEN
 				rightPanel.takesFocus.Set(TRUE); (* make field NONEDITABLE? *)
-				efx.fillColor.Set(0FFFFFFFFH); efx.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efy.fillColor.Set(0FFFFFFFFH); efy.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efw.fillColor.Set(0FFFFFFFFH); efw.tv.defaultTextBgColor.Set(0FFFFFFFFH);
-				efh.fillColor.Set(0FFFFFFFFH); efh.tv.defaultTextBgColor.Set(0FFFFFFFFH);
+				efx.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efx.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efy.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efy.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efw.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efw.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
+				efh.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); efh.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
 (*				efn.fillColor.Set(0BBBBBBFFH); efn.tv.defaultTextBgColor.Set(0BBBBBBFFH);
 				efs.fillColor.Set(0BBBBBBFFH); efs.tv.defaultTextBgColor.Set(0BBBBBBFFH);
 				eftw.fillColor.Set(0BBBBBBFFH); eftw.tv.defaultTextBgColor.Set(0BBBBBBFFH);
@@ -2146,17 +2146,17 @@ TYPE
 		BEGIN
 			IF active OR activeALL THEN
 				rightPanel.takesFocus.Set(FALSE); (* make field EDITABLE? *)
-				efx.fillColor.Set(0BBBBBBFFH); efx.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				efy.fillColor.Set(0BBBBBBFFH); efy.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				efw.fillColor.Set(0BBBBBBFFH); efw.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				efh.fillColor.Set(0BBBBBBFFH); efh.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				efn.fillColor.Set(0BBBBBBFFH); efn.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				efs.fillColor.Set(0BBBBBBFFH); efs.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				eftw.fillColor.Set(0BBBBBBFFH); eftw.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				efwt.fillColor.Set(0BBBBBBFFH); efwt.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				efwb.fillColor.Set(0BBBBBBFFH); efwb.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				efwl.fillColor.Set(0BBBBBBFFH); efwl.tv.defaultTextBgColor.Set(0BBBBBBFFH);
-				efwr.fillColor.Set(0BBBBBBFFH); efwr.tv.defaultTextBgColor.Set(0BBBBBBFFH);
+				efx.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efx.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				efy.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efy.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				efw.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efw.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				efh.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efh.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				efn.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efn.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				efs.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efs.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				eftw.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); eftw.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				efwt.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efwt.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				efwb.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efwb.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				efwl.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efwl.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
+				efwr.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); efwr.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
 				rightPanel.Invalidate;
 				active := FALSE; activeALL := FALSE;
 			END;

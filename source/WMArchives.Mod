@@ -104,7 +104,7 @@ TYPE
 			Init^;
 				(* title *)
 			NEW(label); label.alignment.Set(WMComponents.AlignTop);
-			label.fillColor.Set(0CCCCCCFFH);
+			label.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 			label.SetCaption("Resource Index"); label.bounds.SetHeight(20);
 			SELF.AddContent(label);
 				(* toolbar *)
@@ -565,14 +565,14 @@ TYPE
 		PROCEDURE CreateForm() : WMComponents.VisualComponent;
 		VAR panel : WMStandardComponents.Panel; resizerH : WMStandardComponents.Resizer;
 		BEGIN
-			NEW(panel); panel.alignment.Set(WMComponents.AlignClient); panel.fillColor.Set(0FFFFFFFFH);
+			NEW(panel); panel.alignment.Set(WMComponents.AlignClient); panel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 
 			(* -- topToolbar -- *)
 			NEW(topToolbar); topToolbar.bounds.SetHeight(20); topToolbar.alignment.Set(WMComponents.AlignTop);
 			panel.AddContent(topToolbar);
 
 			NEW(filenameEdit); filenameEdit.alignment.Set(WMComponents.AlignLeft); filenameEdit.multiLine.Set(FALSE);
-			filenameEdit.bounds.SetWidth(200); filenameEdit.fillColor.Set(0FFFFFFFFH); filenameEdit.tv.showBorder.Set(TRUE);
+			filenameEdit.bounds.SetWidth(200); filenameEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); filenameEdit.tv.showBorder.Set(TRUE);
 			filenameEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1)); filenameEdit.onEnter.Add(LoadHandler);
 			filenameEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			topToolbar.AddContent(filenameEdit);
@@ -582,7 +582,7 @@ TYPE
 
 			(* -- statusbar -- *)
 			NEW(statusbar); statusbar.bounds.SetHeight(20); statusbar.alignment.Set(WMComponents.AlignBottom);
-			panel.AddContent(statusbar); statusbar.fillColor.Set(0CCCCCCFFH);
+			panel.AddContent(statusbar); statusbar.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 
 			NEW(statusLabel); statusLabel.bounds.SetWidth(WindowWidth); statusLabel.textColor.Set(0000000FFH); statusLabel.alignment.Set(WMComponents.AlignLeft);
 			statusLabel.caption.SetAOC(" Total -- Folder(s) and -- Byte(s) in -- File(s)");

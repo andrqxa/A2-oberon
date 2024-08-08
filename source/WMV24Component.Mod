@@ -269,7 +269,7 @@ TYPE
 			NEW(w, 128);
 			currentBytes := 0; maxBytes := length;
 
-			NEW(panel); panel.fillColor.Set(0FFFFFFFFH); panel.bounds.SetExtents(300, 60); panel.alignment.Set(WMComponents.AlignClient);
+			NEW(panel); panel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); panel.bounds.SetExtents(300, 60); panel.alignment.Set(WMComponents.AlignClient);
 			AddContent(panel);
 
 			NEW(filenameLabel); filenameLabel.bounds.SetHeight(20); filenameLabel.alignment.Set(WMComponents.AlignTop);
@@ -637,7 +637,7 @@ TYPE
 				IF settings.indicateKeyboardFocus THEN textView.fillColor.Set(00H); END;
 			ELSE
 				FocusLost;
-				IF settings.indicateKeyboardFocus THEN textView.fillColor.Set(0CCCCCCCCH); END;
+				IF settings.indicateKeyboardFocus THEN textView.fillColor.Set(WMGraphics.Color(0CCCCCCCCH)); END;
 			END;
 		END ExtFocus;
 
@@ -646,7 +646,7 @@ TYPE
 		BEGIN
 			NEW(toolbar);
 			toolbar.alignment.Set(WMComponents.AlignTop); toolbar.bounds.SetHeight(20);
-			toolbar.fillColor.Set(0E0E0E0FFH);
+			toolbar.fillColor.Set(WMGraphics.Color(0E0E0E0FFH));
 
 			NEW(label);
 			label.alignment.Set(WMComponents.AlignLeft); label.bounds.SetWidth(50);
@@ -767,7 +767,7 @@ TYPE
 		BEGIN
 			NEW(toolbar);
 			toolbar.alignment.Set(WMComponents.AlignBottom); toolbar.bounds.SetHeight(20);
-			toolbar.fillColor.Set(0E0E0E0FFH);
+			toolbar.fillColor.Set(WMGraphics.Color(0E0E0E0FFH));
 
 			NEW(sendCommandBtn);
 			sendCommandBtn.alignment.Set(WMComponents.AlignLeft); sendCommandBtn.bounds.SetWidth(100);
@@ -800,7 +800,7 @@ TYPE
 		BEGIN
 			NEW(statusBar);
 			statusBar.alignment.Set(WMComponents.AlignBottom); statusBar.bounds.SetHeight(20);
-			statusBar.fillColor.Set(0E0E0E0FFH);
+			statusBar.fillColor.Set(WMGraphics.Color(0E0E0E0FFH));
 
 			NEW(clearStatusBtn);
 			clearStatusBtn.bounds.SetWidth(80); clearStatusBtn.alignment.Set(WMComponents.AlignRight);
@@ -840,7 +840,7 @@ TYPE
 			textView.SetScrollbars(NIL, scrollbarY);
 			textView.SetExtKeyEventHandler(ExtKeyPressed);
 			textView.SetExtFocusHandler(ExtFocus);
-			IF settings.indicateKeyboardFocus THEN textView.fillColor.Set(0CCCCCCCCH); END;
+			IF settings.indicateKeyboardFocus THEN textView.fillColor.Set(WMGraphics.Color(0CCCCCCCCH)); END;
 
 			NEW(searchPanel);
 			searchPanel.alignment.Set(WMComponents.AlignBottom);
@@ -1239,7 +1239,7 @@ TYPE
 				(terminal.transportErrors > 0) THEN
 				terminal.status.fillColor.Set(WMGraphics.Red);
 			ELSE
-				terminal.status.fillColor.Set(0E0E0E0FFH);
+				terminal.status.fillColor.Set(WMGraphics.Color(0E0E0E0FFH));
 			END;
 		END UpdateStatusLabel;
 
@@ -1325,7 +1325,7 @@ TYPE
 		VAR panel : WMStandardComponents.Panel; width, height : SIGNED32;
 		BEGIN
 			GetStartupSize(width, height);
-			NEW(panel); panel.bounds.SetExtents(width, height); panel.fillColor.Set(0FFFFFFFFH); panel.takesFocus.Set(TRUE);
+			NEW(panel); panel.bounds.SetExtents(width, height); panel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); panel.takesFocus.Set(TRUE);
 			NEW(terminal); terminal.alignment.Set(WMComponents.AlignClient);
 			panel.AddContent(terminal);
 			RETURN panel

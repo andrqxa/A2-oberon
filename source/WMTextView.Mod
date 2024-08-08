@@ -4342,7 +4342,7 @@ BEGIN
 	NEW(PTVLineNumberColor, NIL, Strings.NewString("LineNumberColor"), Strings.NewString("Color of line numbers"));
 	PTVLineNumberColor.Set(WMGraphics.Black);
 	NEW(PTVLineNumberBgColor, NIL, Strings.NewString("LineNumberBgColor"), Strings.NewString("Background color of line numbers"));
-	PTVLineNumberBgColor.Set(0CCCCCCFFH);
+	PTVLineNumberBgColor.Set(WMGraphics.Color(0CCCCCCFFH));
 	NEW(PTVHighlighting, NIL, Strings.NewString("Highlighting"), Strings.NewString("Name of highlighting to be applied"));
 	PTVHighlighting.Set(NIL);
 	NEW(PTVclBgCurrentLine, NIL, Strings.NewString("ClBgCurrentLine"), Strings.NewString("Background color of currently edited line"));

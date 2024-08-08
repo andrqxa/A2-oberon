@@ -26,7 +26,6 @@ MODULE WMInspectionComponents; (** AUTHOR "staubesv"; PURPOSE "Components for co
 *)
 
 IMPORT
-	SYSTEM,
 	Modules, Kernel, KernelLog, Strings, Inputs, Files, XML, XMLObjects, Repositories, Types, Models, WMDialogs, WMUtilities,
 	WMMessages, WMWindowManager,
 	WMRectangles, WMGraphics, WMEvents, WMProperties, WMComponents, WMStandardComponents,
@@ -140,7 +139,7 @@ TYPE
 
 			NEW(adrLabel); adrLabel.alignment.Set(WMComponents.AlignLeft);
 			adrLabel.bounds.SetWidth(40);
-			adrLabel.fillColor.Set(0CCCCFFFFH);
+			adrLabel.fillColor.Set(WMGraphics.Color(0CCCCFFFFH));
 			adrLabel.bearing.Set(WMRectangles.MakeRect(2, 0, 2, 0));
 			AddContent(adrLabel);
 			adrLabel.onStartDrag.Add(MyStartDrag);
@@ -160,7 +159,7 @@ TYPE
 				adrLabel.textColor.Set(WMGraphics.White);
 			ELSE
 				adrLabel.caption.SetAOC("NIL");
-				adrLabel.fillColor.Set(0CCCCFFFFH);
+				adrLabel.fillColor.Set(WMGraphics.Color(0CCCCFFFFH));
 				adrLabel.textColor.Set(WMGraphics.Black);
 			END;
 		END UpdateAdrLabel;
@@ -302,14 +301,14 @@ TYPE
 				lastTimestamp := property.GetTimestamp() - 1;
 				IF (info # NIL) & (info^ # "") THEN
 					infoLabel.caption.SetAOC("i");
-					infoLabel.fillColor.Set(0FFFF88FFH);
+					infoLabel.fillColor.Set(WMGraphics.Color(0FFFF88FFH));
 				ELSE
 					infoLabel.caption.SetAOC("");
 					infoLabel.fillColor.Set(0);
 				END;
 				IF name # NIL THEN
 					nameLabel.caption.SetAOC(name^);
-					nameLabel.fillColor.Set(0FFFF88FFH);
+					nameLabel.fillColor.Set(WMGraphics.Color(0FFFF88FFH));
 				ELSE
 					nameLabel.caption.SetAOC("Unnamed");
 					nameLabel.fillColor.Set(0);
@@ -829,7 +828,7 @@ TYPE
 					END;
 				ELSE
 					editor.enabled.Set(FALSE);
-					editor.fillColor.Set(0CCCCCCCCH);
+					editor.fillColor.Set(WMGraphics.Color(0CCCCCCCCH));
 				END;
 			END UpdateState;
 
@@ -1003,7 +1002,7 @@ TYPE
 					END;
 				ELSE
 					editor.enabled.Set(FALSE);
-					editor.fillColor.Set(0CCCCCCCCH);
+					editor.fillColor.Set(WMGraphics.Color(0CCCCCCCCH));
 				END;
 			END UpdateState;
 

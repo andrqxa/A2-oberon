@@ -215,7 +215,7 @@ TYPE
 			label.SetCaption(" LineWidth:"); label.textColor.Set(0000000FFH);
 			leftPanel.AddContent(label);
 			NEW(lineWidthEdit); lineWidthEdit.bounds.SetHeight(20); lineWidthEdit.alignment.Set(WMComponents.AlignTop);
-			lineWidthEdit.tv.showBorder.Set(TRUE); lineWidthEdit.multiLine.Set(FALSE); lineWidthEdit.fillColor.Set(0FFFFFFFFH);
+			lineWidthEdit.tv.showBorder.Set(TRUE); lineWidthEdit.multiLine.Set(FALSE); lineWidthEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			lineWidthEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			lineWidthEdit.onEnter.Add(SetValueHandler); lineWidthEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			Strings.FloatToStr(theCaller.lineWidth, 0, 5, 0, colorString);
@@ -230,7 +230,7 @@ TYPE
 			lineButton := button;
 			container.AddContent(lineButton); button.SetExtPointerDownHandler(LineColorHandler);
 			NEW(lineColorEdit); lineColorEdit.bounds.SetHeight(20); lineColorEdit.alignment.Set(WMComponents.AlignClient);
-			lineColorEdit.tv.showBorder.Set(TRUE); lineColorEdit.multiLine.Set(FALSE); lineColorEdit.fillColor.Set(0FFFFFFFFH);
+			lineColorEdit.tv.showBorder.Set(TRUE); lineColorEdit.multiLine.Set(FALSE); lineColorEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			lineColorEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			lineColorEdit.onEnter.Add(SetValueHandler); lineColorEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			Strings.IntToStr(theCaller.lineColor, colorString);
@@ -246,7 +246,7 @@ TYPE
 			rectButton := button;
 			container.AddContent(rectButton); button.SetExtPointerDownHandler(RectColorHandler);
 			NEW(rectColorEdit); rectColorEdit.bounds.SetHeight(20); rectColorEdit.alignment.Set(WMComponents.AlignClient);
-			rectColorEdit.tv.showBorder.Set(TRUE); rectColorEdit.multiLine.Set(FALSE); rectColorEdit.fillColor.Set(0FFFFFFFFH);
+			rectColorEdit.tv.showBorder.Set(TRUE); rectColorEdit.multiLine.Set(FALSE); rectColorEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			rectColorEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			rectColorEdit.onEnter.Add(SetValueHandler); rectColorEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			Strings.IntToStr(theCaller.rectColor, colorString);
@@ -262,7 +262,7 @@ TYPE
 			rect2Button := button;
 			container.AddContent(rect2Button); button.SetExtPointerDownHandler(RectColor2Handler);
 			NEW(rectColorEdit2); rectColorEdit2.bounds.SetHeight(20); rectColorEdit2.alignment.Set(WMComponents.AlignClient);
-			rectColorEdit2.tv.showBorder.Set(TRUE); rectColorEdit2.multiLine.Set(FALSE); rectColorEdit2.fillColor.Set(0FFFFFFFFH);
+			rectColorEdit2.tv.showBorder.Set(TRUE); rectColorEdit2.multiLine.Set(FALSE); rectColorEdit2.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			rectColorEdit2.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			rectColorEdit2.onEnter.Add(SetValueHandler); rectColorEdit2.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			Strings.IntToStr(theCaller.rectColor2, colorString);
@@ -278,7 +278,7 @@ TYPE
 			modeButton := button;
 			container.AddContent(modeButton); button.SetExtPointerDownHandler(FillModeHandler);
 			NEW(fillModeEdit); fillModeEdit.bounds.SetHeight(20); fillModeEdit.alignment.Set(WMComponents.AlignClient);
-			fillModeEdit.tv.showBorder.Set(TRUE); fillModeEdit.multiLine.Set(FALSE); fillModeEdit.fillColor.Set(0FFFFFFFFH);
+			fillModeEdit.tv.showBorder.Set(TRUE); fillModeEdit.multiLine.Set(FALSE); fillModeEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			fillModeEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			fillModeEdit.onEnter.Add(SetValueHandler); fillModeEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			Strings.IntToStr(theCaller.fillMode, colorString);
@@ -290,7 +290,7 @@ TYPE
 			label.SetCaption(" Horizontal:"); label.textColor.Set(0000000FFH);
 			leftPanel.AddContent(label);
 			NEW(gradHorizEdit); gradHorizEdit.bounds.SetHeight(20); gradHorizEdit.alignment.Set(WMComponents.AlignTop);
-			gradHorizEdit.tv.showBorder.Set(TRUE); gradHorizEdit.multiLine.Set(FALSE); gradHorizEdit.fillColor.Set(0FFFFFFFFH);
+			gradHorizEdit.tv.showBorder.Set(TRUE); gradHorizEdit.multiLine.Set(FALSE); gradHorizEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			gradHorizEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			gradHorizEdit.onEnter.Add(SetValueHandler); gradHorizEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			Strings.BoolToStr(theCaller.gradientHorizontal, colorString);

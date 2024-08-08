@@ -23,10 +23,10 @@ CONST
 	ErrFileNotFound* = 100;
 	ErrNoISOImage* = 101;
 
-	White = 0FFFFFFFFH;
-	Black = 0000000FFH;
-	LightGray = (0C8C8C8FFH);
-	DarkGray = (0A0A0A0FFH);
+	White =     WMGraphics.Color(0FFFFFFFFH);
+	Black =     WMGraphics.Color(0000000FFH);
+	LightGray = WMGraphics.Color(0C8C8C8FFH);
+	DarkGray =  WMGraphics.Color(0A0A0A0FFH);
 
 TYPE
 	String = Strings.String;

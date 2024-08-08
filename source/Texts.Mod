@@ -21,6 +21,7 @@ CONST
 	TraceHard = FALSE;
 
 TYPE
+	Color* = SIGNED32;
 	Char32* = UTF8Strings.Char32;
 	UCS32String* = ARRAY OF Char32;
 	PUCS32String* = POINTER TO UCS32String;
@@ -48,11 +49,11 @@ TYPE
 
 	Attributes* = OBJECT
 	VAR
-		color*, bgcolor* : SIGNED32;
+		color*, bgcolor* : Color;
 		voff* : SIGNED32;
 		fontInfo* : FontInfo;
 
-		PROCEDURE Set* (color, bgcolor, voff : SIGNED32; CONST name : ARRAY OF CHAR; size : SIZE; style : SET);
+		PROCEDURE Set* (color, bgcolor: Color; voff : SIGNED32; CONST name : ARRAY OF CHAR; size : SIZE; style : SET);
 		BEGIN
 			SELF.color := color;
 			SELF.bgcolor := bgcolor;
@@ -141,8 +142,8 @@ TYPE
 
 		scaleHorizontal* : SIGNED32;					(* horizontal character scale *)
 		scaleVertical* : SIGNED32;					(* vertical character scale *)
-		color* : SIGNED32;							(* character color *)
-		bgColor* : SIGNED32;						(* character background color *)
+		color* : Color;							(* character color *)
+		bgColor* : Color;						(* character background color *)
 
 		PROCEDURE &New*;
 		BEGIN
@@ -499,7 +500,8 @@ TYPE
 		piece : Piece;
 		backwards : BOOLEAN;
 		eot- : BOOLEAN;
-		voff-, color-, bgcolor- : SIGNED32;
+		voff-: SIGNED32;
+		color-, bgcolor-: Color;
 		font- : FontInfo;
 		attributes- : Attributes;
 		cstyle- : CharacterStyle;
@@ -1400,7 +1402,7 @@ VAR
 	str: Strings.String;
 	cStyle : CharacterStyle;
 	pStyle : ParagraphStyle;
-	tempReal: FLOAT64; tempInt: SIGNED32; tempRes : INTEGER;
+	tempReal: FLOAT64; tempInt: SIGNED32; tempUInt: UNSIGNED32; tempRes : INTEGER;
 BEGIN
 	NEW(scanner, r);
 	NEW(parser, scanner);
@@ -1429,8 +1431,8 @@ BEGIN
 				str := ptr(XML.Element).GetAttributeValue("font-size"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); cStyle.size := FP1616.FloatToFixp(SHORT(tempReal)); END;
 				str := ptr(XML.Element).GetAttributeValue("leading"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); cStyle.leading := FP1616.FloatToFixp(SHORT(tempReal)); END;
 				str := ptr(XML.Element).GetAttributeValue("baseline-shift"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); cStyle.baselineShift := FP1616.FloatToFixp(SHORT(tempReal)); END;
-				str := ptr(XML.Element).GetAttributeValue("color"); IF str # NIL THEN Strings.HexStrToInt(str^, tempInt, tempRes); cStyle.color := tempInt; END;
-				str := ptr(XML.Element).GetAttributeValue("bgcolor"); IF str # NIL THEN Strings.HexStrToInt(str^, tempInt, tempRes); cStyle.bgColor := tempInt; END;
+				str := ptr(XML.Element).GetAttributeValue("color"); IF str # NIL THEN Strings.HexStrToUInt32(str^, tempUInt, tempRes); cStyle.color := Color(tempUInt); END;
+				str := ptr(XML.Element).GetAttributeValue("bgcolor"); IF str # NIL THEN Strings.HexStrToUInt32(str^, tempUInt, tempRes); cStyle.bgColor := Color(tempUInt); END;
 				str := ptr(XML.Element).GetAttributeValue("tracking"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); cStyle.tracking := FP1616.FloatToFixp(SHORT(tempReal)); END;
 				str := ptr(XML.Element).GetAttributeValue("h-scale"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); cStyle.scaleHorizontal := FP1616.FloatToFixp(SHORT(tempReal)); END;
 				str := ptr(XML.Element).GetAttributeValue("v-scale"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); cStyle.scaleVertical := FP1616.FloatToFixp(SHORT(tempReal)); END;

@@ -74,6 +74,13 @@ TYPE
 			RETURN ElapsedTicks( ) * TicksDivFrequency;
 		END ElapsedReal;
 
+		PROCEDURE ElapsedString*( ): ARRAY 32 OF CHAR;
+		BEGIN
+			VAR t:= ENTIERH( ElapsedTicks( ) * TicksDivFrequency);
+			ToString(t, RESULT);
+			RETURN RESULT;
+		END ElapsedString;
+
 		PROCEDURE ElapsedMilliseconds*( ): Counter;
 		BEGIN
 			RETURN ENTIERH( ElapsedTicks( ) * TicksDivFrequency + 0.5 ) DIV TicksPerMillisecond;

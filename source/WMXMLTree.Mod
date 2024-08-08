@@ -49,7 +49,7 @@ TYPE
 			AddContent(toolbar);
 
 			NEW(label); label.alignment.Set(WMComponents.AlignTop);
-			label.fillColor.Set(0CCCCCCFFH);
+			label.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 			label.caption.SetAOC("XML Structure (alpha)");
 			label.bounds.SetHeight(20);
 			SELF.AddContent(label);
@@ -251,10 +251,10 @@ TYPE
 				errorMsg.visible.Set(showErrorMessage & hasErrors);
 				IF hasErrors THEN errorMsg.tv.firstLine.Set(0);
 					label.caption.SetAOC("XML Structure (ERRORS)");
-					label.fillColor.Set(0FF0000FFH);
+					label.fillColor.Set(WMGraphics.Color(0FF0000FFH));
 				ELSE
 					label.caption.SetAOC("XML Structure");
-					label.fillColor.Set(0CCCCCCFFH);
+					label.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 				END;
 				IF doc # NIL THEN
 					SetDocument(doc.GetRoot())

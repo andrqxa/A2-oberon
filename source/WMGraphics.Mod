@@ -28,6 +28,8 @@ CONST
 	Gold* = SIGNED32(0FFD700FFH);
 
 TYPE
+	Color* = Raster.Color;
+
 	Real* = FLOAT32;
 	Char32* = UTF8Strings.Char32;
 	Point2d* = RECORD x*, y* : SIZE END;
@@ -37,7 +39,6 @@ TYPE
 	END Image;
 
 	Rectangle* = Rectangles.Rectangle;
-	Color* = SIGNED32;
 
 	GlyphSpacings* = RECORD
 		bearing* : Rectangle;
@@ -757,7 +758,7 @@ BEGIN
 	result.l := l; result.t := t; result.r := r; result.b := b; RETURN result
 END MakeRectangle;
 
-PROCEDURE ColorToRGBA*(color : Color; VAR r, g, b, a : SIGNED32);
+PROCEDURE ColorToRGBA*(color : Color; VAR r, g, b, a : Color);
 BEGIN
 	r := (color DIV 1000000H) MOD 100H;
 	g := (color DIV 10000H) MOD 100H;
@@ -765,13 +766,13 @@ BEGIN
 	a :=	color MOD 100H
 END ColorToRGBA;
 
-PROCEDURE RGBAToColor*(r, g, b, a: SIGNED32): Color;
+PROCEDURE RGBAToColor*(r, g, b, a: Color): Color;
 BEGIN
 	RETURN r * 1000000H + g * 10000H + b * 100H + a
 END RGBAToColor;
 
-PROCEDURE RGBtoHSL*(r, g, b: SIGNED32; VAR h, s, l: SIGNED32);
-VAR delta, maxC, minC, HL: SIGNED32;
+PROCEDURE RGBtoHSL*(r, g, b: Color; VAR h, s, l: Color);
+VAR delta, maxC, minC, HL: Color;
 BEGIN
 	h := 0; s := 0;
 	maxC := MAX(r, MAX(g, b));
@@ -789,8 +790,8 @@ BEGIN
 	END;
 END RGBtoHSL;
 
-PROCEDURE HSLtoRGB*(h, s, l: SIGNED32; VAR r, g, b: SIGNED32);
-VAR v, vsf, m, m1, m2: SIGNED32;
+PROCEDURE HSLtoRGB*(h, s, l: Color; VAR r, g, b: Color);
+VAR v, vsf, m, m1, m2: Color;
 BEGIN
 	r := 0; g := 0; b := 0;
 	v := l * (256 + s) DIV 256 IF l <= 127 ELSE l + s - l * s DIV 255;
@@ -812,8 +813,8 @@ BEGIN
 	END;
 END HSLtoRGB;
 
-PROCEDURE ComplementaryRGB*(r, g, b: SIGNED32; VAR R, G, B: SIGNED32);
-VAR h, s, l: SIGNED32;
+PROCEDURE ComplementaryRGB*(r, g, b: Color; VAR R, G, B: Color);
+VAR h, s, l: Color;
 BEGIN
   RGBtoHSL(r, g, b, h, s, l);
   h := h + 128;
@@ -821,8 +822,8 @@ BEGIN
   HSLtoRGB(h, s, l, R, G, B);
 END ComplementaryRGB;
 
-PROCEDURE DominantRGB*(r, g, b: SIGNED32; VAR R, G, B: SIGNED32);
-VAR maxValue: SIGNED32;
+PROCEDURE DominantRGB*(r, g, b: Color; VAR R, G, B: Color);
+VAR maxValue: Color;
 BEGIN
 	maxValue := MAX(r, MAX(b, g));
 	IF r = maxValue THEN
@@ -843,8 +844,8 @@ BEGIN
 	B := b;
 END DominantRGB;
 
-PROCEDURE ChangeBrightnessHSL*(r, g, b: SIGNED32; VAR R, G, B: SIGNED32; amount: SIGNED32);
-VAR h, s, l: SIGNED32;
+PROCEDURE ChangeBrightnessHSL*(r, g, b: Color; VAR R, G, B: Color; amount: SIGNED32);
+VAR h, s, l: Color;
 BEGIN
   RGBtoHSL(r, g, b, h, s, l);
   l := l + amount;
@@ -859,7 +860,7 @@ BEGIN
 	c := 100H * c + MAX(0, (color DIV 10000H) MOD 100H - 40H);
 	c := 100H * c +MAX(0, (color DIV 100H) MOD 100H-40H);
 	c := 100H * c + color MOD 100H;
-	RETURN SIGNED32(c);
+	RETURN c;
 END Dark;
 
 PROCEDURE Light*(color:Color):Color;
@@ -869,7 +870,7 @@ BEGIN
 	c := 100H * c + MIN(0FFH, (color DIV 10000H) MOD 100H + 40H);
 	c := 100H * c +MIN(0FFH, (color DIV 100H) MOD 100H + 40H);
 	c := 100H * c + color MOD 100H;
-	RETURN SIGNED32(c);
+	RETURN c;
 END Light;
 
 PROCEDURE CheckImage(obj: ANY; VAR cont: BOOLEAN);

@@ -99,7 +99,7 @@ TYPE
 			NEW(onRefresh, SELF, NIL, NIL, NIL); events.Add(onRefresh);
 
 			NEW(label); label.alignment.Set(WMComponents.AlignTop);
-			label.fillColor.Set(0CCCCCCFFH);
+			label.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 			label.SetCaption(""); label.bounds.SetHeight(20);
 			SELF.AddContent(label);
 
@@ -108,7 +108,7 @@ TYPE
 			SELF.AddContent(toolbar);
 
 			NEW(treeView); treeView.alignment.Set(WMComponents.AlignClient);
-			treeView.clSelected.Set(0B0B0FFA0H);
+			treeView.clSelected.Set(WMGraphics.Color(0B0B0FFA0H));
 			treeView.SetFont(FontPlain);
 			SELF.AddContent(treeView);
 

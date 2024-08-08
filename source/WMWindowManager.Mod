@@ -87,7 +87,8 @@ TYPE
 		buttonAlignedToTop*, buttonAlignedToLeft* : BOOLEAN;
 
 		(** Window title position and color (a = active, i = inactive) *)
-		atextX*, atextY*, atextColor*, itextX*, itextY*, itextColor* : SIGNED32;
+		atextX*, atextY*, itextX*, itextY* : SIGNED32;
+		atextColor*, itextColor* : Graphics.Color;;
 
 		bgColor*, fgColor*, selectCol*, desktopColor* : Graphics.Color;
 

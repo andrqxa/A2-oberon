@@ -56,14 +56,14 @@ TYPE
 			SetTitle(Strings.NewString("Hobbes' Chinese Tool"));
 
 			NEW(mainPanel); mainPanel.bounds.SetExtents(800, 600);
-			mainPanel.fillColor.Set(0FFFFFFFFH);
+			mainPanel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 
 			NEW(toolbar); toolbar.bounds.SetHeight(30); toolbar.alignment.Set(WMComponents.AlignTop); mainPanel.AddContent(toolbar);
 			NEW(infobar); infobar.bounds.SetHeight(256); infobar.alignment.Set(WMComponents.AlignTop); mainPanel.AddContent(infobar);
 
 			(* information elements *)
 			NEW(paintBox); paintBox.bounds.SetWidth(256); paintBox.alignment.Set(WMComponents.AlignLeft); infobar.AddContent(paintBox);
-			paintBox.fillColor.Set(0FFFFFFFFH); paintBox.SetExtDrawHandler(PaintCharacter);
+			paintBox.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); paintBox.SetExtDrawHandler(PaintCharacter);
 			bigFont := WMGraphics.GetFont("Single", 256, {});
 			IF bigFont IS WMCCGFonts.Font THEN fontinfo := bigFont(WMCCGFonts.Font).gf END;
 			bigFont := WMGraphics.GetFont("Cyberbit", 256, {});

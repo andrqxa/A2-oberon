@@ -43,7 +43,7 @@ TYPE
 		name : ARRAY 128 OF CHAR;
 		deltaSizeMode : SIGNED32; (* Interpretation of deltasize field: Absolute, IncrementBy, DecrementBy *)
 		deltaSize : SIGNED32;
-		fgColor, bgColor : SIGNED32;
+		fgColor, bgColor : WMGraphics.Color;
 		style : SET;
 
 		PROCEDURE &Init*;
@@ -120,12 +120,12 @@ TYPE
 			(* style edit *)
 			NEW(toolbar); toolbar.bounds.SetHeight(20); toolbar.alignment.Set(WMComponents.AlignTop);
 			panel.AddContent(toolbar);
-			NEW(more); more.caption.SetAOC("More"); AB(toolbar, more); more.clDefault.Set(0CC000080H);
-			NEW(edit); edit.caption.SetAOC("Edit"); AB(toolbar, edit); edit.clDefault.Set(0CC000080H); edit.visible.Set(FALSE);
+			NEW(more); more.caption.SetAOC("More"); AB(toolbar, more); more.clDefault.Set(WMGraphics.Color(0CC000080H));
+			NEW(edit); edit.caption.SetAOC("Edit"); AB(toolbar, edit); edit.clDefault.Set(WMGraphics.Color(0CC000080H)); edit.visible.Set(FALSE);
 
 			(* List *)
 			NEW(cList); cList.alignment.Set(WMComponents.AlignClient);
-			cList.onClick.Add(SetStyleFromList); cList.clCell.Set(0FFFFFFCCH); cList.clHover.Set(0FFFF00CCH);
+			cList.onClick.Add(SetStyleFromList); cList.clCell.Set(WMGraphics.Color(0FFFFFFCCH)); cList.clHover.Set(WMGraphics.Color(0FFFF00CCH));
 			cList.model.Acquire;
 			cList.model.SetNofCols(1);
 			cList.model.SetNofRows(1);
@@ -382,9 +382,9 @@ TYPE
 
 			PROCEDURE AE(panel : WMStandardComponents.Panel; edtr : WMEditors.Editor);
 			BEGIN
-				edtr.alignment.Set(WMComponents.AlignClient); edtr.multiLine.Set(FALSE); edtr.fillColor.Set(0FFFFFF88H); edtr.tv.showBorder.Set(TRUE);
+				edtr.alignment.Set(WMComponents.AlignClient); edtr.multiLine.Set(FALSE); edtr.fillColor.Set(WMGraphics.Color(0FFFFFF88H)); edtr.tv.showBorder.Set(TRUE);
 				edtr.tv.textAlignV.Set(WMGraphics.AlignCenter);
-				edtr.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1)); edtr.tv.defaultTextBgColor.Set(0FFFFFF88H);
+				edtr.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1)); edtr.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFF88H));
 				panel.AddContent(edtr)
 			END AE;
 
@@ -401,8 +401,8 @@ TYPE
 			(* Get/Apply *)
 			NEW(toolbar); toolbar.bounds.SetHeight(20); toolbar.alignment.Set(WMComponents.AlignTop);
 			panel.AddContent(toolbar);
-			NEW(get); get.caption.SetAOC("Get"); AB(toolbar, get); get.clDefault.Set(088000088H);
-			NEW(apply); apply.caption.SetAOC("Apply"); AB(toolbar, apply); apply.clDefault.Set(088000088H);
+			NEW(get); get.caption.SetAOC("Get"); AB(toolbar, get); get.clDefault.Set(WMGraphics.Color(088000088H));
+			NEW(apply); apply.caption.SetAOC("Apply"); AB(toolbar, apply); apply.clDefault.Set(WMGraphics.Color(088000088H));
 
 			NEW(toolbar); toolbar.bounds.SetHeight(20); toolbar.alignment.Set(WMComponents.AlignTop);
 			panel.AddContent(toolbar);
@@ -675,7 +675,7 @@ TYPE
 			VAR editor: WMEditors.Editor;
 			BEGIN
 				NEW(editor); editor.alignment.Set(WMComponents.AlignClient);
-				editor.multiLine.Set(FALSE); editor.fillColor.Set(0FFFFFFFFH); editor.tv.showBorder.Set(TRUE);
+				editor.multiLine.Set(FALSE); editor.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); editor.tv.showBorder.Set(TRUE);
 				editor.tv.textAlignV.Set(WMGraphics.AlignCenter);
 				editor.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1)); editor.onEnter.Add(UpdateValueHandler);
 				RETURN editor
@@ -700,7 +700,7 @@ TYPE
 			mainPanel.takesFocus.Set(TRUE);
 
 			(* -- tabs -- *)
-			NEW(tabPanel); tabPanel.bounds.SetHeight(20); tabPanel.fillColor.Set(0CCCCCCFFH);
+			NEW(tabPanel); tabPanel.bounds.SetHeight(20); tabPanel.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 			tabPanel.alignment.Set(WMComponents.AlignTop);
 			NEW(pstyleButton); pstyleButton.caption.SetAOC("Paragraph"); pstyleButton.alignment.Set(WMComponents.AlignLeft);
 			pstyleButton.onClick.Add(TabHandler); pstyleButton.clDefault.Set(tabSelectedColor);
@@ -715,7 +715,7 @@ TYPE
 			pstylePanel.visible.Set(FALSE);
 			mainPanel.AddContent(pstylePanel);
 			NEW(gridPanel); gridPanel.alignment.Set(WMComponents.AlignClient);
-			gridPanel.fillColor.Set(0FFFFFFFFH);
+			gridPanel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			NEW(pList); pList.alignment.Set(WMComponents.AlignClient);
 			pList.onClick.Add(PClickSelected);
 			pList.model.Acquire;
@@ -774,7 +774,7 @@ TYPE
 			propertyPanel.AddContent(panel);
 
 			(* -- paragraph panel buttons -- *)
-			NEW(buttonPanel); buttonPanel.bounds.SetHeight(20); buttonPanel.fillColor.Set(08888FFFFH);
+			NEW(buttonPanel); buttonPanel.bounds.SetHeight(20); buttonPanel.fillColor.Set(WMGraphics.Color(08888FFFFH));
 			buttonPanel.alignment.Set(WMComponents.AlignBottom);
 
 			NEW(button); button.caption.SetAOC("Apply"); button.alignment.Set(WMComponents.AlignRight);
@@ -801,7 +801,7 @@ TYPE
 			cstylePanel.visible.Set(TRUE);
 			mainPanel.AddContent(cstylePanel);
 			NEW(gridPanel); gridPanel.bounds.SetWidth(200); gridPanel.alignment.Set(WMComponents.AlignLeft);
-			gridPanel.fillColor.Set(0FFFFFFFFH);
+			gridPanel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			NEW(cList); cList.alignment.Set(WMComponents.AlignClient);
 			cList.onClick.Add(CClickSelected);
 			cList.model.Acquire;
@@ -889,12 +889,12 @@ TYPE
 			(* preview panel *)
 			NEW(panel); panel.bounds.SetHeight(15); panel.alignment.Set(WMComponents.AlignTop); propertyPanel.AddContent(panel);
 			NEW(groupPanel); groupPanel.alignment.Set(WMComponents.AlignTop); groupPanel.caption.SetAOC("Preview:"); groupPanel.bounds.SetHeight(80);
-			NEW(previewLabel); previewLabel.fillColor.Set(0FFFFFFFFH); previewLabel.alignment.Set(WMComponents.AlignClient);
+			NEW(previewLabel); previewLabel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); previewLabel.alignment.Set(WMComponents.AlignClient);
 			previewLabel.caption.SetAOC("The quick brown Fox jumped over the lazy Dog"); previewLabel.alignH.Set(1); previewLabel.alignV.Set(1);
 			groupPanel.AddContent(previewLabel); propertyPanel.AddContent(groupPanel);
 			NEW(fontNotFound); fontNotFound.bounds.SetHeight(20); fontNotFound.alignment.Set(WMComponents.AlignTop);
 			fontNotFound.caption.SetAOC("  ERROR: Font not found! - using DefaultFont"); fontNotFound.visible.Set(FALSE);
-			propertyPanel.AddContent(fontNotFound); fontNotFound.textColor.Set(0FF0000FFH);
+			propertyPanel.AddContent(fontNotFound); fontNotFound.textColor.Set(WMGraphics.Color(0FF0000FFH));
 
 			(* -- character style buttons -- *)
 			NEW(buttonPanel); buttonPanel.bounds.SetHeight(20); buttonPanel.fillColor.Set(windowStyle.bgColor);
@@ -1793,7 +1793,7 @@ VAR
 	ctxAlignLeft, ctxAlignCenter, ctxAlignRight, ctxAlignJustified : ContextMenuData;
 	ctxRegular, ctxBold, ctxItalic, ctxBoldItalic : ContextMenuData;
 
-PROCEDURE CreateStyleName(CONST fontname : ARRAY OF CHAR; style : SET; size : SIZE; fgColor, bgColor : SIGNED32; VAR name : ARRAY OF CHAR);
+PROCEDURE CreateStyleName(CONST fontname : ARRAY OF CHAR; style : SET; size : SIZE; fgColor, bgColor : WMGraphics.Color; VAR name : ARRAY OF CHAR);
 VAR string : ARRAY 32 OF CHAR; styleInt : SIGNED32;
 BEGIN
 	(* create AdHoc Name *)

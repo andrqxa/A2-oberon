@@ -35,7 +35,7 @@ VAR
 
 	intensityBuffer, thresholdBuffer : POINTER TO ARRAY OF CHAR;
 
-	PROCEDURE RGBToYUVReal(r, g, b : SIGNED32; VAR y, u, v : SIGNED32);
+	PROCEDURE RGBToYUVReal(r, g, b : WMGraphics.Color; VAR y, u, v : WMGraphics.Color);
 	BEGIN
 		y := ENTIER(0.299 * r + 0.587 * g + 0.114 * b);
 		u := ENTIER(128  - 0.16874 * r - 0.33126 * g + 0.5 * b);
@@ -115,9 +115,9 @@ BEGIN
 END Transform;
 
 PROCEDURE SearchHVLines(buffer : Raster.Image);
-VAR x, y : SIZE; tr, tg, tb, ta : SIGNED32;
-	sum : SIGNED32;
-	hArray, vArray : ARRAY 2048 OF SIGNED32;
+VAR x, y : SIZE; tr, tg, tb, ta : WMGraphics.Color;
+	sum : WMGraphics.Color;
+	hArray, vArray : ARRAY 2048 OF WMGraphics.Color;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 BEGIN
@@ -143,7 +143,7 @@ BEGIN
 END SearchHVLines;
 
 PROCEDURE IsEmptyField(buffer : Raster.Image; x, y , w, h : SIZE) : BOOLEAN;
-VAR i, j : SIZE; tr, tg, tb, ta : SIGNED32;
+VAR i, j : SIZE; tr, tg, tb, ta : WMGraphics.Color;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 	nonEmpty : SIGNED32;
@@ -162,11 +162,11 @@ BEGIN
 	RETURN nonEmpty < 8*w*h DIV 100;
 END IsEmptyField;
 
-PROCEDURE Dist(buffer : Raster.Image; x0, y0, x1, y1, w, h : SIZE) : SIGNED32;
-VAR i, j : SIZE; tr, tg, tb, ta, s0, s1 : SIGNED32;
+PROCEDURE Dist(buffer : Raster.Image; x0, y0, x1, y1, w, h : SIZE) : WMGraphics.Color;
+VAR i, j : SIZE; tr, tg, tb, ta, s0, s1 : WMGraphics.Color;;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
-	sum : SIGNED32;
+	sum : WMGraphics.Color;
 BEGIN
 	Raster.InitMode(mode, Raster.srcCopy);
 	sum := 0;
@@ -190,16 +190,16 @@ VAR i, j, x, y, w, h : SIZE;
 		nofFields : SIGNED8;
 		fields : ARRAY 81 OF SIGNED8;
 	END;
-	distance, dist : ARRAY 81, 81 OF SIGNED32;
+	distance, dist : ARRAY 81, 81 OF WMGraphics.Color;
 
-	PROCEDURE SetDist(a, b : SIZE; d : SIGNED32);
+	PROCEDURE SetDist(a, b : SIZE; d : WMGraphics.Color);
 	BEGIN
 		IF a < b THEN dist[a, b] := d
 		ELSE dist[b, a] := d
 		END
 	END SetDist;
 
-	PROCEDURE GetDist(a, b : SIZE) : SIGNED32;
+	PROCEDURE GetDist(a, b : SIZE) : WMGraphics.Color;
 	BEGIN
 		IF a < b THEN RETURN dist[a, b]
 		ELSE RETURN dist[b, a]
@@ -207,7 +207,7 @@ VAR i, j, x, y, w, h : SIZE;
 	END GetDist;
 
 	PROCEDURE GetSmallest(VAR maxi, maxj : SIZE);
-	VAR max : SIGNED32;
+	VAR max : WMGraphics.Color;
 		first : BOOLEAN;
 	BEGIN
 		first := TRUE;
@@ -277,8 +277,8 @@ END CheckFields;
 PROCEDURE BinaryLabler*(buffer : Raster.Image; VAR labelBuffer, equivalence : ARRAY OF SIGNED16; colorThreshold, pixelThreshold, maxLabels : SIGNED32;
 	VAR labelInfo : ARRAY OF LabelInfo;
 	unifyLabels : BOOLEAN; VAR nofFLabels : SIGNED32; VAR res : INTEGER);
-VAR i, x, y, w, h: SIZE; color: SIGNED32;
-	tr, tg, tb, ta  : SIGNED32;
+VAR i, x, y, w, h: SIZE; color: WMGraphics.Color;
+	tr, tg, tb, ta  : WMGraphics.Color;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 	nofLabels : SIGNED16;
@@ -649,7 +649,7 @@ END Label2;
 
 PROCEDURE YUVFilter(buffer : Raster.Image);
 VAR x, y, w , h : SIZE;
-	tr, tg, tb, ta, cy, cu, cv : SIGNED32;
+	tr, tg, tb, ta, cy, cu, cv : WMGraphics.Color;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 BEGIN
@@ -674,7 +674,7 @@ END SetYUVFilter;
 
 PROCEDURE BWFilter(buffer : Raster.Image);
 VAR x, y, w , h : SIZE;
-	tr, tg, tb, ta, cy, cu, cv : SIGNED32;
+	tr, tg, tb, ta, cy, cu, cv : WMGraphics.Color;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 BEGIN
@@ -698,7 +698,7 @@ END SetBWFilter;
 
 PROCEDURE RedDotFilter(buffer : Raster.Image);
 VAR x, y, w , h : SIZE;
-	tr, tg, tb, ta : SIGNED32;
+	tr, tg, tb, ta : WMGraphics.Color;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 BEGIN
@@ -722,10 +722,10 @@ END SetRedDotFilter;
 
 PROCEDURE ThresholdFilter(buffer : Raster.Image);
 VAR x, y, w , h : SIZE;
-	sum, lastsum, tr, tg, tb, ta : SIGNED32;
+	sum, lastsum, tr, tg, tb, ta : WMGraphics.Color;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
-	tresh : SIGNED32;
+	tresh : WMGraphics.Color;
 	darkMode : BOOLEAN;
 BEGIN
 	Raster.InitMode(mode, Raster.srcCopy);

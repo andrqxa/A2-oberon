@@ -103,7 +103,7 @@ TYPE
 				IF verbose THEN KernelLog.String("done."); KernelLog.Ln(); END;
 			END;
 			IF (rc = NIL) OR (rc.reader = NIL) OR (img = NIL) THEN
-				fillColor.Set(0FFFFFFFFH);
+				fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 				IF (x < 0) OR (y < 0) THEN
 					x := 15;
 					y := 15;

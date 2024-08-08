@@ -1122,7 +1122,7 @@ TYPE
 
 			NEW(resizerH);
 			resizerH.bounds.SetWidth(5); resizerH.alignment.Set(WMComponents.AlignRight);
-			resizerH.fillColor.Set(0808080FFH);
+			resizerH.fillColor.Set(WMGraphics.Color(0808080FFH));
 			treePanel.AddContent(resizerH);
 
 			(* add a tree component *)

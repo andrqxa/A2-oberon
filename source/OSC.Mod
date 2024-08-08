@@ -385,15 +385,27 @@ OSCBundle b:
 		END OSCParamChar;
 
 		(* 32bit RGBA color: OSC Type Tag 'r' *)
-		OSCParamRGBAColor* = OBJECT(OSCParamAbsInteger);
+		OSCParamRGBAColor* = OBJECT(OSCParamObject)
+			VAR
+				color: WMGraphics.Color;
 			PROCEDURE &InitRGBAColor*(c: WMGraphics.Color);
 			BEGIN
 				tag := 'r';
-				integer := c;
+				color := c;
 			END InitRGBAColor;
+
+			PROCEDURE GetSize*(): SIZE;
+			BEGIN
+				RETURN 4;
+			END GetSize;
+			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
+			BEGIN
+				Network.PutNet4(packet, pos, SIGNED32(color));
+				INC(pos, 4);
+			END export;
 			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
-				indentDump(indent); KernelLog.String('OSCParamRGBAColor { '); KernelLog.Int(integer, 4); KernelLog.String(' }'); KernelLog.Ln;
+				indentDump(indent); KernelLog.String('OSCParamRGBAColor { '); KernelLog.UInt(color, 4); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
 		END OSCParamRGBAColor;
 
