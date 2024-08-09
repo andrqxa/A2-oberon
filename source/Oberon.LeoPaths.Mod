@@ -393,7 +393,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 					Files.WriteReal(msg.R, p.x); Files.WriteReal(msg.R, p.y);
 					Gadgets.WriteRef(msg.R, p.lib, p.link)
 				ELSIF msg.id = Objects.load THEN
-					pos := Files.Pos(msg.R);
+					pos := Files.Pos(msg.R)(SIGNED32);
 					Files.ReadNum(msg.R, ver);
 					IF ver = 1 THEN	(* old style point *)
 						Files.ReadReal(msg.R, p.x); Files.ReadReal(msg.R, p.y)

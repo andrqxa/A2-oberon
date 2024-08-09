@@ -2157,7 +2157,7 @@ BEGIN
 	END;
 
 	Texts.WriteString(W, " and OpTabLen = "); Texts.WriteInt(W, OpTabN, 0); Texts.WriteLn(W);
-	Texts.WriteInt(W, Files.Pos(r),1); Texts.WriteLn(W);
+	Texts.WriteInt(W, Files.Pos(r)(SIGNED32),1); Texts.WriteLn(W);
 	Files.WriteInt(r, OpTabN);
 	FOR i:= 0 TO OpTabN-1 DO
 		Files.WriteInt(r, OpTab[i].op[0]); Files.WriteInt(r, OpTab[i].op[1]); Files.WriteInt(r, OpTab[i].op[2]);

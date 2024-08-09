@@ -214,7 +214,7 @@ END CheckFile;
 (** Read BMP file.  colorConversion indicates if the BMP file palette and contents should be converted to
 the current physical palette. Color matching is done by euclidean distance *)
 PROCEDURE LoadBmp* (VAR R: Files.Rider; colorConversion: BOOLEAN; pict: Pictures.Picture);
-VAR F: Files.File; pos: SIGNED32; fHeader: FileHeader; bHeader: BitmapHeader;
+VAR F: Files.File; pos: Files.Position; fHeader: FileHeader; bHeader: BitmapHeader;
 BEGIN
 	pos := Files.Pos(R); F := Files.Base(R);
 	ScanFileHeader(R, fHeader);
@@ -244,7 +244,7 @@ BEGIN
 END LoadBmp;
 
 PROCEDURE Handle* (obj: Objects.Object; VAR M: Objects.ObjMsg);
-	VAR pos: SIGNED32;
+	VAR pos: Files.Position;
 BEGIN
 	WITH obj: Pictures.Picture DO
 		IF M IS Objects.AttrMsg THEN
@@ -257,7 +257,7 @@ BEGIN
 			WITH M: Objects.FileMsg DO
 				IF (M.id = Objects.load) THEN
 					error := FALSE;  pos := Files.Pos(M.R); LoadBmp(M.R, FALSE, obj); (* LoadBmp; TRUE -> FALSE, fof 030904 *)
-					IF error THEN M.len := 0 ELSE M.len := Files.Pos(M.R) - pos END
+					IF error THEN M.len := 0 ELSE M.len := (Files.Pos(M.R) - pos)(SIGNED32) END
 				ELSE
 					Pictures.Handle(obj, M)
 				END

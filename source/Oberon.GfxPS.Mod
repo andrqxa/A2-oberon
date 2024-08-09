@@ -1982,7 +1982,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 			Str(psc.out, "showpage"); Ln(psc.out);
 			Str(psc.out, "restore"); Ln(psc.out);
 			Str(psc.out, "%%PageTrailer"); Ln(psc.out);
-			psc.fileLen := Files.Pos(psc.out);
+			psc.fileLen := Files.Pos(psc.out)(SIGNED32);
 			Str(psc.out, "%%Page: "); Int(psc.out, psc.pages); Blank(psc.out); Int(psc.out, psc.pages+1); Ln(psc.out);
 			Str(psc.out, "save"); Ln(psc.out);
 			Str(psc.out, "gs"); Ln(psc.out);
@@ -2017,7 +2017,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 			Str(psc.out, "%%EndComments"); Ln(psc.out);
 			Prolog(psc.out);
 			Setup(psc);
-			IF psc.eps THEN psc.fileLen := Files.Length(Files.Base(src)) END;
+			IF psc.eps THEN psc.fileLen := Files.Length(Files.Base(src))(SIGNED32) END;
 			WHILE psc.fileLen >= bufSize DO
 				Files.ReadBytes(src, buf, bufSize);
 				Files.WriteBytes(psc.out, buf, bufSize);

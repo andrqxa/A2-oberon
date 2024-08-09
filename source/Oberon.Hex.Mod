@@ -802,7 +802,7 @@ BEGIN
 END LoadDoc;
 
 PROCEDURE StoreDoc (D: Documents.Document);
-VAR main: Frame; rR: Texts.Reader; wR: Files.Rider; F: Files.File; i: SIGNED16;
+VAR main: Frame; rR: Texts.Reader; wR: Files.Rider; F: Files.File; i: INTEGER;
 		new: ARRAY 128 OF CHAR; ch: CHAR; M: StoreMsg;
 BEGIN
 	main := D.dsc(Frame);

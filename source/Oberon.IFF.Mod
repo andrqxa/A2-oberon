@@ -97,7 +97,7 @@ VAR
 	type: ChunkId;
 	c,k,z: SIGNED8;
 	line: POINTER TO ARRAY OF CHAR;
-	start,bpos,cpos,hpos,size: SIGNED32;
+	start,bpos,cpos,hpos,size: Files.Position;
 	p,w,h,x,y,cols,rep,cnt: SIGNED16;
 BEGIN
 	start:= Files.Pos(R);
@@ -182,7 +182,7 @@ END LoadIFF;
 
 PROCEDURE Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg);
 VAR
-	pos: SIGNED32;
+	pos: Files.Position;
 BEGIN
 	WITH obj: Pictures.Picture DO
 		IF msg IS Objects.AttrMsg THEN
@@ -195,7 +195,7 @@ BEGIN
 			WITH msg: Objects.FileMsg DO
 				IF (msg.id = Objects.load) THEN
 					pos:= Files.Pos(msg.R);
-					LoadIFF(msg.R,14,TRUE,obj); msg.len:= Files.Pos(msg.R) - pos;
+					LoadIFF(msg.R,14,TRUE,obj); msg.len:= (Files.Pos(msg.R) - pos)(SIGNED32);
 				ELSE
 					Pictures.Handle(obj,msg)
 				END;

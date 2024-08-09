@@ -52,7 +52,7 @@ END ReadFile;
 
 PROCEDURE PosFile(VAR R: Rider): SIGNED32;
 BEGIN
-	RETURN(Files.Pos(R.rider));
+	RETURN(Files.Pos(R.rider))(SIGNED32);
 END PosFile;
 
 PROCEDURE SetFile(VAR R: Rider; pos: SIGNED32);
@@ -78,7 +78,7 @@ END SetText;
 
 (* End of Rider Methods *)
 
-PROCEDURE OpenRider(VAR FR: Files.Rider; VAR R: Rider; pos: SIGNED32);
+PROCEDURE OpenRider(VAR FR: Files.Rider; VAR R: Rider; pos: Files.Position);
 	(* initialize a Rider. Supported are Oberon Texts and DOS/UNIX Files *)
 VAR
 	c: CHAR;
@@ -96,7 +96,7 @@ BEGIN
 	IF (c = Texts.TextBlockId) THEN
 		NEW(R.text); Texts.Load(R.text,Files.Base(FR),pos+1,len);
 		Texts.OpenReader(R.reader,R.text,0);
-		R.ofs:= pos; R.eof:= R.reader.eot;
+		R.ofs:= pos(SIGNED32); R.eof:= R.reader.eot;
 		R.Read:= ReadText; R.Pos:= PosText; R.Set:= SetText;
 	ELSE
 		Files.Set(R.rider,Files.Base(FR),pos); R.eof:= R.rider.eof;
@@ -351,7 +351,7 @@ END LoadPPM;
 PROCEDURE Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg);
 VAR
 	R: Rider;
-	pos: SIGNED32;
+	pos: Files.Position;
 BEGIN
 	WITH obj: Pictures.Picture DO
 		IF msg IS Objects.AttrMsg THEN
@@ -364,7 +364,7 @@ BEGIN
 			WITH msg: Objects.FileMsg DO
 				IF (msg.id = Objects.load) THEN
 					pos:= Files.Pos(msg.R); OpenRider(msg.R,R,pos);
-					LoadPPM(R,14,TRUE,obj); msg.len:= R.Pos(R) - pos;
+					LoadPPM(R,14,TRUE,obj); msg.len:= (R.Pos(R) - pos)(SIGNED32);
 				ELSE
 					Pictures.Handle(obj,msg)
 				END;

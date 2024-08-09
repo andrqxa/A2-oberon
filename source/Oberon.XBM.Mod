@@ -181,7 +181,7 @@ MODULE XBM IN Oberon; (** portable *)	(* ejz  *)
 				WITH M: Objects.FileMsg DO
 					IF M.id = Objects.load THEN
 						obj.depth := 0;  R := M.R; Load(M.R, obj);
-						IF obj.depth = 0 THEN M.len := 0 ELSE M.len := Files.Pos(M.R) - Files.Pos(R) END
+						IF obj.depth = 0 THEN M.len := 0 ELSE M.len := (Files.Pos(M.R) - Files.Pos(R))(SIGNED32) END
 					ELSE
 						Pictures.Handle(obj, M)
 					END

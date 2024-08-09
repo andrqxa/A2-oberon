@@ -119,7 +119,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			beg, end, time, len: SIGNED32;
 
 		PROCEDURE Backup (VAR name: ARRAY OF CHAR);
-			VAR res, i: SIGNED16; bak: ARRAY 32 OF CHAR;
+			VAR res, i: INTEGER; bak: ARRAY 32 OF CHAR;
 		BEGIN i := 0;
 			WHILE name[i] # 0X DO bak[i] := name[i]; INC(i) END;
 			bak[i] := "."; bak[i+1] := "B"; bak[i+2] := "a"; bak[i+3] := "k"; bak[i+4] := 0X;

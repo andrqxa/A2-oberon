@@ -1170,7 +1170,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 					DEC(cY, CH); DEC(cT, CH);
 				ELSE
 					PrinterStripe(ORD(ch));
-					cY := PH - CH ; cT := PH; spool.actPos := Files.Pos(spool.readR);
+					cY := PH - CH ; cT := PH; spool.actPos := Files.Pos(spool.readR)(SIGNED32);
 					spool.lastActPict := spool.actPict;
 					ClosePage
 				END

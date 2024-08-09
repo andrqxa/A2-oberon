@@ -191,7 +191,7 @@ MODULE Streams IN Oberon;	(** portable *)
 	PROCEDURE FileAvailable(S: Stream): SIGNED32;
 	BEGIN
 		WITH S: FileStream DO
-			RETURN Files.Length(Files.Base(S.R)) - Files.Pos(S.R)
+			RETURN (Files.Length(Files.Base(S.R)) - Files.Pos(S.R))(SIGNED32)
 		END
 	END FileAvailable;
 
@@ -251,7 +251,7 @@ MODULE Streams IN Oberon;	(** portable *)
 
 	PROCEDURE FilePos*(S: FileStream): SIGNED32;
 	BEGIN
-		RETURN Files.Pos(S.R)
+		RETURN Files.Pos(S.R)(SIGNED32)
 	END FilePos;
 
 	PROCEDURE Copy*(src, dest: Stream);

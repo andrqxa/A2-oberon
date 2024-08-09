@@ -155,7 +155,7 @@ PROCEDURE doExtract(action: SIGNED16;
 						path, overwrite,show: BOOLEAN; VAR res: INTEGER);
 VAR
 	f, of: Files.File; r: Files.Rider;
-	bakname, temp: ARRAY 256 OF CHAR; res2: SIGNED16;
+	bakname, temp: ARRAY 256 OF CHAR; res2: INTEGER;
 	suf: ARRAY 32 OF CHAR;
 	T : Texts.Text;
 BEGIN
@@ -433,7 +433,7 @@ BEGIN
 		res := Zip.BadName
 	ELSE
 		Files.Set(r, f, 0);
-		Zip.AddEntry(arc, dstname, r, Files.Length(f), level, strategy, res);
+		Zip.AddEntry(arc, dstname, r, Files.Length(f)(SIGNED32), level, strategy, res);
 	END;
 END AddFile;
 

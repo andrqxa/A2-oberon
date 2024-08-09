@@ -480,7 +480,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		Files.Set(R, F, fix2);
 		Files.ReadLInt(R, len);
 		IF len > 0 THEN
-			pos := Files.Pos(R)+1;
+			pos := Files.Pos(R)(SIGNED32)+1;
 			Texts.Load(il.notes, F, pos, len)
 		END;
 		RETURN TRUE
@@ -612,7 +612,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 			END;
 			P.cur := t;
 			IF len > 0 THEN
-				pos := Files.Pos(R)+1;
+				pos := Files.Pos(R)(SIGNED32)+1;
 				Texts.Load(t.text, F, pos, len);
 				IF Books0.error THEN
 					Texts.WriteString(Wr, "error with fixup");

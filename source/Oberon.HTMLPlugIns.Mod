@@ -239,7 +239,7 @@ MODULE HTMLPlugIns IN Oberon; (** portable *)	(* ejz  *)
 	END EMBED;
 
 	PROCEDURE ClearCache;
-		VAR res: SIGNED16;
+		VAR res: INTEGER;
 	BEGIN
 		WHILE cache # NIL DO
 			IF ~Strings.Prefix("file", cache.stream.url) THEN

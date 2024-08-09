@@ -485,8 +485,8 @@ BEGIN
 					WHILE i < Files.Length(f) DIV BufLen DO
 						Files.ReadBytes(Rf,buf,BufLen); Files.WriteBytes(Rg,buf,BufLen); INC(i)
 					END;
-					Files.ReadBytes(Rf, buf, Files.Length(f) MOD BufLen);
-					Files.WriteBytes(Rg, buf, Files.Length(f) MOD BufLen);
+					Files.ReadBytes(Rf, buf, (Files.Length(f) MOD BufLen)(SIZE));
+					Files.WriteBytes(Rg, buf, (Files.Length(f) MOD BufLen)(SIZE));
 					Files.Register(g)
 				ELSE
 					Texts.WriteString(W, " failed"); S.eot := TRUE
@@ -517,7 +517,7 @@ BEGIN
 END CopyFiles;
 
 PROCEDURE RenameFile (name: ARRAY OF CHAR; VAR S: Texts.Scanner);
-VAR res: SIGNED16;
+VAR res: INTEGER;
 BEGIN
 	Texts.Scan(S);
 	IF (S.class = Texts.Char) & (S.c = "=") THEN
@@ -555,7 +555,7 @@ BEGIN
 END RenameFiles;
 
 PROCEDURE DeleteFile(VAR name: ARRAY OF CHAR;  VAR S: Texts.Scanner);
-VAR res: SIGNED16;
+VAR res: INTEGER;
 BEGIN
 	Texts.WriteString(W, name); Texts.WriteString(W, " deleting");
 	Texts.Append(Oberon.Log, W.buf); Files.Delete(name, res);

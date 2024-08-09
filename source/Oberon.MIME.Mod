@@ -748,7 +748,7 @@ MODULE MIME IN Oberon; (** portable *)
 		CalcDispVec(); prev := 0X;
 		IF sPatLen > 0 THEN
 			Files.Set(R, F, pos); prev := ch; Files.Read(R, ch);
-			INC(pos); l := Files.Length(F); i := 0;
+			INC(pos); l := Files.Length(F)(SIZE); i := 0;
 			WHILE (i # sPatLen) & (pos <= l) DO
 				IF (i = 0) & (prev >= " ") THEN
 					prev := ch; Files.Read(R, ch); INC(pos)
@@ -892,7 +892,7 @@ MODULE MIME IN Oberon; (** portable *)
 			pos, beg, end, len: SIGNED32;
 	BEGIN
 		NEW(T); Texts.Open(T, ""); Texts.OpenWriter(W);
-		pos := 0; end := 0; len := Files.Length(F); parts := NIL;
+		pos := 0; end := 0; len := Files.Length(F)(SIGNED32); parts := NIL;
 		IF SearchBoundary(F, boundary, pos) THEN
 			DecodePart(F, 0, pos-Strings.Length(boundary)(SIGNED32)-2, T, W, parts, mail);
 			WHILE end < len DO

@@ -565,7 +565,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 				IF (S.status = FileStatusOk) OR (S.status = FileActionOk) OR (S.status = DataConnectionOpen) THEN
 					IF IP.AdrsEqual(S.dataIP , NetSystem.anyIP) THEN C := WaitDataCon(S) END;
 					IF S.res = Done THEN
-						NetTools.curLen := Files.Length(F); NetTools.curPos := 0;
+						NetTools.curLen := Files.Length(F)(SIGNED32); NetTools.curPos := 0;
 						Files.Set(R, F, 0);
 						NetTools.WriteData(C, R)
 					END;

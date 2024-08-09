@@ -335,7 +335,7 @@ VAR
 
 
    BEGIN
-      NEW(s); s.pos:= Files.Pos(r); NEW(str,len+1); NEW(s.name,len+1);
+      NEW(s); s.pos:= Files.Pos(r)(SIGNED32); NEW(str,len+1); NEW(s.name,len+1);
       IF (GetToken() = Identifier) & (str^ = "PSfile") THEN
          IF (GetToken() # Identifier) OR (str^ # "=") OR
             (GetToken() # String) THEN
@@ -414,14 +414,14 @@ VAR
    PROCEDURE DoSpecial(F: Frame; M: DVIFiles.File; h,v: FLOAT64;
       VAR r: Files.Rider; len: SIGNED32);
    VAR
-      tmp: DVIFiles.Special; s: PSFileSpecial; pos: SIGNED32;
+      tmp: DVIFiles.Special; s: PSFileSpecial; pos: Files.Position;
       ctm: GfxMatrix.Matrix; sc,phi: FLOAT32;
    BEGIN
       pos:= Files.Pos(r);
       IF ~DVIFiles.IsSpecialCacheComplete(M,F.pageNo) THEN
          tmp:= ParseSpecial(M,r,F.pageNo,len);
       ELSE
-         tmp:= DVIFiles.GetCachedSpecial(M,F.pageNo,pos);
+         tmp:= DVIFiles.GetCachedSpecial(M,F.pageNo,pos(SIGNED32));
          DVIFiles.SkipBytes(r,len)
       END;
       IF tmp # NIL THEN

@@ -297,7 +297,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 			Files.ReadBytes(R, buffer, BufLen)
 		END;
 		IF R.res > 0 THEN
-			NetSystem.WriteBytes(C, 0, BufLen-R.res, buffer)
+			NetSystem.WriteBytes(C, 0, BufLen-R.res(SIGNED32), buffer)
 		END;
 		curPos := 0; ProgMNotify()
 	END WriteData;

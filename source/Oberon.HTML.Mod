@@ -300,7 +300,7 @@ PROCEDURE Compile*;
 
 	PROCEDURE CompileT;
 		VAR R: Texts.Reader; beg, end: SIGNED32; typ: SIGNED8;
-				res, i: SIGNED16; bak: ARRAY 64 OF CHAR;
+				res, i: INTEGER; bak: ARRAY 64 OF CHAR;
 	BEGIN
 		IF T.len > 0 THEN
 		(* Get the file name from the source text, at the beginning i.e. pos 0 *)
@@ -322,7 +322,7 @@ PROCEDURE Compile*;
 				Files.Set(out, f, 0);
 				ConvertText(T, 0, filename);
 				Files.Register(f);
-				Out.Int(Files.Length(f), 10);
+				Out.Int(Files.Length(f)(SIGNED32), 10);
 			ELSE Out.String("no destination file name in text")
 			END
 		END;

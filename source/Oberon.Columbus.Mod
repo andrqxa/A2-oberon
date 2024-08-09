@@ -1765,7 +1765,7 @@ END Back;
 
 (* Renames the file "<name>" to "<name>.Bak". *)
 PROCEDURE Backup (CONST name: ARRAY OF CHAR);
-	VAR res, i: SIGNED16; bak: ARRAY 64 OF CHAR;
+	VAR res, i: INTEGER; bak: ARRAY 64 OF CHAR;
 BEGIN i := 0;
 	WHILE name[i] # 0X DO bak[i]:= name[i]; INC(i) END;
 	bak[i] := "."; bak[i+1] := "B"; bak[i+2] := "a"; bak[i+3] := "k"; bak[i+4] := 0X;

@@ -86,7 +86,7 @@ VAR
 	END PutObj;
 
 	PROCEDURE Elem(VAR R, S: Files.Rider; n: SIGNED32);
-	VAR w, h, pos: SIGNED32;
+	VAR w, h: SIGNED32; pos: Files.Position;
 		ch: CHAR;
 		proc, cmd: ARRAY 32 OF CHAR; res: SIGNED16;
 	BEGIN Files.ReadLInt(R, w); Files.ReadLInt(R, h); Files.Read(R, ch);
@@ -149,7 +149,7 @@ VAR
 	END Conv;
 
 	PROCEDURE Backup(name: ARRAY OF CHAR);
-	VAR bak: ARRAY 32 OF CHAR; i, res: SIGNED16;
+	VAR bak: ARRAY 32 OF CHAR; i, res: INTEGER;
 	BEGIN i := 0;
 		WHILE name[i] # 0X DO bak[i] := name[i]; INC(i) END;
 		bak[i] := "."; bak[i+1] := "B"; bak[i+2] := "a"; bak[i+3] := "k"; bak[i+4] := 0X;

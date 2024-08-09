@@ -73,7 +73,7 @@ BEGIN
 				ELSIF M.id = Objects.load THEN
 					obj.F := Files.Base(M.R);
 					Files.ReadLInt(M.R, obj.len);
-					obj.beg := Files.Pos(M.R);
+					obj.beg := Files.Pos(M.R)(SIGNED32);
 					Files.Set(M.R, Files.Base(M.R), obj.beg + obj.len);
 					Files.ReadLInt(M.R, len); ASSERT(len = 42);
 					Gadgets.objecthandle(obj, M)
@@ -91,7 +91,7 @@ BEGIN
 	obj.F := F;
 	IF F # NIL THEN
 		obj.beg := 0;
-		obj.len := Files.Length(F)
+		obj.len := Files.Length(F)(SIGNED32)
 	END
 END OpenFileObj;
 
@@ -170,7 +170,7 @@ BEGIN
 END CopySuitcase;
 
 PROCEDURE OpenSuitcase(F: Suitcase; obj: Objects.Object);
-VAR D: Documents.Document; f: TextGadgets.Frame; res: SIGNED16;
+VAR D: Documents.Document; f: TextGadgets.Frame; res: INTEGER;
 BEGIN
 	IF obj # NIL THEN
 		IF obj IS Texts.Text THEN

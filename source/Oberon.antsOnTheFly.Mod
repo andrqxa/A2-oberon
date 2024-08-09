@@ -91,7 +91,7 @@ END Replace;
 
 PROCEDURE Set1d* (const, function: ARRAY OF CHAR): BOOLEAN;
 	VAR w: Texts.Writer;     error: BOOLEAN;    source: Texts.Reader;
-	t: Texts.Text;    Log: Texts.Text;    res: SIGNED16;     m: Modules.Module;    p: Modules.Command;
+	t: Texts.Text;    Log: Texts.Text;    res: INTEGER;     m: Modules.Module;    p: Modules.Command;
 	r: Texts.Reader;    ch: CHAR;    omsg: Objects.ObjMsg;    counter: ARRAY 32 OF CHAR;
 	ModuleName,mn: ARRAY 64 OF CHAR;    F: Files.File;    name: ARRAY 256 OF CHAR;
 	text: Texts.Text;
@@ -180,7 +180,7 @@ END Set1d;
 
 PROCEDURE SetXd* (const, function: ARRAY OF CHAR): BOOLEAN;
 	VAR w: Texts.Writer;     error: BOOLEAN;    source: Texts.Reader;
-	t: Texts.Text;    Log: Texts.Text;    res: SIGNED16;     m: Modules.Module;    p: Modules.Command;
+	t: Texts.Text;    Log: Texts.Text;    res: INTEGER;     m: Modules.Module;    p: Modules.Command;
 	r: Texts.Reader;    ch: CHAR;    omsg: Objects.ObjMsg;    counter: ARRAY 32 OF CHAR;
 	ModuleName,mn: ARRAY 64 OF CHAR;    F: Files.File;    name: ARRAY 256 OF CHAR;   text: Texts.Text;
 BEGIN
@@ -397,7 +397,7 @@ END GetModuleName;
 
 PROCEDURE CompileText*(t: Texts.Text; inModule,cmd: ARRAY OF CHAR; begpat,endpat: ARRAY OF CHAR): BOOLEAN;
 VAR  buf: Texts.Buffer; T: Texts.Text; pos: SIGNED32; source: Texts.Reader; fbeg: SIGNED32; error: BOOLEAN;
-S1: Texts.Scanner; m: Modules.Module; p: Modules.Command;name,mn: ARRAY 256 OF CHAR; F: Files.File; res: SIGNED16;
+S1: Texts.Scanner; m: Modules.Module; p: Modules.Command;name,mn: ARRAY 256 OF CHAR; F: Files.File; res: INTEGER;
 BEGIN
 	aM.dS("enterCompileText");
 	RemoveErrors(t);

@@ -182,7 +182,7 @@ END LoadIcon;
 
 PROCEDURE Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg);
 VAR
-	pos: SIGNED32;
+	pos: Files.Position;
 	icons,this: SIGNED16;
 BEGIN
 	WITH obj: Pictures.Picture DO
@@ -206,7 +206,7 @@ BEGIN
 					ELSE
 						Files.Set(msg.R,Files.Base(msg.R),pos);
 					END;
-					msg.len:= Files.Pos(msg.R) - pos;
+					msg.len:= (Files.Pos(msg.R) - pos)(SIGNED32);
 				ELSE
 					Pictures.Handle(obj,msg)
 				END;

@@ -26,8 +26,8 @@ MODULE Clipboard IN Oberon; (** non-portable / source: Windows.Clipboard.Mod *)	
 				NEW(t); Texts.Open(t, ""); Texts.Append(t, buf);
 				f := Files.New(""); Files.Set(r, f, 0); Files.WriteLInt(r, 0);
 				Texts.Store(t, f, Files.Pos(r), size);
-				Files.Set(r, f, 0); Files.WriteLInt(r, Files.Length(f)-4);
-				hMem := Kernel32.GlobalAlloc({Kernel32.GMemMoveable, Kernel32.GMemDDEShare}, Files.Length(f));
+				Files.Set(r, f, 0); Files.WriteLInt(r, Files.Length(f)(SIGNED32)-4);
+				hMem := Kernel32.GlobalAlloc({Kernel32.GMemMoveable, Kernel32.GMemDDEShare}, Files.Length(f)(SIZE));
 				adr := Kernel32.GlobalLock(hMem);
 				Files.Set(r, f, 0); Files.Read(r, ch);
 				WHILE ~r.eof DO

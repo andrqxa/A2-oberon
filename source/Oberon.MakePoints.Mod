@@ -1227,7 +1227,7 @@ BEGIN
 			END
 		END;
 		Files.Register(F);
-		Int(Files.Length(F), 0)
+		Int(Files.Length(F)(SIGNED32), 0)
 	END;
 	Ln
 END WriteData;

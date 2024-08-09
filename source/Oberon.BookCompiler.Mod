@@ -683,11 +683,11 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 		ind := l.frame.pos1;
 		pos := l.frame.pos2;
 		BookDocs.WriteHeader(R, 0, 0, width, heigth, ind, pos, options, iconStr);
-		fixPos1 := Files.Pos(R);
+		fixPos1 := Files.Pos(R)(SIGNED32);
 		Files.WriteLInt(R, 0);
-		fixPos2:= Files.Pos(R);
+		fixPos2:= Files.Pos(R)(SIGNED32);
 		Files.WriteLInt(R, 0);
-		fixPos3 := Files.Pos(R);
+		fixPos3 := Files.Pos(R)(SIGNED32);
 		Files.WriteLInt(R, 0);
 		ind := 0;
 		il := imports;
@@ -702,21 +702,21 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 		WHILE c # NIL DO
 			len := c.text.len;
 			IF c.text = noteText THEN
-				pos := Files.Pos(R);
+				pos := Files.Pos(R)(SIGNED32);
 				Files.Set(R, F, fixPos2);
 				Files.WriteLInt(R, pos);
 				Files.Set(R, F, pos)
 			END;
 			Files.WriteLInt(R, len);
 			IF len > 0 THEN
-				pos := Files.Pos(R);
+				pos := Files.Pos(R)(SIGNED32);
 				Texts.Store(c.text, F, pos, len);
 				Files.Set(R, F, pos+len)
 			END;
 			c := c.next
 		END;
 		Files.WriteLInt(R, -1);
-		pos := Files.Pos(R);
+		pos := Files.Pos(R)(SIGNED32);
 		Files.Set(R, F, fixPos1);
 		Files.WriteLInt(R, pos);
 		Files.Set(R, F, pos);
@@ -731,7 +731,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 			l := l.next
 		END;
 		Files.Write(R, Books0.none);
-		pos := Files.Pos(R);
+		pos := Files.Pos(R)(SIGNED32);
 		Files.Set(R, F, fixPos3);
 		Files.WriteLInt(R, pos);
 		Files.Set(R, F, pos);

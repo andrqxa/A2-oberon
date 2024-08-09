@@ -115,15 +115,15 @@ TYPE
 
 (** Load text block from ASCII file f to text T. *)
   PROCEDURE LoadAscii* (T: Text; f: Files.File);
-    VAR Q, q: Piece; len: SIGNED32;
+    VAR Q, q: Piece; len: Files.Size;
   BEGIN len := Files.Length(f);
     NEW(Q); Q.f := Wfile; Q.off := 0; Q.len := 1; Q.ref := MIN(SIGNED16);
     Q.lib := NIL; Q.col := 127; Q.voff := 0;
-    NEW(q); q.f := f; q.off := 0; q.len := len; q.ref := MIN(SIGNED16);
+    NEW(q); q.f := f; q.off := 0; q.len := len(SIGNED32); q.ref := MIN(SIGNED16);
     q.lib := Fonts.Default; q.col := 15; q.voff := 0;
     Q.next := q; q.prev := Q; q.next := Q; Q.prev := q;
     T.handle := H; T.obs := NIL;
-    T.trailer := Q; T.len := len;
+    T.trailer := Q; T.len := len(SIGNED32);
     T.org := -1; T.pce := T.trailer (*init cache*)
   END LoadAscii;
 
@@ -143,11 +143,11 @@ TYPE
   END ReadDocHeader;
 
 (** Load text block from file f at position pos to text T (assumes that the text id has been read already). len returns length. *)
-  PROCEDURE Load* (T: Text; f: Files.File; pos: SIGNED32; VAR len: SIGNED32);
+  PROCEDURE Load* (T: Text; f: Files.File; pos: Files.Position; VAR len: SIGNED32);
     VAR
       R, S: Files.Rider;
       Q, q, p: Piece;
-      hlen, tlen, flen, off: SIGNED32;
+      hlen, tlen, flen: SIGNED32; off: Files.Position;
       N, lib: SIGNED8;
       type, ref, tag: CHAR;
       LName: ARRAY 256 OF CHAR;
@@ -192,7 +192,7 @@ TYPE
         IF q.len < 0 THEN
           LoadAscii (T, f); RETURN
         END;
-       q.f := f; q.off := off;
+       q.f := f; q.off := off(SIGNED32);
         off := off + q.len;
         p.next := q; q.prev := p; p := q
       END;
@@ -238,7 +238,7 @@ TYPE
 	END SyncPiece;
 
 (** Store text T on disk file f at position pos. Writes the first id character too. len is the number of bytes written. *)
-  PROCEDURE Store* (T: Text; f: Files.File; pos: SIGNED32; VAR len: SIGNED32);
+  PROCEDURE Store* (T: Text; f: Files.File; pos: Files.Position; VAR len: SIGNED32);
 	TYPE
 		ObjsBlock = POINTER TO ObjsBlockDesc;
 		ObjsBlockDesc = RECORD
@@ -248,7 +248,7 @@ TYPE
     VAR
       p, q: Piece;
       R, W: Files.Rider;
-      hlen, flen, rlen, m: SIGNED32;
+      hlen: Files.Size; flen, rlen, m: SIGNED32;
       id, i: SIGNED16;
       N, n: SIGNED8;
       type, ch: CHAR;
@@ -354,8 +354,8 @@ TYPE
     END;
     Files.Set(W, f, pos + 1);
     Files.Write(W, type); (*fixup*)
-    Files.WriteLInt(W, hlen); (*fixup*)
-    len := hlen + T.len + flen
+    Files.WriteLInt(W, hlen(SIGNED32)); (*fixup*)
+    len := (hlen + T.len + flen)(SIGNED32)
   END Store;
 
   PROCEDURE GenNew (T: Text);
@@ -855,7 +855,7 @@ information about the last character read. *)
     IF ~(W.lib IS Fonts.Font) OR (W.lib # p.lib) OR (W.col # p.col) OR (W.voff # p.voff) OR (Files.Base(W.R) # p.f) THEN
       NEW(q); q.ref := MIN(SIGNED16);
       IF ~(W.lib IS Fonts.Font) THEN W.lib.GetObj(W.lib, ORD(ch), q.obj) END;
-      q.f := Files.Base(W.R); q.off := Files.Pos(W.R); q.len := 0;
+      q.f := Files.Base(W.R); q.off := Files.Pos(W.R)(SIGNED32); q.len := 0;
       q.lib := W.lib; q.col := W.col; q.voff:= W.voff;
       q.next := NIL; p.next := q; q.prev := p; p := q;
       W.buf.last := p

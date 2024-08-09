@@ -389,7 +389,7 @@ BEGIN
 					Files.Read(M.R, ch);
 					IF (F.fstate = folded) & (ch = Texts.TextBlockId) THEN
 						NEW(F.buf); Texts.OpenBuf(F.buf);
-						file := Files.Base(M.R); pos := Files.Pos(M.R);
+						file := Files.Base(M.R); pos := Files.Pos(M.R)(SIGNED32);
 						NEW(text); Texts.Open(text, "");
 						Texts.Load(text, file, pos, len);
 						Files.Set(M.R, file, pos + len);
@@ -408,7 +408,7 @@ BEGIN
 					IF (F.fstate = folded) & (F.buf # NIL) THEN (* there is a text to save *)
 						NEW(text); Texts.Open(text, "");
 						Texts.OpenBuf(saveB); Texts.Copy(F.buf, saveB); Texts.Append(text, saveB);
-						file := Files.Base(M.R); pos := Files.Pos(M.R);
+						file := Files.Base(M.R); pos := Files.Pos(M.R)(SIGNED32);
 						Texts.Store(text, file, pos, len);
 						Files.Set(M.R, file, pos + len)
 					ELSE

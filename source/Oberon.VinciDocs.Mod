@@ -58,7 +58,7 @@ MODULE VinciDocs IN Oberon; (** portable *)	(* eos  *)
 					Files.Read(r, ch)
 				END;
 				IF (ch = Texts.TextBlockId) OR (ch = 1X) THEN
-					pos := Files.Pos(r);
+					pos := Files.Pos(r)(SIGNED32);
 					Texts.Load(text, file, pos, len)
 				ELSE
 					Texts.Open(text, "")
@@ -84,7 +84,7 @@ MODULE VinciDocs IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Store (doc: Documents.Document);
 		VAR
-			file: Files.File; bak: ARRAY 64 OF CHAR; res: SIGNED16; r: Files.Rider; pos, len: SIGNED32;
+			file: Files.File; bak: ARRAY 64 OF CHAR; res: INTEGER; r: Files.Rider; pos, len: SIGNED32;
 			obj: Objects.Object; frame: VinciGadgets.Frame;
 	BEGIN
 		Texts.WriteString(W, "Store ");
@@ -102,7 +102,7 @@ MODULE VinciDocs IN Oberon; (** portable *)	(* eos  *)
 			IF (doc.attr # NIL) OR (doc.link # NIL) THEN
 				Documents.StoreAttachments(r, doc.attr, doc.link)
 			END;
-			pos := Files.Pos(r);
+			pos := Files.Pos(r)(SIGNED32);
 			Links.GetLink(doc.dsc, "Model", obj);
 			ASSERT((obj # NIL) & (obj IS Texts.Text));
 			Texts.Store(obj(Texts.Text), file, pos, len);

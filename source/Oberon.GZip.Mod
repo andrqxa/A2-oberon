@@ -60,7 +60,7 @@ MODULE GZip IN Oberon;	(** eos  **)
 	PROCEDURE Unzip*;
 		VAR
 			S: Texts.Scanner; T: Texts.Text; beg, end, time: SIGNED32; overwrite, oldfilefound: BOOLEAN;
-			suffix, infile, outfile, newname: ARRAY 256 OF CHAR; in, out: Files.File; res: INTEGER; res2: SIGNED16;
+			suffix, infile, outfile, newname: ARRAY 256 OF CHAR; in, out: Files.File; res: INTEGER; res2: INTEGER;
 	BEGIN
 		T := Oberon.Par.text;
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
@@ -139,12 +139,12 @@ MODULE GZip IN Oberon;	(** eos  **)
 			IF gzw.res # GZWriters.Ok THEN
 				res := FileError
 			ELSE
-				len := Files.Length(in);
+				len := Files.Length(in)(SIGNED32);
 				totWritten := 0;
 				Files.Set(r, in, 0);
 				REPEAT
 					Files.ReadBytes(r, buf, BufSize);
-					GZWriters.WriteBytes(gzw, buf, 0, BufSize - r.res, written);
+					GZWriters.WriteBytes(gzw, buf, 0, BufSize - r.res(SIGNED32), written);
 					INC(totWritten, written)
 				UNTIL (gzw.res # GZWriters.Ok) OR (totWritten >= len);
 				CASE gzw.res OF
@@ -227,8 +227,8 @@ MODULE GZip IN Oberon;	(** eos  **)
 						END;
 					ELSE
 						Texts.WriteString(W, " => "); Texts.WriteString(W, outfile); Texts.WriteLn(W);
-						Texts.WriteString(W, " original size: "); Texts.WriteInt(W, Files.Length(in), 1);
-						Texts.WriteString(W, ", compressed size: "); Texts.WriteInt(W, Files.Length(out), 1);
+						Texts.WriteString(W, " original size: "); Texts.WriteInt(W, Files.Length(in)(SIGNED32), 1);
+						Texts.WriteString(W, ", compressed size: "); Texts.WriteInt(W, Files.Length(out)(SIGNED32), 1);
 						Texts.WriteString(W, ", compression degree: ");
 						Texts.WriteInt(W, ENTIER(((1 - Files.Length(out) / Files.Length(in)) * 100) + 0.5), 1); Texts.WriteString(W, "%");
 					END

@@ -299,7 +299,7 @@ MODULE Sokoban IN Oberon; (** portable *)	(* ejz  *)
 			new: BOOLEAN;
 			R: Files.Rider;
 			level, moves: SIGNED16;
-			time, pos: SIGNED32;
+			time: SIGNED32; pos: Files.Position;
 			name: ARRAY 32 OF CHAR;
 	BEGIN
 		file := Files.Old(HighScores);

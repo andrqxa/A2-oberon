@@ -283,7 +283,7 @@ END GetLine;
 *)
 
 (** Stores picture run length encoded to file F (including tag). *)
-PROCEDURE Store* (P: Picture; F : Files.File; pos: SIGNED32; VAR len: SIGNED32);
+PROCEDURE Store* (P: Picture; F : Files.File; pos: Files.Position; VAR len: SIGNED32);
 (* stores picture to run length encoded file F  (including tag *)
 	VAR j, i,a,b,d,wth: SIGNED16; adr, OldAdr: ADDRESS; size: SIGNED32; h: SIGNED8;
 			buf: ARRAY 129 OF SIGNED8; R: Files.Rider;
@@ -321,7 +321,7 @@ BEGIN
 		Files.WriteBytes(R, buf, j + 1);
 		INC(i)
 	END;
-	len := Files.Pos(R) - pos
+	len := (Files.Pos(R) - pos)(SIGNED32)
 END Store;
 
 PROCEDURE LoadRLE(P: Picture; VAR R: Files.Rider; rv: BOOLEAN);
@@ -359,7 +359,7 @@ BEGIN
 END LoadRLE;
 
 (** Load a run length encoded picture from position pos from file F. Pos should be AFTER the two byte picture identification of a picture file. *)
-PROCEDURE Load*(P: Picture; F : Files.File; pos: SIGNED32; VAR len: SIGNED32);
+PROCEDURE Load*(P: Picture; F : Files.File; pos: Files.Position; VAR len: SIGNED32);
 	VAR R: Files.Rider; id: SIGNED16;
 			(* buf: ARRAY MaxWth OF CHAR; *) err: ARRAY 32 OF CHAR;
 			size: SIGNED32;
@@ -380,7 +380,7 @@ BEGIN
 		LoadRLE(P,R,P.depth = 1)
 	ELSE err := "This file is not a picture "; HALT(42) END;
 	P.handle := handler;
-	len := Files.Pos(R) - pos
+	len := (Files.Pos(R) - pos)(SIGNED32)
 END Load;
 
 PROCEDURE SplitName (VAR name, MName, PName: ARRAY OF CHAR);

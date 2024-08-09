@@ -440,7 +440,7 @@ END ReadLn;
 
 		PROCEDURE  (* VAR R: Rider*) Pos*( ): SIGNED32;
 		BEGIN
-			RETURN Files.Pos( SELF.R )
+			RETURN Files.Pos( SELF.R )(SIGNED32)
 		END Pos;
 
 		PROCEDURE  (* VAR R: Rider*) Close*;

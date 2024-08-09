@@ -342,7 +342,7 @@ MODULE LeoBasic IN Oberon; (** portable **)	(* eos  *)
 					Gadgets.WriteRef(msg.R, f.lib, f.pen);
 					GfxMatrix.Write(msg.R, f.mat)
 				ELSIF msg.id = Objects.load THEN
-					pos := Files.Pos(msg.R);
+					pos := Files.Pos(msg.R)(SIGNED32);
 					Files.ReadNum(msg.R, ver);
 					IF ver >= 3 THEN
 						Leonardo.HandleContainer(f, msg);

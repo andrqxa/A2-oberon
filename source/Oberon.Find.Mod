@@ -58,7 +58,7 @@ MODULE Find IN Oberon;	(** portable *)	(* tk 12.12.95 / pr 12.12.95 *)
 		patj := spat[m-1]; found := FALSE;
 		LOOP
 			(*----- read buffer[0..n-1] *)
-			n:=Files.Length(F)-pos;
+			n:=(Files.Length(F)-pos)(SIGNED32);
 			IF n>bufSize THEN n:=bufSize END;
 			IF n<m THEN EXIT END;
 			Files.Set(R, F, pos); Files.ReadBytes(R, buffer, n);

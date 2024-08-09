@@ -829,7 +829,7 @@ BEGIN
 END WriteState;
 
 PROCEDURE Backup*(VAR name: ARRAY OF CHAR);
-VAR res, i: SIGNED16; bak: ARRAY 64 OF CHAR;
+VAR res, i: INTEGER; bak: ARRAY 64 OF CHAR;
 BEGIN
 	i := 0;
 	WHILE name[i] # 0X DO

@@ -1607,8 +1607,9 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 	NATIVE, WIN { Oberon.Types.Mod }
 	WIN { Windows.Oberon.Kernel.Mod }
 	Oberon.Modules.Mod
-	NATIVE, UNIX { Oberon.FileDir.Mod Oberon.Files.Mod }
-	WIN { Windows.Oberon.FileDir.Mod Windows.Oberon.Files.Mod }
+	NATIVE, UNIX { Oberon.FileDir.Mod }
+	WIN { Windows.Oberon.FileDir.Mod }
+	Oberon.Files.Mod
 
 	Oberon.Disks.Mod
 

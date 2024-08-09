@@ -31,7 +31,7 @@ VAR
 
 	PROCEDURE Close*( P: Printer.Printer );
 	VAR cmd, name: ARRAY 256 OF CHAR;
-		res: SIGNED16;
+		res: INTEGER;
 	BEGIN
 		WITH P: UnixPrinter DO
 			COPY( P.printerName, name );  COPY( prcmd, cmd );

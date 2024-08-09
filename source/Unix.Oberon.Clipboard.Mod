@@ -89,9 +89,9 @@ BEGIN
 		ev.property := event.property;
 		f := Files.New(""); Files.Set(r, f, 0); Files.WriteLInt(r, 0);
 		Texts.Store(scrap, f, Files.Pos(r), size);
-		NEW(selectionData, Files.Length(f));
+		NEW(selectionData, Files.Length(f)(SIZE));
 		IF selectionData # NIL THEN
-			Files.Set(r, f, 0); Files.WriteLInt(r, Files.Length(f)-4);
+			Files.Set(r, f, 0); Files.WriteLInt(r, Files.Length(f)(SIGNED32)-4);
 			Files.Set(r, f, 0); Files.Read(r, ch); i:= 0;
 			WHILE ~r.eof DO
 				selectionData[i] := ch; INC(i);

@@ -52,7 +52,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 	END ReadHeader;
 
 	PROCEDURE ReadColors(VAR R: Files.Rider; VAR h: Header);
-		VAR pos, len, i: SIGNED32; r, g, b: CHAR;
+		VAR pos: Files.Position; len, i: SIGNED32; r, g, b: CHAR;
 	BEGIN
 		ReadLInt(R, len); pos := Files.Pos(R);
 		IF h.mode = 2 THEN (* Indexed *)
@@ -131,7 +131,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 				SkipSection(R); (* image resources *)
 				SkipSection(R); (* layer and mask information *)
 				ReadInt(R, comp); (* Raw data = 0, RLE compressed = 1 *)
-				h.data := Files.Pos(R);
+				h.data := Files.Pos(R)(SIGNED32);
 				IF comp = 1 THEN
 					LoadRLEInd8(R, h, P)
 				END
@@ -152,7 +152,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 				WITH M: Objects.FileMsg DO
 					IF M.id = Objects.load THEN
 						obj.depth := 0; Load(M.R, obj);
-						IF obj.depth = 0 THEN M.len := 0 ELSE M.len := Files.Length(Files.Base(M.R)) END
+						IF obj.depth = 0 THEN M.len := 0 ELSE M.len := Files.Length(Files.Base(M.R))(SIGNED32) END
 					ELSE
 						Pictures.Handle(obj, M)
 					END

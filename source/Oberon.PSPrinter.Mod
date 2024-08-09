@@ -60,7 +60,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		headerT: Texts.Text;
 		bodyF: Files.File;
 		writer: Files.Rider;
-		ppos: SIGNED32;
+		ppos: Files.Position;
 		hexArray: ARRAY 17 OF CHAR;
 		curR, curG, curB, setR, setG, setB: SIGNED16;
 

@@ -1271,7 +1271,7 @@ VAR
 	PROCEDURE OutFile( VAR stack: Stack;  VAR res: Value;  append: BOOLEAN );
 	VAR ptr1, ptr2: ANY;  file: Value;  f: Files.File;  R: Files.Rider;  len: SIGNED32;  l: Objects.Library;  M: Objects.BindMsg;
 		gen: ARRAY 64 OF CHAR;
-		fM: Objects.FileMsg;  n: vyName.tNameArray;  pos: SIGNED32;  varadr: SIGNED32;
+		fM: Objects.FileMsg;  n: vyName.tNameArray;  pos: Files.Position;  varadr: SIGNED32;
 	BEGIN
 		Eval( stack, file );  Eval( stack, res );  Ln;  Str( "OutVal: " );  OutVal( res );  Ln;  Str( "To File" );  OutVal( file );
 		IF file.class = String THEN
@@ -1325,7 +1325,7 @@ VAR
 	VAR class: SIGNED8;  adr: SIGNED32;  ch: CHAR;  global: BOOLEAN;  ptr1: ANY;  f: Files.File;  R: Files.Rider;  file: Value;  obj: Objects.Object;
 		l: Objects.Library;  len: SIGNED32;
 		gen: ARRAY 64 OF CHAR;
-		obj1: OPT.Object;  n: vyName.tNameArray;  fM: Objects.FileMsg;  nil: BOOLEAN;  isfirstitem: BOOLEAN;  pos: SIGNED32;
+		obj1: OPT.Object;  n: vyName.tNameArray;  fM: Objects.FileMsg;  nil: BOOLEAN;  isfirstitem: BOOLEAN;  pos: Files.Position;
 	BEGIN
 		isfirstitem := (itnr = 1);  Eval( stack, file );  global := TRUE;  obj1 := PopWrVar( stack, global, nil );  Ln;  Str( "To File" );
 		OutVal( file );

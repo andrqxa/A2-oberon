@@ -1356,7 +1356,7 @@ BEGIN
 	r.file.ReadBytes(r, SYSTEM.VAL(Bytes, x), 0, Size)
 END ReadSet;
 
-PROCEDURE ReadSet32*(VAR r: Rider; VAR x: SET32);
+PROCEDURE ReadSet32*(VAR r: Rider; VAR x: SET);
 BEGIN
 	r.file.ReadBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
 END ReadSet32;
@@ -1479,7 +1479,7 @@ BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes, x), 0, Size)
 END WriteSet;
 
-PROCEDURE WriteSet32*(VAR r: Rider; x: SET32);
+PROCEDURE WriteSet32*(VAR r: Rider; x: SET);
 BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
 END WriteSet32;

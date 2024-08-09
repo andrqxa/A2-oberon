@@ -544,7 +544,7 @@ TYPE
 	codes = ARRAY 2 OF SIGNED16;
 VAR
 
-	filespos : SIGNED32;
+	filespos : Files.Position;
 	x, y: SIGNED16;
 	chars: ARRAY 32 OF CHAR;
 	char : CHAR;
@@ -575,7 +575,7 @@ VAR
 	new: SIGNED16;
 	code : codes;
 	i: SIGNED32;
-	fp: SIGNED32;
+	fp: Files.Position;
 
 PROCEDURE resetstt;
 

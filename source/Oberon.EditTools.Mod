@@ -489,7 +489,7 @@ VAR
 	PROCEDURE StoreDoc(D: Documents.Document; os: SIGNED8);
 	VAR L: Objects.LinkMsg;
 		R: Texts.Reader; F: Files.File; r: Files.Rider; bak: ARRAY 64 OF CHAR; ch: CHAR;
-		i, res: SIGNED16;
+		i, res: INTEGER;
 	BEGIN
 		IF (D # NIL) & (D.dsc # NIL) THEN
 			Texts.WriteString(W, "EditTools.Store");

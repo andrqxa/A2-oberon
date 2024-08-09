@@ -1019,7 +1019,7 @@ VAR
 				| SFtypProcTyp:
 
 					(** fof >> *)
-					pos := Files.Pos( R );  Files.Read( R, ch );
+					pos := Files.Pos( R )(SIGNED32);  Files.Read( R, ch );
 					IF ch # SYSTEM.VAL( CHAR, 13 ) THEN Files.Set( R, Files.Base( R ), pos )  END;
 					(** << fof  *)
 

@@ -292,14 +292,14 @@ VAR
 	PROCEDURE WriteArray( VAR R: Files.Rider;  VAR A: ARRAY OF FLOAT64 );
 	VAR i: SIGNED32;
 	BEGIN
-		Files.WriteLInt( R, LEN( A ) );  aM.dSISI( "Writing len at pos", LEN( A ), "  ", Files.Pos( R ) );
+		Files.WriteLInt( R, LEN( A ) );  aM.dSISI( "Writing len at pos", LEN( A ), "  ", Files.Pos( R )(SIGNED32) );
 		FOR i := 0 TO LEN( A ) - 1 DO Files.WriteLReal( R, A[i] );  END;
 	END WriteArray;
 
 	PROCEDURE ReadArray( VAR R: Files.Rider;  VAR A: ARRAY OF FLOAT64 );
 	VAR i, len: SIGNED32;
 	BEGIN
-		Files.ReadLInt( R, len );  aM.dSISI( "Reading len at pos", len, "   ", Files.Pos( R ) );
+		Files.ReadLInt( R, len );  aM.dSISI( "Reading len at pos", len, "   ", Files.Pos( R )(SIGNED32) );
 		FOR i := 0 TO len - 1 DO Files.ReadLReal( R, A[i] );  END;
 	END ReadArray;
 

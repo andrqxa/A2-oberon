@@ -222,7 +222,7 @@ Most entities in Oberon are derived from this base type.
 
 (** Search, load and cache a public library. *)
   PROCEDURE ThisLibrary* (CONST name: ARRAY OF CHAR): Library;
-    VAR L: Library; len, n, n0, t: SIGNED32; proc: NewProc;  A: Alias;
+    VAR L: Library; len, n, n0, t: SIGNED32; proc: NewProc;  A: Alias; pos: Files.Position;
   BEGIN
     A := FirstAlias.next;
     WHILE (A # NIL) & (name # A.name) DO A := A.next END;
@@ -258,7 +258,9 @@ Most entities in Oberon are derived from this base type.
     END;
     (* found existing library --  but in A2 it is possible that the file referenced in L has been finalized meanwhile (concurrent finalization of libraries and files !) *)
     L.f := Files.Old(L.name);
-    IF L.f # NIL THEN Files.Set(L.R, L.f, Files.Pos(L.R)) END;
+(*!    TRACE(L.name);*)
+    IF L.R.file # NIL THEN pos := Files.Pos(L.R) ELSE pos := 0; END;
+    IF L.f # NIL THEN Files.Set(L.R, L.f, pos) END;
     RETURN L
   END ThisLibrary;
 
@@ -426,7 +428,7 @@ Most entities in Oberon are derived from this base type.
 	END GenRef;
 
 (* Load a standard object library (old format) from position pos in file f. *)
-	PROCEDURE OldLoadLibrary (L: Library; f: Files.File; pos: SIGNED32; VAR len: SIGNED32);
+	PROCEDURE OldLoadLibrary (L: Library; f: Files.File; pos: Files.Position; VAR len: SIGNED32);
 		VAR R, S: Files.Rider; Mod: Modules.Module; Cmd: Modules.Command; NofRuns, key, N, i, k, m: SIGNED16;
 				clen, dlen: SIGNED32; type, n: SIGNED8; ch: CHAR; entry: Entry;
 				obj: Object; M: FileMsg; MName, PName: Name; GName: ARRAY MaxNews OF Name;
@@ -500,7 +502,7 @@ Most entities in Oberon are derived from this base type.
 	END OldLoadLibrary;
 
 (** Load a standard object library from position pos in file f. *)
-	PROCEDURE LoadLibrary* (L: Library; f: Files.File; pos: SIGNED32; VAR len: SIGNED32);
+	PROCEDURE LoadLibrary* (L: Library; f: Files.File; pos: Files.Position; VAR len: SIGNED32);
 		VAR ind: ArrayIndex; dict: ListDict; i, n, N, version, dorg, gorg: SIGNED32; key: SIGNED16; entry: Entry;
 				R: Files.Rider;
 	BEGIN
@@ -509,7 +511,7 @@ Most entities in Oberon are derived from this base type.
 		Files.ReadLInt(R, version);
 		IF version = Version THEN
 			Files.ReadLInt(R, gorg); Files.ReadLInt(R, dorg);
-			Files.ReadInt(R, L.maxref); ind.size := L.maxref; ind.org := Files.Pos(R);
+			Files.ReadInt(R, L.maxref); ind.size := L.maxref; ind.org := Files.Pos(R)(SIGNED32);
 			IF L.maxref > 0 THEN NEW(ind.index, L.maxref) END;
 			FOR i := 0 TO L.maxref - 1 DO ind.index[i] := NIL END;
 			(* read generator table *)
@@ -535,7 +537,7 @@ Most entities in Oberon are derived from this base type.
 			END;
 
 			L.f := f; Files.Set(L.R, f, ind.org);
-			len := Files.Pos(R) - pos
+			len := (Files.Pos(R) - pos)(SIGNED32)
 		ELSE
 			ind.org := 0; ind.size := 0; ind.index := NIL;
 			L.f := NIL; Files.Set(L.R, NIL, 0);
@@ -544,7 +546,7 @@ Most entities in Oberon are derived from this base type.
 	END LoadLibrary;
 
 (** Store a standard object library at position pos in file f. *)
-	PROCEDURE StoreLibrary* (L: Library; f: Files.File; pos: SIGNED32; VAR len: SIGNED32);
+	PROCEDURE StoreLibrary* (L: Library; f: Files.File; pos: Files.Position; VAR len: SIGNED32);
 		VAR obj: Object; ind: ArrayIndex; i, olen, org, indorg,n,N: SIGNED32; m: SIGNED16; entry: Entry;
 				ch: CHAR; GName: ARRAY MaxNews OF GenName; R, indR: Files.Rider; M: FileMsg; A: AttrMsg;
 	BEGIN
@@ -555,7 +557,7 @@ Most entities in Oberon are derived from this base type.
 		Files.WriteLInt(R, -1);	(* place holder genTable pos *)
 		Files.WriteLInt(R, -1);	(* place holder dict pos *)
 		Files.WriteInt(R, L.maxref);
-		indorg := Files.Pos(R); Files.Set(indR, f, indorg);
+		indorg := Files.Pos(R)(SIGNED32); Files.Set(indR, f, indorg);
 		IF L.maxref > 0 THEN Files.WriteBytes(R, ind.index^, LONG(L.maxref)*4) END;
 
 		(* store obj data *)
@@ -575,7 +577,7 @@ Most entities in Oberon are derived from this base type.
 					WHILE GName[n] # GName[N] DO INC(n) END;
 					IF n = N THEN INC(N) END;
 
-					Files.WriteLInt(indR, Files.Pos(R));	(* write index *)
+					Files.WriteLInt(indR, Files.Pos(R)(SIGNED32));	(* write index *)
 					Files.WriteInt(R, SHORT(n));
 					Files.WriteLInt(R, olen);
 					WHILE olen > 0 DO Files.Read(L.R, ch); Files.Write(R, ch); DEC(olen) END
@@ -588,11 +590,11 @@ Most entities in Oberon are derived from this base type.
 				WHILE GName[n] # GName[N] DO INC(n) END;
 				IF n = N THEN INC(N) END;
 
-				Files.WriteLInt(indR, Files.Pos(R));	(* write index *)
+				Files.WriteLInt(indR, Files.Pos(R)(SIGNED32));	(* write index *)
 				Files.WriteInt(R, SHORT(n));
 				Files.Set(M.R, f, Files.Pos(R));
 				Files.WriteLInt(M.R, 0); obj.handle(obj, M);
-				olen := Files.Pos(M.R) - Files.Pos(R) - 4;
+				olen := (Files.Pos(M.R) - Files.Pos(R) - 4)(SIGNED32);
 				Files.WriteLInt(R, olen);
 				Files.Set(R, f, Files.Pos(M.R))
 			ELSE	(* no object *)
@@ -601,7 +603,7 @@ Most entities in Oberon are derived from this base type.
 		END;
 
 		(* write generator table *)
-		i := Files.Pos(R);
+		i := Files.Pos(R)(SIGNED32);
 		Files.Set(R, f, pos + 5); Files.WriteLInt(R, i); Files.Set(R, f, i);
 		Files.WriteInt(R, SHORT(N));
 		IF N > 0 THEN
@@ -613,7 +615,7 @@ Most entities in Oberon are derived from this base type.
 		END;
 
 		(* store dict *)
-		i := Files.Pos(R);
+		i := Files.Pos(R)(SIGNED32);
 		Files.Set(R, f, pos + 9); Files.WriteLInt(R, i); Files.Set(R, f, i);
 		entry := L.dict(ListDict).first;
 		WHILE entry # NIL DO
@@ -622,7 +624,7 @@ Most entities in Oberon are derived from this base type.
 			entry := entry.next
 		END;
 		Files.WriteInt(R, MIN(SIGNED16));
-		len := Files.Pos(R) - pos;
+		len := (Files.Pos(R) - pos)(SIGNED32);
 		L.f := f; ind.org := indorg;
 		Files.Set(L.R, L.f, ind.org)
 	END StoreLibrary;

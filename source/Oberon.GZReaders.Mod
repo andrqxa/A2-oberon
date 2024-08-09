@@ -138,7 +138,7 @@ MODULE GZReaders IN Oberon;	(** Stefan Walthert  **)
 					buf[offset + i] := bufp[i]
 				END
 			END;
-			read := len - fr.res
+			read := len - fr.res(SIGNED32)
 		ELSE
 			ZlibReaders.ReadBytes(r.zr, buf, offset, len, read)
 		END;

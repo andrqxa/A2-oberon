@@ -90,7 +90,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	PROCEDURE ClosePackage(VAR pack: Package);
 		VAR F: Files.File; R: Files.Rider; h: Compress.Header; attr: Attributes.BoolAttr;
 	BEGIN
-		F := Files.Base(pack.R); h.length := Files.Length(F); Files.Set(pack.R, F, 0);
+		F := Files.Base(pack.R); h.length := Files.Length(F)(SIGNED32); Files.Set(pack.R, F, 0);
 		F := Files.New(pack.name); Files.Set(R, F, 0);
 		(* Document Head *)
 		Files.WriteInt(R, Documents.Id);
@@ -208,8 +208,8 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 			F := Files.Old(file);
 			IF F # NIL THEN
 				Files.GetDate(F, res.time, res.date);
-				WriteResource(pack.R, res, DataTag, 4+Files.Length(F));
-				Files.WriteLInt(pack.R, Files.Length(F));
+				WriteResource(pack.R, res, DataTag, 4+Files.Length(F)(SIZE));
+				Files.WriteLInt(pack.R, Files.Length(F)(SIGNED32));
 				Files.Set(R, F, 0);
 				Files.ReadBytes(R, buf, 1024);
 				WHILE ~R.eof DO
@@ -296,9 +296,9 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	PROCEDURE ReadResource(VAR R: Files.Rider; VAR res: Resource; VAR tag: SIGNED16; VAR dLen: SIGNED32);
 		VAR p: SIGNED32;
 	BEGIN
-		p := Files.Pos(R);
+		p := Files.Pos(R)(SIGNED32);
 		Files.ReadInt(R, tag); Files.ReadString(R, res.name); Files.ReadLInt(R, dLen);
-		dLen := dLen + Files.Pos(R)-p;
+		dLen := dLen + Files.Pos(R)(SIGNED32)-p;
 		Files.ReadLInt(R, res.time); Files.ReadLInt(R, res.date);
 		Files.ReadInt(R, res.minor); Files.ReadInt(R, res.major)
 	END ReadResource;
@@ -323,7 +323,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		BTrees.SearchStr(index, res.name, org, err);
 		IF err # BTrees.Done THEN
 			BTrees.InsertStr(index, res.name, -1, err);
-			org := Files.Length(BTrees.Base(index));
+			org := Files.Length(BTrees.Base(index))(SIGNED32);
 			BTrees.InsertStr(index, res.name, org, err);
 			ASSERT(err = BTrees.EntryChanged);
 			BTrees.Flush(index)
@@ -407,7 +407,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 
 	PROCEDURE OpenPackage(VAR pack: Package; F: Files.File): BOOLEAN;
 		VAR
-			R: Files.Rider; h: Compress.Header; i: SIGNED16;
+			R: Files.Rider; h: Compress.Header; i: SIGNED16; res: INTEGER;
 			attr, attrs: Attributes.Attr; links: Links.Link; ch: CHAR;
 	BEGIN
 		Files.Set(pack.R, F, 0); Files.ReadInt(pack.R, i);
@@ -423,11 +423,11 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 				useCrypt := attr(Attributes.BoolAttr).b
 			END
 		END;
-		h.extensions := {}; h.length := Files.Length(F)-Files.Pos(pack.R);
+		h.extensions := {}; h.length := (Files.Length(F)-Files.Pos(pack.R))(SIGNED32);
 		IF useCrypt THEN INCL(h.extensions, Compress.encryption) END;
 		F := Files.New(""); Files.Set(R, F, 0);
-		Compress.CopyFromArc(pack.R, R, h, i);
-		IF i # Compress.Done THEN COPY("error in file", pack.gen); RETURN FALSE END;
+		Compress.CopyFromArc(pack.R, R, h, res);
+		IF res # Compress.Done THEN COPY("error in file", pack.gen); RETURN FALSE END;
 		Files.Set(pack.R, F, 0);
 		RETURN TRUE
 	END OpenPackage;
@@ -474,7 +474,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 			Files.WriteBytes(R, buf, len)
 		END CopyData;
 		PROCEDURE Backup(VAR res: Resource);
-			VAR bak: FileDir.FileName; err: SIGNED16;
+			VAR bak: FileDir.FileName; err: INTEGER;
 		BEGIN
 			IF Files.Old(res.name) # NIL THEN
 				COPY(res.name, bak); Strings.Append(bak, ".Bak");
@@ -564,7 +564,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 					END;
 					Compress.DeleteFile(file, cRes.name, re);
 					Files.Set(R2, F2, 0);
-					Compress.AddFile(file, cRes.name, R2, Files.Length(F2), re);
+					Compress.AddFile(file, cRes.name, R2, Files.Length(F2)(SIGNED32), re);
 					IF re = Compress.Done THEN
 						RegisterResource(cRes, pack.name)
 					ELSE
@@ -637,7 +637,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 			WHILE ((p+l) < Files.Length(F)) DO
 				p := p+l; Files.Set(R, F, p);
 				ReadResource(R, res^, i, l);
-				res.pos := Files.Pos(R);
+				res.pos := Files.Pos(R)(SIGNED32);
 				IF i = DataTag THEN
 					res.next := resl; resl := res; NEW(res)
 				ELSIF i = URLTag THEN
@@ -661,7 +661,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 				WHILE ((p+l) < Files.Length(F)) DO
 					p := p+l; Files.Set(R, F, p);
 					ReadResource(R, res^, i, l);
-					res.pos := Files.Pos(R);
+					res.pos := Files.Pos(R)(SIGNED32);
 					IF i IN {DataTag, URLTag} THEN
 						(* done *)
 					ELSIF i = CmdTag THEN

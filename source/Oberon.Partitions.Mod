@@ -792,13 +792,13 @@ BEGIN
 	IF res = Ok THEN
 		f := Files.Old(BootLoaderName); Files.Set(r, f, 0);
 		ASSERT((f # NIL) & (Files.Length(f) <= Size));	(* assume boot file is present and small enough *)
-		Files.ReadBytes(r, b, Files.Length(f));
+		Files.ReadBytes(r, b, Files.Length(f)(SIZE));
 		ASSERT(r.res = 0);
 		ASSERT(Get4(b, 1F8H) = FSIDOBL);	(* new OBL.Bin *)
 			(* get parameters from boot loader *)
 		rsize := Get2(b, 0EH); tsize := ORD(b[10H]);
 		ASSERT((rsize-tsize)*BS = Files.Length(f));	(* check boot loader size *)
-		lsize := Files.Length(f) DIV BS;
+		lsize := (Files.Length(f) DIV BS)(SIGNED32);
 		ASSERT(lsize = LoaderSize);
 			(* set parameters in boot loader *)
 		dev.getSize(dev, size, res);
@@ -1155,11 +1155,11 @@ CONST Size = 32;
 VAR buf: ARRAY Size*BS OF CHAR; r: Files.Rider; n, num: SIGNED32;
 BEGIN
 	ASSERT(dev.blockSize = BS);
-	Files.Set(r, f, 0); num := (Files.Length(f)+BS-1) DIV BS; sum := 0;
+	Files.Set(r, f, 0); num := ((Files.Length(f)+BS-1) DIV BS)(SIGNED32); sum := 0;
 	LOOP
 		IF num <= 0 THEN EXIT END;
 		Files.ReadBytes(r, buf, Size*BS);
-		n := Size*BS - r.res;
+		n := Size*BS - r.res(SIGNED32);
 		WHILE n MOD BS # 0 DO buf[n] := 0X; INC(n) END;
 		ASSERT((n > 0) & (n <= num*BS));
 		dev.transfer(dev, Write, pos, n DIV BS, buf, 0, res);
@@ -1170,26 +1170,26 @@ BEGIN
 	sum := (-sum) MOD 100H
 END WriteFile;
 
-PROCEDURE CheckFile(f: Files.File; dev: Disks.Device; pos: SIGNED32; sum: SIGNED32; VAR res: INTEGER);
+PROCEDURE CheckFile(f: Files.File; dev: Disks.Device; pos: Files.Position; sum: SIGNED32; VAR res: INTEGER);
 CONST Size = 32;
-VAR buf1, buf2: ARRAY Size*BS OF CHAR; r: Files.Rider; n, num, i: SIGNED32;
+VAR buf1, buf2: ARRAY Size*BS OF CHAR; r: Files.Rider; n, num, i: SIZE;
 BEGIN
 	ASSERT(dev.blockSize = BS);
-	Files.Set(r, f, 0); num := (Files.Length(f)+BS-1) DIV BS;
+	Files.Set(r, f, 0); num := (Files.Length(f)(SIGNED32)+BS-1) DIV BS;
 	LOOP
 		IF num <= 0 THEN EXIT END;
 		Files.ReadBytes(r, buf1, Size*BS);
 		n := Size*BS - r.res;
 		WHILE n MOD BS # 0 DO buf1[n] := 0X; INC(n) END;
 		ASSERT((n > 0) & (n <= num*BS));
-		dev.transfer(dev, Read, pos, n DIV BS, buf2, 0, res);
+		dev.transfer(dev, Read, pos(SIGNED32), n(SIGNED32) DIV BS, buf2, 0, res);
 		IF res # Ok THEN EXIT END;
 		i := 0;
 		WHILE i # n DO
 			IF buf1[i] # buf2[i] THEN res := CoreMismatch; EXIT END;
 			INC(i)
 		END;
-		DEC(num, n DIV BS); INC(pos, n DIV BS);
+		DEC(num, n DIV BS); INC(pos, n(SIGNED32) DIV BS);
 		REPEAT DEC(n); sum := (sum + ORD(buf2[n])) MOD 100H UNTIL n = 0
 	END;
 	IF (res = Ok) & (sum # 0) THEN res := CoreChecksumError END;
@@ -1224,7 +1224,7 @@ BEGIN
 				IF res = Ok THEN
 					Put4(data, 0, LoadAdr); Put4(data, 4, Frags + ASH(sum, 16));
 					Put4(data, 8, StartAdr); Put4(data, 12, 0);	(* pos relative to start *)
-					Put4(data, 16, (Files.Length(f)+BS-1) DIV BS);
+					Put4(data, 16, (Files.Length(f)(SIGNED32)+BS-1) DIV BS);
 					AddEntry(table, Frag, LEN(data), data);
 					PutTable(dev, part, table, res)
 				END
@@ -1270,7 +1270,7 @@ BEGIN
 							IF ~In.Done THEN name := BootFileName END;
 							f := Files.Old(name);
 							IF (f # NIL) OR (fsres # -1) THEN
-								IF fsres = -1 THEN fsres := (Files.Length(f)+BS-1) DIV BS END;
+								IF fsres = -1 THEN fsres := (Files.Length(f)(SIGNED32)+BS-1) DIV BS END;
 								In.LongInt(flag);
 								IF ~In.Done THEN flag := 1FH END;
 								Texts.WriteString(w, "Reserving "); WriteK(w, fsres*BS DIV 1024);
@@ -1778,7 +1778,7 @@ BEGIN
 					ofs := 0; size := MAX(SIGNED32)
 				END;
 				IF size > 0 THEN
-					num := (Files.Length(f)+BS-1) DIV BS - ofs;
+					num := (Files.Length(f)(SIGNED32)+BS-1) DIV BS - ofs;
 					IF size > num THEN size := num END;
 					Files.Set(r, f, 0); pos := dev.table[part].start + ofs;
 					Texts.WriteString(w, "Copying... "); Texts.Append(Oberon.Log, w.buf);
@@ -1786,7 +1786,7 @@ BEGIN
 					LOOP
 						Progress(Oberon.Log, i, size, pr);
 						Files.ReadBytes(r, buf, Size);
-						num := Size - r.res;
+						num := Size - r.res(SIGNED32);
 						IF num = 0 THEN EXIT END;
 						WHILE num MOD BS # 0 DO buf[num] := 0X; INC(num) END;
 						num := num DIV BS;
@@ -1911,15 +1911,15 @@ BEGIN
 	IF res = Ok THEN
 		Files.Set(r, f, 0);
 		ASSERT((f # NIL) & (Files.Length(f) <= Size));	(* assume boot file is present and small enough *)
-		Files.ReadBytes(r, bnew, Files.Length(f));
+		Files.ReadBytes(r, bnew, Files.Length(f)(SIZE));
 		ASSERT(r.res = 0);
-		lsize := Files.Length(f) DIV BS;
+		lsize := (Files.Length(f) DIV BS)(SIGNED32);
 		dev.transfer(dev, Read, dev.table[part].start, lsize, b, 0, res);
 		ASSERT(Get4(b, 1F8H) = FSID);	(* OBL.Bin signature 'AOS!' *)
 			(* get parameters from boot loader *)
 		rsize := Get2(b, 0EH); tsize := ORD(b[10H]);
 		ASSERT((rsize-tsize)*BS = Files.Length(f));	(* check boot loader size *)
-		lsize := Files.Length(f) DIV BS;
+		lsize := (Files.Length(f) DIV BS)(SIGNED32);
 		ASSERT(lsize = LoaderSize);
 			(* set parameters in boot loader *)
 		FOR i := 0H TO 2H DO

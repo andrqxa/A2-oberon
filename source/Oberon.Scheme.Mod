@@ -1186,7 +1186,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE FilePos (ip: Input): SIGNED32;
 	BEGIN
-		RETURN Files.Pos(ip(FileInput).r)
+		RETURN Files.Pos(ip(FileInput).r)(SIGNED32)
 	END FilePos;
 
 	PROCEDURE NewFileInput* (file: Files.File): Object;

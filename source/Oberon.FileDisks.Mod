@@ -18,7 +18,7 @@ TYPE
 			new: BOOLEAN;
 
 		PROCEDURE Transfer*(op, lba, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
-		VAR pos, n: SIGNED32; r: Files.Rider;
+		VAR pos, n: SIZE; r: Files.Rider;
 		BEGIN
 			ASSERT(ofs = 0);	(* implementation restriction *)
 			IF (op = Disks.Read) OR (op = Disks.Write) THEN
@@ -34,13 +34,13 @@ TYPE
 								r.res := num*SELF.blockSize
 							END;
 							IF r.res # 0 THEN	(* fill rest of block with 0 *)
-								pos := num*SELF.blockSize - r.res + SIGNED32(ofs); n := r.res;
+								pos := num*SELF.blockSize - r.res + ofs; n := r.res(SIGNED32);
 								WHILE n # 0 DO data[pos] := 0X; INC(pos); DEC(n) END
 							END;
 							res := Disks.Ok
 						|Disks.Write:
 							IF pos > Files.Length(SELF.f) THEN	(* outside file *)
-								n := pos - Files.Length(SELF.f);
+								n := pos - Files.Length(SELF.f)(SIGNED32);
 								Files.Set(r, SELF.f, Files.Length(SELF.f));
 								WHILE n > 0 DO Files.Write(r, 0X); DEC(n) END
 							END;
@@ -56,7 +56,7 @@ TYPE
 			END
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size, res: SIGNED32);
+		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			size := SELF.size; res := Disks.Ok
 		END GetSize;
@@ -93,7 +93,7 @@ BEGIN
 		ELSE
 			dev.f := Files.Old(name);
 			IF (dev.f # NIL) & (Files.Length(dev.f) MOD BS = 0) THEN
-				dev.size := Files.Length(dev.f) DIV BS
+				dev.size := Files.Length(dev.f)(SIGNED32) DIV BS
 			ELSE
 				dev.f := NIL
 			END
@@ -115,12 +115,12 @@ VAR n: SIGNED32; r: Files.Rider;
 BEGIN
 	Disks.registry.Remove(dev);
 	Out.String("Closing "); Out.String(dev.name); Out.Char(" ");
-	n := dev.size*BS - Files.Length(dev.f);
+	n := dev.size*BS - Files.Length(dev.f)(SIGNED32);
 	IF n > 0 THEN	(* not complete *)
 		Files.Set(r, dev.f, Files.Length(dev.f));
 		WHILE n > 0 DO Files.Write(r, 0X); DEC(n) END
 	END;
-	Out.Int(Files.Length(dev.f) DIV 1024, 1); Out.String("KB"); Out.Ln;
+	Out.Int(Files.Length(dev.f)(SIGNED32) DIV 1024, 1); Out.String("KB"); Out.Ln;
 	IF dev.new THEN Files.Register(dev.f) ELSE Files.Close(dev.f) END;
 	dev.f := NIL
 END Unregister;

@@ -85,7 +85,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 		R.sizeRecord := sizeRecord;
 		nFields := (sizeHead-32-1) DIV 32;
 		address := 1; width := 0;
-		NEW(R.fields); field := R.fields; field.next := NIL; pos := Files.Pos(R.R)+20;
+		NEW(R.fields); field := R.fields; field.next := NIL; pos := Files.Pos(R.R)(SIGNED32)+20;
 		Files.Set(R.R, F, pos);
 		WHILE nFields > 0 DO
 			NEW(field.next); field := field.next; field.next := NIL;
@@ -98,7 +98,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 			Files.Read(R.R, ch); field.width := ORD(ch);
 			Files.Read(R.R, ch); field.digits := ORD(ch);
 			address := field.address; width := field.width;
-			pos := Files.Pos(R.R)+14; Files.Set(R.R, F, pos);
+			pos := Files.Pos(R.R)(SIGNED32)+14; Files.Set(R.R, F, pos);
 			DEC(nFields)
 		END;
 		R.fields := R.fields.next;
@@ -121,7 +121,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 		Files.Set(R.R, Files.Base(R.R), R.firstRecord + record*R.sizeRecord);
 		Files.Read(R.R, ch);
 		IF ch = " " THEN
-	 		R.thisRecord := Files.Pos(R.R)-1; R.res := Done
+	 		R.thisRecord := Files.Pos(R.R)(SIGNED32)-1; R.res := Done
 	 	ELSIF ch = CHR(27) THEN
 	 		R.res := RecordDeleted
 	 	ELSE

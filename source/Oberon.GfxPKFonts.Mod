@@ -247,7 +247,7 @@ MODULE GfxPKFonts IN Oberon; (** portable *)	(* eos  *)
 		Files.Set(r, file, 0);
 		Files.Read(r, ch); Files.Read(r, id);
 		IF (ch = CHR(247)) & (id = CHR(89)) THEN
-			NEW(base); NEW(base.buf, Files.Length(file));	(* longer than necessary :-( *)
+			NEW(base); NEW(base.buf, Files.Length(file)(SIZE));	(* longer than necessary :-( *)
 			FOR i := 0 TO 0FFH DO base.pos[i] := -1 END;	(* mark as not present *)
 			pos := 0;	(* offset into buffer *)
 			Files.Read(r, ch); Files.Set(r, file, 3 + ORD(ch));	(* skip comment *)

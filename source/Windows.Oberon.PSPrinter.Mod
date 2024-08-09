@@ -948,7 +948,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 					IF ~P.eps THEN
 						Int(bodyR, nofcopies); Str(bodyR, " p"); Ln(bodyR)
 					END;
-					curFont := -1; INC(P.pno); ppos := Files.Pos(bodyR);
+					curFont := -1; INC(P.pno); ppos := Files.Pos(bodyR)(SIGNED32);
 					Str(bodyR, "%%Page: 0 "); Int(bodyR, P.pno); Ln(bodyR);
 				|twoup:
 					x := 2336 * 3048 DIV P.Unit;
@@ -956,7 +956,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 						| 0: Int(bodyR, x); Str(bodyR, " 0 translate"); Ln(bodyR)
 						| 1: Int(bodyR, -x); Str(bodyR, " 0 translate"); Ln(bodyR);
 							Int(bodyR, nofcopies); Str(bodyR, " p"); Ln(bodyR);
-							curFont := -1; INC(P.pno); ppos := Files.Pos(bodyR);
+							curFont := -1; INC(P.pno); ppos := Files.Pos(bodyR)(SIGNED32);
 							Str(bodyR, "%%Page: 0 "); Int(bodyR, P.pno); Ln(bodyR)
 					END; (* CASE *)
 					P.location := 1-P.location
@@ -968,7 +968,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 						| 2: Int(bodyR, x); Str(bodyR, " 0 translate"); Ln(bodyR)
 						| 3: Int(bodyR, -x); Ch(bodyR, " "); Int(bodyR, y); Str(bodyR, " translate"); Ln(bodyR);
 							Int(bodyR, nofcopies); Str(bodyR, " p"); Ln(bodyR);
-							curFont := -1; INC(P.pno); ppos := Files.Pos(bodyR);
+							curFont := -1; INC(P.pno); ppos := Files.Pos(bodyR)(SIGNED32);
 							Str(bodyR, "%%Page: 0 "); Int(bodyR, P.pno); Ln(bodyR)
 					END; (* CASE *)
 					P.location := (P.location+1) MOD 4
@@ -991,7 +991,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 			dpi := 914400 DIV Printer.current.Unit;
 			IF (P.mode # oneup) & (P.location # 0) THEN
 				Int(bodyR, 1); Str(bodyR, " p"); Ln(bodyR);
-				curFont := -1; INC(P.pno); ppos := Files.Pos(bodyR)
+				curFont := -1; INC(P.pno); ppos := Files.Pos(bodyR)(SIGNED32)
 			END;
 			Files.Set(bodyR, bodyF, ppos);	(*overwrite last %%Page line*)
 			Str(bodyR, "%%Trailer         "); Ln(bodyR);

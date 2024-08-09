@@ -435,7 +435,7 @@ VAR
 		pos: SIGNED32;
 	BEGIN
 		IF numBytes > 0 THEN
-			pos:=F.Pos(cInfo.src.rider);
+			pos:=F.Pos(cInfo.src.rider)(SIGNED32);
 			F.Set(cInfo.src.rider,cInfo.src.file,pos + numBytes);
 		END;
 	END skipInputData;
@@ -470,7 +470,7 @@ VAR
 		IF cInfo.src.startOfFile THEN
 			ErrMsg("no image data found", 1)
 		END;
-		pos := F.Pos(cInfo.src.rider);
+		pos := F.Pos(cInfo.src.rider)(SIGNED32);
 		F.Write(cInfo.src.rider,JPEGFF);
 		F.Write(cInfo.src.rider,JPEGEOI);
 		F.Set(cInfo.src.rider,cInfo.src.file,pos);
@@ -3780,7 +3780,7 @@ VAR
 				WITH msg: Objects.FileMsg DO
 					IF (msg.id = Objects.load) THEN
 						Decode(Files.Base(msg.R), obj, Integer, 1, DitherFS, ColorsOld);
-						IF err = 0 THEN msg.len := Files.Length(Files.Base(msg.R)) ELSE msg.len := 0 END;
+						IF err = 0 THEN msg.len := Files.Length(Files.Base(msg.R))(SIGNED32) ELSE msg.len := 0 END;
 					ELSE
 						Pictures.Handle(obj, msg)
 					END;

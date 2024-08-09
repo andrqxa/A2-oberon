@@ -33,7 +33,7 @@ MODULE ZipDocs IN Oberon; (** portable *)	(* ejz  *)
 		arc: Zip.Archive; ent: Zip.Entry; arcname, name, tempname: ARRAY 256 OF CHAR;
 		line, res: SIGNED32;
 		tempfile: Files.File;
-		res2 : SIGNED16;
+		res2 : INTEGER;
 	BEGIN
 		Oberon.GetSelection(T, beg, end, time);
 		D := Desktops.CurDoc(Gadgets.context);

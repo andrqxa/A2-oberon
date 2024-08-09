@@ -147,12 +147,12 @@ BEGIN
 			ELSE read := srclen - totWritten
 			END;
 			Files.ReadBytes(src, buf, read);
-			WriteBytes(w, buf, 0, read - src.res, written);
+			WriteBytes(w, buf, 0, read - src.res(SIGNED32), written);
 			INC(totWritten, written)
 		UNTIL (w.res # Ok) OR (totWritten >= srclen);
 		Close(w);
 		crc32 := w.crc32;
-		dstlen := Files.Pos(w.r) - Files.Pos(dst);
+		dstlen := (Files.Pos(w.r) - Files.Pos(dst))(SIGNED32);
 	END;
 	res := w.res
 END Compress;

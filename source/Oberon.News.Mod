@@ -713,7 +713,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			Texts.WriteLn(W);
 			Texts.Append(Oberon.Log, W.buf);
 			indexM := BTrees.NewStr(Files.New(""), 0, SHORT(2*(end-beg))); BTrees.Flush(indexM);
-			indexA := BTrees.NewLInt(BTrees.Base(indexM), Files.Length(BTrees.Base(indexM)), SHORT(2*(end-beg)));
+			indexA := BTrees.NewLInt(BTrees.Base(indexM), Files.Length(BTrees.Base(indexM))(SIGNED32), SHORT(2*(end-beg)));
 			NetTools.curLen := end-beg; availBeg := beg;
 			refs := Files.New(""); Files.Set(R, refs, 0);
 			line := "XOVER ";
@@ -752,7 +752,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 						WHILE (line[i] # 0X) & (line[i] # "<") DO
 							INC(i)
 						END;
-						org := Files.Pos(R);
+						org := Files.Pos(R)(SIGNED32);
 						BTrees.InsertStr(indexM, msgid, org, bres);	(* add msgid to msgs index *)
 						BTrees.InsertLInt(indexA, nr, org, bres);
 						Files.WriteLInt(R, -1);	(* offset of title line *)
@@ -781,7 +781,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 							END
 						END;
 						Files.WriteLInt(R, -1);	(* end of reference list *)
-						org2 := Files.Pos(R);
+						org2 := Files.Pos(R)(SIGNED32);
 						Files.Set(R, refs, org);	(* fixup for title line *)
 						Files.WriteLInt(R, org2);
 						Files.Set(R, refs, org2);	(* write the title line *)
@@ -805,15 +805,15 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 								Strings.Upper(msgid, msgid);
 								Files.ReadLInt(R, org);
 								IF org = -2 THEN
-									org2 := Files.Length(refs); DEC(beg);
+									org2 := Files.Length(refs)(SIGNED32); DEC(beg);
 									BTrees.InsertStr(indexM, msgid, org2, bres);
 									BTrees.InsertLInt(indexA, beg, org2, bres);
-									org := Files.Pos(R)-4;
+									org := Files.Pos(R)(SIGNED32)-4;
 									Files.Set(R, refs, org2);
 									Files.WriteLInt(R, -1);	(* offset of title line *)
 									Files.WriteLInt(R, beg);	(* the article nr. for article msgid *)
 									Files.WriteLInt(R, -1);	(* end of reference list *)
-									org3 := Files.Pos(R);
+									org3 := Files.Pos(R)(SIGNED32);
 									Strings.IntToStr(beg, dummy); Strings.AppendCh(dummy, Strings.Tab);
 									Strings.Append(dummy, "Was: "); Strings.Append(dummy, msgid);
 									Files.WriteString(R, dummy);	(* write the title line *)
@@ -827,7 +827,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 									INC(i)
 								END
 							END;
-							org := Files.Length(refs); Files.Set(R, refs, org)
+							org := Files.Length(refs)(SIGNED32); Files.Set(R, refs, org)
 						END
 					END;
 					NetSystem.ReadString(S.C, line)

@@ -159,7 +159,7 @@ BEGIN
 	Files.ReadLInt(r, longDummy);
 	IF longDummy = CentralFileHeaderSignature THEN
 		NEW(ent);
-		ent.offsetCentralDir := Files.Pos(r) - 4;
+		ent.offsetCentralDir := Files.Pos(r)(SIGNED32) - 4;
 		ent.support := 0;
 		Files.ReadInt(r, intDummy);	(* version made by *)
 		Files.ReadInt(r, intDummy);	(* version needed to extract *)
@@ -197,7 +197,7 @@ BEGIN
 			Files.ReadBytes(r, ent.comment^, commentLen)	(* file comment *)
 		END;
 		(* read extra field length in the local file header (can be different from extra field length stored in the file header...) *)
-		longDummy := Files.Pos(r);	(* store actual position of file reader *)
+		longDummy := Files.Pos(r)(SIGNED32);	(* store actual position of file reader *)
 		Files.Set(r, Files.Base(r), ent.offsetLocal + 28);	(* set r to position of extra field length in local file header *)
 		Files.ReadInt(r, extraLen);	(* extra field length *)
 		ent.offsetFileData := ent.offsetLocal + 30 + nameLen + extraLen;	(* compute offset of file data *)
@@ -236,7 +236,7 @@ END WriteLocalFileHeader;
 (* Writes file header in central directory, updates ent.offsetCentralDir *)
 PROCEDURE WriteFileHeader(ent: Entry; VAR r: Files.Rider);
 BEGIN
-	ent.offsetCentralDir := Files.Pos(r);
+	ent.offsetCentralDir := Files.Pos(r)(SIGNED32);
 	Files.WriteLInt(r, CentralFileHeaderSignature);	(* central file header signature *)
 	Files.WriteInt(r, CompatibleVersions * 10);	(* version made by *)
 	Files.WriteInt(r, CompatibleVersions * 10);	(* version needed to extract *)
@@ -307,7 +307,7 @@ BEGIN
 		WriteFileHeader(ent, r);
 		ent := ent.next
 	END;
-	arc.offset := Files.Pos(r);
+	arc.offset := Files.Pos(r)(SIGNED32);
 	WriteEndOfCentDir(arc, r)
 END WriteCentralDirectory;
 
@@ -343,7 +343,7 @@ BEGIN
 		ELSE
 			NEW(arc);
 			arc.file := f;
-			arc.offset := Files.Pos(r) - 4;
+			arc.offset := Files.Pos(r)(SIGNED32) - 4;
 			Files.ReadInt(r, intDummy);	(* number of this disk *)
 			Files.ReadInt(r, intDummy);	(* number of the disk with the start of the central directory *)
 			Files.ReadInt(r, intDummy);	(* total number of entries in the central dir on this disk *)
@@ -531,9 +531,9 @@ BEGIN
 		END;
 		Files.Set(dst, arc.file, ent.offsetLocal);
 		WriteLocalFileHeader(ent, dst);
-		ent.offsetFileData := Files.Pos(dst);
+		ent.offsetFileData := Files.Pos(dst)(SIGNED32);
 		Files.Close(arc.file);
-		start := Files.Pos(src);
+		start := Files.Pos(src)(SIGNED32);
 		IF level = 0 THEN
 			Copy(src, dst, len, TRUE, ent.crc32);
 			ent.compSize := len;
@@ -547,7 +547,7 @@ BEGIN
 			END
 		END;
 		IF res = Ok THEN
-			ent.uncompSize := Files.Pos(src) - start;
+			ent.uncompSize := Files.Pos(src)(SIGNED32) - start;
 			Files.Close(arc.file);
 			Files.Set(dst, arc.file, ent.offsetLocal + 14);
 			Files.WriteLInt(dst, ent.crc32);
@@ -692,7 +692,7 @@ BEGIN
 					buf[offset + i] := bufp[i]
 				END
 			END;
-			read := len - r(UncompReader).fr.res;
+			read := len - r(UncompReader).fr.res(SIGNED32);
 			r(UncompReader).crc32 := Zlib.CRC32(r(UncompReader).crc32, buf, offset, read)
 		ELSIF r IS DefReader THEN
 			ZlibReaders.ReadBytes(r(DefReader).zr, buf, offset, len, read);

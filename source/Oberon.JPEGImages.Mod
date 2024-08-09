@@ -442,7 +442,7 @@ VAR
 	(* numBytes Daten auf InputFile ueberspringen *)
 	PROCEDURE skipInputData(cInfo: CInfoPtr; numBytes:SIGNED32);
 	VAR
-		pos: SIGNED32;
+		pos: Files.Position;
 	BEGIN
 		IF numBytes > 0 THEN
 			pos:=F.Pos(cInfo.src.rider);
@@ -475,7 +475,7 @@ VAR
 	(* Fehlerbehandlung wenn File Ende des InputFile erreicht wird *)
 	PROCEDURE fileEnd(cInfo: CInfoPtr);
 	VAR
-		pos: SIGNED32;
+		pos: Files.Position;
 	BEGIN
 		IF cInfo.src.startOfFile THEN
 			ErrMsg("no image data found", 1)
@@ -3771,7 +3771,7 @@ PROCEDURE Load (img: Images.Image; VAR fname: ARRAY OF CHAR; VAR done: BOOLEAN);
 				WITH msg: Objects.FileMsg DO
 					IF (msg.id = Objects.load) THEN
 (*es*						Decode(Files.Base(msg.R), obj, Integer, 1, DitherFS, ColorsOld);  **)
-						IF err = 0 THEN msg.len := Files.Length(Files.Base(msg.R)) ELSE msg.len := 0 END;
+						IF err = 0 THEN msg.len := Files.Length(Files.Base(msg.R))(SIGNED32) ELSE msg.len := 0 END;
 					ELSE
 						Pictures.Handle(obj, msg)
 					END;

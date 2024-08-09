@@ -570,7 +570,7 @@ VAR
 	END Handle;
 
 	PROCEDURE AsciiText(name: ARRAY OF CHAR): Texts.Text;
-		VAR text: Texts.Text;	res: SIGNED16;	ch, pch: CHAR;
+		VAR text: Texts.Text;	res: INTEGER;	ch, pch: CHAR;
 			f, g : Files.File;	Rf, Rg : Files.Rider;
 	BEGIN
 		f := Files.Old(name);
@@ -756,7 +756,7 @@ VAR
 	END UpdateNameLog;
 
 	PROCEDURE RenameOld(name: ARRAY OF CHAR);
-		VAR bck: ARRAY 32 OF CHAR;	i, res: SIGNED16;
+		VAR bck: ARRAY 32 OF CHAR;	i, res: INTEGER;
 	BEGIN
 		i := 0; WHILE (i < 32-5) & (name[i]# 0X) DO bck[i] := name[i]; INC(i) END;
 		bck[i] := "."; INC(i); bck[i] := "B"; INC(i); bck[i] := "a"; INC(i); bck[i] := "k"; INC(i); bck[i] := 0X;

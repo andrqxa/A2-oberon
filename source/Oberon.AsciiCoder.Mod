@@ -21,11 +21,11 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 		table: ARRAY N OF CHAR;	(* hash table for compression *)
 
 	PROCEDURE Compress*(src, dest: Files.File);	(* due to Stefan Ludwig *)
-		VAR hash, byte, bit, i: SIGNED32; ch: CHAR; from, to: Files.Rider;
+		VAR hash, byte, bit: SIGNED32; i: Files.Position; ch: CHAR; from, to: Files.Rider;
 	BEGIN
 		i := 0; REPEAT table[i] := 0X; INC(i) UNTIL i = N;
 		Files.Set(from, src, 0); Files.Set(to, dest, 0);
-		i := Files.Length(src); Files.WriteNum(to, i);
+		i := Files.Length(src); Files.WriteNum(to, i(SIGNED32));
 		IF i > 0 THEN
 			hash := 0; bit := 0; byte := 0;
 			REPEAT
@@ -160,7 +160,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 	END CodeFiles;
 
 	PROCEDURE DecodeFiles*;
-		VAR pos, beg, end, time: SIGNED32; i, res: SIGNED16; ch: CHAR; ok, compress: BOOLEAN;
+		VAR pos, beg, end, time: SIGNED32; i, res: INTEGER; ch: CHAR; ok, compress: BOOLEAN;
 			f, f1: Files.File; text: Texts.Text; s: Texts.Scanner; names: NameList; bakname: ARRAY 256 OF CHAR;
 	BEGIN text := Oberon.Par.text; pos := Oberon.Par.pos; compress := FALSE;
 		Texts.OpenScanner(s, text, pos); Texts.Scan(s);

@@ -2126,7 +2126,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		VAR b: CHAR;
 	BEGIN
 		Next(b); Texts.SetFont(W, titleFont); WriteString(str);
-		IF memory THEN WriteDWHex(SIGNED32(ReadAdr)-1) ELSE WriteDWHex(Files.Pos(R)-1) END;
+		IF memory THEN WriteDWHex(SIGNED32(ReadAdr)-1) ELSE WriteDWHex(Files.Pos(R)(SIGNED32)-1) END;
 		IF b = ch THEN WriteLn ELSE WriteString(" wrong sign! "); WriteByte(ORD(b)); WriteLn END;
 		Texts.SetFont(W, defaultFont)
 	END Check;
@@ -2264,7 +2264,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 			symSize: SIGNED32;
 			name: ARRAY 32 OF CHAR;
 			ch: CHAR;
-			pos, filepos: SIGNED32;
+			pos, filepos: Files.Position;
 			data: ARRAY 16 OF CHAR;
 			entry: EntryArray;
 			noProcs,tmp,codeoffset,beginOffset,endOffset,nofptrs,p: SIGNED32;   (* fof *)
@@ -2502,7 +2502,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 			WriteLn;
 			(* output *)
-			IF T # NIL THEN Texts.Insert(T, pos, W.buf) END;
+			IF T # NIL THEN Texts.Insert(T, pos(SIGNED32), W.buf) END;
 			Files.Set(R, NIL, 0)
 		END
 	END DecodeObjFile;

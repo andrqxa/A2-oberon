@@ -40,14 +40,14 @@ BEGIN
 		Files.ReadInt(R, pcxh.xMax); Files.ReadInt(R, pcxh.yMax);
 		Files.ReadInt(R, pcxh.hRes); Files.ReadInt(R, pcxh.vRes);
 		IF (pcxh.bits <= 4X) OR (pcxh.version = 00X) OR (pcxh.version = 03X) THEN
-			pcxh.palPos := Files.Pos(R)
+			pcxh.palPos := Files.Pos(R)(SIGNED32)
 		ELSE
-			pcxh.palPos := Files.Length(Files.Base(R)) - (256 * 3)
+			pcxh.palPos := (Files.Length(Files.Base(R)) - (256 * 3))(SIGNED32)
 		END;
 		Files.ReadBytes(R, filler, 48);
 		Files.Read(R, pcxh.vMode); Files.Read(R, pcxh.planes);
 		Files.ReadInt(R, pcxh.bytesPerLine); Files.ReadInt(R, pcxh.paletteInfo);
-		Files.ReadBytes(R, filler, 58); pcxh.picPos := Files.Pos(R);
+		Files.ReadBytes(R, filler, 58); pcxh.picPos := Files.Pos(R)(SIGNED32);
 		RETURN(TRUE)
 	END
 END ReadPCXHeader;

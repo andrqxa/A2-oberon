@@ -571,7 +571,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 				IF log # NIL THEN
 					Texts.WriteString(W, "Received: ");
 					Texts.WriteString(W, locName); Texts.WriteString(W, " ");
-					Texts.WriteInt(W, Files.Length(F), 1); Texts.WriteString(W, " bytes");
+					Texts.WriteInt(W, Files.Length(F)(SIGNED32), 1); Texts.WriteString(W, " bytes");
 					Texts.WriteLn(W); Texts.Append(log, W.buf)
 				END
 			ELSE
@@ -590,7 +590,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 			Files.ReadBytes(R, buffer, BufLen)
 		END;
 		IF R.res > 0 THEN
-			NetSystem.WriteBytes(C, 0, BufLen-R.res, buffer)
+			NetSystem.WriteBytes(C, 0, BufLen-R.res(SIGNED32), buffer)
 		END
 	END WriteData;
 
@@ -1197,7 +1197,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 						IF log # NIL THEN
 							Texts.WriteString(W, "Received: ");
 							Texts.WriteString(W, loc); Texts.WriteString(W, " ");
-							Texts.WriteInt(W, Files.Length(F), 1); Texts.WriteString(W, " bytes");
+							Texts.WriteInt(W, Files.Length(F)(SIGNED32), 1); Texts.WriteString(W, " bytes");
 							Texts.WriteLn(W); Texts.Append(log, W.buf)
 						END
 					ELSE

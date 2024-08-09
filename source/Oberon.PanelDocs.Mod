@@ -106,7 +106,7 @@ END LoadPanel;
 (** Document method. *)
 PROCEDURE StorePanel*(D: Documents.Document);
 VAR lib: Objects.Library; f: Files.File; len: SIGNED32; P: Display.Frame;
-	new, gen: ARRAY 64 OF CHAR; i: SIGNED16; B: Objects.BindMsg; R: Files.Rider;
+	new, gen: ARRAY 64 OF CHAR; i: INTEGER; B: Objects.BindMsg; R: Files.Rider;
 BEGIN
 	Texts.WriteString(W, "Store "); Texts.Append(Oberon.Log, W.buf);
 	IF D.name # "" THEN

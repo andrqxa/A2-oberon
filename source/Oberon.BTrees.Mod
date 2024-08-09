@@ -78,7 +78,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	PROCEDURE AllocSpace(T: Tree; size: SIGNED32): SIGNED32;
 		VAR
 			R: Files.Rider;
-			pos: SIGNED32;
+			pos: Files.Position;
 	BEGIN
 		IF T.free > T.org THEN
 			pos := T.free; Files.Set(R, T.F, pos);
@@ -89,7 +89,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 				Files.Write(R, 0X); DEC(size)
 			END
 		END;
-		RETURN pos
+		RETURN pos(SIGNED32)
 	END AllocSpace;
 
 	PROCEDURE ToFree(T: Tree; P: Page);
@@ -1086,7 +1086,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 		Files.ReadInt(R, tag); ASSERT(tag = Tag); Files.ReadInt(R, T.class);
 		Files.ReadInt(R, T.maxCache); Files.ReadLInt(R, T.free);
 		IF T.maxCache < 4 THEN T.maxCache := 4 END;
-		T.root := Files.Pos(R); T.noCache := 0; T.cache := NIL;
+		T.root := Files.Pos(R)(SIGNED32); T.noCache := 0; T.cache := NIL;
 		RETURN T
 	END Old;
 

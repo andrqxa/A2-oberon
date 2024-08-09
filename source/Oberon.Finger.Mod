@@ -205,7 +205,7 @@ END finger0;
 	PROCEDURE finger*(VAR host, request: ARRAY OF CHAR; port: UNSIGNED16; VAR T: Texts.Text);
 		VAR
 			F: Files.File;
-			res: SIGNED16;
+			res: INTEGER;
 	BEGIN
 		finger0( host, request, port, F);
 		NEW(T);
@@ -231,7 +231,7 @@ END finger0;
 			F: Files.File;
 			R: Files.Rider;
 			ch: CHAR;
-			port: UNSIGNED16; res: SIGNED16;
+			port: UNSIGNED16; res: INTEGER;
 	BEGIN
 		WITH L: HyperDocs.LinkScheme DO
 			IF M IS HyperDocs.RegisterLinkMsg THEN

@@ -304,7 +304,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 	(* *************** DEF FILE *************** *)
 
 	PROCEDURE OpenDef(T: Texts.Text; mod: ARRAY OF CHAR; compressed: BOOLEAN);	(* Opens a saved def-text *)
-		VAR R: Files.Rider; len: SIGNED32; x, y, w, h, tag, res: SIGNED16; s: ARRAY 64 OF CHAR; ch: CHAR;
+		VAR R: Files.Rider; len: SIGNED32; x, y, w, h, tag: SIGNED16; res: INTEGER; s: ARRAY 64 OF CHAR; ch: CHAR;
 				A: Objects.AttrMsg;
 	BEGIN Append(mod, defFileExt);
 		IF compressed THEN	(* def. file is stored in the archive *)

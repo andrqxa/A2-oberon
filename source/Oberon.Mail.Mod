@@ -797,7 +797,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 			uT: Texts.Text;
 			Sc: Texts.Scanner;
 			R: Texts.Reader;
-			pos, i, k, new, maxSize: SIGNED32;
+			pos: Files.Position; i, k, new, maxSize: SIGNED32;
 			onServer: BOOLEAN;
 			obj: Objects.Object;
 			ch: CHAR;
@@ -850,7 +850,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 							WriteString(Ri, "X-UIDL: "); WriteString(Ri, uidl); WriteLn(Ri);
 							AddUIDL(set, uidl); set.uidls[set.nouidls-1][63] := 01X;
 							ReceiveMail(S, i, Ri); add := S.res = NetTools.Done;
-							AddMsgHead(pos); msgs[noMsgs-1].len := Files.Length(msgsF)-msgs[noMsgs-1].pos;
+							AddMsgHead(pos(SIGNED32)); msgs[noMsgs-1].len := (Files.Length(msgsF)-msgs[noMsgs-1].pos)(SIGNED32);
 							IF add & ~onServer THEN
 								Files.Close(msgsF); DeleteMail(S, i)
 							END
@@ -1328,8 +1328,8 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 			F: Files.File;
 			R: Files.Rider;
 			msg, bak: FileDir.FileName;
-			beg, end, offs, i: SIGNED32;
-			res: SIGNED16;
+			beg, end, offs: Files.Position; i: SIGNED32;
+			res: INTEGER;
 			ch, old: CHAR;
 		PROCEDURE Copy;
 			VAR
@@ -1339,7 +1339,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 			IF (msgs[i].pos > beg) & (msgs[i].pos < end) THEN
 				Files.Set(R, msgsF, beg);
 				Files.Set(r, F, Files.Length(F));
-				msgs[i].pos := Files.Pos(r)+offs;
+				msgs[i].pos := (Files.Pos(r)+offs)(SIGNED32);
 				WHILE beg < end DO
 					Files.Read(R, ch); Files.Write(r, ch);
 					INC(beg)
@@ -1733,7 +1733,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 	END QueryTopic;
 
 	PROCEDURE SaveIndexFile;
-		VAR f: Files.File; r: Files.Rider; i, t, d, len: SIGNED32; new: BOOLEAN;
+		VAR f: Files.File; r: Files.Rider; i, t, d: SIGNED32; new: BOOLEAN; len: Files.Position;
 	BEGIN
 		ASSERT(msgsF # NIL);
 		f := Files.Old(IndexFile); new := FALSE;
@@ -1742,7 +1742,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 			Files.GetDate(msgsF, t, d); len := Files.Length(msgsF);
 			Files.Set(r, f, 0);
 			Files.WriteLInt(r, IndexFileKey);
-			Files.WriteNum(r, t); Files.WriteNum(r, d); Files.WriteNum(r, len);
+			Files.WriteNum(r, t); Files.WriteNum(r, d); Files.WriteNum(r, len(SIGNED32));
 			Files.WriteNum(r, noMsgs); Files.WriteNum(r, delMsgs);
 			Files.WriteNum(r, LEN(msgs^)(SIGNED32));	(* size of msgs array *)
 			Files.WriteNum(r, noMsgs);
@@ -1768,7 +1768,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE TryLoadIndexFile(): BOOLEAN;
 		VAR
 			f: Files.File; r: Files.Rider;
-			t0, d0, len0, key, i, t, d, len: SIGNED32;
+			t0, d0, len0, key, t, d: SIGNED32; i, len: SIGNED32;
 
 		PROCEDURE err(n: SIGNED16);
 		BEGIN
@@ -1798,7 +1798,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		Files.Set(r, f, 0);
 		Files.ReadLInt(r, key);
 		IF key # IndexFileKey THEN err(3); RETURN FALSE END;
-		Files.GetDate(msgsF, t, d); len := Files.Length(msgsF);
+		Files.GetDate(msgsF, t, d); len := Files.Length(msgsF)(SIGNED32);
 		Files.ReadNum(r, t0); Files.ReadNum(r, d0); Files.ReadNum(r, len0);
 		IF (t0 # t) OR (d0 # d) OR (len0 # len) THEN err(4); RETURN FALSE END;
 		Files.ReadNum(r, noMsgs); Files.ReadNum(r, delMsgs);
@@ -1930,7 +1930,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 			buf[BufLen-R.res] := 0X;
 			AddMsgs();
 			IF (noMsgs > 0) & (msgs[noMsgs-1].len <= 0) THEN
-				msgs[noMsgs-1].len := Files.Length(msgsF)-1-msgs[noMsgs-1].pos
+				msgs[noMsgs-1].len := (Files.Length(msgsF)-1-msgs[noMsgs-1].pos)(SIGNED32)
 			END;
 			SaveIndexFile()
 		END

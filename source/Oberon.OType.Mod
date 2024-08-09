@@ -347,7 +347,7 @@ MODULE OType IN Oberon;	(** eos  **)
 					END;
 					INC(n)
 				END;
-				len := SHORT(offset + len - Files.Pos(r)) DIV 2;
+				len := SHORT(offset + len - Files.Pos(r)(SIGNED32)) DIV 2;
 				IF len > 0 THEN
 					NEW(font.cmap.glyph, len);
 					n := 0; WHILE n < len DO ReadInt(r, font.cmap.glyph[n]); INC(n) END

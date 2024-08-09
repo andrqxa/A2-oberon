@@ -86,7 +86,7 @@ BEGIN
 	F := Files.Base(R);
 
 	Files.Write(R, 0F7X); Files.Write(R, 08X);
-	patch := Files.Pos(R);
+	patch := Files.Pos(R)(SIGNED32);
 	Files.WriteLInt(R, 0); (* patch *)
 	Attributes.StoreAttributes(R, attr);
 	NEW(lib); Objects.OpenLibrary(lib);
@@ -94,7 +94,7 @@ BEGIN
 	Objects.StoreLibrary(lib, F, Files.Pos(R), len);
 	Files.Set(R, F, Files.Pos(R) + len);
 	Links.StoreLinks(R, lib, link);
-	len := Files.Pos(R) - patch - 4;
+	len := (Files.Pos(R) - patch - 4)(SIGNED32);
 	Files.Set(r, F, patch);
 	Files.WriteLInt(r, len);
 END StoreAttachments;

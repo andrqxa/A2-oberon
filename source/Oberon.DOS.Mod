@@ -148,7 +148,7 @@ BEGIN
 					END;
 					EXIT	(* ### *)
 				END;
-				FATFiles.WriteBytes(dst, buf, BufSize-src.res, res);
+				FATFiles.WriteBytes(dst, buf, BufSize-src.res(SIGNED32), res);
 				IF res # 0 THEN Texts.Write(wn, " ");  Error(wn, res);  EXIT END;	(* ### *)
 				IF dst.res # 0 THEN Texts.WriteString(wn, " write error");  res := -1;  EXIT END	(* ### *)
 			END;

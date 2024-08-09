@@ -368,7 +368,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
 
 	PROCEDURE getAll;
 	VAR Mail: NS.Connection; f: Files.File;
-			S: Texts.Scanner; text: Texts.Text; mpos, pos, len, d: SIGNED32;
+			S: Texts.Scanner; text: Texts.Text; mpos, len, d: SIGNED32; pos: Files.Position;
 			n, mails: SIGNED16;
 	BEGIN
         Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);

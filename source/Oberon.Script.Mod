@@ -88,7 +88,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 	END Open;
 
 	PROCEDURE Backup (VAR name: ARRAY OF CHAR);
-	VAR res, i: SIGNED16; bak: ARRAY 32 OF CHAR;
+	VAR res, i: INTEGER; bak: ARRAY 32 OF CHAR;
 	BEGIN
 		i := 0; WHILE name[i] # 0X DO bak[i] := name[i]; INC(i) END;
 		IF i > 31-4 THEN i := 31-4 END;

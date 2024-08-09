@@ -131,7 +131,7 @@ BEGIN
 END StoreAttrs;
 
 PROCEDURE StoreTextDocument(D: Documents.Document);
-	VAR new: ARRAY 128 OF CHAR; i: SIGNED16; f: Files.File; len: SIGNED32; F: Display.Frame; R: Files.Rider;
+	VAR new: ARRAY 128 OF CHAR; i: INTEGER; f: Files.File; len: SIGNED32; F: Display.Frame; R: Files.Rider;
 		M: StoreMsg;
 BEGIN
 	F := D.dsc;

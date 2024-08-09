@@ -227,13 +227,13 @@ END ImageToPict;
 	END InstallConverter;
 
 	PROCEDURE LoadPicture0( VAR pict: Pictures.Picture;  R: Files.Rider;  VAR done: BOOLEAN );
-	VAR msg: Objects.FileMsg;  i: SIGNED32;  id: SIGNED16;  pos: SIGNED32;
+	VAR msg: Objects.FileMsg;  i: SIGNED32;  id: SIGNED16;  pos: Files.Position;
 	BEGIN
 		IF pict = NIL THEN Pictures.NewPicture;  pict := Objects.NewObj( Pictures.Picture ) ELSE Objects.NewObj := pict END;
 		msg.R := R;  msg.id := Objects.load;  msg.len := 0;  done := FALSE;  i := 0;  pos := Files.Pos( msg.R );
 		Files.ReadInt( msg.R, id );  Files.Set( msg.R, Files.Base( msg.R ), pos );
 		IF id = Pictures.PictFileId THEN
-			Pictures.Handle( pict, msg );  msg.len := Files.Pos( msg.R );
+			Pictures.Handle( pict, msg );  msg.len := Files.Pos( msg.R )(SIGNED32);
 			IF msg.len > 0 THEN done := TRUE;  RETURN END
 		END;
 		WHILE i < LEN( pictconversions^ ) DO

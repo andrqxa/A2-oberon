@@ -337,7 +337,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	END SymWNum;
 
 	PROCEDURE SymWPos*():SIGNED32;
-	BEGIN RETURN Files.Pos(newSymF)+Files.Pos(ModF);
+	BEGIN RETURN (Files.Pos(newSymF)+Files.Pos(ModF))(SIGNED32);
 	END SymWPos;
 
 	PROCEDURE SymWMod*(VAR name: ARRAY OF CHAR);
@@ -396,13 +396,13 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	END ObjWString;
 
 	PROCEDURE ObjAllocInt*(): SIGNED32;
-		VAR pos: SIGNED32;
+		VAR pos: Files.Position;
 	BEGIN	pos:=Files.Pos(ObjF); Files.WriteInt(ObjF, SIGNED16(0));
-		RETURN pos;
+		RETURN pos(SIGNED32);
 	END ObjAllocInt;
 
 	PROCEDURE ObjFillInt*(pos: SIGNED32; int: SIGNED16);
-		VAR savepos: SIGNED32;
+		VAR savepos: Files.Position;
 	BEGIN	savepos:=Files.Pos(ObjF);
 		Files.Set(ObjF, ObjFile, pos); Files.WriteBytes(ObjF, int, 2);
 		Files.Set(ObjF, ObjFile, savepos);
@@ -462,21 +462,21 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	END Commit;
 
 	PROCEDURE EndSym*;
-		VAR sfsize: SIGNED32;
+		VAR sfsize: Files.Position;
 	BEGIN	Files.Write(ModF, 0X);
 		IF NewFileFormat THEN
 			sfsize := 4 + Files.Length(newSymFile) + Files.Length(ModFile);
-			Files.WriteNum(ObjF, sfsize);
+			Files.WriteNum(ObjF, sfsize(SIGNED32));
 			Files.WriteSet(ObjF, codeOptions)
 		ELSE
-			sfsize:=Files.Length(newSymFile)+Files.Length(ModFile); Files.WriteNum(ObjF, sfsize)
+			sfsize:=Files.Length(newSymFile)+Files.Length(ModFile); Files.WriteNum(ObjF, sfsize(SIGNED32))
 		END;
 		Commit(ModFile); Commit(newSymFile);
-		refpatch:=Files.Pos(ObjF); ObjWInt(0); ObjWInt(0)
+		refpatch:=Files.Pos(ObjF)(SIGNED32); ObjWInt(0); ObjWInt(0)
 	END EndSym;
 
 	PROCEDURE EndObj*;
-		VAR refsize: SIGNED32;
+		VAR refsize: Files.Position;
 	BEGIN
 		refsize:=Files.Length(RefFile); ObjW(8DX); Commit(RefFile);
 		Files.Set(ObjF, ObjFile, refpatch); ObjWBytes(refsize, 4);
@@ -484,7 +484,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	END EndObj;
 
 	PROCEDURE CloseObj*;
-		VAR refsize: SIGNED32; ch: CHAR; ref: Files.Rider;
+		VAR refsize: Files.Size; ch: CHAR; ref: Files.Rider;
 	BEGIN (*ref block*)
 		refsize:=Files.Length(RefFile);
 		Files.Set(ref, RefFile, 0); Files.Read(ref, ch); WHILE ~ref.eof DO ObjW(ch); Files.Read(ref, ch) END;

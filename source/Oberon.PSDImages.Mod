@@ -52,7 +52,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 	END ReadHeader;
 
 	PROCEDURE ReadColors(VAR R: Files.Rider; VAR h: Header);
-		VAR pos, len, i: SIGNED32;
+		VAR pos: Files.Position; len, i: SIGNED32;
 	BEGIN
 		h.pal := NIL;
 		ReadLInt(R, len); pos := Files.Pos(R);
@@ -171,7 +171,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 				SkipSection(R); (* image resources *)
 				SkipSection(R); (* layer and mask information *)
 				ReadInt(R, comp); (* Raw data = 0, RLE compressed = 1 *)
-				h.data := Files.Pos(R);
+				h.data := Files.Pos(R)(SIGNED32);
 				IF ((h.mode = 1) OR (h.mode = 2)) & (comp = 1) THEN
 					Images.InitPaletteFormat(fmt, h.pal);
 					Images.Create(img, SHORT(h.width), SHORT(h.height), fmt);

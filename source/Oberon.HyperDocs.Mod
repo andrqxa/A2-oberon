@@ -245,7 +245,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		END;
 		BTrees.SearchStr(linksIndex, link, porg, res);
 		IF res = BTrees.Done THEN
-			org := Files.Length(linksFile);
+			org := Files.Length(linksFile)(SIGNED32);
 			l := Strings.Length(link)(SIGNED32);
 			Files.Set(R, linksFile, porg);
 			Files.ReadLInt(R, key); (* key *)
@@ -253,14 +253,14 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 				RETURN key
 			END; INC(l);
 			Files.ReadLInt(R, cache); (* cache *)
-			porg := Files.Pos(R);
+			porg := Files.Pos(R)(SIGNED32);
 			Files.ReadLInt(R, next); (* next *)
 			same := SameLink(); (* link *)
 			WHILE (next > 0) & ~same DO
 				Files.Set(R, linksFile, next);
 				Files.ReadLInt(R, key); (* key *)
 				Files.ReadLInt(R, cache); (* cache *)
-				porg := Files.Pos(R);
+				porg := Files.Pos(R)(SIGNED32);
 				Files.ReadLInt(R, next); (* next *)
 				same := SameLink() (* link *)
 			END;
@@ -272,7 +272,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			END
 		ELSE
 			BTrees.InsertStr(linksIndex, link, -1, res);
-			org := Files.Length(linksFile);
+			org := Files.Length(linksFile)(SIGNED32);
 			BTrees.InsertStr(linksIndex, link, org, res)
 		END;
 		INC(curKey); key := curKey;
@@ -1193,7 +1193,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 					M.contType := MIME.GetContentType("application/oberondoc");
 					F := Files.Old(path);
 					IF F # NIL THEN
-						M.size := Files.Length(F);
+						M.size := Files.Length(F)(SIGNED32);
 						Files.GetDate(F, M.time, M.date)
 					ELSE
 						M.time := 0; M.date := 0; M.size := 0
@@ -1285,7 +1285,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			IF text # NIL THEN
 				Files.Set(R, linksFile, org);
 				Files.ReadLInt(R, org); (* key *)
-				org := Files.Length(diskCache);
+				org := Files.Length(diskCache)(SIGNED32);
 				Files.WriteLInt(R, org); (* cache *)
 				len := 0; Texts.Store(text, diskCache, org, len)
 			ELSE
@@ -1318,7 +1318,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 				oldLib := F.lib; oldRef := F.ref; F.lib := NIL; F.ref := -1;
 				Files.Set(R, linksFile, org);
 				Files.ReadLInt(R, org); (* key *)
-				org := Files.Length(diskCache);
+				org := Files.Length(diskCache)(SIGNED32);
 				Files.WriteLInt(R, org); (* cache *)
 				NEW(newLib); Objects.OpenLibrary(newLib);
 				B.lib := newLib; Objects.Stamp(B); B.dlink := NIL;
@@ -1385,7 +1385,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 				IF tag # Objects.LibBlockId THEN
 					RETURN NIL
 				END;
-				org := Files.Pos(R);
+				org := Files.Pos(R)(SIGNED32);
 				Objects.LoadLibrary(lib, diskCache, org, len);
 				lib.GetObj(lib, refd, obj);
 				doc := obj(Documents.Document);
@@ -1423,7 +1423,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 				IF tag # Texts.TextBlockId THEN
 					RETURN NIL
 				END;
-				NEW(text); len := 0; org := Files.Pos(R);
+				NEW(text); len := 0; org := Files.Pos(R)(SIGNED32);
 				Texts.Load(text, diskCache, org, len)
 			END
 		END;
@@ -1510,7 +1510,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			R: Files.Rider;
 			org: SIGNED32;
 			W: Texts.Writer;
-			res: SIGNED16;
+			res: INTEGER;
 	BEGIN
 		linksFile := Files.Old("URL.DB");
 		IF (linksFile = NIL) OR new THEN
@@ -1524,7 +1524,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			curKey := 0; Files.WriteLInt(R, -curKey-1);
 			Files.WriteLInt(R, -1); Files.WriteLInt(R, -1);
 			linksIndex := BTrees.NewStr(linksFile, 12, 100);
-			org := Files.Length(linksFile);
+			org := Files.Length(linksFile)(SIGNED32);
 			keysIndex := BTrees.NewLInt(linksFile, org, 100);
 			Files.Set(R, linksFile, 4);
 			Files.WriteLInt(R, 12); Files.WriteLInt(R, org);
