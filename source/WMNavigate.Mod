@@ -1901,13 +1901,13 @@ END InitStrings;
 PROCEDURE InitProtos;
 BEGIN
 	NEW(ProtoClDefault, NIL, Strings.NewString("ClDefault"), Strings.NewString("Default color of item"));
-	ProtoClDefault.Set(0A0A0A0A0H);
+	ProtoClDefault.Set(WMGraphics.Color(0A0A0A0A0H));
 	NEW(ProtoClSelected, NIL, Strings.NewString("ClSelected"), Strings.NewString("Color of selected item"));
 	ProtoClSelected.Set(060606A0H);
 	NEW(ProtoClMouseOver, NIL, Strings.NewString("ClMouseOver"), Strings.NewString("Mouse over color of item"));
-	ProtoClMouseOver.Set(0D0D0D0A0H);
+	ProtoClMouseOver.Set(WMGraphics.Color(0D0D0D0A0H));
 	NEW(ProtoClSelectedMouseOver, NIL, Strings.NewString("ClSelectedMouseOver"), Strings.NewString("Mouse over color of selected item"));
-	ProtoClSelectedMouseOver.Set(0F0F0F0A0H);
+	ProtoClSelectedMouseOver.Set(WMGraphics.Color(0F0F0F0A0H));
 
 	NEW(ProtoClTextDefault, NIL, Strings.NewString("ClTextDefault"), Strings.NewString("Default text color"));
 	ProtoClTextDefault.Set(WMGraphics.White);

@@ -305,6 +305,69 @@ TYPE
 
 	END Integer;
 
+	UInt32* = OBJECT(Model)
+	VAR
+		value : UNSIGNED32;
+
+		PROCEDURE &Init*;
+		BEGIN
+			Init^;
+			SetNameAsString(StrUInt32);
+			value := 0;
+			SetGenerator("Models.GenUInt32");
+		END Init;
+
+		PROCEDURE Set*(value : UNSIGNED32);
+		BEGIN
+			AcquireWrite;
+			IF (SELF.value # value) THEN
+				SELF.value := value;
+				Changed;
+			END;
+			ReleaseWrite;
+		END Set;
+
+		PROCEDURE Get*() : UNSIGNED32;
+		VAR value : UNSIGNED32;
+		BEGIN
+			AcquireRead;
+			value := SELF.value;
+			ReleaseRead;
+			RETURN value;
+		END Get;
+
+		PROCEDURE Add*(value : UNSIGNED32);
+		BEGIN
+			IF (value # 0) THEN
+				AcquireWrite;
+				SELF.value := SELF.value + value;
+				Changed;
+				ReleaseWrite;
+			END;
+		END Add;
+
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		VAR newValue : UNSIGNED32;
+		BEGIN
+			Types.GetUInt32(value, newValue, res);
+			IF (res = Types.Ok) THEN Set(newValue); END;
+		END SetGeneric;
+
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		VAR currentValue : UNSIGNED32;
+		BEGIN
+			currentValue := Get();
+			Types.SetUInt32(value, currentValue, res);
+		END GetGeneric;
+
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		BEGIN
+			WriteValue^(w, level);
+			w.UInt(value, 0);
+		END WriteValue;
+
+	END UInt32;
+
 	Hugeint* = OBJECT(Model)
 	VAR
 		value : SIGNED64;
@@ -367,6 +430,69 @@ TYPE
 		END WriteValue;
 
 	END Hugeint;
+
+	UInt64* = OBJECT(Model)
+	VAR
+		value : UNSIGNED64;
+
+		PROCEDURE &Init*;
+		BEGIN
+			Init^;
+			SetNameAsString(StrUInt64);
+			value := 0;
+			SetGenerator("Models.GenUInt64");
+		END Init;
+
+		PROCEDURE Set*(value : UNSIGNED64);
+		BEGIN
+			AcquireWrite;
+			IF (SELF.value # value) THEN
+				SELF.value := value;
+				Changed;
+			END;
+			ReleaseWrite;
+		END Set;
+
+		PROCEDURE Get*() : UNSIGNED64;
+		VAR value : UNSIGNED64;
+		BEGIN
+			AcquireRead;
+			value := SELF.value;
+			ReleaseRead;
+			RETURN value;
+		END Get;
+
+		PROCEDURE Add*(value : UNSIGNED64);
+		BEGIN
+			IF (value # 0) THEN
+				AcquireWrite;
+				SELF.value := SELF.value + value;
+				Changed;
+				ReleaseWrite;
+			END;
+		END Add;
+
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
+		VAR newValue : UNSIGNED64;
+		BEGIN
+			Types.GetUInt64(value, newValue, res);
+			IF (res = Types.Ok) THEN Set(newValue); END;
+		END SetGeneric;
+
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
+		VAR currentValue : UNSIGNED64;
+		BEGIN
+			currentValue := Get();
+			Types.SetUInt64(value, currentValue, res);
+		END GetGeneric;
+
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		BEGIN
+			WriteValue^(w, level);
+			w.UInt(value, 0);
+		END WriteValue;
+
+	END UInt64;
 
 	Size* = OBJECT(Model)
 	VAR
@@ -964,7 +1090,7 @@ TYPE
 
 
 VAR
-	StrBoolean, StrInteger, StrHugeint, StrSize, StrReal, StrLongreal, StrChar, StrString, StrSet, StrText, StrContainer : Strings.String;
+	StrBoolean, StrInteger, StrUInt32, StrHugeint, StrUInt64, StrSize, StrReal, StrLongreal, StrChar, StrString, StrSet, StrText, StrContainer : Strings.String;
 
 PROCEDURE NewLine*(w : Streams.Writer; level : SIGNED32);
 BEGIN
@@ -1005,6 +1131,17 @@ BEGIN
 	END;
 END GetInteger;
 
+PROCEDURE GetSize*(m: Model; VAR i: SIZE): BOOLEAN;
+VAR int: Types.Size; res: INTEGER;
+BEGIN
+	IF m = NIL THEN RETURN FALSE END;
+	m.GetGeneric(int, res);
+	IF (res = Ok) THEN
+		i := int.value; RETURN TRUE
+	ELSE RETURN FALSE
+	END;
+END GetSize;
+
 PROCEDURE SetReal*(m: Model; r: FLOAT64);
 VAR real: Types.Longreal; res: INTEGER;
 BEGIN
@@ -1027,11 +1164,23 @@ BEGIN
 	NEW(integer); RETURN integer;
 END GenInteger;
 
+PROCEDURE GenUInt32*() : XML.Element;
+VAR integer : UInt32;
+BEGIN
+	NEW(integer); RETURN integer;
+END GenUInt32;
+
 PROCEDURE GenHugeint*() : XML.Element;
 VAR hugeint : Hugeint;
 BEGIN
 	NEW(hugeint); RETURN hugeint;
 END GenHugeint;
+
+PROCEDURE GenUInt64*() : XML.Element;
+VAR integer : UInt64;
+BEGIN
+	NEW(integer); RETURN integer;
+END GenUInt64;
 
 PROCEDURE GenSize*() : XML.Element;
 VAR size : Size;
@@ -1085,7 +1234,9 @@ PROCEDURE InitStrings;
 BEGIN
 	StrBoolean := Strings.NewString("Boolean");
 	StrInteger := Strings.NewString("Integer");
+	StrUInt32 := Strings.NewString("UInt32");
 	StrHugeint := Strings.NewString("Hugeint");
+	StrUInt64 := Strings.NewString("UInt64");
 	StrSize := Strings.NewString("Size");
 	StrReal := Strings.NewString("Real");
 	StrLongreal := Strings.NewString("Longreal");

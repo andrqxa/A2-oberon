@@ -1475,7 +1475,7 @@ TYPE
 
 		(* llen = -1 to render until the end of line > 0 to render llen elements in the line *)
 		PROCEDURE RenderLine*(canvas : WMGraphics.Canvas; VAR l : LineInfo; linenr: SIZE; top : SIZE; llen : SIZE);
-		VAR sx, x, i, j, k, w, voff : SIZE; color, bgcolor: SIGNED32; sp, linelength, p: SIZE; char : Char32; gs: WMGraphics.GlyphSpacings;
+		VAR sx, x, i, j, k, w, voff : SIZE; color, bgcolor: WMGraphics.Color; sp, linelength, p: SIZE; char : Char32; gs: WMGraphics.GlyphSpacings;
 	 		curAttr : Texts.Attributes; font : WMGraphics.Font; vc : WMComponents.VisualComponent;
 	 		hc : BOOLEAN;
 	 		realX, dx: FLOAT32;
@@ -1693,7 +1693,7 @@ TYPE
 			UNTIL (i >= linelength) OR utilreader.eot OR (x + sx > w)
 		END RenderLine;
 
-		PROCEDURE RenderChar(canvas : WMGraphics.Canvas; x, y: FLOAT32; char: Char32; font: WMGraphics.Font; color: SIGNED32);
+		PROCEDURE RenderChar(canvas : WMGraphics.Canvas; x, y: FLOAT32; char: Char32; font: WMGraphics.Font; color: WMGraphics.Color);
 		VAR g: WMGraphics.GlyphSpacings; img: WMGraphics.Image;
 			glyphCanvas: WMGraphics.BufferCanvas;
 			glyphImg: WMGraphics.Image;
@@ -2869,7 +2869,7 @@ TYPE
 			NEW(label); label.alignment.Set(WMComponents.AlignLeft); label.SetCaption(" Chain next:");
 			panel2.AddContent(label); label.bounds.SetWidth(labelWidth); label.textColor.Set(0000000FFH);
 			NEW(chain); chain.alignment.Set(WMComponents.AlignClient);
-			chain.tv.showBorder.Set(TRUE); chain.multiLine.Set(FALSE); chain.fillColor.Set(0FFFFFFFFH);
+			chain.tv.showBorder.Set(TRUE); chain.multiLine.Set(FALSE); chain.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			chain.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			chain.onEnter.Add(SetValueHandler); chain.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			chain.SetAsString("none");
@@ -2880,7 +2880,7 @@ TYPE
 			NEW(label); label.alignment.Set(WMComponents.AlignLeft); label.SetCaption(" Vertical Align:");
 			panel2.AddContent(label); label.bounds.SetWidth(labelWidth); label.textColor.Set(0000000FFH);
 			NEW(vAlign); vAlign.alignment.Set(WMComponents.AlignClient);
-			vAlign.tv.showBorder.Set(TRUE); vAlign.multiLine.Set(FALSE); vAlign.fillColor.Set(0FFFFFFFFH);
+			vAlign.tv.showBorder.Set(TRUE); vAlign.multiLine.Set(FALSE); vAlign.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			vAlign.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			vAlign.onEnter.Add(SetValueHandler); vAlign.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			vAlign.SetAsString("Top");
@@ -2900,7 +2900,7 @@ TYPE
 
 			NEW(panel3); panel3.bounds.SetHeight(5); panel3.alignment.Set(WMComponents.AlignTop);
 			panel2.AddContent(panel3);
-			NEW(panel3); panel3.bounds.SetHeight(150); panel3.alignment.Set(WMComponents.AlignTop); panel3.fillColor.Set(0FFCCCCFFH);
+			NEW(panel3); panel3.bounds.SetHeight(150); panel3.alignment.Set(WMComponents.AlignTop); panel3.fillColor.Set(WMGraphics.Color(0FFCCCCFFH));
 			NEW(label); label.alignment.Set(WMComponents.AlignTop); label.SetCaption(" Paragraph Styles:");
 			label.fillColor.Set(panelColor); label.bounds.SetHeight(20); label.textColor.Set(0000000FFH);
 			panel3.AddContent(label);
@@ -2918,7 +2918,7 @@ TYPE
 			resizerV.bounds.SetHeight(4);
 			panel3.AddContent(resizerV);
 
-			NEW(panel3); panel3.alignment.Set(WMComponents.AlignClient); panel3.fillColor.Set(0CCFFCCFFH);
+			NEW(panel3); panel3.alignment.Set(WMComponents.AlignClient); panel3.fillColor.Set(WMGraphics.Color(0CCFFCCFFH));
 			NEW(label); label.alignment.Set(WMComponents.AlignTop); label.SetCaption(" Character Styles:");
 			label.fillColor.Set(panelColor); label.bounds.SetHeight(20); label.textColor.Set(0000000FFH);
 			panel3.AddContent(label);

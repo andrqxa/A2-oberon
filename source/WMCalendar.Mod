@@ -486,7 +486,7 @@ TYPE
 			IF (scheme = 0) THEN
 				calendar.clText.Set(WMGraphics.White);
 				calendar.clTextTitle.Set(WMGraphics.White);
-				calendar.clTextOtherMonths.Set(0FFFFFF80H);
+				calendar.clTextOtherMonths.Set(WMGraphics.Color(0FFFFFF80H));
 				calendar.clTextWeekend.Set(WMGraphics.White);
 				control.dateLabel.textColor.Set(WMGraphics.White);
 				control.prevBtn.clTextDefault.Set(WMGraphics.White);
@@ -671,10 +671,10 @@ BEGIN
 	PrototypeClTextCurrentDay.Set(WMGraphics.Red);
 
 	NEW(PrototypeClTextOtherMonths, NIL, Strings.NewString("ClTextOtherMonths"), Strings.NewString("Text color of other months displayed"));
-	PrototypeClTextOtherMonths.Set(0CCCCCCFFH);
+	PrototypeClTextOtherMonths.Set(WMGraphics.Color(0CCCCCCFFH));
 
 	NEW(PrototypeClMouseOver, NIL, Strings.NewString("ClMouseOver"), Strings.NewString("Background color of mouse over cell"));
-	PrototypeClMouseOver.Set(0FFFF0060H);
+	PrototypeClMouseOver.Set(WMGraphics.Color(0FFFF0060H));
 
 	NEW(PrototypeCurrentDayImageName, NIL, Strings.NewString("CurrentDayImageName"), Strings.NewString("Filename of current day image"));
 	PrototypeCurrentDayImageName.Set(NIL);

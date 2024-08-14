@@ -64,7 +64,7 @@ TYPE
 			SetNameAsString(StrPreviewPanel);
 				(* title *)
 			NEW(titleLbl); titleLbl.alignment.Set(WMComponents.AlignTop);
-			titleLbl.fillColor.Set(0CCCCCCFFH);
+			titleLbl.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 			titleLbl.SetCaption("Entry Info"); titleLbl.bounds.SetHeight(20);
 			SELF.AddContent(titleLbl);
 				(* entry info *)
@@ -121,12 +121,12 @@ TYPE
 			resizerH, resizerV, resizerV2 : WMStandardComponents.Resizer;
 		BEGIN
 				(* main panel *)
-			NEW(panel); panel.bounds.SetExtents(850, 700); panel.fillColor.Set(0FFFFFFFFH); panel.takesFocus.Set(TRUE);
+			NEW(panel); panel.bounds.SetExtents(850, 700); panel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); panel.takesFocus.Set(TRUE);
 				(* top toolbar *)
 			NEW(topToolbar); topToolbar.bounds.SetHeight(20); topToolbar.alignment.Set(WMComponents.AlignTop);
 			panel.AddContent(topToolbar);
 					(* filename edit *)
-			NEW(filenameEdit); filenameEdit.alignment.Set(WMComponents.AlignLeft); filenameEdit.fillColor.Set(0FFFFFFFFH);
+			NEW(filenameEdit); filenameEdit.alignment.Set(WMComponents.AlignLeft); filenameEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			filenameEdit.multiLine.Set(FALSE); filenameEdit.bounds.SetWidth(200);
 			filenameEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			topToolbar.AddContent(filenameEdit);

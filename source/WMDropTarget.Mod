@@ -12,6 +12,8 @@ CONST
 	TypeInt32* = 5;
 	TypeString* = 6;
 	TypeObject* = 7;
+	TypeUInt32* = 8;
+	TypeColor* = 9;
 
 	Ok* = 0;
 	Failed* = -1;
@@ -43,6 +45,15 @@ TYPE
 		END Set;
 
 	END DropInt32;
+
+	DropUInt32* = OBJECT(DropInterface)
+
+		PROCEDURE Set*(i : UNSIGNED32);
+		END Set;
+
+	END DropUInt32;
+	
+	DropColor* = DropInt32;
 
 	DropString* = OBJECT(DropInterface)
 

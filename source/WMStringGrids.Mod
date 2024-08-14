@@ -553,7 +553,7 @@ BEGIN
 	g.alignment.Set(WMComponents.AlignClient);
 	g.model.SetNofRows(10);
 	g.model.SetNofCols(3);
-	p:=WMStandardComponents.GenPanel()(WMStandardComponents.Panel); p.fillColor.Set(0FF0000FFH);
+	p:=WMStandardComponents.GenPanel()(WMStandardComponents.Panel); p.fillColor.Set(WMGraphics.Color(0FF0000FFH));
 	g.model.SetCellData(0,0,p);
 	img:=WMGraphics.LoadImage("Yellow_Duck.jpg",FALSE);
 	g.model.SetCellTextAOC(0,1,12,"yellow duck");

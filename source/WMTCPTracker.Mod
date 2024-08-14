@@ -70,14 +70,14 @@ TYPE
 			cBtn.bounds.SetWidth(panel.bounds.GetWidth() DIV 2);
 			cBtn.alignment.Set(WMComponents.AlignLeft);
 			toolbar.AddContent(cBtn);
-			cBtn.clDefault.Set(0FF0000FFH);
+			cBtn.clDefault.Set(WMGraphics.Color(0FF0000FFH));
 			SELF.closeBtn := cBtn;
 
 			NEW(dBtn); dBtn.caption.SetAOC("Discard selected connection (think 2x !)");
 			dBtn.bounds.SetWidth(panel.bounds.GetWidth() DIV 2);
 			dBtn.alignment.Set(WMComponents.AlignLeft);
 			toolbar.AddContent(dBtn);
-			dBtn.clDefault.Set(0FF0000FFH);
+			dBtn.clDefault.Set(WMGraphics.Color(0FF0000FFH));
 			SELF.discardBtn := dBtn;
 
 			NEW(grid); grid.alignment.Set(WMComponents.AlignClient);

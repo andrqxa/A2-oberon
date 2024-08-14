@@ -62,7 +62,7 @@ TYPE
 			BEGIN
 				btn.alignment.Set(WMComponents.AlignTop);
 				btn.bounds.SetHeight(20);
-				btn.fillColor.Set(0FFFFFFFFH);
+				btn.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 				btn.clDefault.Set(windowStyle.bgColor);
 				btn.clTextDefault.Set(WMGraphics.Black);
 				panel.AddContent(btn)
@@ -83,7 +83,7 @@ TYPE
 
 			PROCEDURE AE(panel : WMStandardComponents.Panel; edtr : WMEditors.TextField);
 			BEGIN
-				edtr.alignment.Set(WMComponents.AlignClient); edtr.fillColor.Set(0FFFFFF88H);
+				edtr.alignment.Set(WMComponents.AlignClient); edtr.fillColor.Set(WMGraphics.Color(0FFFFFF88H));
 				panel.AddContent(edtr)
 			END AE;
 
@@ -108,7 +108,7 @@ TYPE
 			NEW(preferred); preferred.caption.SetAOC("Preferred"); AB(leftPanel, preferred);
 			NEW(incSize); incSize.caption.SetAOC("Inc Size"); AB(leftPanel, incSize);
 			NEW(get); get.caption.SetAOC("Get"); AB(leftPanel, get);
-			get.clDefault.Set(088000088H); get.clTextDefault.Set(WMGraphics.White);
+			get.clDefault.Set(WMGraphics.Color(088000088H)); get.clTextDefault.Set(WMGraphics.White);
 			leftPanel.alignment.Set(WMComponents.AlignLeft);
 
 			NEW(rightPanel);
@@ -119,7 +119,7 @@ TYPE
 			NEW(normal); normal.caption.SetAOC("Normal"); AB(rightPanel, normal);
 			NEW(decSize); decSize.caption.SetAOC("Dec Size"); AB(rightPanel, decSize);
 			NEW(apply); apply.caption.SetAOC("Apply"); AB(rightPanel, apply);
-			apply.clDefault.Set(088000088H); apply.clTextDefault.Set(WMGraphics.White);
+			apply.clDefault.Set(WMGraphics.Color(088000088H)); apply.clTextDefault.Set(WMGraphics.White);
 			rightPanel.alignment.Set(WMComponents.AlignLeft);
 
 
@@ -332,6 +332,7 @@ TYPE
 			changeInfo : ChangeInfo;
 			string: ARRAY 32 OF CHAR;
 			res : INTEGER;
+			color: UNSIGNED32;
 		BEGIN
 			NEW(changeInfo);
 			IF (famCheck.state.Get() = 1) THEN
@@ -353,11 +354,11 @@ TYPE
 				changeInfo.fields := changeInfo.fields + ChangeStyle;
 			END;
 			IF (colorCheck.state.Get() = 1) THEN
-				colorEdit.GetAsString(string); Strings.HexStrToInt(string, changeInfo.fgColor, res);
+				colorEdit.GetAsString(string); Strings.HexStrToUInt32(string, color, res); changeInfo.fgColor := WMGraphics.Color(color);
 				changeInfo.fields := changeInfo.fields + ChangeFgColor;
 			END;
 			IF (bgColCheck.state.Get() = 1) THEN
-				bgColEdit.GetAsString(string); Strings.HexStrToInt(string, changeInfo.bgColor, res);
+				bgColEdit.GetAsString(string); Strings.HexStrToUInt32(string, color, res); changeInfo.bgColor := WMGraphics.Color(color);
 				changeInfo.fields := changeInfo.fields + ChangeBgColor;
 			END;
 			ApplyChange(changeInfo);

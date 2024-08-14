@@ -53,8 +53,7 @@ TYPE
 		PROCEDURE SetDrawColor(color: WMGraphics.Color);
 		VAR
 			i: SIGNED32;
-			s: SIGNED32;
-			r, g, b, a: SIGNED32;
+			s, r, g, b, a: WMGraphics.Color;
 		BEGIN
 			WMGraphics.ColorToRGBA(color,r,g,b,a);
 			s := (256 * a) DIV 255;

@@ -41,7 +41,7 @@ TYPE
 		lastX, lastY : SIZE;
 
 		PROCEDURE &New*(context : WMRestorable.Context; flags : SET);
-		VAR configuration : WMRestorable.XmlElement; viewMode, color : SIGNED32;
+		VAR configuration : WMRestorable.XmlElement; viewMode: SIGNED32; color : UNSIGNED32 (*WMGraphics.Color*);
 		BEGIN
 			IncCount;
 			IF (context # NIL) THEN
@@ -60,8 +60,8 @@ TYPE
 			IF (context # NIL) THEN
 				configuration := WMRestorable.GetElement(context, "Configuration");
 				IF (configuration # NIL) THEN
-					WMRestorable.LoadLongint(configuration, "color", color); clock.color.Set(color);
-					WMRestorable.LoadLongint(configuration, "viewMode", viewMode); clock.viewMode.Set(viewMode);
+					WMRestorable.LoadUInt32(configuration, "color", color); clock.color.Set(WMGraphics.Color(color));
+					WMRestorable.LoadInt32(configuration, "viewMode", viewMode); clock.viewMode.Set(viewMode);
 				END;
 				WMRestorable.AddByContext(SELF, context);
 			ELSE
@@ -175,8 +175,8 @@ TYPE
 					NEW(configuration); configuration.SetName("Configuration");
 					WMRestorable.StoreBoolean(configuration, "stayOnTop", WMWindowManager.FlagStayOnTop IN flags);
 					WMRestorable.StoreBoolean(configuration, "navigation", WMWindowManager.FlagNavigation IN flags);
-					WMRestorable.StoreLongint(configuration, "color", clock.color.Get());
-					WMRestorable.StoreLongint(configuration, "viewMode", clock.viewMode.Get());
+					WMRestorable.StoreUInt32(configuration, "color", clock.color.Get());
+					WMRestorable.StoreInt32(configuration, "viewMode", clock.viewMode.Get());
 					x.ext(WMRestorable.Storage).Add("WMClock", "WMClock.Restore", SELF, configuration);
 				ELSE Handle^(x)
 				END

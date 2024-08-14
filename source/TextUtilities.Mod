@@ -44,7 +44,7 @@ TYPE
 	VAR text : Texts.Text;
 		ucs32buf : POINTER TO ARRAY OF Char32;
 		fontName : ARRAY 32 OF CHAR;
-		fontSize: SIZE; fontVOff : SIGNED32; fontColor, fontBgColor: SIGNED32 (*WMGraphics.Color*);
+		fontSize: SIZE; fontVOff : SIGNED32; fontColor, fontBgColor: Texts.Color (*WMGraphics.Color*);
 		fontStyle : SET;
 		currentAttributes- : Texts.Attributes;
 		oldBytes : ARRAY 7 OF CHAR;
@@ -158,13 +158,13 @@ TYPE
 			SetAttributes(NewAttributes());
 		END SetFontStyle;
 
-		PROCEDURE SetFontColor* (color : SIGNED32 (*WMGraphics.Color*));
+		PROCEDURE SetFontColor* (color : Texts.Color (*WMGraphics.Color*));
 		BEGIN
 			fontColor := color;
 			SetAttributes(NewAttributes());
 		END SetFontColor;
 
-		PROCEDURE SetBgColor* (bgColor : SIGNED32);
+		PROCEDURE SetBgColor* (bgColor : Texts.Color);
 		BEGIN
 			fontBgColor := bgColor;
 			SetAttributes(NewAttributes());
@@ -579,13 +579,13 @@ TYPE
 		w2: Streams.StringWriter;
 		string: Strings.String;
 		buffer : Streams.Buffer;
-		oberonColors : ARRAY 16 OF SIGNED32;
+		oberonColors : ARRAY 16 OF Texts.Color;
 		fonts : ARRAY 256 OF Texts.FontInfo;
 		font : Texts.FontInfo;
 		nofFonts, hLen : SIGNED32;
 		firstPiece : BOOLEAN;
 		voff: SIGNED32;
-		color : SIGNED32;
+		color : Texts.Color;
 
 		PROCEDURE Open*(out : Streams.Writer);
 		BEGIN
@@ -594,7 +594,7 @@ TYPE
 			END;
 		END Open;
 
-		PROCEDURE ColorToIndex(col: SIGNED32): SIGNED32;
+		PROCEDURE ColorToIndex(col: Texts.Color): SIGNED32;
 		BEGIN
 			RETURN SIGNED32(
 					SET32(ASH(col, 7-23)) * {5..7} +
@@ -602,7 +602,7 @@ TYPE
 					SET32(ASH(col, 1-7)) * {0..1})
 		END ColorToIndex;
 
-		PROCEDURE GetOberonColor(color : SIGNED32):SIGNED32;
+		PROCEDURE GetOberonColor(color : Texts.Color):SIGNED32;
 		VAR i: SIGNED32;
 		BEGIN
 			i := 0; WHILE i < LEN(oberonColors) DO IF oberonColors[i] = color THEN RETURN i END; INC(i) END;
@@ -775,7 +775,7 @@ TYPE
 		VAR i, m : SIZE; res : INTEGER; ch, last : Texts.Char32; tempUCS32 : ARRAY 1024 OF Texts.Char32;
 			oldpos, len : SIZE;
 			r, sr : Streams.StringReader; token : ARRAY 256 OF CHAR;
-			tempInt: SIGNED32;
+			tempInt: SIGNED32; tempUInt: UNSIGNED32;
 			buffer : Strings.String;
 			char : CHAR;
 			cStyle : Texts.CharacterStyle;
@@ -832,8 +832,8 @@ TYPE
 				ELSE attr.fontInfo.style := {};
 				END;
 				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt32(token, attr.voff);				(* voff *)
-				sr.SkipWhitespace; sr.Token(token); Strings.HexStrToInt(token, attr.color, res);		(* color *)
-				sr.SkipWhitespace; sr.Token(token); Strings.HexStrToInt(token, attr.bgcolor, res);	(* bgcolor *)
+				sr.SkipWhitespace; sr.Token(token); Strings.HexStrToUInt32(token, tempUInt, res); attr.color := Texts.Color(tempUInt);		(* color *)
+				sr.SkipWhitespace; sr.Token(token); Strings.HexStrToUInt32(token, tempUInt, res);	attr.bgcolor := Texts.Color(tempUInt); (* bgcolor *)
 
 				(* add Ad-Hoc style to the System in case it was not present already *)
 				IF cStyle = NIL THEN
@@ -1013,8 +1013,8 @@ TYPE
 		size, dfSize : SIZE;
 		style, dfStyle : SIGNED32;							(* 0 = regular; 1 = bold; 2 = italic; 3 = bold-italic *)
 		voff, dfVoff : SIGNED32;
-		color, dfColor : SIGNED32;
-		bgcolor, dfBgcolor : SIGNED32;
+		color, dfColor : Texts.Color;
+		bgcolor, dfBgcolor : Texts.Color;
 
 		(* Set the default  attribute values *)
 		PROCEDURE Init;
@@ -1073,8 +1073,8 @@ TYPE
 					Strings.IntToStr(size, string); Strings.Append(tempstring, string); Strings.Append(tempstring, " ");
 					Strings.IntToStr(style, string); Strings.Append(tempstring, string); Strings.Append(tempstring, " ");
 					Strings.IntToStr(voff, string); Strings.Append(tempstring, string); Strings.Append(tempstring, " ");
-					Strings.IntToHexStr(color,7, string); Strings.Append(tempstring, string); Strings.Append(tempstring, " ");
-					Strings.IntToHexStr(bgcolor,7, string); Strings.Append(tempstring, string);
+					Strings.UIntToHexStr(color,7, string); Strings.Append(tempstring, string); Strings.Append(tempstring, " ");
+					Strings.UIntToHexStr(bgcolor,7, string); Strings.Append(tempstring, string);
 					COPY(tempstring, stylename);
 					(* KernelLog.String("Writing Ad-hoc Style: "); KernelLog.String(tempstring);  KernelLog.Ln; *)
 				END;

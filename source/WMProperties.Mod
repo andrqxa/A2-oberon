@@ -766,6 +766,185 @@ TYPE
 	END Int32Property;
 
 TYPE
+	(** Accessor property to an unsigned integer value. The range of possible values can be restricted. *)
+	UInt32Property* = OBJECT(Property)
+	VAR
+		value : UNSIGNED32;
+		min, max : UNSIGNED32;
+		bounded : BOOLEAN;
+
+		PROCEDURE UpdateProperty;
+		VAR integer: Types.UInt32; model: Models.Model; res: INTEGER;
+		BEGIN
+			IF GetModel(object, model) THEN
+				 model.GetGeneric(integer, res);
+				 IF res = 0 THEN Set(integer.value) END;
+			END;
+		END UpdateProperty;
+
+		PROCEDURE UpdateModel;
+		VAR type: Types.UInt32; model: Models.Model; res: INTEGER;
+		BEGIN
+			IF inLinkUpdate THEN RETURN END;
+			IF GetModel(object, model) THEN
+				type.value := value;
+				model.SetGeneric(type, res);
+			END;
+		END UpdateModel;
+
+		(** Confines the possible input values between min and max. Implicitly activates the bounds check. If the current value
+			lies outside the bounds, it is truncated to the nearest and a change notification is sent after the end of the transaction. *)
+		PROCEDURE SetBounds*(min, max : UNSIGNED32);
+		BEGIN
+			AcquireWrite;
+			SELF.min := min; SELF.max := max; bounded := TRUE;
+			Stamp;
+			Set(value);
+			ReleaseWrite
+		END SetBounds;
+
+		PROCEDURE GetBounds*(VAR min, max : UNSIGNED32);
+		BEGIN
+			AcquireRead;
+			min := SELF.min; max := SELF.max;
+			ReleaseRead;
+		END GetBounds;
+
+		(** enables or disables the bounds of the value. If enabled, a change notification is sent if the current value had to be
+			changed to lie within the bounds *)
+		PROCEDURE SetIsBounded*(isBounded : BOOLEAN);
+		BEGIN
+			AcquireWrite;
+			IF isBounded # bounded THEN
+				bounded := isBounded;
+				Stamp;
+				Set(value);
+			END;
+			ReleaseWrite
+		END SetIsBounded;
+
+		PROCEDURE GetIsBounded*(VAR isBounded : BOOLEAN);
+		BEGIN
+			AcquireRead;
+			isBounded := bounded;
+			ReleaseRead;
+		END GetIsBounded;
+
+		PROCEDURE Validate(v : UNSIGNED32) : UNSIGNED32;
+		BEGIN
+			IF bounded THEN RETURN MAX(min, MIN(max, v))
+			ELSE RETURN v
+			END
+		END Validate;
+
+		PROCEDURE FromStream*(r : Streams.Reader);
+		VAR v : UNSIGNED32;
+		BEGIN
+			AcquireWrite;
+			r.UInt32(v, TRUE);
+			Set(v);
+			ReleaseWrite
+		END FromStream;
+
+		PROCEDURE ToStream*(w : Streams.Writer);
+		BEGIN
+			AcquireRead;
+			w.UInt(value, 0);
+			ReleaseRead
+		END ToStream;
+
+		PROCEDURE Get*() : UNSIGNED32;
+		VAR r : UNSIGNED32;
+		BEGIN
+			AcquireRead;
+			IF nonDefault OR (prototype = NIL) THEN r := value
+			ELSE r := prototype(UInt32Property).Get()
+			END;
+			ReleaseRead;
+			RETURN r
+		END Get;
+
+		PROCEDURE Set*(value : UNSIGNED32);
+		VAR v: UNSIGNED32;
+		BEGIN
+			v := Validate(value);
+			AcquireWrite;
+			IF v # SELF.value THEN
+				SELF.value := v;
+				Changed;
+				IF object # NIL THEN UpdateModel END;
+			ELSIF ~nonDefault THEN
+				Changed;
+			END;
+			NotDefault;
+			ReleaseWrite
+		END Set;
+
+		PROCEDURE SetPassive*(value : UNSIGNED32);
+		VAR v: UNSIGNED32;
+		BEGIN
+			v := Validate(value);
+			AcquireWrite;
+			IF v # SELF.value THEN
+				SELF.value := v;
+				NotDefault;
+			END;
+			ReleaseWrite
+		END SetPassive;
+
+		PROCEDURE FromXML*(xml : XML.Element);
+		VAR
+			en : XMLObjects.Enumerator;
+			p : ANY;
+			s, mins, maxs : String;
+		BEGIN
+			AcquireWrite; NotDefault;
+			mins := xml.GetAttributeValue("min");
+			maxs := xml.GetAttributeValue("max");
+			IF mins # NIL THEN Strings.StrToUInt32(mins^, min) ELSE min := MIN(UNSIGNED32) END;
+			IF maxs # NIL THEN Strings.StrToUInt32(maxs^, max) ELSE max := MAX(UNSIGNED32) END;
+			bounded := (mins # NIL) OR (maxs # NIL);
+			en := xml.GetContents();
+			IF en.HasMoreElements() THEN
+				p := en.GetNext();
+				IF IsLink(p) THEN
+				ELSIF p IS XML.Chars THEN
+					s := p(XML.Chars).GetStr();
+					IF s # NIL THEN Strings.StrToUInt32(s^, value); Set(value) END
+				END
+			END;
+			Stamp;
+			ReleaseWrite
+		END FromXML;
+
+		PROCEDURE ToXML*(VAR element: XML.Element);
+		VAR chars: XML.ArrayChars;s: ARRAY 20 OF CHAR;
+		BEGIN
+			IF (GetName # NIL) & nonDefault THEN
+				ToXML^(element);
+				element.SetAttributeValue("loader","WMProperties.NewUInt32");
+				element.AddContent(NewUIntChars(value));
+			END;
+		END ToXML;
+
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
+		VAR name : String;
+		BEGIN
+			name := GetName();
+			IF name = NIL THEN KernelLog.String("Nameless Int32 property encountered. Ignored"); KernelLog.Ln; RETURN END;
+			IF nonDefault THEN
+				Indent(w, indent);
+				w.Char("<"); w.String(name^); w.String(' loader="WMProperties.NewUInt32"'); w.Char(">");
+				IF ~WriteLink(w,context,indent) THEN
+					w.UInt(value, 0);
+				END;
+				w.String("</"); w.String(name^); w.Char(">"); w.Ln
+			END
+		END WriteXML;
+
+	END UInt32Property;
+
+TYPE
 	(** Accessor property to an integer value. The range of possible values can be restricted. *)
 	IntegerProperty* = OBJECT(Property)
 	VAR
@@ -946,6 +1125,188 @@ TYPE
 
 	END IntegerProperty;
 
+TYPE
+	(** Accessor property to an unsigned integer value. The range of possible values can be restricted. *)
+	UnsignedProperty* = OBJECT(Property)
+	VAR
+		value : UNSIGNED64;
+		min, max : UNSIGNED64;
+		bounded : BOOLEAN;
+
+		PROCEDURE UpdateProperty;
+		VAR integer: Types.UInt64; model: Models.Model; res: INTEGER;
+		BEGIN
+			IF GetModel(object, model) THEN
+				 model.GetGeneric(integer, res);
+				 IF res = 0 THEN Set(integer.value) END;
+			END;
+		END UpdateProperty;
+
+		PROCEDURE UpdateModel;
+		VAR type: Types.UInt64; model: Models.Model; res: INTEGER;
+		BEGIN
+			IF inLinkUpdate THEN RETURN END;
+			IF GetModel(object, model) THEN
+				type.value := value;
+				model.SetGeneric(type, res);
+			END;
+		END UpdateModel;
+
+		(** Confines the possible input values between min and max. Implicitly activates the bounds check. If the current value
+			lies outside the bounds, it is truncated to the nearest and a change notification is sent after the end of the transaction. *)
+		PROCEDURE SetBounds*(min, max : UNSIGNED64);
+		BEGIN
+			AcquireWrite;
+			SELF.min := min; SELF.max := max; bounded := TRUE;
+			Stamp;
+			Set(value);
+			ReleaseWrite
+		END SetBounds;
+
+		PROCEDURE GetBounds*(VAR min, max : UNSIGNED64);
+		BEGIN
+			AcquireRead;
+			min := SELF.min; max := SELF.max;
+			ReleaseRead;
+		END GetBounds;
+
+		(** enables or disables the bounds of the value. If enabled, a change notification is sent if the current value had to be
+			changed to lie within the bounds *)
+		PROCEDURE SetIsBounded*(isBounded : BOOLEAN);
+		BEGIN
+			AcquireWrite;
+			IF isBounded # bounded THEN
+				bounded := isBounded;
+				Stamp;
+				Set(value);
+			END;
+			ReleaseWrite
+		END SetIsBounded;
+
+		PROCEDURE GetIsBounded*(VAR isBounded : BOOLEAN);
+		BEGIN
+			AcquireRead;
+			isBounded := bounded;
+			ReleaseRead;
+		END GetIsBounded;
+
+		PROCEDURE Validate(v : UNSIGNED64) : UNSIGNED64;
+		BEGIN
+			IF bounded THEN RETURN MAX(min, MIN(max, v))
+			ELSE RETURN v
+			END
+		END Validate;
+
+		PROCEDURE FromStream*(r : Streams.Reader);
+		VAR v : UNSIGNED64;
+		BEGIN
+			AcquireWrite;
+			r.UInt64(v, TRUE);
+			Set(v);
+			ReleaseWrite
+		END FromStream;
+
+		PROCEDURE ToStream*(w : Streams.Writer);
+		BEGIN
+			AcquireRead;
+			w.UInt(value, 0);
+			ReleaseRead
+		END ToStream;
+
+		PROCEDURE Get*() : UNSIGNED64;
+		VAR r : UNSIGNED64;
+		BEGIN
+			AcquireRead;
+			IF nonDefault OR (prototype = NIL) THEN r := value
+			ELSE r := prototype(UnsignedProperty).Get()
+			END;
+			ReleaseRead;
+			RETURN r
+		END Get;
+
+
+		PROCEDURE Set*(value : UNSIGNED64);
+		VAR v: UNSIGNED64;
+		BEGIN
+			v := Validate(value);
+			AcquireWrite;
+			IF v # SELF.value THEN
+				SELF.value := v;
+				Changed;
+				IF object # NIL THEN UpdateModel END;
+			ELSIF ~nonDefault THEN
+				Changed;
+			END;
+			NotDefault;
+			ReleaseWrite
+		END Set;
+
+		PROCEDURE SetPassive*(value : UNSIGNED64);
+		VAR v: UNSIGNED64;
+		BEGIN
+			v := Validate(value);
+			AcquireWrite;
+			IF v # SELF.value THEN
+				SELF.value := v;
+				NotDefault;
+			END;
+			ReleaseWrite
+		END SetPassive;
+
+
+		PROCEDURE FromXML*(xml : XML.Element);
+		VAR
+			en : XMLObjects.Enumerator;
+			p : ANY;
+			s, mins, maxs : String;
+		BEGIN
+			AcquireWrite; NotDefault;
+			mins := xml.GetAttributeValue("min");
+			maxs := xml.GetAttributeValue("max");
+			IF mins # NIL THEN Strings.StrToUInt64(mins^, min) ELSE min := MIN(UNSIGNED64) END;
+			IF maxs # NIL THEN Strings.StrToUInt64(maxs^, max) ELSE max := MAX(UNSIGNED64) END;
+			bounded := (mins # NIL) OR (maxs # NIL);
+			en := xml.GetContents();
+			IF en.HasMoreElements() THEN
+				p := en.GetNext();
+				IF IsLink(p) THEN
+				ELSIF p IS XML.Chars THEN
+					s := p(XML.Chars).GetStr();
+					IF s # NIL THEN Strings.StrToUInt64(s^, value); Set(value) END
+				END
+			END;
+			Stamp;
+			ReleaseWrite
+		END FromXML;
+
+		PROCEDURE ToXML*(VAR element: XML.Element);
+		VAR chars: XML.ArrayChars;s: ARRAY 21 OF CHAR;
+		BEGIN
+			IF (GetName # NIL) & nonDefault THEN
+				ToXML^(element);
+				element.SetAttributeValue("loader","WMProperties.NewUnsigned");
+				element.AddContent(NewUIntChars(value));
+			END;
+		END ToXML;
+
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
+		VAR name : String;
+		BEGIN
+			name := GetName();
+			IF name = NIL THEN KernelLog.String("Nameless Integer property encountered. Ignored"); KernelLog.Ln; RETURN END;
+			IF nonDefault THEN
+				Indent(w, indent);
+				w.Char("<"); w.String(name^); w.String(' loader="WMProperties.NewUnsigned"'); w.Char(">");
+				IF ~WriteLink(w,context,indent) THEN
+					w.UInt(value, 0);
+				END;
+				w.String("</"); w.String(name^); w.Char(">"); w.Ln
+			END
+		END WriteXML;
+
+	END UnsignedProperty;
+
+TYPE
 	(** Accessor property to a size value. The range of possible values can be restricted. *)
 	SizeProperty* = OBJECT(Property)
 	VAR
@@ -1572,7 +1933,7 @@ TYPE
 		END UpdateProperty;
 
 		PROCEDURE UpdateModel;
-		VAR type: Types.Integer; model: Models.Model; res: INTEGER;
+		VAR type: Types.Color; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
 			IF GetModel(object, model) THEN
@@ -1595,8 +1956,8 @@ TYPE
 		PROCEDURE Set*(value : SIGNED64);
 		BEGIN
 			AcquireWrite;
-			IF SHORT(value) # SELF.value THEN
-				SELF.value := SHORT(value); Changed;
+			IF WMGraphics.Color(value) # SELF.value THEN
+				SELF.value := WMGraphics.Color(value); Changed;
 				IF (object # NIL) THEN UpdateModel END;
 			ELSIF ~nonDefault THEN Changed
 			END;
@@ -1607,8 +1968,8 @@ TYPE
 		PROCEDURE SetPassive*(value : SIGNED64);
 		BEGIN
 			AcquireWrite;
-			IF SHORT(value) # SELF.value THEN
-				SELF.value := SHORT(value);
+			IF WMGraphics.Color(value) # SELF.value THEN
+				SELF.value := WMGraphics.Color(value);
 				NotDefault;
 			END;
 			ReleaseWrite
@@ -1620,6 +1981,7 @@ TYPE
 			en : XMLObjects.Enumerator;
 			p : ANY;
 			s : String; res : INTEGER;
+			pos := SIZE(0), color := UNSIGNED32(0);
 		BEGIN
 			AcquireWrite;
 			en := xml.GetContents();
@@ -1628,7 +1990,6 @@ TYPE
 				IF IsLink(p) THEN
 				ELSIF p IS XML.Chars THEN
 					s := p(XML.Chars).GetStr();
-					VAR pos := SIZE(0), color := UNSIGNED32(0);
 					IF (s # NIL) THEN
 						IF ~Strings.TryScanUInt32At(pos, s^, 16, color, res) THEN
 							TRACE("invalid color format", s^);
@@ -2825,6 +3186,14 @@ BEGIN
 	RETURN chars
 END NewIntChars;
 
+PROCEDURE NewUIntChars(i: UNSIGNED64): XML.Chars;
+VAR chars: XML.ArrayChars; s: ARRAY 32 OF CHAR;
+BEGIN
+	NEW(chars);
+	Strings.UIntToStr(i, s);
+	chars.SetStr(s);
+	RETURN chars
+END NewUIntChars;
 
 PROCEDURE NewBoolean*(): Property;
 VAR property: BooleanProperty;
@@ -2841,10 +3210,20 @@ VAR property: Int32Property;
 BEGIN NEW(property,NIL,NIL,NIL); RETURN property
 END NewInt32;
 
+PROCEDURE NewUInt32*(): Property;
+VAR property: UInt32Property;
+BEGIN NEW(property,NIL,NIL,NIL); RETURN property
+END NewUInt32;
+
 PROCEDURE NewInteger*(): Property;
 VAR property: IntegerProperty;
 BEGIN NEW(property,NIL,NIL,NIL); RETURN property
 END NewInteger;
+
+PROCEDURE NewUnsigned*(): Property;
+VAR property: UnsignedProperty;
+BEGIN NEW(property,NIL,NIL,NIL); RETURN property
+END NewUnsigned;
 
 PROCEDURE NewSize*(): Property;
 VAR property: SizeProperty;

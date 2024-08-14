@@ -545,7 +545,7 @@ END SubscribeProcess;
 
 PROCEDURE CheckColor(color : WMGraphics.Color) : BOOLEAN;
 VAR
-	r, g, b, a : SIGNED32;
+	r, g, b, a : WMGraphics.Color;
 BEGIN
 	WMGraphics.ColorToRGBA(color, r, g, b, a);
 	RETURN

@@ -114,7 +114,7 @@ TYPE
 
 			NEW(statusLabel); statusLabel.alignment.Set(WMComponents.AlignBottom);
 			statusLabel.bounds.SetHeight(20);
-			statusLabel.fillColor.Set(0CCCCCCCCH);
+			statusLabel.fillColor.Set(WMGraphics.Color(0CCCCCCCCH));
 			statusLabel.caption.SetAOC("0: OK");
 			panel.AddContent(statusLabel);
 
@@ -1913,7 +1913,7 @@ TYPE
 			NEW(panel);
 			panel.SetName("VisualComponent");
 			panel.alignment.Set(WMComponents.AlignClient);
-			panel.fillColor.Set(0CCCCCCFFH);
+			panel.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 			panel.takesFocus.Set(FALSE);
 			AddContent(panel);
 

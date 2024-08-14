@@ -721,7 +721,7 @@ TYPE
 
 			NEW(statusbar); statusbar.alignment.Set(WMComponents.AlignBottom);
 			statusbar.bounds.SetHeight(20);
-			statusbar.fillColor.Set(0CCCCCCFFH);
+			statusbar.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 			panel.AddContent(statusbar);
 
 			NEW(allBtn); allBtn.alignment.Set(WMComponents.AlignRight);

@@ -3213,13 +3213,13 @@ BEGIN
 	NEW(ColorPrototype, NIL, Strings.NewString("ClInactive"), Strings.NewString("Inactive background color")); ColorPrototype.Set(SIGNED32(80808080H));
 	NEW(PrototypeBclInactive, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclInactive);
 		(* font color *)
-	NEW(ColorPrototype, NIL, Strings.NewString("ClTextDefault"), Strings.NewString("Default text color")); ColorPrototype.Set(SIGNED32(0FFFF00FFH));
+	NEW(ColorPrototype, NIL, Strings.NewString("ClTextDefault"), Strings.NewString("Default text color")); ColorPrototype.Set(WMGraphics.Color(0FFFF00FFH));
 	NEW(PrototypeBclTextDefault, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclTextDefault);
 	NEW(ColorPrototype, NIL, Strings.NewString("ClTextHover"), Strings.NewString("Mouseover text color")); ColorPrototype.Set(00000FFFFH);
 	NEW(PrototypeBclTextHover, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclTextHover);
-	NEW(ColorPrototype, NIL, Strings.NewString("ClTextPressed"), Strings.NewString("Pressed text color")); ColorPrototype.Set(00000FFFFH);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClTextPressed"), Strings.NewString("Pressed text color")); ColorPrototype.Set(WMGraphics.Color(00000FFFFH));
 	NEW(PrototypeBclTextPressed, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclTextPressed);
-	NEW(ColorPrototype, NIL, Strings.NewString("ClTextInactive"), Strings.NewString("Inactive text color")); ColorPrototype.Set(0FFFFFF80H);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClTextInactive"), Strings.NewString("Inactive text color")); ColorPrototype.Set(WMGraphics.Color(0FFFFFF80H));
 	NEW(PrototypeBclTextInactive, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclTextInactive);
 
 		(* effect3D *)

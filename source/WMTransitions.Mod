@@ -29,7 +29,7 @@ TYPE
 		END Init;
 
 		PROCEDURE SetMask*(mi : Raster.Image);
-		VAR x, y, col, i : SIZE; tr, tg, tb, ta : SIGNED32;
+		VAR x, y, col, i : SIZE; tr, tg, tb, ta : WMGraphics.Color;
 			adr: ADDRESS;
 			ti : Raster.Image;
 			mode : Raster.Mode;
@@ -959,7 +959,7 @@ VAR
 	canvas : WMGraphics.BufferCanvas;
 	pix : Raster.Pixel; (* pixel read from a or b *)
 	ca, cb : WMGraphics.Color; (* color of pixel in a and b *)
-	red, green, blue, alpha : SIGNED32;
+	red, green, blue, alpha : WMGraphics.Color;
 BEGIN
 	IF (DEBUG) THEN
 		KernelLog.String("Fade in other Format ["); KernelLog.String("a.fmt.code= "); KernelLog.Int(a.fmt.code, 0); KernelLog.String("b.fmt.code= "); KernelLog.Int(b.fmt.code, 0);  KernelLog.String("]");  KernelLog.Ln;
