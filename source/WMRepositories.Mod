@@ -574,7 +574,7 @@ TYPE
 
 			NEW(statusLabel); statusLabel.alignment.Set(WMComponents.AlignBottom);
 			statusLabel.bounds.SetHeight(20);
-			statusLabel.fillColor.Set(0CCCCCCCCH);
+			statusLabel.fillColor.Set(WMGraphics.Color(0CCCCCCCCH));
 			statusLabel.caption.SetAOC("0: OK");
 			panel.AddContent(statusLabel);
 

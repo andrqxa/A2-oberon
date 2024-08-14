@@ -862,7 +862,7 @@ TYPE
 		PROCEDURE CreateForm(): WMComponents.VisualComponent;
 		VAR panel, toolbar : WMStandardComponents.Panel; button : WMStandardComponents.Button;
 		BEGIN
-			NEW(panel); panel.bounds.SetExtents(800, 700); panel.fillColor.Set(0FFFFFFFFH); panel.takesFocus.Set(TRUE);
+			NEW(panel); panel.bounds.SetExtents(800, 700); panel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); panel.takesFocus.Set(TRUE);
 
 			NEW(toolbar); toolbar.fillColor.Set(000FF00FFH); toolbar.bounds.SetHeight(20); toolbar.alignment.Set(WMComponents.AlignTop);
 			panel.AddContent(toolbar);

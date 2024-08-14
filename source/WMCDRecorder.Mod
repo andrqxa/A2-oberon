@@ -7,11 +7,11 @@ IMPORT
 
 CONST
 	Title = "CD Recording Tool";
-	White = 0FFFFFFFFH;
-	Black = 0000000FFH;
-	LightGray = 0C8C8C8FFH;
-	DarkGray = 0A0A0A0FFH;
-	Blue = 00000FFFFH;
+	White = WMGraphics.Color(0FFFFFFFFH);
+	Black = WMGraphics.Color(0000000FFH);
+	LightGray = WMGraphics.Color(0C8C8C8FFH);
+	DarkGray = WMGraphics.Color(0A0A0A0FFH);
+	Blue = WMGraphics.Color(00000FFFFH);
 	MaxLen = 256;
 	ResOk=0; ResErr=1;
 	DefaultImageLocation = "AOS:Image.Iso";

@@ -102,7 +102,7 @@ TYPE
 			NEW(onGoToExternalModule, NIL, NIL, NIL, NIL); events.Add(onGoToExternalModule);
 
 			NEW(label); label.alignment.Set(WMComponents.AlignTop);
-			label.fillColor.Set(0CCCCCCFFH);
+			label.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 			label.SetCaption(TreeLabelCaption); label.bounds.SetHeight(20);
 			SELF.AddContent(label);
 
@@ -111,7 +111,7 @@ TYPE
 			SELF.AddContent(toolbar);
 
 			NEW(treeView); treeView.alignment.Set(WMComponents.AlignClient);
-			treeView.clSelected.Set(0B0B0FFA0H);
+			treeView.clSelected.Set(WMGraphics.Color(0B0B0FFA0H));
 			treeView.SetFont(treeFontPlain);
 			SELF.AddContent(treeView);
 

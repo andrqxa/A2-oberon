@@ -80,7 +80,7 @@ END LoadCursors;
 (* load window-style specified by xml-tree with root el *)
 PROCEDURE LoadWindow(el : XML.Element) : WM.WindowStyle;
 VAR contents, en : Objects.Enumerator; p : ANY; x, y : XML.Element;
-	s, ts, ss : XML.String; desc : WM.WindowStyle; res : INTEGER;
+	s, ts, ss : XML.String; desc : WM.WindowStyle; u32: UNSIGNED32; res : INTEGER;
 
 		PROCEDURE Error(CONST x: ARRAY OF CHAR);
 		BEGIN
@@ -212,10 +212,10 @@ BEGIN
 
 						ELSIF ss^ = "ActiveColor" THEN
 							ts := GetCharContent(y);
-							IF ts # NIL THEN Strings.HexStrToInt(ts^, desc.atextColor, res) END
+							IF ts # NIL THEN Strings.HexStrToUInt32(ts^, u32, res); desc.atextColor := Graphics.Color(u32); END
 						ELSIF ss^ = "InactiveColor" THEN
 							ts := GetCharContent(y);
-							IF ts = NIL THEN desc.itextColor := desc.atextColor ELSE Strings.HexStrToInt(ts^, desc.itextColor, res) END;
+							IF ts = NIL THEN desc.itextColor := desc.atextColor ELSE Strings.HexStrToUInt32(ts^, u32, res); desc.itextColor := Graphics.Color(u32); END;
 
 						ELSIF ss^ = "MinimizeOffset" THEN
 							ts := GetCharContent(y);
@@ -366,13 +366,13 @@ BEGIN
 						y := p(XML.Element);
 						ss := y.GetName();
 						IF ss^ = "Color" THEN
-							ts := GetCharContent(y);	IF ts # NIL THEN Strings.HexStrToInt(ts^, desc.desktopColor, res) END
+							ts := GetCharContent(y);	IF ts # NIL THEN Strings.HexStrToUInt32(ts^, u32, res); desc.desktopColor := Graphics.Color(u32); END
 						ELSIF ss^ = "FgColor" THEN
-							ts := GetCharContent(y);	IF ts # NIL THEN Strings.HexStrToInt(ts^, desc.fgColor, res) END
+							ts := GetCharContent(y);	IF ts # NIL THEN Strings.HexStrToUInt32(ts^, u32, res); desc.fgColor := Graphics.Color(u32); END
 						ELSIF ss^ = "BgColor" THEN
-							ts := GetCharContent(y);	IF ts # NIL THEN Strings.HexStrToInt(ts^, desc.bgColor, res) END
+							ts := GetCharContent(y);	IF ts # NIL THEN Strings.HexStrToUInt32(ts^, u32, res); desc.bgColor := Graphics.Color(u32); END
 						ELSIF ss^ = "SelectColor" THEN
-							ts := GetCharContent(y);	IF ts # NIL THEN Strings.HexStrToInt(ts^, desc.selectCol, res) END
+							ts := GetCharContent(y);	IF ts # NIL THEN Strings.HexStrToUInt32(ts^, u32, res); desc.selectCol := Graphics.Color(u32); END
 						END
 					END
 				END

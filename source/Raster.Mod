@@ -62,6 +62,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		MAXCOL = 10000H; (*current implementation limitation for number of color indexes *)
 
 	TYPE
+		Color* = CLUTs.Color;
+
 		(** general pixels with red, green, blue, and alpha information in range 0..255; alpha is pre-multiplied into RGB **)
 		Pixel* = ARRAY 4 OF CHAR;
 
@@ -143,7 +145,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #IF ARM THEN
 
 	(** set pixel to opaque RGB value **)
-	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: INTEGER);
+	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: Color);
 	CODE
 		LDR R0, [FP, #pix] ; ADDRESSOF(pix[0])
 		LDRB R1, [FP, #blue]
@@ -172,7 +174,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #ELSE
 
 	(** set pixel to opaque RGB value **)
-	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: INTEGER);
+	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: Color);
 	BEGIN
 		pix[b] := CHR(blue); pix[g] := CHR(green); pix[r] := CHR(red); pix[a] := 0FFX
 	END SetRGB;
@@ -182,7 +184,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #IF ARM THEN
 
 	(** set pixel to partly transparent RGB value **)
-	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: INTEGER);
+	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: Color);
 	CODE
 		LDR R0, [FP, #pix] ; ADDRESSOF(pix[0])
 		LDRB R1, [FP, #blue]
@@ -223,7 +225,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #ELSE
 
 	(** set pixel to partly transparent RGB value **)
-	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: INTEGER);
+	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: Color);
 	BEGIN
 		pix[b] := CHR(blue * alpha DIV 255);
 		pix[g] := CHR(green * alpha DIV 255);
@@ -234,7 +236,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #END
 
 	(** retrieve RGB and alpha values from pixel **)
-	PROCEDURE GetRGBA* (pix: Pixel; VAR red, green, blue, alpha: INTEGER);
+	PROCEDURE GetRGBA* (pix: Pixel; VAR red, green, blue, alpha: Color);
 	BEGIN
 		alpha := ORD(pix[a]);
 		IF alpha = 0 THEN	(* color has disappeared *)
@@ -253,7 +255,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	(**--- Palettes ---**)
 
 	(** return index of color in palette which approximates the requested color reasonably well **)
-	PROCEDURE PaletteIndex* (pal: Palette; red, green, blue: INTEGER): SIGNED32;
+	PROCEDURE PaletteIndex* (pal: Palette; red, green, blue: Color): SIGNED32;
 	BEGIN
 		IF pal.used>256 THEN
 			RETURN CLUTs.Match(pal.clut, ASH(red, 16) + ASH(green, 8) +  blue) *pal.used DIV 256 (*PH090122*)
@@ -263,7 +265,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(** compute internal palette structures whenever palette colors have been modified **)
 	PROCEDURE InitPalette* (pal: Palette; used, bits: SIGNED32);
-		VAR n: SIZE; red, green, blue, alpha: INTEGER;
+		VAR n: SIZE; red, green, blue, alpha: Color;
 	BEGIN
 		n := 0;
 		IF used>pal.used THEN NEW(pal.col,used);END;

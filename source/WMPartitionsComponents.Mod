@@ -461,7 +461,7 @@ TYPE
 		PROCEDURE BuildDiskPanel(VAR disk  : Disk): WMStandardComponents.Panel;
 		VAR
 			diskSelected : BOOLEAN;
-			fillColor : SIGNED32;
+			fillColor : WMGraphics.Color;
 			text : ARRAY 32 OF CHAR;
 			logical : SIGNED32; (* nbr of logical partitions on disk *)
 			i, k : SIGNED32;
@@ -543,7 +543,7 @@ TYPE
 		PROCEDURE UpdateDiskPanel(disk  : Disk);
 		VAR
 			width, offset, extWidth, extOffset, totalWidth, extTotalWidth : SIZE;
-			fillColor : SIGNED32;
+			fillColor : WMGraphics.Color;
 			text : ARRAY 32 OF CHAR;
 			primary, logical : SIGNED32; (* nbr of primary/logical partitions on disk *)
 			i, k : SIZE;
@@ -841,7 +841,7 @@ TYPE
 		VAR
 			table : AosDisks.PartitionTable;
 			caption, temp : ARRAY 128 OF CHAR;
-			fillColor : SIGNED32;
+			fillColor : WMGraphics.Color;
 			grid : NoWheelGrid;
 			disk: SIZE; partition : SIGNED32;
 			width, height : SIZE;

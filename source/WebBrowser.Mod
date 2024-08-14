@@ -41,7 +41,7 @@ TYPE
 
 			NEW(topToolbar); topToolbar.bounds.SetHeight(20); topToolbar.alignment.Set(WMComponents.AlignTop);
 
-			NEW(panel); panel.bounds.SetExtents(1000, 650); panel.fillColor.Set(0FFFFFFFFH); panel.takesFocus.Set(TRUE);
+			NEW(panel); panel.bounds.SetExtents(1000, 650); panel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); panel.takesFocus.Set(TRUE);
 			NEW(topToolbar); topToolbar.bounds.SetHeight(20); topToolbar.alignment.Set(WMComponents.AlignTop);
 			panel.AddContent(topToolbar);
 
@@ -78,7 +78,7 @@ TYPE
 			NEW(urlEdit); urlEdit.alignment.Set(WMComponents.AlignClient);
 			urlEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			urlEdit.multiLine.Set(FALSE); urlEdit.bounds.SetWidth(500);
-			topToolbar.AddContent(urlEdit); urlEdit.fillColor.Set(0FFFFFFFFH);
+			topToolbar.AddContent(urlEdit); urlEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			urlEdit.tv.showBorder.Set(TRUE);
 			urlEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
 			urlEdit.onEnter.Add(Go);

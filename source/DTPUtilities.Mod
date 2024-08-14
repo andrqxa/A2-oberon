@@ -188,7 +188,7 @@ TYPE
 		END SetCaller;
 
 		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
-		VAR r, g, b, a: SIGNED32; i, j: SIZE; cColor: WMGraphics.Color;
+		VAR r, g, b, a: WMGraphics.Color; i, j: SIZE; cColor: WMGraphics.Color;
 		BEGIN
 			i := y DIV 10; j := x DIV 10;
 			IF (i>= 0) & (i<=2) THEN
@@ -219,7 +219,7 @@ TYPE
 		END FocusLost;
 *)
 		PROCEDURE Draw*(canvas: WMGraphics.Canvas);
-		VAR r, g, b, a, i, j: SIGNED32; color: WMGraphics.Color;
+		VAR r, g, b, a: WMGraphics.Color;  i, j: SIGNED32; color: WMGraphics.Color;
 		BEGIN
 			Draw^(canvas);
 

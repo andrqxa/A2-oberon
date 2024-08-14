@@ -306,7 +306,8 @@ TYPE
 		minimizeOffset, spaceBetweenButtons : SIGNED32;
 		titleCanvas : Graphics.BufferCanvas;
 		down, hover : SIGNED32;
-		tac, tic, tax, tix, tay, tiy : SIGNED32;
+		tac, tic: Graphics.Color;
+		tax, tix, tay, tiy : SIGNED32;
 
 		PROCEDURE CheckButtons(x, y : SIZE; VAR button : SIGNED32);
 		VAR img : Graphics.Image;
@@ -433,7 +434,7 @@ TYPE
 		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
 		CONST IconBorder  = 5;
 		VAR
-			color, tc, sw : SIGNED32; tx, ty, dx, dy : SIZE; fw, fh : FLOAT32; a, b, c, img : Graphics.Image; title : String;
+			color, tc: Graphics.Color; sw : SIGNED32; tx, ty, dx, dy : SIZE; fw, fh : FLOAT32; a, b, c, img : Graphics.Image; title : String;
 			f : Graphics.Font;
 			iconSize, closeImageWidth, offsetX := 0, imgWidth := 0: SIZE;
 			VAR style := manager.GetStyle();

@@ -248,16 +248,50 @@ BEGIN
 	elem.AddAttribute(a);
 END StoreBoolean;
 
-PROCEDURE LoadLongint*(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR value : SIGNED32);
+CONST LoadLongint* = LoadInt32;
+PROCEDURE LoadInt32*(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR value : SIGNED32);
 VAR string : String;
 BEGIN
 	string := elem.GetAttributeValue(name);
 	IF string # NIL THEN
 		Strings.StrToInt32(string^, value);
 	ELSE
-		ShowLoadError("LoadLongint", elem, name);
+		ShowLoadError("LoadInt32", elem, name);
 	END;
-END LoadLongint;
+END LoadInt32;
+
+PROCEDURE LoadInt64*(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR value : SIGNED64);
+VAR string : String;
+BEGIN
+	string := elem.GetAttributeValue(name);
+	IF string # NIL THEN
+		Strings.StrToInt64(string^, value);
+	ELSE
+		ShowLoadError("LoadInt64", elem, name);
+	END;
+END LoadInt64;
+
+PROCEDURE LoadUInt32*(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR value : UNSIGNED32);
+VAR string : String;
+BEGIN
+	string := elem.GetAttributeValue(name);
+	IF (string # NIL) THEN
+		Strings.StrToUInt32(string^, value);
+	ELSE
+		ShowLoadError("LoadUInt32", elem, name);
+	END;
+END LoadUInt32;
+
+PROCEDURE LoadUInt64*(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR value : UNSIGNED64);
+VAR string : String;
+BEGIN
+	string := elem.GetAttributeValue(name);
+	IF (string # NIL) THEN
+		Strings.StrToUInt64(string^, value);
+	ELSE
+		ShowLoadError("LoadUInt64", elem, name);
+	END;
+END LoadUInt64;
 
 PROCEDURE LoadSize*(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR value : SIZE);
 VAR string : String;
@@ -270,12 +304,34 @@ BEGIN
 	END;
 END LoadSize;
 
-PROCEDURE StoreLongint*(elem : XML.Element; CONST name : ARRAY OF CHAR; value : SIGNED32);
+CONST StoreLongint* = StoreInt32;
+PROCEDURE StoreInt32*(elem : XML.Element; CONST name : ARRAY OF CHAR; value : SIGNED32);
 VAR a : XML.Attribute; string : ARRAY 32 OF CHAR;
 BEGIN
 	NEW(a); a.SetName(name); Strings.IntToStr(value, string); a.SetValue(string);
 	elem.AddAttribute(a);
-END StoreLongint;
+END StoreInt32;
+
+PROCEDURE StoreInt64*(elem : XML.Element; CONST name : ARRAY OF CHAR; value : SIGNED64);
+VAR a : XML.Attribute; string : ARRAY 32 OF CHAR;
+BEGIN
+	NEW(a); a.SetName(name); Strings.IntToStr(value, string); a.SetValue(string);
+	elem.AddAttribute(a);
+END StoreInt64;
+
+PROCEDURE StoreUInt32*(elem : XML.Element; CONST name : ARRAY OF CHAR; value : UNSIGNED32);
+VAR a : XML.Attribute; string : ARRAY 32 OF CHAR;
+BEGIN
+	NEW(a); a.SetName(name); Strings.UIntToStr(value, string); a.SetValue(string);
+	elem.AddAttribute(a);
+END StoreUInt32;
+
+PROCEDURE StoreUInt64*(elem : XML.Element; CONST name : ARRAY OF CHAR; value : UNSIGNED64);
+VAR a : XML.Attribute; string : ARRAY 32 OF CHAR;
+BEGIN
+	NEW(a); a.SetName(name); Strings.UIntToStr(value, string); a.SetValue(string);
+	elem.AddAttribute(a);
+END StoreUInt64;
 
 PROCEDURE StoreSize*(elem : XML.Element; CONST name : ARRAY OF CHAR; value : SIZE);
 VAR a : XML.Attribute; string : ARRAY 32 OF CHAR;

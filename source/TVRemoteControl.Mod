@@ -3,7 +3,7 @@ MODULE TVRemoteControl;	(** AUTHOR "oljeger@student.ethz.ch"; PURPOSE "Graphical
 IMPORT
 	TVDriver, TV, TVChannels, Standard := WMStandardComponents, Base := WMComponents, Commands,
 	Streams, WM := WMWindowManager, Modules, KernelLog, TeletextViewer, WMDialogs,
-	Messages := WMMessages, WMRestorable, XML, Strings, WMGrids, WMStringGrids;
+	Messages := WMMessages, WMRestorable, XML, Strings, WMGrids, WMStringGrids, WMGraphics;
 
 CONST
 	Width = 200;
@@ -11,7 +11,7 @@ CONST
 	ButtonHeight = 30;
 	ButtonsPerRow = 3;
 
-	ButtonCol = 0FF00008FH;
+	ButtonCol = WMGraphics.Color(0FF00008FH);
 
 TYPE
 	(** Remote control window *)

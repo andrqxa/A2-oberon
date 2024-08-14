@@ -1805,10 +1805,17 @@ TYPE
 			RETURN result
 		END MathArrayConversion;
 
-		PROCEDURE ConvertValue(position: Position; expression: SyntaxTree.Value; type: SyntaxTree.Type): SyntaxTree.Expression;
+		PROCEDURE ConvertValue(position: Position; expression: SyntaxTree.Value; type: SyntaxTree.Type; systemVal := FALSE: BOOLEAN): SyntaxTree.Expression;
 		VAR result: SyntaxTree.Expression; int: Basic.Integer; real, imaginary: FLOAT64; set: Basic.Set; char: CHAR; string: Scanner.StringType;
+			r64: RECORD f: FLOAT64; i{OFFSET=0}: SIGNED64; s{OFFSET=0}: SET64; END;
+			r32: RECORD f: FLOAT32; i{OFFSET=0}: SIGNED32; s{OFFSET=0}: SET32; END;
 		BEGIN
 			result := expression; type := type.resolvedType;
+			IF systemVal & (expression.type.sizeInBits # type.sizeInBits) THEN
+				Error(position, "SYSTEM.VAL conversion to a type with incompatible size");
+				result := SyntaxTree.invalidExpression;
+				RETURN result;
+			END;
 			IF (type IS SyntaxTree.ArrayType) & (type(SyntaxTree.ArrayType).arrayBase.resolvedType IS SyntaxTree.ByteType) THEN
 				(* skip, no conversion *)
 			ELSIF IsIntegerValue(expression,int) THEN
@@ -1821,23 +1828,33 @@ TYPE
 					result := SyntaxTree.NewIntegerValue(position,int);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.FloatType) THEN
-					result := SyntaxTree.NewRealValue(expression.position,int,Scanner.None);
+					IF type.sizeInBits = 64 THEN
+						IF systemVal THEN r64.i := SIGNED64(int); ELSE r64.f := int; END;
+						result := SyntaxTree.NewRealValue(expression.position,r64.f,Scanner.Longreal);
+					ELSIF type.sizeInBits = 32 THEN
+						IF systemVal THEN r32.i := SIGNED32(int); ELSE r32.f := int; END;
+						result := SyntaxTree.NewRealValue(expression.position,r32.f,Scanner.Real);
+					ELSE HALT(100);
+					END;
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.ComplexType) THEN
+					ASSERT(~systemVal);
 					result := SyntaxTree.NewComplexValue(expression.position, int, 0, Scanner.None);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.SetType) THEN
-					result := SyntaxTree.NewSetValue(expression.position,SYSTEM.VAL(Basic.Set,int));
+					r64.i := SIGNED64(int);
+					result := SyntaxTree.NewSetValue(expression.position,r64.s);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.CharacterType) OR (type IS SyntaxTree.ByteType) THEN
 					result := SyntaxTree.NewCharacterValue(expression.position,CHR(int));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.EnumerationType) THEN
+					ASSERT(~systemVal);
 					result := SyntaxTree.NewEnumerationValue(expression.position,int);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.PortType) THEN
+					ASSERT(~systemVal);
 					result := ConvertValue(position, expression, Global.Signed16);
-
 				ELSE
 					Error(position, "integer value cannot be converted");
 					result := SyntaxTree.invalidExpression;
@@ -1848,27 +1865,39 @@ TYPE
 				END;
 			ELSIF IsRealValue(expression,real) THEN
 				IF (type IS SyntaxTree.IntegerType) & (type.sizeInBits < 64) THEN
-					int := Global.ConvertSigned(ENTIER(real),system.SizeOf(type));
+					IF systemVal THEN
+						ASSERT((expression.type.sizeInBits = 32) & (type.sizeInBits = 32));
+						r32.f := FLOAT32(real);
+					ELSE r32.i := ENTIER(real); END;
+					int := Global.ConvertSigned(r32.i,system.SizeOf(type));
 					result := SyntaxTree.NewIntegerValue(expression.position,int);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.IntegerType) OR (type IS SyntaxTree.SizeType) THEN
-					int := ENTIERH(real);
+					IF systemVal THEN
+						ASSERT((expression.type.sizeInBits = 64) & (type.sizeInBits = 64));
+						r64.f := FLOAT64(real);
+					ELSE r64.i := ENTIERH(real); END;
+					int := Global.ConvertSigned(r64.i,system.SizeOf(type));
 					result := SyntaxTree.NewIntegerValue(expression.position,int);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.FloatType) THEN
+					ASSERT(~systemVal);
 					result := SyntaxTree.NewRealValue(position,real,Scanner.None);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.ComplexType) THEN
+					ASSERT(~systemVal);
 					result := SyntaxTree.NewComplexValue(expression.position, real, 0, Scanner.None);
 					result.SetType(type);
 					result(SyntaxTree.ComplexValue).UpdateSubtype;
 				ELSIF (type IS SyntaxTree.PortType) THEN
+					ASSERT(~systemVal);
 					result := ConvertValue(position, expression, Global.Signed16);
 				ELSE
 					Error(position, "real value cannot be converted");
 					result := SyntaxTree.invalidExpression;
 				END
 			ELSIF IsComplexValue(expression, real, imaginary) THEN
+				ASSERT(~systemVal);
 				IF (type IS SyntaxTree.ComplexType) THEN
 					result := SyntaxTree.NewComplexValue(expression.position, real, imaginary, 0);
 					result.SetType(type);
@@ -1879,14 +1908,18 @@ TYPE
 				END
 			ELSIF IsSetValue(expression,set) THEN
 				IF IsIntegerType(type) THEN
-					result := SyntaxTree.NewIntegerValue(expression.position,SYSTEM.VAL(Basic.Integer,set));
+					r64.s := set;
+					result := SyntaxTree.NewIntegerValue(expression.position,r64.i);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.CharacterType) OR (type IS SyntaxTree.ByteType) THEN (* for example: possible via ch = CHR(SYSTEM.VAL(Basic.Integer,set)) *)
+					ASSERT(~systemVal);
 					result := SyntaxTree.NewCharacterValue(expression.position,SYSTEM.VAL(CHAR,SET8(set)));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.PortType) THEN
+					ASSERT(~systemVal);
 					result := ConvertValue(position, expression, Global.Signed16);
 				ELSIF (type IS SyntaxTree.SetType) THEN
+					ASSERT(~systemVal);
 					set := Global.ConvertSet(set,system.SizeOf(type));
 					result := SyntaxTree.NewSetValue(expression.position,set);
 					result.SetType(type);
@@ -1895,6 +1928,7 @@ TYPE
 					result := SyntaxTree.invalidExpression;
 				END;
 			ELSIF IsStringValue(expression,string) THEN
+				ASSERT(~systemVal);
 				IF ((type IS SyntaxTree.CharacterType) OR (type IS SyntaxTree.ByteType)) & (string[1]=0X) THEN
 					result := SyntaxTree.NewCharacterValue(expression.position,string[0]);
 					result.SetType(type);
@@ -1904,31 +1938,38 @@ TYPE
 					result := SyntaxTree.invalidExpression;
 				END;
 			ELSIF IsCharacterValue(expression,char) THEN
+				ASSERT(~systemVal);
 				IF (type IS SyntaxTree.StringType) OR (type IS SyntaxTree.ArrayType) & (type(SyntaxTree.ArrayType).arrayBase.resolvedType IS SyntaxTree.CharacterType) THEN
 					string[0] := char; string[1] := 0X;
 					type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,2);
 					result := SyntaxTree.NewStringValue(expression.position,string);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.ByteType) THEN
+					ASSERT(~systemVal);
 					(* do not simply set the new type as this could invalidate types of constants *)
 					result := SyntaxTree.NewCharacterValue(expression.position,char);
 					result.SetType(type)
 				ELSIF (type IS SyntaxTree.IntegerType) THEN
+					ASSERT(~systemVal);
 					result := SyntaxTree.NewIntegerValue(expression.position,ORD(char));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.SetType) THEN
+					ASSERT(~systemVal);
 					result := SyntaxTree.NewSetValue(expression.position,SYSTEM.VAL(Basic.Set,Basic.Integer(ORD(char))));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.CharacterType) THEN
+					ASSERT(~systemVal);
 					result := SyntaxTree.NewCharacterValue(expression.position,char);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.PortType) THEN
+					ASSERT(~systemVal);
 					result := ConvertValue(position, expression, Global.Signed16);
 				ELSE
 					Error(position, "character value cannot be converted");
 					result := SyntaxTree.invalidExpression;
 				END;
 			ELSIF expression IS SyntaxTree.NilValue THEN
+				ASSERT(~systemVal);
 				IF type IS SyntaxTree.AddressType THEN
 					result := SyntaxTree.NewIntegerValue(position,0);
 					result.SetType(type);
@@ -1937,8 +1978,10 @@ TYPE
 				END;
 				(* nothing to be done *)
 			ELSIF expression IS SyntaxTree.MathArrayValue THEN
+				ASSERT(~systemVal);
 				result := MathArrayConversion(position, expression,type);
 			ELSIF expression IS SyntaxTree.EnumerationValue THEN
+				ASSERT(~systemVal);
 				int := expression(SyntaxTree.EnumerationValue).value;
 				IF (type IS SyntaxTree.IntegerType) OR (type IS SyntaxTree.SizeType) THEN
 					int := Global.ConvertSigned(int,system.SizeOf(type));
@@ -1949,6 +1992,7 @@ TYPE
 				END;
 				(* nothing to be done *)
 			ELSIF expression IS SyntaxTree.ProcedureValue THEN
+				ASSERT(~systemVal);
 				IF type IS SyntaxTree.ProcedureType THEN
 					result := expression;
 				ELSE
@@ -1963,6 +2007,14 @@ TYPE
 				result := SyntaxTree.invalidExpression;
 			END;
 			RETURN result
+		FINALLY
+			Error(position, "expression cannot be converted");
+			IF VerboseErrorMessage THEN
+				Printout.Info("expression",expression);
+				Printout.Info("type",type);
+			END;
+			result := SyntaxTree.invalidExpression;
+			RETURN result;
 		END ConvertValue;
 
 		(**
@@ -5431,7 +5483,7 @@ TYPE
 								Warning(parameter[0].position,"types do not have the same size");
 							END;
 							IF (parameter[1].resolved # NIL) THEN
-								parameter[0] := ConvertValue(parameter[1].position,parameter[1].resolved,type);
+								parameter[0] := ConvertValue(parameter[1].position,parameter[1].resolved,type,TRUE);
 								IF (parameter[0] # NIL) & (parameter[0] IS SyntaxTree.Value) THEN
 									result.SetResolved(parameter[0](SyntaxTree.Value));
 								END;

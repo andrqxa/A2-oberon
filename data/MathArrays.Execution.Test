@@ -178,7 +178,7 @@ positive: test driver
 		END TestFillS0;
 
 		PROCEDURE TestS1*(CONST a: ARRAY [*] OF SIGNED8; r: RANGE);
-		VAR i: SIGNED32;
+		VAR i: SIZE;
 		BEGIN
 		 	i := FIRST(r); WHILE i <= LAST(r) DO
 		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=SIGNED8(i));
@@ -187,7 +187,7 @@ positive: test driver
 		END TestS1;
 
 		PROCEDURE TestS2*(CONST a: ARRAY [*,*] OF SIGNED8; r1, r2: RANGE);
-		VAR i,j: SIGNED32;
+		VAR i,j: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
@@ -197,7 +197,7 @@ positive: test driver
 		END TestS2;
 
 		PROCEDURE TestS3*(CONST a: ARRAY [*,*,*] OF SIGNED8; r1, r2, r3: RANGE);
-		VAR i,j,k: SIGNED32;
+		VAR i,j,k: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
@@ -263,7 +263,7 @@ positive: test driver
 		END RandomI;
 
 		PROCEDURE TestI1*(CONST a: ARRAY [*] OF SIGNED16; r: RANGE);
-		VAR i: SIGNED32;
+		VAR i: SIZE;
 		BEGIN
 		 	i := FIRST(r); WHILE i <= LAST(r) DO
 		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=SIGNED16(i));
@@ -272,7 +272,7 @@ positive: test driver
 		END TestI1;
 
 		PROCEDURE TestI2*(CONST a: ARRAY [*,*] OF SIGNED16; r1, r2: RANGE);
-		VAR i,j: SIGNED32;
+		VAR i,j: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
@@ -282,7 +282,7 @@ positive: test driver
 		END TestI2;
 
 		PROCEDURE TestI3*(CONST a: ARRAY [*,*,*] OF SIGNED16; r1, r2, r3: RANGE);
-		VAR i,j,k: SIGNED32;
+		VAR i,j,k: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
@@ -298,9 +298,9 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO a[i] := 10*base+i END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO a[i] := 10*base+i END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO FillL0(a[i,?],10*base+i) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO FillL0(a[i,?],10*base+i) END;
 			END;
 		END FillL0;
 
@@ -312,9 +312,9 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO ASSERT(a[i] = 10*base+i) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO ASSERT(a[i] = 10*base+i) END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO TestFillL0(a[i,?],10*base+i) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO TestFillL0(a[i,?],10*base+i) END;
 			END;
 		END TestFillL0;
 
@@ -327,14 +327,14 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO a[i] := gen.Dice(1000) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO a[i] := gen.Dice(1000) END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO RandomL(a[i,?]) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO RandomL(a[i,?]) END;
 			END;
 		END RandomL;
 
 		PROCEDURE TestL1*(CONST a: ARRAY [*] OF SIGNED32; r: RANGE);
-		VAR i: SIGNED32;
+		VAR i: SIZE;
 		BEGIN
 		 	i := FIRST(r); WHILE i <= LAST(r) DO
 		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=SIGNED32(i));
@@ -343,7 +343,7 @@ positive: test driver
 		END TestL1;
 
 		PROCEDURE TestL2*(CONST a: ARRAY [*,*] OF SIGNED32; r1, r2: RANGE);
-		VAR i,j: SIGNED32;
+		VAR i,j: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
@@ -353,7 +353,7 @@ positive: test driver
 		END TestL2;
 
 		PROCEDURE TestL3*(CONST a: ARRAY [*,*,*] OF SIGNED32; r1, r2, r3: RANGE);
-		VAR i,j,k: SIGNED32;
+		VAR i,j,k: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
@@ -368,9 +368,9 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO a[i] := 10*base+i END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO a[i] := 10*base+i END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO FillX0(a[i,?],10*base+i) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO FillX0(a[i,?],10*base+i) END;
 			END;
 		END FillX0;
 
@@ -382,9 +382,9 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO ASSERT(ENTIER(a[i]+0.5) = 10*base+i) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO ASSERT(ENTIER(a[i]+0.5) = 10*base+i) END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO TestFillX0(a[i,?],10*base+i) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO TestFillX0(a[i,?],10*base+i) END;
 			END;
 		END TestFillX0;
 
@@ -397,9 +397,9 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO a[i] := gen.Uniform() END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO a[i] := gen.Uniform() END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO RandomX(a[i,?]) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO RandomX(a[i,?]) END;
 			END;
 		END RandomX;
 
@@ -407,14 +407,14 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO Debugging.Int(ENTIER(a[i]+0.5),5) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO Debugging.Int(ENTIER(a[i]+0.5),5) END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO PrintX(a[i,?]); Debugging.Ln; END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO PrintX(a[i,?]); Debugging.Ln; END;
 			END;
 		END PrintX;
 
 		PROCEDURE TestX1*(CONST a: ARRAY [*] OF FLOAT64; r: RANGE);
-		VAR i: SIGNED32;
+		VAR i: SIZE;
 		BEGIN
 		 	i := FIRST(r); WHILE i <= LAST(r) DO
 		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=FLOAT64(i));
@@ -423,7 +423,7 @@ positive: test driver
 		END TestX1;
 
 		PROCEDURE TestX2*(CONST a: ARRAY [*,*] OF FLOAT64; r1, r2: RANGE);
-		VAR i,j: SIGNED32;
+		VAR i,j: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
@@ -433,7 +433,7 @@ positive: test driver
 		END TestX2;
 
 		PROCEDURE TestX3*(CONST a: ARRAY [*,*,*] OF FLOAT64; r1, r2, r3: RANGE);
-		VAR i,j,k: SIGNED32;
+		VAR i,j,k: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
@@ -449,9 +449,9 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO a[i] := 10*base+i END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO a[i] := 10*base+i END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO FillR0(a[i,?],10*base+i) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO FillR0(a[i,?],10*base+i) END;
 			END;
 		END FillR0;
 
@@ -463,9 +463,9 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO ASSERT(ENTIER(a[i]+0.5) = 10*base+i) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO ASSERT(ENTIER(a[i]+0.5) = 10*base+i) END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO TestFillR0(a[i,?],10*base+i) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO TestFillR0(a[i,?],10*base+i) END;
 			END;
 		END TestFillR0;
 
@@ -478,14 +478,14 @@ positive: test driver
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO LEN(a,0)-1 DO a[i] := gen.Uniform() END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO a[i] := gen.Uniform() END;
 			ELSE
-				FOR i := 0 TO LEN(a,0)-1 DO RandomR(a[i,?]) END;
+				FOR i := 0 TO SIGNED32(LEN(a,0)-1) DO RandomR(a[i,?]) END;
 			END;
 		END RandomR;
 
 		PROCEDURE TestR1*(CONST a: ARRAY [*] OF FLOAT32; r: RANGE);
-		VAR i: SIGNED32;
+		VAR i: SIZE;
 		BEGIN
 		 	i := FIRST(r); WHILE i <= LAST(r) DO
 		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=FLOAT32(i));
@@ -494,7 +494,7 @@ positive: test driver
 		END TestR1;
 
 		PROCEDURE TestR2*(CONST a: ARRAY [*,*] OF FLOAT32; r1, r2: RANGE);
-		VAR i,j: SIGNED32;
+		VAR i,j: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
@@ -504,7 +504,7 @@ positive: test driver
 		END TestR2;
 
 		PROCEDURE TestR3*(CONST a: ARRAY [*,*,*] OF FLOAT32; r1, r2, r3: RANGE);
-		VAR i,j,k: SIGNED32;
+		VAR i,j,k: SIZE;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO

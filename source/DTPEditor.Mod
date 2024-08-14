@@ -140,7 +140,7 @@ TYPE
 			panelColor := windowStyle.bgColor;
 
 			NEW(panel); panel.bounds.SetExtents(WINDOWWIDTH,WINDOWHEIGHT);
-			panel.fillColor.Set(0FFFFFFFFH);
+			panel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			panel.takesFocus.Set(TRUE);
 			NEW(topToolbar); topToolbar.bounds.SetHeight(20);
 			topToolbar.alignment.Set(WMComponents.AlignTop); topToolbar.fillColor.Set(panelColor);
@@ -149,7 +149,7 @@ TYPE
 			NEW(filenameEdit);
 			filenameEdit.alignment.Set(WMComponents.AlignLeft);
 			filenameEdit.multiLine.Set(FALSE); filenameEdit.bounds.SetWidth(200);
-			topToolbar.AddContent(filenameEdit); filenameEdit.fillColor.Set(0FFFFFFFFH);
+			topToolbar.AddContent(filenameEdit); filenameEdit.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			filenameEdit.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			filenameEdit.tv.showBorder.Set(TRUE);
 			filenameEdit.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
@@ -248,7 +248,7 @@ TYPE
 			NEW(masterNumber);
 			masterNumber.alignment.Set(WMComponents.AlignTop);
 			masterNumber.multiLine.Set(FALSE); masterNumber.bounds.SetHeight(20);
-			masterNumber.fillColor.Set(0FFFFFFFFH);
+			masterNumber.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			masterNumber.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			masterNumber.tv.showBorder.Set(TRUE);
 			masterNumber.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
@@ -275,7 +275,7 @@ TYPE
 			NEW(pageNumber);
 			pageNumber.alignment.Set(WMComponents.AlignLeft);
 			pageNumber.multiLine.Set(FALSE); pageNumber.bounds.SetWidth(28);
-			cpan.AddContent(pageNumber); pageNumber.fillColor.Set(0FFFFFFFFH);
+			cpan.AddContent(pageNumber); pageNumber.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			pageNumber.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			pageNumber.tv.showBorder.Set(TRUE);
 			pageNumber.tv.borders.Set(WMRectangles.MakeRect(3,3,1,1));
@@ -514,12 +514,12 @@ TYPE
 			IF masterON THEN
 				masterON := FALSE;
 				modeMaster.caption.SetAOC("MasterPage");
-				masterNumber.fillColor.Set(0FFFFFFFFH); masterNumber.tv.defaultTextBgColor.Set(0FFFFFFFFH);
+				masterNumber.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); masterNumber.tv.defaultTextBgColor.Set(WMGraphics.Color(0FFFFFFFFH));
 				masterLabel.caption.SetAOC(" Linked Master:");
 			ELSE
 				masterON := TRUE;
 				modeMaster.caption.SetAOC("Document");
-				masterNumber.fillColor.Set(0BBBBBBFFH); masterNumber.tv.defaultTextBgColor.Set(0BBBBBBFFH);
+				masterNumber.fillColor.Set(WMGraphics.Color(0BBBBBBFFH)); masterNumber.tv.defaultTextBgColor.Set(WMGraphics.Color(0BBBBBBFFH));
 				masterLabel.caption.SetAOC(" Master Name:");
 			END;
 			drawPanel.SetMasterEditMode(masterON);
@@ -1940,7 +1940,7 @@ TYPE
 			labelPanel.AddContent(dw);
 
 			NEW(dwe); dwe.bounds.SetHeight(20); dwe.alignment.Set(WMComponents.AlignTop);
-			dwe.tv.showBorder.Set(TRUE); dwe.multiLine.Set(FALSE); dwe.fillColor.Set(0FFFFFFFFH);
+			dwe.tv.showBorder.Set(TRUE); dwe.multiLine.Set(FALSE); dwe.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			dwe.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			editorsPanel.AddContent(dwe); dwe.onEnter.Add(FocusNextField);
 
@@ -1948,7 +1948,7 @@ TYPE
 			labelPanel.AddContent(dh);
 
 			NEW(dhe); dhe.bounds.SetHeight(20); dhe.alignment.Set(WMComponents.AlignTop);
-			dhe.tv.showBorder.Set(TRUE); dhe.multiLine.Set(FALSE); dhe.fillColor.Set(0FFFFFFFFH);
+			dhe.tv.showBorder.Set(TRUE); dhe.multiLine.Set(FALSE); dhe.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			dhe.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			editorsPanel.AddContent(dhe); dhe.onEnter.Add(FocusNextField);
 
@@ -1956,7 +1956,7 @@ TYPE
 			labelPanel.AddContent(dmt);
 
 			NEW(dmte); dmte.bounds.SetHeight(20); dmte.alignment.Set(WMComponents.AlignTop);
-			dmte.tv.showBorder.Set(TRUE); dmte.multiLine.Set(FALSE); dmte.fillColor.Set(0FFFFFFFFH);
+			dmte.tv.showBorder.Set(TRUE); dmte.multiLine.Set(FALSE); dmte.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			dmte.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			editorsPanel.AddContent(dmte);	dmte.onEnter.Add(FocusNextField);
 
@@ -1964,7 +1964,7 @@ TYPE
 			labelPanel.AddContent(dmb);
 
 			NEW(dmbe); dmbe.bounds.SetHeight(20); dmbe.alignment.Set(WMComponents.AlignTop);
-			dmbe.tv.showBorder.Set(TRUE); dmbe.multiLine.Set(FALSE); dmbe.fillColor.Set(0FFFFFFFFH);
+			dmbe.tv.showBorder.Set(TRUE); dmbe.multiLine.Set(FALSE); dmbe.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			dmbe.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			editorsPanel.AddContent(dmbe); dmbe.onEnter.Add(FocusNextField);
 
@@ -1972,7 +1972,7 @@ TYPE
 			labelPanel.AddContent(dml);
 
 			NEW(dmle); dmle.bounds.SetHeight(20); dmle.alignment.Set(WMComponents.AlignTop);
-			dmle.tv.showBorder.Set(TRUE); dmle.multiLine.Set(FALSE); dmle.fillColor.Set(0FFFFFFFFH);
+			dmle.tv.showBorder.Set(TRUE); dmle.multiLine.Set(FALSE); dmle.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			dmle.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			editorsPanel.AddContent(dmle); dmle.onEnter.Add(FocusNextField);
 
@@ -1980,7 +1980,7 @@ TYPE
 			labelPanel.AddContent(dmr);
 
 			NEW(dmre); dmre.bounds.SetHeight(20); dmre.alignment.Set(WMComponents.AlignTop);
-			dmre.tv.showBorder.Set(TRUE); dmre.multiLine.Set(FALSE); dmre.fillColor.Set(0FFFFFFFFH);
+			dmre.tv.showBorder.Set(TRUE); dmre.multiLine.Set(FALSE); dmre.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			dmre.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			editorsPanel.AddContent(dmre); dmre.onEnter.Add(FocusNextField);
 
@@ -1988,7 +1988,7 @@ TYPE
 			labelPanel.AddContent(dfp);
 
 			NEW(dfpe); dfpe.bounds.SetHeight(20); dfpe.alignment.Set(WMComponents.AlignTop);
-			dfpe.tv.showBorder.Set(TRUE); dfpe.multiLine.Set(FALSE); dfpe.fillColor.Set(0FFFFFFFFH);
+			dfpe.tv.showBorder.Set(TRUE); dfpe.multiLine.Set(FALSE); dfpe.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			dfpe.tv.textAlignV.Set(WMGraphics.AlignCenter);
 			(* editorsPanel.AddContent(dfpe); *)  dfpe.onEnter.Add(FocusNextField);
 

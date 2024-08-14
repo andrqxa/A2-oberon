@@ -26,15 +26,15 @@ TYPE
 			mailText : WMEditors.Editor;
 			vResizer : WMStandardComponents.Resizer;
 		BEGIN
-			NEW(panel); panel.bounds.SetExtents(800, 700); panel.fillColor.Set(0FFFFFFFFH); panel.takesFocus.Set(TRUE);
+			NEW(panel); panel.bounds.SetExtents(800, 700); panel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); panel.takesFocus.Set(TRUE);
 			NEW(toolbar); toolbar.fillColor.Set(000FF00FFH); toolbar.bounds.SetHeight(20); toolbar.alignment.Set(WMComponents.AlignTop);
 			panel.AddContent(toolbar);
 
-			NEW(mailboxSelection); mailboxSelection.fillColor.Set(0FF0000FFH); mailboxSelection.bounds.SetWidth(64);
+			NEW(mailboxSelection); mailboxSelection.fillColor.Set(WMGraphics.Color(0FF0000FFH)); mailboxSelection.bounds.SetWidth(64);
 			mailboxSelection.alignment.Set(WMComponents.AlignLeft);
 			panel.AddContent(mailboxSelection);
 
-			NEW(mailContentPanel); mailContentPanel.fillColor.Set(0FFFFFFFFH); mailContentPanel.bounds.SetHeight(350);
+			NEW(mailContentPanel); mailContentPanel.fillColor.Set(WMGraphics.Color(0FFFFFFFFH)); mailContentPanel.bounds.SetHeight(350);
 			mailContentPanel.alignment.Set(WMComponents.AlignBottom);
 			panel.AddContent(mailContentPanel);
 

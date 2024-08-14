@@ -54,8 +54,8 @@ TYPE
 		kerning* : FLOAT32;								(* NOT USED - needs appropriate Fonts *)
 		scaleHorizontal* : FLOAT32;						(* horizontal character scale *)
 		scaleVertical* : FLOAT32;						(* vertical character scale *)
-		color* : SIGNED32;							(* character color *)
-		bgColor* : SIGNED32;						(* character background color *)
+		color* : WMGraphics.Color;							(* character color *)
+		bgColor* : WMGraphics.Color;						(* character background color *)
 
 		PROCEDURE Clone*(): CharacterStyleObject;
 		VAR newCSO: CharacterStyleObject;
@@ -181,8 +181,8 @@ TYPE
 			newCStyle.kerning := 0;
 			newCStyle.scaleHorizontal := 100;
 			newCStyle.scaleVertical := 100;
-			newCStyle.color := 0000000FFH;
-			newCStyle.bgColor := SIGNED32(0FFFFFF00H);
+			newCStyle.color := WMGraphics.Color(0000000FFH);
+			newCStyle.bgColor := WMGraphics.Color(0FFFFFF00H);
 
 			NEW(newPStyle);
 			newPStyle.name := "defaultParagraphStyle";
@@ -1335,9 +1335,9 @@ TYPE
 		END Clone;
 
 		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: FLOAT32; quality, preview: BOOLEAN);
-		VAR color: SIGNED32;
+		VAR color: WMGraphics.Color;
 		BEGIN
-			color := SIGNED32(0FF0000FFH);
+			color := WMGraphics.Color(0FF0000FFH);
 			canvas.Line(x, y, x+w, y+h, color, WMGraphics.ModeCopy);
 			canvas.Line(x+w, y, x, y+h, color, WMGraphics.ModeCopy);
 		END Draw;

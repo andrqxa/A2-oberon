@@ -316,7 +316,7 @@ TYPE
 			toolbar.AddContent(flattenBtn);
 
 			NEW(statusbar); statusbar.alignment.Set(WMComponents.AlignBottom); statusbar.bounds.SetHeight(20);
-			statusbar.fillColor.Set(0CCCCCCFFH);
+			statusbar.fillColor.Set(WMGraphics.Color(0CCCCCCFFH));
 			panel.AddContent(statusbar);
 
 			NEW(progressBar); progressBar.alignment.Set(WMComponents.AlignRight);

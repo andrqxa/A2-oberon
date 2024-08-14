@@ -2,7 +2,7 @@ MODULE WMUnicodeMarkerTool;	(** AUTHOR "gubsermi"; PURPOSE "Unicode Marker Tool"
 
 
 IMPORT
-	Strings, WMComponents, WMRestorable, WMCharMap, WMMessages,
+	Strings, WMComponents, WMRestorable, WMCharMap, WMMessages, WMGraphics,
 	WMStandardComponents, WMTextView, Modules, WM := WMWindowManager,
 	XML, UnicodeBidirectionality;
 
@@ -180,7 +180,7 @@ TYPE
 				focusButton.clDefault.Set(0CC0080H);
 				focusButton.caption.SetAOC("");
 			ELSE
-				focusButton.clDefault.Set(0CC000080H);
+				focusButton.clDefault.Set(WMGraphics.Color(0CC000080H));
 				IF res = -1 THEN
 					focusButton.caption.SetAOC("bad format");
 				ELSIF res = -2 THEN

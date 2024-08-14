@@ -8,7 +8,7 @@ TYPE
 
 (* factor in 1/256, alpha remains unchanged *)
 PROCEDURE ScaleColor*(color : WMGraphics.Color; factor : SIGNED32): WMGraphics.Color;
-VAR r, g, b, a : SIGNED32;
+VAR r, g, b, a : WMGraphics.Color;
 BEGIN
 	WMGraphics.ColorToRGBA(color, r, g, b, a);
 	r := MIN(r * factor DIV 256, 255);
@@ -18,14 +18,14 @@ BEGIN
 END ScaleColor;
 
 (** linear interpolation percent in [0..256] *)
-PROCEDURE InterpolateLinear*(a, b, percent : SIGNED32) : SIGNED32;
+PROCEDURE InterpolateLinear*(a, b: WMGraphics.Color; percent : SIGNED32) : WMGraphics.Color;
 BEGIN
 	RETURN ((a * (256 - percent)) + b * percent) DIV 256
 END InterpolateLinear;
 
 (* interpolate between two colors; percent [0..256]*)
 PROCEDURE InterpolateColorLinear*(cl0, cl1: WMGraphics.Color; percent : SIGNED32) : WMGraphics.Color;
-VAR r0, g0, b0, a0, r1, g1, b1, a1: SIGNED32;
+VAR r0, g0, b0, a0, r1, g1, b1, a1: WMGraphics.Color;
 BEGIN
 	WMGraphics.ColorToRGBA(cl0, r0, g0, b0, a0);
 	WMGraphics.ColorToRGBA(cl1, r1, g1, b1, a1);

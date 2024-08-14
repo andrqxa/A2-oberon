@@ -24,7 +24,7 @@ TYPE
 		PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 		VAR cdi : ColorDropInterface;
 		BEGIN
-			IF type = WMDropTarget.TypeInt32 THEN
+			IF type = WMDropTarget.TypeColor THEN
 				NEW(cdi, setColor); RETURN cdi
 			ELSE
 				RETURN NIL
@@ -33,7 +33,7 @@ TYPE
 
 	END ColorDropTarget;
 
-	ColorDropInterface = OBJECT(WMDropTarget.DropInt32)
+	ColorDropInterface = OBJECT(WMDropTarget.DropColor)
 	VAR setColor : ColorChangeHandler;
 
 		PROCEDURE & Init*(cch : ColorChangeHandler);
@@ -41,7 +41,7 @@ TYPE
 			setColor := cch
 		END Init;
 
-		PROCEDURE Set*(i : SIGNED32);
+		PROCEDURE Set*(i : WMGraphics.Color);
 		VAR c : Color;
 		BEGIN
 			NEW(c); c.value := i; setColor(SELF, c)
@@ -56,7 +56,7 @@ TYPE
 		buttons : WMStandardComponents.Panel;
 		caption -: WMStandardComponents.Label;
 
-		min-, max-, value- : WMProperties.Int32Property;
+		min-, max-, value- : WMProperties.ColorProperty;
 
 		changeHandler : ChangeHandler;
 
@@ -74,7 +74,7 @@ TYPE
 			bounds.SetHeight(21);
 			(* caption *)
 			NEW(caption); caption.alignment.Set(WMComponents.AlignLeft); AddInternalComponent(caption);
-			caption.bounds.SetWidth(10); caption.fillColor.Set(0FFFFFFFFH);
+			caption.bounds.SetWidth(10); caption.fillColor.Set(WMGraphics.Color(0FFFFFFFFH));
 			(* input field *)
 			NEW(input); input.multiLine.Set(FALSE); input.bounds.SetWidth(30); input.alignment.Set(WMComponents.AlignLeft);
 			input.tv.showBorder.Set(TRUE); AddInternalComponent(input);
@@ -122,16 +122,16 @@ TYPE
 
 		(* called if user modifies the input-field *)
 		PROCEDURE ValueChanged(sender, data : ANY);
-		VAR buf : ARRAY 128 OF CHAR; new : SIGNED32;
+		VAR buf : ARRAY 128 OF CHAR; new : UNSIGNED32;
 		BEGIN
 			input.GetAsString(buf);
 			IF ~IsNumber(buf) THEN
 				RecacheProperties
 			ELSE
-				Strings.StrToInt32(buf, new);
+				Strings.StrToUInt32(buf, new);
 				IF (new # value.Get()) THEN
 					IF (new >= min.Get()) & (new <= max.Get()) THEN
-						value.Set(new);
+						value.Set(WMGraphics.Color(new));
 						changeHandler()
 					ELSE
 						RecacheProperties
@@ -314,9 +314,9 @@ TYPE
 				RETURN
 			END;
 				(* drop integer *)
-			itf := dt.GetInterface(WMDropTarget.TypeInt32);
+			itf := dt.GetInterface(WMDropTarget.TypeColor);
 			IF itf # NIL THEN
-				itf(WMDropTarget.DropInt32).Set(fillColor.Get());
+				itf(WMDropTarget.DropUInt32).Set(fillColor.Get());
 				RETURN
 			END;
 
@@ -355,7 +355,7 @@ TYPE
 			SetGenerator("WMColorComponents.GenColorChooser");
 			(* title *)
 			NEW(title); title.bounds.SetHeight(20); title.alignment.Set(WMComponents.AlignTop);
-			title.fillColor.Set(0CCCCCCFFH); title.SetCaption("ColorChooser"); AddInternalComponent(title);
+			title.fillColor.Set(WMGraphics.Color(0CCCCCCFFH)); title.SetCaption("ColorChooser"); AddInternalComponent(title);
 			(* main panel *)
 			NEW(main); main.bounds.SetWidth(190); main.alignment.Set(WMComponents.AlignLeft); AddInternalComponent(main);
 			(* palette *)

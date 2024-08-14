@@ -573,7 +573,7 @@ TYPE
 			IF ~simple THEN
 				NEW(libPanel); libPanel.alignment.Set(WMComponents.AlignBottom);
 				libPanel.bounds.SetHeight(60);
-				libPanel.fillColor.Set(0C0C0C0FFH);
+				libPanel.fillColor.Set(WMGraphics.Color(0C0C0C0FFH));
 				rightPanel.AddContent(libPanel);
 
 				NEW(resizer); resizer.alignment.Set(WMComponents.AlignTop);

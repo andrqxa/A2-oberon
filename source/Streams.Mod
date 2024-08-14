@@ -326,6 +326,16 @@ TYPE
 			REPEAT DEC( i );  Char( a[i] ) UNTIL i = 0
 		END Int;
 
+	(** Write an unsigned integer in decimal right-justified in a field of at least w characters. *)
+		PROCEDURE UInt*( x: UNSIGNED64; w: SIZE );
+		VAR i := 0: SIZE;
+			a: ARRAY 21 OF CHAR;
+		BEGIN
+			REPEAT a[i] := CHR( x MOD 10 + 30H );  x := x DIV 10;  INC( i ) UNTIL x = 0;
+			WHILE w > i DO Char( " " );  DEC( w ) END;
+			REPEAT DEC( i );  Char( a[i] ) UNTIL i = 0
+		END UInt;
+
 	(** Write a SET in Oberon notation. *)
 		PROCEDURE Set*( s: SET );   (* from P. Saladin *)
 		VAR i, last: INTEGER;  dots: BOOLEAN;
@@ -874,7 +884,7 @@ TYPE
 
 		(** -- Read formatted data (uses Peek for one character lookahead) -- *)
 
-	 (** Read an unsigned integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
+	 (** Read an unsigned32 value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
 		PROCEDURE UInt32*( VAR x: UNSIGNED32;  hex: BOOLEAN );
 		VAR vd, vh: UNSIGNED32; d: INTEGER;  ch: CHAR;  ok: BOOLEAN;
 		BEGIN
@@ -896,44 +906,38 @@ TYPE
 			IF (res = 0) & ~ok THEN res := FormatError END
 		END UInt32;
 
-	 (** Read an integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
+	 (** Read a signed32 value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
 		PROCEDURE Int*( VAR x: SIGNED32;  hex: BOOLEAN );
-		VAR try: UNSIGNED32; sgn: INTEGER; ch: CHAR; ok: BOOLEAN;
 		BEGIN
-			sgn := 1;
+			Int32(x, hex);
+		END Int;
+
+		PROCEDURE Int32*( VAR x: SIGNED32;  hex: BOOLEAN );
+		VAR try := 0: UNSIGNED32; sgn := 1: INTEGER; ch: CHAR; ok: BOOLEAN;
+		BEGIN
 			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
 			UInt32(try, hex);
 			x := sgn * SIGNED32(try);
-		END Int;
+		END Int32;
 
-	 (** Read a huge integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
+	 (** Read a signed64 value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
 		PROCEDURE HInt*( VAR x: SIGNED64;  hex: BOOLEAN );
-		VAR vd, vh: SIGNED64; sgn, d: INTEGER;  ch: CHAR;  ok: BOOLEAN;
 		BEGIN
-			vd := 0;  vh := 0;  sgn := 1;  ok := FALSE;
-			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
-			LOOP
-				ch := Peek();
-				IF (ch >= "0") & (ch <= "9") THEN d := ORD( ch ) - ORD( "0" )
-				ELSIF hex & (CAP( ch ) >= "A") & (CAP( ch ) <= "F") THEN d := ORD( CAP( ch ) ) - ORD( "A" ) + 10
-				ELSE EXIT
-				END;
-				vd := 10 * vd + d;  vh := 16 * vh + d;   (* ignore overflow *)
-				ch := Get();  ok := TRUE
-			END;
-			IF hex & (CAP( ch ) = "H") THEN  (* optional "H" present *)
-				vd := vh;   (* use the hex value *)
-				ch := Get()
-			END;
-			x := sgn * vd;
-			IF (res = 0) & ~ok THEN res := FormatError END
+			Int64(x, hex)
 		END HInt;
 
-	 (** Read a size value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
-		PROCEDURE Size*( VAR x: SIZE;  hex: BOOLEAN );
-		VAR vd, vh: SIZE; d: INTEGER;  ch: CHAR;  ok: BOOLEAN;
+		PROCEDURE Int64*( VAR x: SIGNED64;  hex: BOOLEAN );
+		VAR try := 0: UNSIGNED64; sgn: INTEGER; ch: CHAR; ok: BOOLEAN;
 		BEGIN
-			vd := 0;  vh := 0; ok := FALSE;
+			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
+			UInt64(try, hex);
+			x := sgn * SIGNED64(try);
+		END Int64;
+
+	 (** Read an unsigned64 value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
+		PROCEDURE UInt64*( VAR x: UNSIGNED64;  hex: BOOLEAN );
+		VAR vd := 0, vh := 0: UNSIGNED64; d: INTEGER;  ch: CHAR;  ok := FALSE: BOOLEAN;
+		BEGIN
 			LOOP
 				ch := Peek();
 				IF (ch >= "0") & (ch <= "9") THEN d := ORD( ch ) - ORD( "0" )
@@ -949,8 +953,37 @@ TYPE
 			END;
 			x := vd;
 			IF (res = 0) & ~ok THEN res := FormatError END
+		END UInt64;
+
+	 (** Read a size value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
+		PROCEDURE Size*( VAR x: SIZE;  hex: BOOLEAN );
+		VAR try := 0: ADDRESS; sgn: INTEGER; ch: CHAR; ok: BOOLEAN;
+		BEGIN
+			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
+			Address(try, hex);
+			x := sgn * SIZE(try);
 		END Size;
 
+	 (** Read an address value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
+		PROCEDURE Address*( VAR x: ADDRESS;  hex: BOOLEAN );
+		VAR vd := 0, vh := 0: ADDRESS; d: INTEGER;  ch: CHAR;  ok := FALSE: BOOLEAN;
+		BEGIN
+			LOOP
+				ch := Peek();
+				IF (ch >= "0") & (ch <= "9") THEN d := ORD( ch ) - ORD( "0" )
+				ELSIF hex & (CAP( ch ) >= "A") & (CAP( ch ) <= "F") THEN d := ORD( CAP( ch ) ) - ORD( "A" ) + 10
+				ELSE EXIT
+				END;
+				vd := 10 * vd + d;  vh := 16 * vh + d;   (* ignore overflow *)
+				ch := Get();  ok := TRUE
+			END;
+			IF hex & (CAP( ch ) = "H") THEN  (* optional "H" present *)
+				vd := vh;   (* use the hex value *)
+				ch := Get()
+			END;
+			x := vd;
+			IF (res = 0) & ~ok THEN res := FormatError END
+		END Address;
 
 	(** Return TRUE iff at the end of a line (or file). *)
 		PROCEDURE EOLN*( ): BOOLEAN;

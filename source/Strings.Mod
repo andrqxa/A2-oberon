@@ -9,6 +9,7 @@ CONST
 	RangeError* = 3;
 	EmptyStringError* = 4;
 	FullStringError* = 5;
+	BitSizeError* = 6;
 
 	radix10 = 10;
 	radix16 = 16;
@@ -524,6 +525,15 @@ BEGIN
 	REPEAT DEC( i );  s[j] := digits[i]; INC(j) UNTIL i = 0;
 	s[j] := 0X;
 END IntToStr;
+
+(** converts an unsigned integer value to a string *)
+PROCEDURE UIntToStr*(x: UNSIGNED64; VAR s: ARRAY OF CHAR);
+VAR i := 0, j := 0: SIZE; digits: ARRAY 21 OF CHAR;
+BEGIN
+	REPEAT digits[i] := CHR( x MOD 10 + 30H );  x := x DIV 10;  INC( i ) UNTIL x = 0;
+	REPEAT DEC( i );  s[j] := digits[i]; INC(j) UNTIL i = 0;
+	s[j] := 0X;
+END UIntToStr;
 
 PROCEDURE TryScanUInt32At*(VAR pos: SIZE; CONST number: ARRAY OF CHAR; base: UNSIGNED32; VAR value: UNSIGNED32; VAR res: INTEGER): BOOLEAN;
 VAR len := LEN(number): SIZE; answer := 0: UNSIGNED32;
@@ -1364,21 +1374,18 @@ BEGIN
 	RETURN n;
 END UpperCaseInNew;
 
-PROCEDURE - IsDigit*(c: CHAR; radix: UNSIGNED32; VAR d: SIGNED32): BOOLEAN;
+PROCEDURE IsDigit*(c: CHAR; radix: UNSIGNED32; VAR d: SIGNED32): BOOLEAN;
 VAR t: UNSIGNED32;
 BEGIN
 	t := ORD32(c) - ORD32('0');
 	IF t > radix10 THEN
 		t := ORD32(CAP(c)) - ORD32('A') + 10;
-		IF t >= radix THEN
-			RETURN FALSE;
-		END;
 	END;
 	d := SIGNED32(t);
 	RETURN t < radix;
 END IsDigit;
 
-PROCEDURE - IsDecimal*(c: CHAR; VAR d: SIGNED32): BOOLEAN;
+PROCEDURE IsDecimal*(c: CHAR; VAR d: SIGNED32): BOOLEAN;
 VAR t: UNSIGNED32;
 BEGIN
   t := ORD32(c) - ORD32('0');
@@ -1389,7 +1396,7 @@ BEGIN
   RETURN FALSE
 END IsDecimal;
 
-PROCEDURE - IsHexadecimal*(c: CHAR; VAR d: SIGNED32): BOOLEAN;
+PROCEDURE IsHexadecimal*(c: CHAR; VAR d: SIGNED32): BOOLEAN;
 VAR t: UNSIGNED32;
 BEGIN
 	t := ORD32(c) - ORD32('0');

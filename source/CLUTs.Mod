@@ -17,8 +17,10 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 
 
 	TYPE
+		Color* = SIGNED32;
+
 		CLUT* = RECORD
-			col*: ARRAY colors OF SIGNED32;	(** blue: bit 0..7; green: bit 8..15; red: bit 16..23 **)
+			col*: ARRAY colors OF Color;	(** blue: bit 0..7; green: bit 8..15; red: bit 16..23 **)
 			size*: SIGNED16;	(** number of valid colors **)
 			bits: SIGNED16;	(* number of bits per component in color cube *)
 			cube: POINTER TO ARRAY OF CHAR;	(* maps RGB triples to indices, size is (2^bits)^3 *)
@@ -26,7 +28,7 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 
 
 	(** set CLUT entry to specific color (invalidates existing reverse lookup structure) **)
-	PROCEDURE Set* (VAR clut: CLUT; n: SIZE; col: SIGNED32);
+	PROCEDURE Set* (VAR clut: CLUT; n: SIZE; col: Color);
 	BEGIN
 		ASSERT((0 <= n) & (n < colors), 100);
 		clut.col[n] := col MOD 1000000H;
@@ -34,7 +36,7 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 	END Set;
 
 	(** get CLUT entry **)
-	PROCEDURE Get* (VAR clut: CLUT; n: SIZE; VAR col: SIGNED32);
+	PROCEDURE Get* (VAR clut: CLUT; n: SIZE; VAR col: Color);
 	BEGIN
 		ASSERT((0 <= n) & (n < colors), 100);
 		col := clut.col[n]
@@ -43,15 +45,15 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 	(** initialize CLUT with number of valid colors and number of bits per component for reverse lookup table **)
 	PROCEDURE Init* (VAR clut: CLUT; size, bits: SIGNED32);
 		VAR
-			nbits, x, colormax, cur, rcol, gcol, bcol, col: SIGNED32;
-			xsqr, txsqr, rstride, gstride, bsize, i, rdist, gdist, bdist, cdist: SIGNED32;
-			dbuf: POINTER TO ARRAY OF SIGNED32;
-			rcenter, gcenter, bcenter, ghere, bhere, gmin, bmin, gmax, bmax: SIGNED32;
-			incr, incg, incb, p, rp, gp: SIGNED32;
-			ginc, binc: SIGNED32;
+			nbits, x, cur: SIGNED32; colormax, rcol, gcol, bcol, col: Color;
+			xsqr, txsqr, bsize, i: SIGNED32; rstride, gstride, rdist, gdist, bdist, cdist: Color;
+			dbuf: POINTER TO ARRAY OF Color;
+			rcenter, gcenter, bcenter, ghere, bhere, gmin, bmin, gmax, bmax: Color;
+			incr, incg, incb, p, rp, gp: Color;
+			ginc, binc: Color;
 
 		PROCEDURE blueloop(): BOOLEAN;
-			VAR detect: BOOLEAN; blue, bp, bdist, bxx: SIGNED32;
+			VAR detect: BOOLEAN; blue, bp, bdist, bxx: Color;
 		BEGIN
 			detect := FALSE;
 			blue := bhere; bp := gp; bdist := gdist; bxx := binc;
@@ -87,7 +89,7 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 		END blueloop;
 
 		PROCEDURE greenloop(): BOOLEAN;
-			VAR detect: BOOLEAN; green, ggp, ggdist, gxx: SIGNED32;
+			VAR detect: BOOLEAN; green, ggp, ggdist, gxx: Color;
 		BEGIN
 			detect := FALSE;
 			bhere := bcenter; bmin := 0; bmax := colormax; binc := incb;	(* restart blueloop *)
@@ -127,7 +129,7 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 		END greenloop;
 
 		PROCEDURE redloop;
-			VAR detect: BOOLEAN; red, rxx: SIGNED32;
+			VAR detect: BOOLEAN; red, rxx: Color;
 		BEGIN
 			(* red up loop *)
 			detect := FALSE;
@@ -183,8 +185,8 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 	END Init;
 
 	(** return index of color that best matches the given RGB triple **)
-	PROCEDURE Match* (VAR clut: CLUT; col: SIGNED32): SIGNED32;
-		VAR shift, red, green, blue, n, best, err, r, g, b, e: SIGNED32;
+	PROCEDURE Match* (VAR clut: CLUT; col: Color): SIGNED32;
+		VAR shift, n, best: SIGNED32; red, green, blue, err, r, g, b, e: Color;
 	BEGIN
 		IF clut.bits # 0 THEN	(* can do reverse lookup *)
 			shift := clut.bits-8;
@@ -230,7 +232,7 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 
 	(** write colors to file (only the color values themselves are written) **)
 	PROCEDURE Write* (VAR w: Streams.Writer; VAR clut: CLUT);
-		VAR n, col: SIGNED32;
+		VAR n: SIGNED32; col: Color;
 	BEGIN
 		FOR n := 0 TO clut.size-1 DO
 			col := clut.col[n];
