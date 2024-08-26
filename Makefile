@@ -1,123 +1,94 @@
 # Define variables
-TARGETS := Linux64 Linux32 LinuxARM Win32 Win64
+PLATFORMS = Bios32 Bios64 Zynq Win32 Win64 Linux32 Linux64 LinuxARM Darwin32 Darwin64 Solaris32 Solaris64 \
+	Bios32C RPiC ZynqC Win32C Linux32C Linux64C
 CURRENT_DIR := $(shell pwd)
 CONFIGS := $(CURRENT_DIR)/configs
 DATA := $(CURRENT_DIR)/data
-# RES := $(CURRENT_DIR)/resources
 SRC := $(CURRENT_DIR)/source
 
-# Define default value for binary files
-BIN := $(CURRENT_DIR)/compilers/Linux64/bin
-# Override path to binary files if the OS is Windows
-ifeq ($(OS),Windows_NT)
-    BIN := $(CURRENT_DIR)/compilers/Win64/bin
-endif
-
 # Define default value for COMPILER
-COMPILER := $(CURRENT_DIR)/compilers/Linux64/oberon
-# Override COMPILER if the OS is Windows
+COMPILER := $(CURRENT_DIR)/compiler/oberon
 ifeq ($(OS),Windows_NT)
-    COMPILER := $(CURRENT_DIR)/compilers/Win64/oberon
+    COMPILER := $(CURRENT_DIR)/compiler/oberon.exe
 endif
 
 BUILD_DIR := $(CURRENT_DIR)/target
 
-# Main rule to build all targets
-.PHONY: all
-all: clean dirs $(TARGETS)
+all: oberon
+commit: Self-Compilation Compilation-Tests Execution-Tests builds
 
-# Rule to build each architecture separately
-.PHONY: $(TARGETS)
-$(TARGETS): %: dirs
-	@echo "Building $@"
-	@mkdir -p $(BUILD_DIR)/$@
+.PHONY: all commit Self-Compilation Compilation-Tests Execution-Tests builds build clean
+MAKEFLAGS += --no-builtin-rules --no-builtin-variables
+.SUFFIXES: # delete the default suffixes
 
-	# Dynamic generate file content for each type of OS
-	@echo "Release.Build --build --path=bin/ $@ ~" > $(BUILD_DIR)/$@/dynamic.txt
-	@if [ "$@" = "Linux64" ] || [ "$@" = "Linux32" ] || [ "$@" = "LinuxARM" ]; then \
-		echo "Linker.Link -p=$@ --path=bin/" >> $(BUILD_DIR)/$@/dynamic.txt; \
-		cat $(BUILD_DIR)/$@/dynamic.txt $(CONFIGS)/moduleListLinux.txt > $(BUILD_DIR)/$@/combined.txt; \
-	elif [ "$@" = "Win32" ]; then \
-		echo "Linker.Link --path=bin/ --fileFormat=PE32CUI --fileName=oberon.exe --extension=GofW --displacement=401000H" >> $(BUILD_DIR)/$@/dynamic.txt; \
-		cat $(BUILD_DIR)/$@/dynamic.txt $(CONFIGS)/moduleListWin.txt > $(BUILD_DIR)/$@/combined.txt; \
-	elif [ "$@" = "Win64" ]; then \
-		echo "Linker.Link --path=bin/ --fileFormat=PE64CUI --fileName=oberon.exe --extension=GofWw --displacement=401000H" >> $(BUILD_DIR)/$@/dynamic.txt; \
-		cat $(BUILD_DIR)/$@/dynamic.txt $(CONFIGS)/moduleListWin.txt > $(BUILD_DIR)/$@/combined.txt; \
-	fi
+TARGET = Linux64
+PLTFRM = Unix64
+OBJECT = .GofUu
+SYMBOL = .SymUu
 
-	# Create necessary files: a2.sh, a2.txt, oberon.ini for each target
-	@if [ "$@" = "Linux64" ] || [ "$@" = "Linux32" ] || [ "$@" = "LinuxARM" ]; then \
-		echo './oberon run a2.txt' > $(BUILD_DIR)/$@/a2.sh; \
-		chmod +x $(BUILD_DIR)/$@/a2.sh; \
-		cat $(CONFIGS)/a2General.txt $(CONFIGS)/a2LinuxSpecific.txt > $(BUILD_DIR)/$@/a2.txt; \
-		cat $(CONFIGS)/oberonGeneral.ini $(CONFIGS)/oberonResources.ini $(CONFIGS)/oberonGeneralLast.ini > $(BUILD_DIR)/$@/oberon.ini; \
-	elif [ "$@" = "Win32" ] || [ "$@" = "Win64" ]; then \
-		echo 'oberon run a2.txt' > $(BUILD_DIR)/$@/a2.bat; \
-		cp $(CONFIGS)/a2General.txt $(BUILD_DIR)/$@/a2.txt; \
-		cat $(CONFIGS)/oberonGeneral.ini $(CONFIGS)/oberonResources.ini $(CONFIGS)/oberonGeneralLast.ini $(CONFIGS)/oberonWindowsSpecific.ini > $(BUILD_DIR)/$@/oberon.ini; \
-	fi
+# module dependencies
 
-	@mkdir -p $(BUILD_DIR)/$@/work
-	@mkdir -p $(BUILD_DIR)/$@/bin
+modules: $(SRC)/Release.Tool
+	@AOSPATH=$(SRC) $(COMPILER) Release.Build --list $(SRC) | tr -d '\r' | grep "^[^ ]\+\.Mod\s" | tr -d ' ' > $@
 
-	# Create oberon.ini for compilation
-	@echo Heaps.SetMetaData~ > $(BUILD_DIR)/$@/oberonCompile.ini
-	@echo Files.AddSearchPath $(BIN)~ >> $(BUILD_DIR)/$@/oberonCompile.ini
-	@cat $(CONFIGS)/oberonResources.ini >> $(BUILD_DIR)/$@/oberonCompile.ini
-	@echo Configuration.Init~ >> $(BUILD_DIR)/$@/oberonCompile.ini
+dependencies: modules $(SRC)/*.Mod
+	@$(COMPILER) DependencyWalker.Walk --define=UNIX,AMD64 --fileExtension=$(OBJECT) $(addprefix $(SRC)/, $(shell sort -u modules)) DependencyWalker.Mod | tr -d '\r' | grep "^.\+\$(OBJECT):" > $@
 
-	# Compile new architecture
-	@cd $(BUILD_DIR)/$@; \
-	$(COMPILER) do " \
-		System.DoFile oberonCompile.ini ~ \
-		Files.SetWorkPath $(BUILD_DIR)/$@ ~ \
-		System.DoFile $(BUILD_DIR)/$@/combined.txt ~ \
-	"
-	@result=$$?; \
-	if [ $$result -eq 0 ]; then \
-		rm -f $(BUILD_DIR)/$@/bin/CompileCommand.Tool; \
-		rm -f $(BUILD_DIR)/$@/oberon.log; \
-		rm -f oberon.ini; \
-		chmod +x $(BUILD_DIR)/$@/oberon*; \
-	else \
-		rm -rf $(BUILD_DIR)/$@; \
-		echo "Build not successful!!!"; \
-		exit 1; \
-	fi
-	
-# Removed generated files
-	@rm -f $(BUILD_DIR)/$@/dynamic.txt
-	# @rm -f $(BUILD_DIR)/$@/combined.txt
-	# @rm -f $(BUILD_DIR)/$@/oberonCompile.ini
+-include dependencies
+FoxArrayBase$(OBJECT): ComplexNumbers$(OBJECT)
 
-# Remove all generated files
-.PHONY: clean
+%$(OBJECT):
+	@$(COMPILER) Compiler.Compile -p=$(PLTFRM) --OBJECTFileExtension=$(OBJECT) --SYMBOLFileExtension=$(SYMBOL) $(if $<, $<, $(error no TARGET for $@))
+
+# Fox Compiler
+
+oberon: $(addsuffix $(OBJECT), Builtins Trace Glue Unix Machine Heaps Modules Objects RealConversions Streams Kernel Reflection KernelLog TrapWriters Commands Pipes StdIO Traps Files UnixFiles BitSets StringPool Diagnostics Reals Clock Strings Dates ObjectFile GenericLinker Loader WMRectangles CLUTs Plugins Displays Raster UTF8Strings WMRasterScale SoundDevices XMLObjects DynamicStrings XML XMLScanner XMLParser Configuration Inflate CRC Unzip WMEvents Locks FP1616 Texts Archives Codecs WMGraphics WMDefaultFont Options StdIOShell Shell ProcessInfo0 ProcessInfo SystemVersion System Debugging FoxBasic FoxScanner FoxSyntaxTree FoxGlobal FoxParser FoxFingerprinter FoxPrintout FoxFormats FoxSemanticChecker FoxSections FoxBinaryCode FoxBackend FoxFrontend Compiler FoxOberonFrontend FoxIntermediateCode FoxInterfaceComparison FoxTextualSymbolFile FoxIntermediateBackend FoxAMD64InstructionSet FoxAMD64Assembler FoxGenericObjectFile FoxCodeGenerators FoxAMDBackend FoxDisassembler FoxARMInstructionSet FoxAssembler FoxARMAssembler FoxARMBackend FoxTestBackend MathL Math ComplexNumbers FoxArrayBase FoxArrayBaseOptimized Localization Repositories UnicodeProperties TextUtilities TestSuite Versioning CompilerInterface FoxTest Linker DependencyWalker ReleaseThreadPool Zlib ZlibBuffers ZlibInflate ZlibReaders ZlibDeflate ZlibWriters Zip Release)
+	@$(COMPILER) Linker.Link -p=$(TARGET) --extension=$(OBJECT) --fileName=$@ $+ && chmod +x $@
+# grep ":processing\s$" oberon.log | grep "^[^:]\+" -o | tr '\n' ' '
+
+
+# Self-Compilation: $(addsuffix $(OBJECT), Compiler CompilerInterface FoxA2Interface FoxActiveCells FoxAMD64Assembler FoxAMD64InstructionSet FoxAMDBackend FoxARMAssembler FoxARMBackend FoxARMInstructionSet FoxArrayBase FoxArrayBaseOptimized FoxAssembler FoxBackend FoxBasic FoxBinaryCode FoxCodeGenerators FoxCSharpFrontend FoxCSharpParser FoxCSharpScanner FoxDisassembler FoxDocumentationBackend FoxDocumentationHtml FoxDocumentationParser FoxDocumentationPrinter FoxDocumentationScanner FoxDocumentationTree FoxFingerprinter FoxFormats FoxFrontend FoxGenericObjectFile FoxGlobal FoxHardware FoxInterfaceComparison FoxIntermediateAssembler FoxIntermediateBackend FoxIntermediateCode FoxIntermediateLinker FoxIntermediateObjectFile FoxIntermediateParser FoxInterpreter FoxInterpreterBackend FoxInterpreterSymbols FoxMinosObjectFile FoxOberonFrontend FoxParser FoxPrintout FoxProfiler FoxProgTools FoxScanner FoxSections FoxSemanticChecker FoxSyntaxTree FoxTest FoxTestBackend FoxTextualSymbolFile FoxTranspilerBackend FoxTRMAssembler FoxTRMBackend FoxTRMInstructionSet TextCompiler)
+# grep "^\(Fox\|Compiler\|TextCompiler\)" modules | sed 's/\.Mod//g' | sort | tr '\n' ' '
+
+
+Self-Compilation: $(addsuffix $(OBJECT), Compiler CompilerInterface FoxA2Interface FoxAMD64Assembler FoxAMD64InstructionSet FoxAMDBackend FoxARMAssembler FoxARMBackend FoxARMInstructionSet FoxActiveCells FoxArrayBase FoxAssembler FoxBackend FoxBasic FoxBinaryCode FoxCSharpFrontend FoxCSharpParser FoxCSharpScanner FoxCodeGenerators FoxDisassembler FoxDocumentationBackend FoxDocumentationHtml FoxDocumentationParser FoxDocumentationPrinter FoxDocumentationScanner FoxDocumentationTree FoxFingerprinter FoxFormats FoxFrontend FoxGenericObjectFile FoxGlobal FoxHardware FoxInterfaceComparison FoxIntermediateAssembler FoxIntermediateBackend FoxIntermediateCode FoxIntermediateLinker FoxIntermediateObjectFile FoxIntermediateParser FoxInterpreter FoxInterpreterBackend FoxInterpreterSymbols FoxMinosObjectFile FoxMinosObjectFile_mine FoxMinosObjectFile_r1906 FoxMinosObjectFile_r8718 FoxOberonFrontend FoxParser FoxPrintout FoxProfiler FoxProgTools FoxScanner FoxSections FoxSemanticChecker FoxSyntaxTree FoxTRMAssembler FoxTRMBackend FoxTRMInstructionSet FoxTRMTools FoxTest FoxTestBackend FoxTextualSymbolFile FoxTranspilerBackend TextCompiler)
+# find source -type f -name "*.Mod" | grep "^\(source\/Fox\|source\/Compiler\|source\/TextCompiler\)" | sed 's/\.Mod//g' | sed 's/source\///g' | sort | tr '\n' ' '
+
+Compilation-Tests: Oberon.Compilation.Test.Diff
+
+Oberon.Compilation.Test.Diff: oberon $(SRC)/Oberon.Compilation.Test
+	@$(COMPILER) FoxTest.Compile $(SRC)/Oberon.Compilation.Test
+
+Execution-Tests: Oberon.Execution.Test.Diff
+
+Oberon.Execution.Test.Diff: oberon $(SRC)/Oberon.Execution.Test
+	@$(COMPILER) FoxTest.Compile --prolog=\"Compiler.Compile --SYMBOLFileExtension=$(SYMBOL) TesterInput.txt\" $(SRC)/Oberon.Execution.Test
+
+# A2 Builds
+
+builds:
+	@make $(foreach platform,$(PLATFORMS),&& make build platform=$(platform))
+
+ifdef platform
+
+build: $(if $(filter $(PLATFORMS), $(platform)), $(platform), $(error invalid platform))
+
+$(platform): oberon $(SRC)/Release.Tool $(addprefix $(SRC)/, $(shell AOSPATH=$(SRC) $(COMPILER) Release.Build --list $(platform) | tr -d '\r' | grep "^[^ ]\+\.Mod\s" | tr -d ' '))
+	@rm -rf $@ && mkdir $@
+	@AOSPATH=$(SRC) ./oberon Release.Build --path=$@/ --build $(platform) || (rm -rf $@ && false)
+
+else
+
+build:
+	$(error undefined platform)
+
+endif
+
+# utilities
+
+original: oberon
+	@cp oberon $@
+
 clean:
-	@echo "Cleaning up..."
-	@rm -rf $(BUILD_DIR)
-	@echo "Directory $(BUILD_DIR) has been removed"
-
-# Create necessary directories
-.PHONY: dirs
-dirs:
-	@if [ ! -d $(BUILD_DIR) ]; then \
-		mkdir -p $(BUILD_DIR); \
-		echo "Directory created: $(BUILD_DIR)"; \
-	else \
-		echo "Directory already exists: $(BUILD_DIR)"; \
-	fi
-
-# Test rule
-.PHONY: test
-test:
-	@echo "Tests have started:"
-	@cd $(BUILD_DIR)/Linux64; \
-	./oberon do " \
-		System.DoFile oberon.ini ~ \
-		FoxTest.Compile --verbose -l=TestCompilation.Log Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~ \
-		FoxTest.Compile --verbose -l=TestExecution.Log Oberon.Execution.Test Oberon.Execution.AMD64TestDiff ~ \
-	"
-	@rm -f $(BUILD_DIR)/Linux64/work/*.SymUu
-	@rm -f $(BUILD_DIR)/Linux64/work/*.GofUu
-	@rm -f $(BUILD_DIR)/Linux64/work/*.txt
-	@echo "All Tests have finished"
+	@rm -f modules dependencies oberon *$(SYMBOL) *$(OBJECT) *.Log *.log
+	@rm -rf $(PLATFORMS)
