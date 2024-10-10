@@ -1912,7 +1912,7 @@ TYPE
 					result := SyntaxTree.NewIntegerValue(expression.position,r64.i);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.CharacterType) OR (type IS SyntaxTree.ByteType) THEN (* for example: possible via ch = CHR(SYSTEM.VAL(Basic.Integer,set)) *)
-					ASSERT(~systemVal);
+					ASSERT(~systemVal OR (expression.type.sizeInBits = 8));
 					result := SyntaxTree.NewCharacterValue(expression.position,SYSTEM.VAL(CHAR,SET8(set)));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.PortType) THEN
