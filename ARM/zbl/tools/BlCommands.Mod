@@ -238,7 +238,7 @@ TYPE
 		VAR
 			hostAdr: IP.Adr;
 			len: SIZE;
-			hostPort, res: SIGNED32;
+			hostPort: UNSIGNED32; res: SIGNED32;
 		BEGIN
 			socket.Send(target, port, cmd, 0, Strings.Length(cmd), res);
 			socket.Receive(resp, 0, LEN(ack), CommandTimeout, hostAdr, hostPort, len, res);
