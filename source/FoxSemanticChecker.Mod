@@ -1811,11 +1811,11 @@ TYPE
 			r32: RECORD f: FLOAT32; i{OFFSET=0}: SIGNED32; s{OFFSET=0}: SET32; END;
 		BEGIN
 			result := expression; type := type.resolvedType;
-			IF systemVal & (expression.type.sizeInBits # type.sizeInBits) THEN
+			(*IF systemVal & (system.SizeOf(type) > system.SizeOf(expression.type)) THEN
 				Error(position, "SYSTEM.VAL conversion to a type with incompatible size");
 				result := SyntaxTree.invalidExpression;
 				RETURN result;
-			END;
+			END;*)
 			IF (type IS SyntaxTree.ArrayType) & (type(SyntaxTree.ArrayType).arrayBase.resolvedType IS SyntaxTree.ByteType) THEN
 				(* skip, no conversion *)
 			ELSIF IsIntegerValue(expression,int) THEN
@@ -1912,7 +1912,7 @@ TYPE
 					result := SyntaxTree.NewIntegerValue(expression.position,r64.i);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.CharacterType) OR (type IS SyntaxTree.ByteType) THEN (* for example: possible via ch = CHR(SYSTEM.VAL(Basic.Integer,set)) *)
-					ASSERT(~systemVal);
+					ASSERT(~systemVal OR (expression.type.sizeInBits = 8));
 					result := SyntaxTree.NewCharacterValue(expression.position,SYSTEM.VAL(CHAR,SET8(set)));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.PortType) THEN
@@ -1938,31 +1938,25 @@ TYPE
 					result := SyntaxTree.invalidExpression;
 				END;
 			ELSIF IsCharacterValue(expression,char) THEN
-				ASSERT(~systemVal);
 				IF (type IS SyntaxTree.StringType) OR (type IS SyntaxTree.ArrayType) & (type(SyntaxTree.ArrayType).arrayBase.resolvedType IS SyntaxTree.CharacterType) THEN
 					string[0] := char; string[1] := 0X;
 					type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,2);
 					result := SyntaxTree.NewStringValue(expression.position,string);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.ByteType) THEN
-					ASSERT(~systemVal);
 					(* do not simply set the new type as this could invalidate types of constants *)
 					result := SyntaxTree.NewCharacterValue(expression.position,char);
 					result.SetType(type)
 				ELSIF (type IS SyntaxTree.IntegerType) THEN
-					ASSERT(~systemVal);
 					result := SyntaxTree.NewIntegerValue(expression.position,ORD(char));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.SetType) THEN
-					ASSERT(~systemVal);
 					result := SyntaxTree.NewSetValue(expression.position,SYSTEM.VAL(Basic.Set,Basic.Integer(ORD(char))));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.CharacterType) THEN
-					ASSERT(~systemVal);
 					result := SyntaxTree.NewCharacterValue(expression.position,char);
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.PortType) THEN
-					ASSERT(~systemVal);
 					result := ConvertValue(position, expression, Global.Signed16);
 				ELSE
 					Error(position, "character value cannot be converted");
@@ -1978,7 +1972,6 @@ TYPE
 				END;
 				(* nothing to be done *)
 			ELSIF expression IS SyntaxTree.MathArrayValue THEN
-				ASSERT(~systemVal);
 				result := MathArrayConversion(position, expression,type);
 			ELSIF expression IS SyntaxTree.EnumerationValue THEN
 				ASSERT(~systemVal);
@@ -1992,7 +1985,6 @@ TYPE
 				END;
 				(* nothing to be done *)
 			ELSIF expression IS SyntaxTree.ProcedureValue THEN
-				ASSERT(~systemVal);
 				IF type IS SyntaxTree.ProcedureType THEN
 					result := expression;
 				ELSE
