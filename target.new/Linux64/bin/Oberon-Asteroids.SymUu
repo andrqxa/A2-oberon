@@ -1,0 +1,268 @@
+MODULE Asteroids IN Oberon;
+	IMPORT Attributes, Desktops, Display, Display3, Documents, Effects, Files, Fonts, Gadgets, Strings, Modules, Math IN A2, Oberon, Objects, Out, Panels, RandomNumbers;
+CONST 
+	Version = \"V 1.5"\; 
+	Date = \"August '97"\; 
+	CompVers = \"V 1.5"\; 
+	DefName = \"Asteroids.Doc"\; 
+	DocMenu1 = \"Desktops.StoreDoc[Store] Asteroids.NewGame[New] Asteroids.PauseGame[Pause]"\; 
+	DocMenu2 = \"Desktops.StoreDoc[Store] Asteroids.NewGame[New] Asteroids.ResumeGame[Cont]"\; 
+	DocIcon = \"Icons3.Asteroids"\; 
+	Indestructable = FALSE; 
+	BaseDelay = 16; 
+	ChThrust = 0C1X; 
+	ChTurnRight = 0C3X; 
+	ChTurnLeft = 0C4X; 
+	ChFire = \" "\; 
+	ChShield = \"z"\; 
+	ChWarp = \"x"\; 
+	StartShips = 3; 
+	ShipRotvel = 5.E-2; 
+	ShipThrust = 3.E-1; 
+	ShipShield = 100; 
+	ShipWarp = 10; 
+	SBulletMax = 5; 
+	SBulletSpd = 5.; 
+	SBulletGrant = 100; 
+	SBulletCost = 10; 
+	SShieldGrant = 5; 
+	EAppear = 8000; 
+	EBulletMax = 1; 
+	EBulletSpd = 2.; 
+	EBulletGrant = 200; 
+	DetonationMax = 50; 
+	DetonationStep = 1; 
+	HitScoreE1 = 100; 
+	HitScoreA1 = 50; 
+	HitScoreA2 = 70; 
+	HitScoreA3 = 80; 
+	StartAsts = 4; 
+	SplitAsts = 2; 
+TYPE 
+	Object = Objects.Object; 
+
+	Document = Documents.Document; 
+
+	AttrMsg = Objects.AttrMsg; 
+
+	CopyMsg = Objects.CopyMsg; 
+
+	DisplayMsg = Display.DisplayMsg; 
+
+	FileMsg = Objects.FileMsg; 
+
+	InputMsg = Oberon.InputMsg; 
+
+	LinkMsg = Objects.LinkMsg; 
+
+	ModifyMsg = Display.ModifyMsg; 
+
+	UpdateMsg = Gadgets.UpdateMsg; 
+
+	MenuMsg = RECORD (Display.FrameMsg)
+		frame: Display.Frame; 
+		paused: BOOLEAN; 
+	END; 
+
+	Vertices = POINTER TO ARRAY OF SIGNED16; 
+
+	Starfield = POINTER TO StarfieldDesc; 
+
+	StarfieldDesc = RECORD (Panels.PanelDesc)
+		scaleX, scaleY: FLOAT32; 
+		fdx: SIGNED16; 
+	END; 
+
+	Shape = POINTER TO ShapeDesc; 
+
+	ShapeDesc = RECORD 
+		n: SIGNED16; 
+		px, py: Vertices; 
+	END; 
+
+	SpaceObj = POINTER TO SpaceObjDesc; 
+
+	SpaceObjDesc = RECORD 
+		x, y, x0, y0: FLOAT32; 
+		alive: BOOLEAN; 
+		next: SpaceObj; 
+	END; 
+
+	Detonation = POINTER TO DetonationDesc; 
+
+	DetonationDesc = RECORD (SpaceObjDesc)
+		r0, r: SIGNED16; 
+	END; 
+
+	Mass = POINTER TO MassDesc; 
+
+	MassDesc = RECORD (SpaceObjDesc)
+		mass: FLOAT64; 
+		rot, xvel, yvel, rotvel: FLOAT32; 
+		shape: Shape; 
+		n0, u, v, w, h: SIGNED16; 
+		px0, py0, px1, py1: Vertices; 
+	END; 
+
+	FlyingObj = POINTER TO FlyingObjDesc; 
+
+	FlyingObjDesc = RECORD (MassDesc)
+		bullets: SIGNED16; 
+	END; 
+
+	Bullet = POINTER TO BulletDesc; 
+
+	BulletDesc = RECORD (MassDesc)
+		time, rpos: SIGNED16; 
+		ship: FlyingObj; 
+	END; 
+
+	Ship = POINTER TO ShipDesc; 
+
+	ShipDesc = RECORD (FlyingObjDesc)
+		thrust0, thrust: BOOLEAN; 
+		shield0, shield: SIGNED8; 
+		shieldval, warpval: SIGNED16; 
+		shape0: Shape; 
+		px2, py2: Vertices; 
+	END; 
+
+	Enemy = POINTER TO EnemyDesc; 
+
+	EnemyDesc = RECORD (FlyingObjDesc)
+	END; 
+
+	SBullet = POINTER TO SBulletDesc; 
+
+	SBulletDesc = RECORD (BulletDesc)
+	END; 
+
+	EBullet = POINTER TO EBulletDesc; 
+
+	EBulletDesc = RECORD (BulletDesc)
+	END; 
+
+	Asteroid = POINTER TO AsteroidDesc; 
+
+	AsteroidDesc = RECORD (MassDesc)
+	END; 
+
+	Field = POINTER TO FieldDesc; 
+
+	FieldDesc = RECORD (Gadgets.ObjDesc)
+		ship: Ship; 
+		started, changed, paused: BOOLEAN; 
+		ships, ufos, frames: SIGNED16; 
+		score, high0, high: SIGNED32; 
+		line0, line: ARRAY 80 OF CHAR; 
+		objects: SpaceObj; 
+	END; 
+
+	Timer = POINTER TO TimerDesc; 
+
+	TimerDesc = RECORD (Oberon.TaskDesc)
+		model: Field; 
+		tnext: Timer; 
+	END; 
+VAR 
+	shAsteroid1, shAsteroid2, shAsteroid3, shEnemy, shEBullet, shShip, shThrShip, shSBullet: Shape; 
+	hitscore: ARRAY 4 OF SIGNED16; 
+	fnt: ARRAY 7 OF Fonts.Font; 
+	fw, fh: ARRAY 7 OF SIGNED16; 
+	b, w: SIGNED16; 
+	timer: Timer; 
+
+	PROCEDURE ^ FontGeometry(dim: ARRAY OF CHAR; fdx: SIGNED16); 
+	PROCEDURE ^ Intersect(x11, y11, x12, y12, x21, y21, x22, y22: SIGNED16; VAR x3, y3: SIGNED16): BOOLEAN; 
+	PROCEDURE ^ Sign(v: FLOAT32): SIGNED16; 
+	PROCEDURE ^ TransX(x, y: SIGNED16; p, v: FLOAT32): FLOAT32; 
+	PROCEDURE ^ TransY(x, y: SIGNED16; p, v: FLOAT32): FLOAT32; 
+	PROCEDURE ^ Model(D: Object): Field; 
+	PROCEDURE ^ Score(F: Field; score: SIGNED16); 
+	PROCEDURE ^ Pair(sh: Shape; n, x, y: SIGNED16); 
+	PROCEDURE ^ Tag(obj: SpaceObj; VAR tag: Objects.Name); 
+	PROCEDURE ^ ShowStatus(obj: Field; VAR status: ARRAY OF CHAR); 
+	PROCEDURE ^ Asteroid1Shape(VAR sh: Shape); 
+	PROCEDURE ^ Asteroid2Shape(VAR sh: Shape); 
+	PROCEDURE ^ Asteroid3Shape(VAR sh: Shape); 
+	PROCEDURE ^ EnemyShape(VAR sh: Shape); 
+	PROCEDURE ^ EBulletShape(VAR sh: Shape); 
+	PROCEDURE ^ ShipShape(VAR sh: Shape); 
+	PROCEDURE ^ ThrShipShape(VAR sh: Shape); 
+	PROCEDURE ^ SBulletShape(VAR sh: Shape); 
+	PROCEDURE ^ InitSpaceObj(obj: SpaceObj); 
+	PROCEDURE ^ InitMass(obj: Mass; shape: Shape); 
+	PROCEDURE ^ InitFlyingObj(obj: FlyingObj; shape: Shape); 
+	PROCEDURE ^ InitBullet(obj: Bullet; shape: Shape; ship: FlyingObj; grant: SIGNED16); 
+	PROCEDURE ^ InitShip(obj: Ship; x, y: FLOAT32); 
+	PROCEDURE ^ InitSBullet(obj: SBullet; ship: Ship); 
+	PROCEDURE ^ InitEnemy(obj: Enemy); 
+	PROCEDURE ^ InitEBullet(obj: EBullet; ufo: Enemy; ship: Ship); 
+	PROCEDURE ^ InitAsteroid(obj, father: Asteroid; shape: Shape; hx, hy: SIGNED16); 
+	PROCEDURE ^ InitField(obj: Field); 
+	PROCEDURE ^ StoreShapeRef(VAR R: Files.Rider; shape: Shape); 
+	PROCEDURE ^ LoadShapeRef(VAR R: Files.Rider; VAR shape: Shape); 
+	PROCEDURE ^ FileSpaceObj(VAR R: Files.Rider; id: SIGNED16; obj, root: SpaceObj); 
+	PROCEDURE ^ FileDetonation(VAR R: Files.Rider; id: SIGNED16; obj: Detonation; root: SpaceObj); 
+	PROCEDURE ^ FileMass(VAR R: Files.Rider; id: SIGNED16; obj: Mass; root: SpaceObj); 
+	PROCEDURE ^ FileFlyingObj(VAR R: Files.Rider; id: SIGNED16; obj: FlyingObj; root: SpaceObj); 
+	PROCEDURE ^ FileBullet(VAR R: Files.Rider; id: SIGNED16; obj: Bullet; root: SpaceObj); 
+	PROCEDURE ^ FileShip(VAR R: Files.Rider; id: SIGNED16; obj: Ship; root: SpaceObj); 
+	PROCEDURE ^ FileEnemy(VAR R: Files.Rider; id: SIGNED16; obj: Enemy; root: SpaceObj); 
+	PROCEDURE ^ FileSBullet(VAR R: Files.Rider; id: SIGNED16; obj: SBullet; root: SpaceObj); 
+	PROCEDURE ^ FileEBullet(VAR R: Files.Rider; id: SIGNED16; obj: EBullet; root: SpaceObj); 
+	PROCEDURE ^ FileAsteroid(VAR R: Files.Rider; id: SIGNED16; obj: Asteroid; root: SpaceObj); 
+	PROCEDURE ^ ModifyStatus(F: Starfield; obj: Field; mx, my: SIGNED16); 
+	PROCEDURE ^ RestoreStatus(F: Starfield; obj: Field; mx, my: SIGNED16); 
+	PROCEDURE ^ DrawDetonation(F: Starfield; obj: Detonation; mx, my: SIGNED16): SIGNED16; 
+	PROCEDURE ^ DrawMass(F: Starfield; obj: Mass; mx, my: SIGNED16): SIGNED16; 
+	PROCEDURE ^ DrawShip(F: Starfield; obj: Ship; mx, my: SIGNED16): SIGNED16; 
+	PROCEDURE ^ MoveMass(obj: Mass); 
+	PROCEDURE ^ IntersectMass(obj1, obj2: Mass; VAR x, y: SIGNED16): BOOLEAN; 
+	PROCEDURE ^ SFire(F: Field; ship: Ship); 
+	PROCEDURE ^ SShield(F: Field; ship: Ship); 
+	PROCEDURE ^ SWarp(F: Field; ship: Ship); 
+	PROCEDURE ^ EFire(F: Field; ufo: Enemy); 
+	PROCEDURE ^ Hit(F: Field; x, y: FLOAT32); 
+	PROCEDURE ^ HitShip(F: Field; obj: Ship); 
+	PROCEDURE ^ SplitAsteroid(F: Field; obj: Asteroid; x, y: SIGNED16): SIGNED16; 
+	PROCEDURE ^ NewShip(F: Field; x, y: FLOAT32); 
+	PROCEDURE ^ NewEnemy(F: Field); 
+	PROCEDURE ^ NewRound(F: Field; amt: SIGNED16); 
+	PROCEDURE ^ MoveShip(F: Field; obj: Ship); 
+	PROCEDURE ^ MoveEnemy(F: Field; obj: Enemy); 
+	PROCEDURE ^ MoveSBullet(F: Field; obj: SBullet); 
+	PROCEDURE ^ MoveEBullet(F: Field; obj: EBullet); 
+	PROCEDURE ^ UpdateShip(obj: Ship); 
+	PROCEDURE ^ UpdateStatus(obj: Field); 
+	PROCEDURE ^ Step1(F: Field; obj: SpaceObj); 
+	PROCEDURE ^ Step2(F: Field; obj: SpaceObj; VAR obj0: SpaceObj): BOOLEAN; 
+	PROCEDURE ^ TimerHandler(me: Oberon.Task); 
+	PROCEDURE ^ StopTimers; 
+	PROCEDURE ^ FieldAttr(F: Field; VAR M: AttrMsg); 
+	PROCEDURE ^ FieldFile(F: Field; VAR M: FileMsg); 
+	PROCEDURE ^ FieldHandler*(F: Object; VAR M: Objects.ObjMsg); 
+	PROCEDURE ^ StarfieldAttr(F: Starfield; VAR M: AttrMsg); 
+	PROCEDURE ^ StarfieldCopy(F: Starfield; VAR M: CopyMsg); 
+	PROCEDURE ^ StarfieldDisplay(F: Starfield; VAR M: DisplayMsg); 
+	PROCEDURE ^ StarfieldFile(F: Starfield; VAR M: FileMsg); 
+	PROCEDURE ^ StarfieldInput(F: Starfield; VAR M: InputMsg); 
+	PROCEDURE ^ StarfieldModify(F: Starfield; VAR M: ModifyMsg); 
+	PROCEDURE ^ StarfieldUpdate(F: Starfield; VAR M: UpdateMsg); 
+	PROCEDURE ^ StarfieldHandler*(F: Object; VAR M: Objects.ObjMsg); 
+	PROCEDURE ^ DocAttr(D: Document; VAR M: AttrMsg); 
+	PROCEDURE ^ DocLink(D: Document; VAR M: LinkMsg); 
+	PROCEDURE ^ DocMenu(D: Document; VAR M: MenuMsg); 
+	PROCEDURE ^ DocHandler*(D: Object; VAR M: Objects.ObjMsg); 
+	PROCEDURE ^ OldDocument(F: Files.File; D: Document; VAR f: Gadgets.Frame); 
+	PROCEDURE ^ NewDocument(D: Document; VAR f: Gadgets.Frame); 
+	PROCEDURE ^ LoadDocument(D: Document); 
+	PROCEDURE ^ StoreDocument(D: Document); 
+	PROCEDURE ^ NewField*; 
+	PROCEDURE ^ NewStarfield*; 
+	PROCEDURE ^ NewDoc*; 
+	PROCEDURE ^ NewGame*; 
+	PROCEDURE ^ PauseGame*; 
+	PROCEDURE ^ ResumeGame*; 
+BEGIN
+END Asteroids.

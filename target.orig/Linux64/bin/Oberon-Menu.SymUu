@@ -1,0 +1,37 @@
+MODULE Menu IN Oberon;
+	IMPORT Display, Fonts, Input, Oberon, Texts, Modules;
+CONST 
+	ML = 2; 
+	MR = 0; 
+	CR = 0DX; 
+	MaxCount = 1000; 
+TYPE 
+	Cache = RECORD 
+		name: ARRAY 32 OF CHAR; 
+		text: Texts.Text; 
+		cmd: SIGNED16; 
+		count: SIGNED32; 
+	END; 
+VAR 
+	cache: ARRAY 4 OF Cache; 
+	R: Texts.Reader; 
+	ch: CHAR; 
+	W: Texts.Writer; 
+	buf: POINTER TO ARRAY OF CHAR; 
+
+	PROCEDURE ^ GetChar(F: Fonts.Font; ch: CHAR; VAR dx, x, y, w, h: SIGNED16; VAR pat: Display.Pattern); 
+	PROCEDURE ^ FontOf(VAR R: Texts.Reader): Fonts.Font; 
+	PROCEDURE ^ CopyArea(x, y, w, h: SIGNED16; save: BOOLEAN); 
+	PROCEDURE ^ MainFrame(ch: CHAR): BOOLEAN; 
+	PROCEDURE ^ WaitRelease; 
+	PROCEDURE ^ SelectItem(cmd, x, y, w, h, entryH: SIGNED16); 
+	PROCEDURE ^ Area(fnt: Fonts.Font; VAR entryH, width, height: SIGNED16); 
+	PROCEDURE ^ Write(fnt: Fonts.Font; X, Y, entryH: SIGNED16); 
+	PROCEDURE ^ MenuDraw(fnt: Fonts.Font; x, y, w, h, entryH: SIGNED16); 
+	PROCEDURE ^ AdjustCoords(dx, dy: SIGNED16; VAR x, y, w, h: SIGNED16); 
+	PROCEDURE ^ Show(T: Texts.Text; x, y: SIGNED16; VAR cmd: SIGNED16; VAR cancel: BOOLEAN); 
+	PROCEDURE ^ CmdMenu*(menu: Texts.Text; x, y: SIGNED16; VAR cmd: SIGNED16); 
+	PROCEDURE ^ ShowCmd*; 
+	PROCEDURE ^ Reset*; 
+BEGIN
+END Menu.

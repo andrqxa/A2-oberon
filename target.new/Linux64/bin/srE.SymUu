@@ -1,0 +1,20 @@
+MODULE srE;
+	IMPORT SYSTEM, srBase;
+TYPE 
+	SREAL = srBase.SREAL; 
+
+	PROCEDURE ^ E*(VAR p: srBase.PT; VAR ijk: srBase.IPT); 
+	PROCEDURE ^ Eprime(VAR in: ARRAY OF SREAL; VAR out: ARRAY OF SIGNED16); 
+	PROCEDURE ^ E2*(in: srBase.PT; VAR out: srBase.IPT); 
+	PROCEDURE {Fingerprint(5337513171976766331)}  - ROUND*(x: SREAL; VAR y: SIGNED32);
+	CODE
+
+       POP RAX
+       FLD DWORD [RBP]
+       ADD RSP, 8
+       FISTP DWORD [RAX]
+
+
+	END ROUND; 
+BEGIN
+END srE.

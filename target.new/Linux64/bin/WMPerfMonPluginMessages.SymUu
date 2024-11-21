@@ -1,0 +1,15 @@
+MODULE WMPerfMonPluginMessages;
+	IMPORT WMPerfMonPlugins, KernelLog, WMMessages, Modules;
+CONST 
+	ModuleName = \"WMPerfMonPluginMessages"\; 
+TYPE 
+	MessagesPlugin = OBJECT {EXCLUSIVE} (WMPerfMonPlugins.Plugin)
+
+		PROCEDURE ^ {OVERRIDE} Init*(p: WMPerfMonPlugins.Parameter); 
+		PROCEDURE ^ {OVERRIDE} UpdateDataset*; 
+	END MessagesPlugin; 
+
+	PROCEDURE ^ Install*; 
+	PROCEDURE ^ Cleanup; 
+BEGIN
+END WMPerfMonPluginMessages.

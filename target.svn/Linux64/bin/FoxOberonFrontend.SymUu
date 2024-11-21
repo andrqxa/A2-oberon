@@ -1,0 +1,17 @@
+MODULE FoxOberonFrontend;
+	IMPORT Streams, Diagnostics, SyntaxTree := FoxSyntaxTree, Parser := FoxParser, Scanner := FoxScanner, FoxFrontend, Compiler;
+TYPE 
+	Frontend* = OBJECT (FoxFrontend.Frontend)
+	VAR 
+		scanner: Scanner.Scanner; 
+		parser: Parser.Parser; 
+
+		PROCEDURE ^ {OVERRIDE} Initialize*(diagnostics: Diagnostics.Diagnostics; flags: SET; reader: Streams.Reader; CONST fileName, definitions: ARRAY OF CHAR; pos: SIGNED32); 
+		PROCEDURE ^ {OVERRIDE} Parse*(): SyntaxTree.Module; 
+		PROCEDURE ^ {OVERRIDE} Error*(): BOOLEAN; 
+		PROCEDURE ^ {OVERRIDE} Done*(): BOOLEAN; 
+	END Frontend; 
+
+	PROCEDURE ^ Get*(): FoxFrontend.Frontend; 
+BEGIN
+END FoxOberonFrontend.

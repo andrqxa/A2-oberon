@@ -1,0 +1,18 @@
+MODULE Sort IN Oberon;
+	IMPORT Oberon, Texts, Objects, Gadgets, TextGadgets, Documents, Desktops;
+CONST 
+	NofLines = 4000; 
+TYPE 
+	String = ARRAY 256 OF CHAR; 
+
+	Array = POINTER TO ARRAY NofLines OF String; 
+VAR 
+	W: Texts.Writer; 
+
+	PROCEDURE ^ WriteMsg(n: SIGNED32; str: ARRAY OF CHAR); 
+	PROCEDURE ^ HSortArray(array: Array; n: SIGNED16); 
+	PROCEDURE ^ FillArray(array: Array; VAR n: SIGNED16; text: Texts.Text; emptyLines: BOOLEAN); 
+	PROCEDURE ^ FillText(text: Texts.Text; array: Array; n: SIGNED16; reverse, unique: BOOLEAN); 
+	PROCEDURE ^ Sort*; 
+BEGIN
+END Sort.

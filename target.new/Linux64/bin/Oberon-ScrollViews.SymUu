@@ -1,0 +1,66 @@
+MODULE ScrollViews IN Oberon;
+	IMPORT Files, Input, Display, Display3, Printer, Printer3, Fonts, Effects, Objects, Gadgets, Views, Oberon, Texts;
+CONST 
+	BarW = 18; 
+	VersionNo = 2; 
+TYPE 
+	Bar = RECORD 
+		min, max, val: SIGNED32; 
+		backC, knoblen: SIGNED16; 
+		vertical: BOOLEAN; 
+	END; 
+
+	View* = POINTER TO ViewDesc; 
+
+	ViewDesc* = RECORD (Views.ViewDesc)
+		vBar, hBar: Bar; 
+		hasVBar, hasHBar: BOOLEAN; 
+	END; 
+VAR 
+	last: View; 
+	W: Texts.Writer; 
+
+	PROCEDURE ^ Max(x, y: SIGNED16): SIGNED16; 
+	PROCEDURE ^ Min(x, y: SIGNED16): SIGNED16; 
+	PROCEDURE ^ ClipAgainst(VAR x, y, w, h: SIGNED16; X, Y, W, H: SIGNED16); 
+	PROCEDURE ^ P(X: SIGNED32): SIGNED16; 
+	PROCEDURE ^ Value(VAR bar: Bar; x, y, w, h, X, Y: SIGNED16; min, max: SIGNED32): SIGNED32; 
+	PROCEDURE ^ Pos(VAR bar: Bar; x, y, w, h, bw: SIGNED16; min, max, val: SIGNED32): SIGNED16; 
+	PROCEDURE ^ UpdateBars(F: View); 
+	PROCEDURE ^ AdjustChildToBar(F: View; bar: Bar); 
+	PROCEDURE ^ DrawKnob(Q: Display3.Mask; x, y, w, h: SIGNED16; vertical: BOOLEAN); 
+	PROCEDURE ^ DrawBar(Q: Display3.Mask; VAR bar: Bar; x, y, w, h: SIGNED16); 
+	PROCEDURE ^ PrintKnob(Q: Display3.Mask; x, y, w, h: SIGNED16; vertical: BOOLEAN); 
+	PROCEDURE ^ PrintBar(Q: Display3.Mask; VAR bar: Bar; x, y, w, h: SIGNED16); 
+	PROCEDURE ^ MoveContent(VAR bar: Bar; Q: Display3.Mask; x, y, w, h: SIGNED16; F: View; dlink: Objects.Object); 
+	PROCEDURE ^ TrackBar(F: View; VAR M: Oberon.InputMsg; VAR bar: Bar; x, y, w, h: SIGNED16); 
+	PROCEDURE ^ InitBar(VAR b: Bar; min, max, val: SIGNED32; backC: SIGNED16; vertical: BOOLEAN; width: SIGNED16); 
+	PROCEDURE ^ RestoreBars(F: View; x, y: SIGNED16; dlink: Objects.Object); 
+	PROCEDURE ^ ToFrame(F: View; x, y: SIGNED16; VAR M: Display.FrameMsg); 
+	PROCEDURE ^ Background(F: View; X, Y: SIGNED16; M: Display3.Mask; col, x, y, w, h, mode: SIGNED16); 
+	PROCEDURE ^ CutoutBack(F: View; R: Display3.Mask; x, y, w, h, X, Y, W, H: SIGNED16); 
+	PROCEDURE ^ RestoreView(F: View; x, y: SIGNED16; dlink: Objects.Object); 
+	PROCEDURE ^ RestoreViewArea(F: View; x, y, u, v, w1, h1: SIGNED16; dlink: Objects.Object); 
+	PROCEDURE ^ PrintView(F: View; M: Display.DisplayMsg); 
+	PROCEDURE ^ InHotspot(X, Y, x, y, w, h: SIGNED16): BOOLEAN; 
+	PROCEDURE ^ TrackSelectChild(F: View; VAR M: Oberon.InputMsg; child: Gadgets.Frame); 
+	PROCEDURE ^ TrackView(F: View; VAR M: Oberon.InputMsg); 
+	PROCEDURE ^ AdjustToFrame(F: View; x, y: SIGNED16; VAR M: Display.ModifyMsg); 
+	PROCEDURE ^ AdjustChild(F: View; x, y, w, h: SIGNED16; VAR M: Display.ModifyMsg); 
+	PROCEDURE ^ Absolute(dlink: Objects.Object): BOOLEAN; 
+	PROCEDURE ^ CleverAdjust(F: View; VAR M: Display.ModifyMsg); 
+	PROCEDURE ^ Adjust(F: View; VAR M: Display.ModifyMsg); 
+	PROCEDURE ^ Consume(F: View; x, y: SIGNED16; VAR M: Display.ConsumeMsg); 
+	PROCEDURE ^ Locate(F: View; VAR M: Display.LocateMsg); 
+	PROCEDURE ^ UpdateMask(F: View; x, y: SIGNED16; VAR M: Display3.UpdateMaskMsg); 
+	PROCEDURE ^ MakeMask(v: Gadgets.View; M: Display3.Mask; ondisplay: BOOLEAN); 
+	PROCEDURE ^ CopyView*(VAR M: Objects.CopyMsg; from, to: View); 
+	PROCEDURE ^ ViewAttr(F: View; VAR M: Objects.AttrMsg); 
+	PROCEDURE ^ ViewLinks(F: View; VAR M: Objects.LinkMsg); 
+	PROCEDURE ^ ViewHandler*(F: Objects.Object; VAR M: Objects.ObjMsg); 
+	PROCEDURE ^ InitView*(F: View; vBar, hBar: BOOLEAN); 
+	PROCEDURE ^ NewView*; 
+	PROCEDURE ^ ViewOf*(F: Display.Frame): View; 
+	PROCEDURE ^ SetBars*(F: View; vBar, hBar: BOOLEAN); 
+BEGIN
+END ScrollViews.

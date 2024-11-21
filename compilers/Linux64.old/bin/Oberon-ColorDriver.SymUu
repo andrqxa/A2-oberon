@@ -1,0 +1,12 @@
+MODULE ColorDriver IN Oberon;
+	IMPORT Display;
+TYPE 
+	ColorMsg* = RECORD (Display.FrameMsg)
+		col*: SIGNED16; 
+	END; 
+VAR 
+	Color: SIGNED16; 
+
+	PROCEDURE ^ NextCol*; 
+BEGIN
+END ColorDriver.

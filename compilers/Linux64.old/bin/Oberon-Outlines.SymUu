@@ -1,0 +1,72 @@
+MODULE Outlines IN Oberon;
+	IMPORT Files, Texts, Objects, Display, Display3, Printer, Printer3, Effects, Attributes, Gadgets, Oberon, Documents, Desktops, Out;
+CONST 
+	open* = 0; 
+	close* = 1; 
+	folded* = 2; 
+	tempOpen* = 3; 
+	openMode* = {open, tempOpen}; 
+	FW = 12; 
+	FH = 10; 
+	MaxPatLen = 128; 
+TYPE 
+	Outline* = POINTER TO OutlineDesc; 
+
+	OutlineDesc* = RECORD (Gadgets.FrameDesc)
+		fstate*: SIGNED16; 
+		len*: SIGNED32; 
+		buf*: Texts.Buffer; 
+	END; 
+
+	FindInfo = RECORD 
+		sPat: ARRAY MaxPatLen OF CHAR; 
+		sDv: ARRAY (MaxPatLen + 1) OF SIGNED16; 
+		sLen: SIGNED16; 
+		time: SIGNED32; 
+		rBuf: Texts.Buffer; 
+	END; 
+VAR 
+	oldBroadcast: Display.MsgProc; 
+	inf: FindInfo; 
+	handle: Objects.Handler; 
+	insertT: Texts.Text; 
+	saveB: Texts.Buffer; 
+
+	PROCEDURE ^ MakeOutline*(state: SIGNED16): Outline; 
+	PROCEDURE ^ GetFrame(): Display.Frame; 
+	PROCEDURE ^ GetText(F: Display.Frame): Texts.Text; 
+	PROCEDURE ^ FindBefore(T: Texts.Text; obj: Objects.Object; VAR before: Objects.Object; VAR pos: SIGNED32); 
+	PROCEDURE ^ CloseForward(F: Outline; T: Texts.Text; pos: SIGNED32); 
+	PROCEDURE ^ CloseBackward(F: Outline; T: Texts.Text; pos: SIGNED32); 
+	PROCEDURE ^ Ins(T: Texts.Text; pos: SIGNED32; obj: Objects.Object); 
+	PROCEDURE ^ Open(F: Outline; T: Texts.Text; pos: SIGNED32); 
+	PROCEDURE ^ Fold(F: Outline; x, y, w, h: SIGNED16; VAR M: Oberon.InputMsg; R: Display3.Mask); 
+	PROCEDURE ^ ExpandAll*(T: Texts.Text; from: SIGNED32; temporal: BOOLEAN); 
+	PROCEDURE ^ CollapseFromTo*(T: Texts.Text; beg, end: SIGNED32; modes: SET); 
+	PROCEDURE ^ CollapseAll*(T: Texts.Text; modes: SET); 
+	PROCEDURE ^ DTriangle(R: Display3.Mask; x, y, dim: SIGNED16; open: BOOLEAN); 
+	PROCEDURE ^ RestoreOutline(F: Outline; R: Display3.Mask; x, y, w, h: SIGNED16); 
+	PROCEDURE ^ P(x: SIGNED16): SIGNED16; 
+	PROCEDURE ^ PTriangle(R: Display3.Mask; x, y, dim: SIGNED16; open: BOOLEAN); 
+	PROCEDURE ^ PrintOutline(F: Outline; M: Display.DisplayMsg); 
+	PROCEDURE ^ CopyOutline*(VAR M: Objects.CopyMsg; from, to: Outline); 
+	PROCEDURE ^ Attr(F: Outline; VAR M: Objects.AttrMsg); 
+	PROCEDURE ^ OutlineHandler*(F: Objects.Object; VAR M: Objects.ObjMsg); 
+	PROCEDURE ^ NewOutline*; 
+	PROCEDURE ^ New*; 
+	PROCEDURE ^ InsertText*(T: Texts.Text; beg, end: SIGNED32); 
+	PROCEDURE ^ RemoveAll*(T: Texts.Text); 
+	PROCEDURE ^ Remove*; 
+	PROCEDURE ^ Insert*; 
+	PROCEDURE ^ NoBroadcast(VAR M: Display.FrameMsg); 
+	PROCEDURE ^ MarkPatPos(F: Display.Frame; T: Texts.Text; pos: SIGNED32); 
+	PROCEDURE ^ CalcDispVec(time: SIGNED32); 
+	PROCEDURE ^ SPatFound(text: Texts.Text; VAR pos: SIGNED32): BOOLEAN; 
+	PROCEDURE ^ Search*; 
+	PROCEDURE ^ replace(): BOOLEAN; 
+	PROCEDURE ^ Replace*; 
+	PROCEDURE ^ ReplaceAll*; 
+	PROCEDURE ^ Expand*; 
+	PROCEDURE ^ Collapse*; 
+BEGIN
+END Outlines.

@@ -1,0 +1,10 @@
+MODULE Simulator IN Oberon;
+	IMPORT Display, Gadgets, Attributes, Diagrams;
+CONST 
+VAR 
+	seed: SIGNED32; 
+
+	PROCEDURE ^ Random(): FLOAT32; 
+	PROCEDURE ^ Start*; 
+BEGIN
+END Simulator.

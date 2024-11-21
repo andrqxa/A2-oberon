@@ -1,0 +1,15 @@
+MODULE WMRussianIME;
+	IMPORT Strings, WMInputMethods, Texts, KernelLog;
+CONST 
+	imeName* = \"Russian"\; 
+TYPE 
+	IME* = OBJECT {EXCLUSIVE} (WMInputMethods.IME)
+
+		PROCEDURE ^ {OVERRIDE} GetName*(): Strings.String; 
+		PROCEDURE ^ {OVERRIDE} KeyEvent*(ucs: SIZE; flags: SET; keysym: SIZE); 
+	END IME; 
+
+	PROCEDURE ^ Install*; 
+	PROCEDURE ^ SelectedCharToUCS*; 
+BEGIN
+END WMRussianIME.

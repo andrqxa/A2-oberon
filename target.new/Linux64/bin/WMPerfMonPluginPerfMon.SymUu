@@ -1,0 +1,16 @@
+MODULE WMPerfMonPluginPerfMon;
+	IMPORT WMPerfMonPlugins, Modules;
+CONST 
+	ModuleName = \"WMPerfMonPluginPerfMon"\; 
+TYPE 
+	PerfMonStats = OBJECT {EXCLUSIVE} (WMPerfMonPlugins.Plugin)
+
+		PROCEDURE ^ {OVERRIDE} Init*(p: WMPerfMonPlugins.Parameter); 
+		PROCEDURE ^ {OVERRIDE} UpdateDataset*; 
+	END PerfMonStats; 
+
+	PROCEDURE ^ Install*; 
+	PROCEDURE ^ InitPlugin; 
+	PROCEDURE ^ Cleanup; 
+BEGIN
+END WMPerfMonPluginPerfMon.

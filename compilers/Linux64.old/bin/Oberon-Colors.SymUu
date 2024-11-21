@@ -1,0 +1,57 @@
+MODULE Colors IN Oberon;
+	IMPORT Files, Objects, Plugins IN A2, Displays IN A2, Display, Strings;
+CONST 
+	undefined* =  -1; 
+	red* = 0; 
+	yellow* = (1 / 6); 
+	green* = (2 / 6); 
+	cyan* = (3 / 6); 
+	blue* = (4 / 6); 
+	magenta* = (5 / 6); 
+TYPE 
+	Color* = POINTER TO ColorDesc; 
+
+	ColorDesc* = RECORD (Objects.ObjDesc)
+		r, g, b: FLOAT32; 
+	END; 
+
+	Index* = RECORD 
+		bits: SIGNED16; 
+		cube: POINTER TO ARRAY OF CHAR; 
+	END; 
+VAR 
+	DisplayIndex*: Index; 
+	DisplayBits*: SIGNED16; 
+	Red*, Green*, Blue*: ARRAY 256 OF SIGNED16; 
+
+	PROCEDURE ^ Match*(index: Index; bits, red, green, blue: SIGNED16): SIGNED32; 
+	PROCEDURE ^ MakeIndex*(VAR index: Index; bits: SIGNED16; colors: SIGNED32; VAR red, green, blue: ARRAY OF SIGNED16); 
+	PROCEDURE ^ Update*; 
+	PROCEDURE ^ DisplayToRGB*(dcol: Display.Color; VAR r, g, b: FLOAT32); 
+	PROCEDURE ^ RGBToDisplay*(r, g, b: FLOAT32; VAR dcol: Display.Color); 
+	PROCEDURE ^ RGBToHSV*(r, g, b: FLOAT32; VAR h, s, v: FLOAT32); 
+	PROCEDURE ^ HSVToRGB*(h, s, v: FLOAT32; VAR r, g, b: FLOAT32); 
+	PROCEDURE ^ RGBToCMY*(r, g, b: FLOAT32; VAR c, m, y: FLOAT32); 
+	PROCEDURE ^ CMYToRGB*(c, m, y: FLOAT32; VAR r, g, b: FLOAT32); 
+	PROCEDURE ^ RGBToCMYK*(r, g, b: FLOAT32; VAR c, m, y, k: FLOAT32); 
+	PROCEDURE ^ CMYKToRGB*(c, m, y, k: FLOAT32; VAR r, g, b: FLOAT32); 
+	PROCEDURE ^ Copy*(VAR msg: Objects.CopyMsg; from, to: Color); 
+	PROCEDURE ^ Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg); 
+	PROCEDURE ^ New*; 
+	PROCEDURE ^ InitRGB*(col: Color; r, g, b: FLOAT32); 
+	PROCEDURE ^ InitDisplay*(col: Color; dcol: Display.Color); 
+	PROCEDURE ^ InitHSV*(col: Color; h, s, v: FLOAT32); 
+	PROCEDURE ^ InitCMY*(col: Color; c, m, y: FLOAT32); 
+	PROCEDURE ^ InitCMYK*(col: Color; c, m, y, k: FLOAT32); 
+	PROCEDURE ^ GetRGB*(col: Color; VAR r, g, b: FLOAT32); 
+	PROCEDURE ^ GetDisplay*(col: Color; VAR dcol: Display.Color); 
+	PROCEDURE ^ GetHSV*(col: Color; VAR h, s, v: FLOAT32); 
+	PROCEDURE ^ GetCMY*(col: Color; VAR c, m, y: FLOAT32); 
+	PROCEDURE ^ GetCMYK*(col: Color; VAR c, m, y, k: FLOAT32); 
+	PROCEDURE ^ SetRGB*(col: Color; r, g, b: FLOAT32); 
+	PROCEDURE ^ SetDisplay*(col: Color; dcol: Display.Color); 
+	PROCEDURE ^ SetHSV*(col: Color; h, s, v: FLOAT32); 
+	PROCEDURE ^ SetCMY*(col: Color; c, m, y: FLOAT32); 
+	PROCEDURE ^ SetCMYK*(col: Color; c, m, y, k: FLOAT32); 
+BEGIN
+END Colors.

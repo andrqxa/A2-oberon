@@ -1,0 +1,67 @@
+MODULE OpenALSound;
+	IMPORT Modules, SoundDevices, AL := OpenAL, Files, Strings, Streams, Kernel, Log := KernelLog;
+CONST 
+	StatePlaying = 1; 
+	StatePaused = 3; 
+	StateStoped = 4; 
+	StateClosed = 5; 
+	Debug = TRUE; 
+	NumBuffers = 20; 
+	OpenALConfig = \"openalplay.ini"\; 
+TYPE 
+	Driver = OBJECT {EXCLUSIVE} (SoundDevices.Driver)
+	VAR 
+		enabled: BOOLEAN; 
+		playChannel: PlayChannel; 
+		ctx: AL.ALCcontext; 
+		dev: AL.ALCdevice; 
+
+		PROCEDURE ^  & Initialize; 
+		PROCEDURE ^ CreateALContext(): BOOLEAN; 
+		PROCEDURE ^ DestroyALContext; 
+		PROCEDURE ^ {OVERRIDE} Enable*; 
+		PROCEDURE ^ {OVERRIDE} Disable*; 
+		PROCEDURE ^ {OVERRIDE} GetNativeFrequency*(nr: SIGNED32): SIGNED32; 
+		PROCEDURE ^ {OVERRIDE} OpenPlayChannel*(VAR channel: SoundDevices.Channel; samplingRate, samplingResolution: SIGNED32; nofSubChannels, format: SIGNED32; VAR res: INTEGER); 
+		PROCEDURE ^ {OVERRIDE} OpenRecordChannel*(VAR channel: SoundDevices.Channel; samplingRate, samplingResolution: SIGNED32; nofSubChannels, format: SIGNED32; VAR res: INTEGER); 
+		PROCEDURE ^ {OVERRIDE} RegisterMixerChangeListener*(mixChangedProc: SoundDevices.MixerChangedProc); 
+		PROCEDURE ^ {OVERRIDE} UnregisterMixerChangeListener*(mixChangeProc: SoundDevices.MixerChangedProc); 
+		PROCEDURE ^ {OVERRIDE} GetMixerChannel*(channelNr: SIGNED32; VAR channel: SoundDevices.MixerChannel); 
+		PROCEDURE ^ {OVERRIDE} GetNofMixerChannels*(): SIGNED32; 
+	END Driver; 
+
+	PlayChannel = OBJECT {EXCLUSIVE} (SoundDevices.Channel)
+	VAR 
+		source: AL.ALuint; 
+		buffers: ARRAY NumBuffers OF AL.ALuint; 
+		freeBuffers: AL.ALint; 
+		bufferListener: SoundDevices.BufferListener; 
+		frequency: AL.ALsizei; 
+		format: AL.ALenum; 
+		count: SIGNED32; 
+		volume: SIGNED32; 
+		state: SIGNED32; 
+		timer: Kernel.Timer; 
+		driver: Driver; 
+
+		PROCEDURE ^  & Initialize*(driver: Driver; samplingRate, bitsPerSample, nofChannels: SIGNED32); 
+		PROCEDURE ^ {OVERRIDE} RegisterBufferListener*(bufferListener: SoundDevices.BufferListener); 
+		PROCEDURE ^ {OVERRIDE} QueueBuffer*(x: SoundDevices.Buffer); 
+		PROCEDURE ^ {OVERRIDE} SetVolume*(vol: SIGNED32); 
+		PROCEDURE ^ {OVERRIDE} GetVolume*(): SIGNED32; 
+		PROCEDURE ^ {OVERRIDE} GetPosition*(): SIGNED32; 
+		PROCEDURE ^ {OVERRIDE} Start*; 
+		PROCEDURE ^ {OVERRIDE} Pause*; 
+		PROCEDURE ^ {OVERRIDE} Stop*; 
+		PROCEDURE ^ {OVERRIDE} Close*; 
+	END PlayChannel; 
+VAR 
+	driver: Driver; 
+
+	PROCEDURE ^ GetDeviceName(VAR sdev: ARRAY OF CHAR); 
+	PROCEDURE ^ Install*; 
+	PROCEDURE ^ Enable*; 
+	PROCEDURE ^ Disable*; 
+	PROCEDURE ^ Cleanup; 
+BEGIN
+END OpenALSound.

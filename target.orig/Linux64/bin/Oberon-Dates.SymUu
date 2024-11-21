@@ -1,0 +1,34 @@
+MODULE Dates IN Oberon;
+	IMPORT Oberon, Texts;
+CONST 
+	minute* = 60; 
+	hour* = (60 * minute); 
+	day* = (24 * hour); 
+	week* = (7 * day); 
+	zeroY = 1900; 
+	firstY* = 1901; 
+VAR 
+	TimeDiff*: SIGNED32; 
+	A: ARRAY 13 OF SIGNED16; 
+	T: ARRAY 365 OF SIGNED8; 
+
+	PROCEDURE ^ IsLeapYear*(year: SIGNED16): BOOLEAN; 
+	PROCEDURE ^ LastDay(year, month: SIGNED16): SIGNED16; 
+	PROCEDURE ^ NumberOfDays*(date: SIGNED32): SIGNED32; 
+	PROCEDURE ^ NumberOfDaysToDate*(days: SIGNED32): SIGNED32; 
+	PROCEDURE ^ ToDate*(year, month, day: SIGNED16): SIGNED32; 
+	PROCEDURE ^ ToTime*(hour, min, sec: SIGNED16): SIGNED32; 
+	PROCEDURE ^ ToYMD*(date: SIGNED32; VAR year, month, day: SIGNED16); 
+	PROCEDURE ^ ToHMS*(time: SIGNED32; VAR hour, min, sec: SIGNED16); 
+	PROCEDURE ^ DayOfWeek*(date: SIGNED32): SIGNED16; 
+	PROCEDURE ^ DaysOfMonth*(date: SIGNED32): SIGNED16; 
+	PROCEDURE ^ AddYear*(date: SIGNED32; years: SIGNED16): SIGNED32; 
+	PROCEDURE ^ AddMonth*(date: SIGNED32; months: SIGNED16): SIGNED32; 
+	PROCEDURE ^ AddDay*(date: SIGNED32; days: SIGNED16): SIGNED32; 
+	PROCEDURE ^ AddHour*(time: SIGNED32; hour: SIGNED16): SIGNED32; 
+	PROCEDURE ^ AddMinute*(time: SIGNED32; min: SIGNED16): SIGNED32; 
+	PROCEDURE ^ AddSecond*(time: SIGNED32; sec: SIGNED16): SIGNED32; 
+	PROCEDURE ^ AddTime*(VAR time, date: SIGNED32; sec: SIGNED32); 
+	PROCEDURE ^ Init; 
+BEGIN
+END Dates.

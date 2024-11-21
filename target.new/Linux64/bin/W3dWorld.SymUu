@@ -1,0 +1,76 @@
+MODULE W3dWorld;
+	IMPORT AbstractWorld := W3dAbstractWorld, Vectors := W3dVectors, Matrix := W3dMatrix, Raster, Classes := TFClasses, Rasterizer := W3dRasterizer, W3dGeometry;
+CONST 
+	TraceNormals = FALSE; 
+TYPE 
+	Vertex* = Rasterizer.Vertex; 
+
+	VertexArray = POINTER TO ARRAY OF Vertex; 
+
+	Texture = Rasterizer.Texture; 
+
+	Triangle = Rasterizer.Triangle; 
+
+	TriangleArray = POINTER TO ARRAY OF Triangle; 
+
+	AABB = RECORD 
+		a, b: Vectors.TVector3d; 
+		empty: BOOLEAN; 
+	END; 
+
+	Object* = OBJECT (AbstractWorld.Object)
+	VAR 
+		triangles: TriangleArray; 
+		nofTriangles: SIGNED32; 
+		vertices: VertexArray; 
+		nofVertices: SIGNED32; 
+		aabb: AABB; 
+		bsCenter: Vectors.TVector3d; 
+		bsRadius: FLOAT64; 
+		bsValid: BOOLEAN; 
+		isAnimated: BOOLEAN; 
+		index: SIGNED32; 
+
+		PROCEDURE ^  & Init*; 
+		PROCEDURE ^ {OVERRIDE} SetIndex*(idx: SIGNED32); 
+		PROCEDURE ^ {OVERRIDE} AddTexture*(img: Raster.Image): AbstractWorld.Texture; 
+		PROCEDURE ^ {OVERRIDE} AddVertex*(p: Vectors.TVector3d): AbstractWorld.Vertex; 
+		PROCEDURE ^ CalcBS; 
+		PROCEDURE ^ {OVERRIDE} AddTriangle*(a, b, c: AbstractWorld.Vertex; color: SIGNED32; tex: AbstractWorld.Texture; mask0, culled: BOOLEAN); 
+		PROCEDURE ^ {OVERRIDE} Clear*; 
+	END Object; 
+
+	World* = OBJECT {EXCLUSIVE} (AbstractWorld.World)
+	VAR 
+		objects, animated: Classes.List; 
+		p, d, u: Vectors.TVector3d; 
+		trans: Matrix.Matrix4x4; 
+		distpp: FLOAT64; 
+		rasterizer: Rasterizer.Rasterizer; 
+		width, height: SIZE; 
+		quality*: SIGNED32; 
+		frustum*: W3dGeometry.Frustum; 
+		clearColor: SIGNED32; 
+		tempTri: Triangle; 
+		tempv0, tempv1: Vertex; 
+		changed, invertable: BOOLEAN; 
+		worldValid: BOOLEAN; 
+
+		PROCEDURE ^  & Init*(w, h: SIZE; clearColor: SIGNED32); 
+		PROCEDURE ^ {OVERRIDE} CreateObject*(): AbstractWorld.Object; 
+		PROCEDURE ^ {OVERRIDE} AddObject*(x: AbstractWorld.Object); 
+		PROCEDURE ^ {OVERRIDE} ReplaceObject*(x, y: AbstractWorld.Object); 
+		PROCEDURE ^ {OVERRIDE} SetAnimated*(obj: AbstractWorld.Object; animated: BOOLEAN); 
+		PROCEDURE ^ {OVERRIDE} Clear*; 
+		PROCEDURE ^ {OVERRIDE} SetCamera*(p, d, u: Vectors.TVector3d); 
+		PROCEDURE ^ ScreenPos(p: Vectors.TVector3d; VAR x, y: FLOAT64); 
+		PROCEDURE ^ RasterTriangle(VAR tri: Triangle); 
+		PROCEDURE ^ ClipDrawTriangle(VAR tri: Triangle); 
+		PROCEDURE ^ RenderInternal*(img: Raster.Image; animatedOnly: BOOLEAN); 
+		PROCEDURE ^ {OVERRIDE} Render*(img: Raster.Image; movingOnly: BOOLEAN); 
+		PROCEDURE ^ {OVERRIDE} GetOwnerIndex*(x, y: SIZE): SIGNED32; 
+	END World; 
+
+	PROCEDURE ^ GrowAABB(VAR aabb: AABB; p: Vectors.TVector3d); 
+BEGIN
+END W3dWorld.

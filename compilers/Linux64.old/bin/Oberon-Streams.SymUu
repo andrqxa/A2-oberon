@@ -1,0 +1,71 @@
+MODULE Streams IN Oberon;
+	IMPORT SYSTEM, Files;
+CONST 
+	closed* = 0; 
+	error* = 1; 
+	in* = 2; 
+	out* = 3; 
+	inout* = 4; 
+	binary* = 0; 
+	oberon* = 1; 
+	iso8859* = 2; 
+TYPE 
+	Stream* = POINTER TO StreamDesc; 
+
+	StreamDesc* = RECORD 
+		ReadBytes*, WriteBytes*: PROCEDURE (S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32); 
+		Available*: PROCEDURE (S: Stream):SIGNED32; 
+		State*: PROCEDURE (S: Stream):SIGNED16; 
+		Flush*: PROCEDURE (S: Stream); 
+		Close*: PROCEDURE (S: Stream); 
+		res*: SIGNED32; 
+		mode*: SIGNED16; 
+		eos*, buffer*: BOOLEAN; 
+	END; 
+
+	FileStream* = POINTER TO FileStreamDesc; 
+
+	FileStreamDesc = RECORD (StreamDesc)
+		R: Files.Rider; 
+		state: SIGNED16; 
+		ch: CHAR; 
+	END; 
+VAR 
+	NULL*: Stream; 
+
+	PROCEDURE ^ Read*(S: Stream; VAR x: CHAR); 
+	PROCEDURE ^ Write*(S: Stream; x: CHAR); 
+	PROCEDURE ^ ReadBool*(S: Stream; VAR x: BOOLEAN); 
+	PROCEDURE ^ ReadInt*(S: Stream; VAR x: SIGNED16); 
+	PROCEDURE ^ ReadLInt*(S: Stream; VAR x: SIGNED32); 
+	PROCEDURE ^ ReadLReal*(S: Stream; VAR x: FLOAT64); 
+	PROCEDURE ^ ReadNum*(S: Stream; VAR x: SIGNED32); 
+	PROCEDURE ^ ReadReal*(S: Stream; VAR x: FLOAT32); 
+	PROCEDURE ^ ReadSet*(S: Stream; VAR x: SET); 
+	PROCEDURE ^ ReadString*(S: Stream; VAR x: ARRAY OF CHAR); 
+	PROCEDURE ^ WriteBool*(S: Stream; x: BOOLEAN); 
+	PROCEDURE ^ WriteInt*(S: Stream; x: SIGNED16); 
+	PROCEDURE ^ WriteLInt*(S: Stream; x: SIGNED32); 
+	PROCEDURE ^ WriteLReal*(S: Stream; x: FLOAT64); 
+	PROCEDURE ^ WriteNum*(S: Stream; x: SIGNED32); 
+	PROCEDURE ^ WriteReal*(S: Stream; x: FLOAT32); 
+	PROCEDURE ^ WriteSet*(S: Stream; x: SET); 
+	PROCEDURE ^ WriteString*(S: Stream; x: ARRAY OF CHAR); 
+	PROCEDURE ^ NULLReadBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32); 
+	PROCEDURE ^ NULLWriteBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32); 
+	PROCEDURE ^ NULLAvailable(S: Stream): SIGNED32; 
+	PROCEDURE ^ NULLState(S: Stream): SIGNED16; 
+	PROCEDURE ^ NULLFlush(S: Stream); 
+	PROCEDURE ^ NULLClose(S: Stream); 
+	PROCEDURE ^ ReadFileBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32); 
+	PROCEDURE ^ WriteFileBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32); 
+	PROCEDURE ^ FileAvailable(S: Stream): SIGNED32; 
+	PROCEDURE ^ FileState(S: Stream): SIGNED16; 
+	PROCEDURE ^ FileFlush(S: Stream); 
+	PROCEDURE ^ FileClose(S: Stream); 
+	PROCEDURE ^ OpenFileReader*(F: Files.File; pos: SIGNED32): Stream; 
+	PROCEDURE ^ OpenFileWriter*(F: Files.File; pos: SIGNED32): Stream; 
+	PROCEDURE ^ FilePos*(S: FileStream): SIGNED32; 
+	PROCEDURE ^ Copy*(src, dest: Stream); 
+BEGIN
+END Streams.

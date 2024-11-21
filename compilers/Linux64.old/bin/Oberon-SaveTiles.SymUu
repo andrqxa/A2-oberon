@@ -1,0 +1,47 @@
+MODULE SaveTiles IN Oberon;
+	IMPORT Modules, Display, In, Out, SaveScreen;
+CONST 
+	versionString = \"SaveTiles 1999.11.05"\; 
+	maxSpeed = 64; 
+	minSpeed = 1; 
+	defSpeed = 16; 
+	maxColumnCount = 16; 
+	minColumnCount = 4; 
+	defColumnCount = 8; 
+	maxRowCount = 12; 
+	minRowCount = 3; 
+	defRowCount = 6; 
+	defFrameRate = 20; 
+TYPE 
+	NeighborList = ARRAY 4 OF RECORD 
+		col, row: SIGNED16; 
+	END; 
+
+	; 
+
+	; 
+VAR 
+	tiles: RECORD 
+		cols, rows: SIGNED16; 
+		colw, rowh: SIGNED16; 
+		ecol, erow: SIGNED16; 
+		pecol, perow: SIGNED16; 
+		cx, cy: SIGNED16; 
+		tx, ty: SIGNED16; 
+		dx, dy: SIGNED16; 
+	END; 
+	rowCount: SIGNED16; 
+	columnCount: SIGNED16; 
+	speed: SIGNED16; 
+
+	PROCEDURE ^ GetTilePos(col, row: SIGNED16; VAR x, y: SIGNED16); 
+	PROCEDURE ^ GetNeighbors(col, row: SIGNED16; VAR neighbors: NeighborList; VAR n: SIGNED16); 
+	PROCEDURE ^ ChooseSlidingTile; 
+	PROCEDURE ^ StartTiles; 
+	PROCEDURE ^ StepTiles; 
+	PROCEDURE ^ StopTiles; 
+	PROCEDURE ^ Install*; 
+	PROCEDURE ^ Remove; 
+	PROCEDURE ^ Configuration*; 
+BEGIN
+END SaveTiles.

@@ -1,0 +1,45 @@
+MODULE PCARMDecoder IN Oberon;
+	IMPORT SYSTEM, Modules, Oberon, Files, Texts, Fonts, Out, Decoder;
+CONST 
+VAR 
+	bigEndian: BOOLEAN; 
+	W*: Texts.Writer; 
+	name0, name1, branch, branchl, dfloat, mfloat, cptnf, tnf, CC, Rot, Psr, Reg, FReg, Copr, CReg: ARRAY 128 OF CHAR; 
+	halfword: ARRAY 16 OF CHAR; 
+
+	PROCEDURE ^ Ch(ch: CHAR); 
+	PROCEDURE ^ Str(s: ARRAY OF CHAR); 
+	PROCEDURE ^ Int(i: SIGNED32); 
+	PROCEDURE ^ tab; 
+	PROCEDURE ^ Ln; 
+	PROCEDURE ^ FixHex(n: SIGNED32); 
+	PROCEDURE ^ Hex(n: SIGNED32); 
+	PROCEDURE ^ word(VAR n: ARRAY OF CHAR; p: SIGNED32); 
+	PROCEDURE ^ word2(VAR n: ARRAY OF CHAR; p: SIGNED32); 
+	PROCEDURE ^ word3(VAR n: ARRAY OF CHAR; p: SIGNED32); 
+	PROCEDURE ^ cond(cc: SIGNED32); 
+	PROCEDURE ^ s; 
+	PROCEDURE ^ l; 
+	PROCEDURE ^ byte; 
+	PROCEDURE ^ copr(n: SIGNED32); 
+	PROCEDURE ^ reg(n: SIGNED32); 
+	PROCEDURE ^ creg(n: SIGNED32); 
+	PROCEDURE ^ psr(s, a: SIGNED32); 
+	PROCEDURE ^ rot(t, c: SIGNED32); 
+	PROCEDURE ^ imm(i, r: SIGNED32); 
+	PROCEDURE ^ PCRelAddr(adr, sign, ofs: SIGNED32); 
+	PROCEDURE ^ decode(adr, code: SIGNED32); 
+	PROCEDURE ^ Init*; 
+	PROCEDURE ^ Decode*(pc, code: SIGNED32; raw: BOOLEAN); 
+	PROCEDURE ^ DecodeManual*; 
+	PROCEDURE ^ DecoderPlugin(VAR pc: SIGNED32; VAR r: Files.Rider; VAR w: Texts.Writer); 
+	PROCEDURE ^ HeaderCallback(VAR dataSize, constSize, codeSize: SIGNED32); 
+	PROCEDURE ^ DecodeRaw*; 
+	PROCEDURE ^ InstallDecoder*; 
+	PROCEDURE ^ Remove; 
+	PROCEDURE ^ Initialize; 
+	PROCEDURE ^ SetBigEndian*; 
+	PROCEDURE ^ SetLittleEndian*; 
+	PROCEDURE ^ SwapBytes(VAR code: SIGNED32); 
+BEGIN
+END PCARMDecoder.

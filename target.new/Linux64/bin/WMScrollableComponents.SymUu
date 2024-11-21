@@ -1,0 +1,54 @@
+MODULE WMScrollableComponents;
+	IMPORT Strings, XML, WMGraphics, WMRectangles, WMMessages, WMProperties, WMComponents, WMStandardComponents;
+CONST 
+TYPE 
+	String = Strings.String; 
+
+	Panel = WMStandardComponents.Panel; 
+
+	ScrollPanel* = OBJECT {EXCLUSIVE} (WMComponents.VisualComponent)
+	VAR 
+		left, top, dx, dy: SIZE; 
+		CheckScrollbars: WMMessages.CompCommand; 
+		resizing: BOOLEAN; 
+
+		PROCEDURE ^  & New*(CheckScrollbars: WMMessages.CompCommand); 
+		PROCEDURE ^ {OVERRIDE} AlignSubComponents*; 
+		PROCEDURE ^ CheckLeftTop; 
+		PROCEDURE ^ SetLeftTop(dxf, dyf: FLOAT32); 
+		PROCEDURE ^ {OVERRIDE} Resized*; 
+		PROCEDURE ^ {OVERRIDE} InvalidateRect*(r: WMRectangles.Rectangle); 
+		PROCEDURE ^ {OVERRIDE} InvalidateCommand*(sender, par: ANY ); 
+		PROCEDURE ^ {OVERRIDE} HandleInternal*(VAR msg: WMMessages.Message); 
+		PROCEDURE ^ {OVERRIDE} Draw*(canvas: WMGraphics.Canvas); 
+	END ScrollPanel; 
+
+	ScrollableContainer* = OBJECT {EXCLUSIVE} (Panel)
+	VAR 
+		vScrollbar, hScrollbar: WMStandardComponents.Scrollbar; 
+		scrollPanel: ScrollPanel; 
+		dx, dy: SIZE; 
+		minNofLevels*, nofLevelsPerPage*: WMProperties.Int32Property; 
+		wheelScrolling-: WMProperties.BooleanProperty; 
+
+		PROCEDURE ^  & Init*; 
+		PROCEDURE ^ {OVERRIDE} AlignSubComponents*; 
+		PROCEDURE ^ {OVERRIDE} HandleInternal*(VAR msg: WMMessages.Message); 
+		PROCEDURE ^ FitScrollTarget(sender, par: ANY ); 
+		PROCEDURE ^ ScrollbarsChanged(sender, data: ANY ); 
+		PROCEDURE ^ {OVERRIDE} WheelMove*(dz: SIZE); 
+		PROCEDURE ^ {OVERRIDE} AddInternalComponent*(component: WMComponents.Component); 
+		PROCEDURE ^ {OVERRIDE} AddContent*(content: XML.Content); 
+	END ScrollableContainer; 
+VAR 
+	Int32Prototype: WMProperties.Int32Property; 
+	PrototypeSCMinNofLevels*, PrototypeSCNofLevelsPerPage*: WMProperties.Int32Property; 
+	PrototypeSCWheelScrolling: WMProperties.BooleanProperty; 
+	StrScrollPanel, StrScrollableContainer: String; 
+
+	PROCEDURE ^ InitStrings; 
+	PROCEDURE ^ InitPrototypes; 
+	PROCEDURE ^ GenScrollableContainer*(): XML.Element; 
+	PROCEDURE ^ NewString(CONST x: ARRAY OF CHAR): String; 
+BEGIN
+END WMScrollableComponents.

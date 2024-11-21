@@ -1,0 +1,15 @@
+MODULE MultiLogger;
+	IMPORT Streams, TextUtilities, Strings, WMComponents, WMEditors, WMGraphics, WMStandardComponents, WM := WMWindowManager;
+TYPE 
+	LogWindow* = OBJECT {EXCLUSIVE} (WMComponents.FormWindow)
+	VAR 
+		panel: WMStandardComponents.Panel; 
+		out-: WMEditors.Editor; 
+		tw-: TextUtilities.TextWriter; 
+		open: BOOLEAN; 
+
+		PROCEDURE ^  & New*(CONST title: ARRAY OF CHAR; VAR stream: Streams.Writer); 
+		PROCEDURE ^ {OVERRIDE} Close*; 
+	END LogWindow; 
+BEGIN
+END MultiLogger.
