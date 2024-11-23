@@ -1,8 +1,0 @@
-MODULE DependencyWalker;
-	IMPORT Commands, Diagnostics, Files, Options, Streams, FoxBasic, FoxGlobal, FoxParser, FoxScanner, FoxSyntaxTree;
-CONST 
-
-	PROCEDURE ^ Process(CONST moduleName, definitions, fileExtension: ARRAY OF CHAR; diagnostics: Diagnostics.Diagnostics; writer: Streams.Writer): BOOLEAN; 
-	PROCEDURE ^ Walk*(context: Commands.Context); 
-BEGIN
-END DependencyWalker.

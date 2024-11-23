@@ -1,7 +1,0 @@
-MODULE EFITrace;
-	IMPORT EFI, Trace;
-
-	PROCEDURE ^ Char(char: CHAR); 
-	PROCEDURE ^ Color(color: SIGNED8); 
-BEGIN
-END EFITrace.

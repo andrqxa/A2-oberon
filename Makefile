@@ -1,6 +1,6 @@
 # Define variables
 # TARGETS := Linux64 Linux32 LinuxARM Win32 Win64
-TARGETS := Linux64 #Linux32 LinuxARM Win32 Win64
+TARGETS := Linux64 #Linux64 Linux32 LinuxARM Win32 Win64
 CURRENT_DIR := $(shell pwd)
 CONFIGS := $(CURRENT_DIR)/configs
 DATA := $(CURRENT_DIR)/data
@@ -34,7 +34,7 @@ $(TARGETS): %: dirs
 	@mkdir -p $(BUILD_DIR)/$@
 
 	# Dynamic generate file content for each type of OS
-	@echo "Release.Build --build --path=bin/ $@ ~" > $(BUILD_DIR)/$@/dynamic.txt
+	@echo "Release.Build --build --exclude-packages=Applications GuiApplications Fun Testing Education Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts --path=bin/ $@ ~" > $(BUILD_DIR)/$@/dynamic.txt
 	@if [ "$@" = "Linux64" ] || [ "$@" = "Linux32" ] || [ "$@" = "LinuxARM" ]; then \
 		echo "Linker.Link -p=$@ --path=bin/" >> $(BUILD_DIR)/$@/dynamic.txt; \
 		cat $(BUILD_DIR)/$@/dynamic.txt $(CONFIGS)/moduleListLinux.txt > $(BUILD_DIR)/$@/combined.txt; \
