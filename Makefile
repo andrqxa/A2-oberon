@@ -34,7 +34,7 @@ $(TARGETS): %: dirs
 	@mkdir -p $(BUILD_DIR)/$@
 
 	# Dynamic generate file content for each type of OS
-	@echo "Release.Build --build --exclude-packages=Applications GuiApplications Fun Testing Education Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts --path=bin/ $@ ~" > $(BUILD_DIR)/$@/dynamic.txt
+	@echo "Release.Build --build --path=bin/ $@ ~" > $(BUILD_DIR)/$@/dynamic.txt
 	@if [ "$@" = "Linux64" ] || [ "$@" = "Linux32" ] || [ "$@" = "LinuxARM" ]; then \
 		echo "Linker.Link -p=$@ --path=bin/" >> $(BUILD_DIR)/$@/dynamic.txt; \
 		cat $(BUILD_DIR)/$@/dynamic.txt $(CONFIGS)/moduleListLinux.txt > $(BUILD_DIR)/$@/combined.txt; \
@@ -88,8 +88,8 @@ $(TARGETS): %: dirs
 	
 # Removed generated files
 	@rm -f $(BUILD_DIR)/$@/dynamic.txt
-	# @rm -f $(BUILD_DIR)/$@/combined.txt
-	# @rm -f $(BUILD_DIR)/$@/oberonCompile.ini
+	@rm -f $(BUILD_DIR)/$@/combined.txt
+	@rm -f $(BUILD_DIR)/$@/oberonCompile.ini
 
 # Remove all generated files
 .PHONY: clean
