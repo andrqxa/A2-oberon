@@ -677,7 +677,7 @@ END MergeSort;
 
 
 
-PROCEDURE SortIndexed* (count: index;  VAR data: ARRAY OF real;  start: index;  VAR Index: ARRAY OF index);
+PROCEDURE SortIndexed* (count: index;  VAR data: ARRAY OF real;  start: index;  VAR Index: ARRAY OF SIGNED32);
 	(*= Natural Mergesort is used for indexed sorting *)
 	(*! PROCEDURE should be excluded, because there is a high risk of using it in a wrong way. SortTwoDepArrays could be used instead*)
 PROCEDURE NMergeIndexed (lo, hi: index);  (* Natural Mergesort *)
@@ -708,7 +708,7 @@ ELSE
 	END
 END;
 FOR h := l TO r DO
-	data[h] := hdata[h - l];  Index[h] := hindex[h - l] 	(* restore the sorted run *)
+	data[h] := hdata[h - l];  Index[h] := SIGNED32(hindex[h - l]) 	(* restore the sorted run *)
 END
 END MergeIndexed;
 
@@ -747,13 +747,13 @@ END SortIndexed;
 (*! add procedure based sorts if necessary *)
 PROCEDURE SortTwoDepArrays* (VAR reg, resp: ARRAY OF real);
 	VAR help: POINTER TO ARRAY OF real;
-	indicator: POINTER TO ARRAY OF index;
+	indicator: POINTER TO ARRAY OF SIGNED32;
 	i, len: index;
 BEGIN
 	len := LEN(reg);
 	NEW(indicator, len); NEW(help, len);
 	FOR i := 0 TO len - 1 DO
-		indicator[i] := i;
+		indicator[i] := SIGNED32(i);
 		help[i] := resp[i]
 	END;
 	SortIndexed(len, reg, 0, indicator^);

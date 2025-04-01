@@ -129,10 +129,10 @@ TYPE
 		END
 	END NumForm;
 
-	PROCEDURE NrNaNs*( data: vyBase.tData ): SIGNED32;
+	PROCEDURE NrNaNs*( data: vyBase.tData ): SIZE;
 	(*= structure form from SInt=4 to LReal=8 if  data can be read as a numeric vector; undef=0 else *)
 	BEGIN
-		IF NumForm( data ) = 0 THEN RETURN MAX( SIGNED32 ) END;
+		IF NumForm( data ) = 0 THEN RETURN MAX( SIZE ) END;
 		(*! not yet implemented*)
 	END NrNaNs;
 
@@ -211,7 +211,7 @@ END CollectReal;
 	(** Read/set from/to vector *)
 (*= Use cenversion if a save and reliable implementation is possible *)
 
-	PROCEDURE VGetR*( v: vyBase.tVector;  pos: SIGNED32 ): FLOAT32;
+	PROCEDURE VGetR*( v: vyBase.tVector;  pos: SIZE ): FLOAT32;
 	BEGIN
 		ASSERT ( v # NIL , 100 );
 		IF v IS vyIntVec.tVector THEN
@@ -408,7 +408,7 @@ END GetIndex;
 *)
 (** Minimum and maximum *)
 
-	PROCEDURE VGetMinMax*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE VGetMinMax*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIZE );
 	VAR imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
 	BEGIN
 		IF v = NIL THEN min := MIN( FLOAT64 );  max := MAX( FLOAT64 );  nrNaNs := 0;  RETURN END;
@@ -428,7 +428,7 @@ END GetIndex;
 		END
 	END VGetMinMax;
 
-	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: FLOAT32;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: FLOAT32;  VAR nrNaNs: SIZE );
 	(*! check. if ok: move this model to other variants *)
 	VAR xmin, xmax: FLOAT64;  imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
 	BEGIN
@@ -451,7 +451,7 @@ END GetIndex;
 		rmin := SHORT( xmin );  rmax := SHORT( xmax )
 	END VGetMinMaxR;
 
-	PROCEDURE VGetMinMaxX*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE VGetMinMaxX*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIZE );
 	VAR imin, imax: SIGNED16;  lmin, lmax: SIGNED32;  rmin, rmax: FLOAT64;
 	BEGIN
 		min := MAX( FLOAT64 );  max := MIN( FLOAT64 );  nrNaNs := 0;
@@ -472,7 +472,7 @@ END GetIndex;
 
 (** Dyadic operators *)
 	PROCEDURE Sub*( x, y: vyBase.tVector;  diff: vyBase.tVector );
-	VAR i: SIGNED32;  chx: vyBase.tBuf;
+	VAR i: SIZE;  chx: vyBase.tBuf;
 	BEGIN
 		IF (x.nrData) # (y.nrData) THEN diff.status := diff.status + {cBadLen} ELSE
 			IF diff = NIL THEN NEW( diff ) END;
@@ -611,7 +611,7 @@ END VectorType;
 	END Compatible;
 
 	PROCEDURE Summary*( VAR w: vyBase.TextsWriter;  v: vyBase.tData );
-	VAR i: SIGNED32;  min, max: FLOAT64;  nrNaNs: SIGNED32;
+	VAR i: SIGNED32;  min, max: FLOAT64;  nrNaNs: SIZE;
 	BEGIN
 		IF v IS vyBase.tVector THEN
 			IF v IS vyBase.tVector THEN
@@ -689,7 +689,7 @@ END VectorType;
 (** Conversion *)
 	PROCEDURE Short*( from: vyBase.tData ): vyBase.tData;
 	(*! speedup: use chunk structure *)
-	VAR fromv, v: vyBase.tVector;  i: SIGNED32;  len: SIGNED32;
+	VAR fromv, v: vyBase.tVector;  i: SIZE;  len: SIZE;
 	BEGIN
 		ASSERT ( from # NIL , 100 );
 		ASSERT ( (from IS vyBase.tVector), 101 );
@@ -710,7 +710,7 @@ END VectorType;
 	PROCEDURE Entier*( from: vyBase.tData;  offs, factor: FLOAT64 ): vyBase.tData;
 	(*= offs and factor are included to allow some scaling *)
 	(*! speedup: use chunk structure *)
-	VAR fromv, v: vyBase.tVector;  i: SIGNED32;  len: SIGNED32;
+	VAR fromv, v: vyBase.tVector;  i: SIZE;  len: SIZE;
 	BEGIN
 		ASSERT ( from # NIL , 100 );
 		ASSERT ( (from IS vyBase.tVector), 101 );
@@ -730,7 +730,7 @@ END VectorType;
 
 	PROCEDURE CvtReal*( src: vyBase.tData ): vyBase.tData;
 	(*= Convert any src to FLOAT32, if safe and reliable *)
-	VAR temp: vyBase.tData;  i: SIGNED32;  len: SIGNED32;  from, v: vyBase.tVector;
+	VAR temp: vyBase.tData;  i: SIZE;  len: SIZE;  from, v: vyBase.tVector;
 	BEGIN
 		ASSERT ( (src # NIL ), 100 );
 		ASSERT ( (src IS vyBase.tVector), 101 );
