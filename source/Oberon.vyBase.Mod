@@ -85,7 +85,7 @@ CONST
 
 TYPE
 	(*** Numeric Types *)
-	Index* = SIGNED32;      	(*= default type for counts, indices of arrays, and related purposes *)
+	Index* = SIZE;      	(*= default type for counts, indices of arrays, and related purposes *)
 	Real* = FLOAT64;      	(*= default type for numerics and 2d/3d graphics *)
 
 	(*** Access Types *)
@@ -201,7 +201,7 @@ TYPE
 		Do*: tActionProc;
 		failed-: BOOLEAN;              (*= If a pre-action failed, abort action chain and bail out.
 		Use Output for explicit status *)
-		todoCount-: SIGNED32;
+		todoCount-: SIZE;
 		preAction-: tAction;     		(* NIL, or an action which must be done, before this one can be invoked *)
 		TickDelta: SIGNED32;     	(* NIL, or an action which must be done, before this one can be invoked *)
 		termination: tAction;
@@ -308,8 +308,8 @@ TYPE
 	tBuf* = POINTER TO tBufDesc;
 	tBufDesc* = RECORD
 		str* : OPTStruct;
-		len* : SIGNED32;       (*= Nr of entries allocated to a chunk. aka  LEN. This is the buffer capacity. *)
-		usedentries* : SIGNED32;       (*= Nr of used entries in a chunk. >=0  *)
+		len* : SIZE;       (*= Nr of entries allocated to a chunk. aka  LEN. This is the buffer capacity. *)
+		usedentries* : SIZE;       (*= Nr of used entries in a chunk. >=0  *)
 		aux* : tBuf;       (*= auxiliary pointer, to hold case nrs for indexed sort *)
 		cache* : tCache;       (*= cached information, such as min, max *)
 		next* : tBuf
@@ -322,7 +322,7 @@ TYPE
 	conventions, or transposed, following FORTRAN conventions *)
 	(*= tLayout will be changed to use OPTStruct. *)
 	tLenArray* = POINTER TO tLenArrayDesc;
-	tLenArrayDesc = ARRAY OF SIGNED32;
+	tLenArrayDesc = ARRAY OF SIZE;
 	tLayout* = POINTER TO tLayoutDesc;
 	tLayoutDesc* = RECORD
 		(*! defunct. replace by type struct *)
@@ -343,7 +343,7 @@ TYPE
 	tVector* = POINTER TO tVectorDesc;
 	tVectorDesc* = RECORD (tDataDesc)
 		Layout*: tLayout;      	(* NIL = vector *)
-		nrData*: SIGNED32;
+		nrData*: SIZE;
 		buf*: tBuf
 	END;
 
@@ -454,7 +454,7 @@ VAR
 	currentThread-: 	tThread;      	(* add objects to this thread. Must not be NIL! *)
 	lastThread-: 	tThread;      	(* add threads here. Must not be NIL!  *)
 	Trash-: 	tThread;      	(* defunct objects - cleaned by GC *)
-	objcount-: 	SIGNED32;         (* for unique id *)
+	objcount-: 	SIZE;         (* for unique id *)
 	objecthandle*: 	Objects.Handler;      	(* may be used if no handler is installed.
 	Default:objecthandle := ObjectHandler;  *)
 	framehandle*: Objects.Handler;   (* may be used if no handler is installed.
@@ -486,7 +486,7 @@ END AppendToLog;
 
 
 (*** Base Procedures *)
-PROCEDURE NextIdCount (): SIGNED32;
+PROCEDURE NextIdCount (): SIZE;
 BEGIN INC(objcount);       RETURN objcount
 END NextIdCount;
 
@@ -553,7 +553,7 @@ BEGIN IF ob = NIL THEN Texts.WriteString(w, '<NIL>')
 	ELSE
 		Texts.Write(w, '[');       Texts.WriteHex(w, ob.ObjectId);      Texts.Write(w, ']');
 		IF ob IS tThread THEN Texts.Write(w, '*') ELSE Texts.Write(w, ' ') END;
-		Texts.WriteHex(w, vyHost.Addr(ob));   Texts.WriteString(w, 'H ');
+		Texts.WriteHex(w, SIGNED32(vyHost.Addr(ob)));   Texts.WriteString(w, 'H ');
 		Texts.WriteDate(w, ob.createdT, ob.createdD);
 		IF 	(ob.createdT # ob.modifiedT) OR	(ob.createdD # ob.modifiedD) THEN
 			Texts.WriteDate(w, ob.modifiedT, ob.modifiedD)
@@ -565,7 +565,7 @@ BEGIN IF ob = NIL THEN Texts.WriteString(w, '<NIL>')
 			IF  link.obj IS Object THEN
 				Texts.Write(w, '[');       Texts.WriteHex(w, link.obj(Object).ObjectId);      Texts.Write(w, ']')
 			END;
-			Texts.WriteHex(w, vyHost.Addr(link.obj));   Texts.WriteString(w, 'H ');
+			Texts.WriteHex(w, SIGNED32(vyHost.Addr(link.obj)));   Texts.WriteString(w, 'H ');
 			link := link.link
 		END;   Texts.WriteLn(w);
 		Texts.Write(w, 09X);   Texts.WriteString(w, 'sources:');
@@ -574,7 +574,7 @@ BEGIN IF ob = NIL THEN Texts.WriteString(w, '<NIL>')
 			IF  link.obj IS Object THEN
 				Texts.Write(w, '[');       Texts.WriteHex(w, link.obj(Object).ObjectId);      Texts.Write(w, ']')
 			END;
-			Texts.WriteHex(w, vyHost.Addr(link.obj));   Texts.WriteString(w, 'H ');
+			Texts.WriteHex(w, SIGNED32(vyHost.Addr(link.obj)));   Texts.WriteString(w, 'H ');
 			link := link.link
 		END;   Texts.WriteLn(w)
 	END
@@ -636,7 +636,7 @@ PROCEDURE register* (ob: Object);       (*vs 0.1d1 set id, create and update tim
 	VAR l: vyLinks.Link;
 BEGIN ASSERT(ob # NIL);
 	(*vyHost.StackFrame('Register');*)
-	ob.ObjectId := NextIdCount();
+	ob.ObjectId := SIGNED32(NextIdCount());
 	ob.Name := NIL;
 	ob.cache := NIL;
 	Update(ob);
@@ -862,7 +862,7 @@ PROCEDURE CopyObject* (VAR M: Objects.CopyMsg;     src, dest: Object);      (*vs
 BEGIN
 	dest := src;
 	Gadgets.CopyObject(M, src, dest);
-	dest.ObjectId := NextIdCount();
+	dest.ObjectId := SIGNED32(NextIdCount());
 	IF M.id = Objects.deep THEN
 		dest.cache := NIL;
 		(*! add more if appropriate *)
@@ -1436,7 +1436,7 @@ BEGIN
 		IF M.id = Objects.get THEN
 			IF M.name = "Gen"THEN
 				COPY('vyBase.NewVec', M.s);     M.class := Objects.String;      M.res := 0
-			ELSIF M.name = "nrData"THEN  M.i := obj.nrData;    M.class := Objects.Int;      M.res := 0
+			ELSIF M.name = "nrData"THEN  M.i := SIGNED32(obj.nrData);    M.class := Objects.Int;      M.res := 0
 
 			ELSE
 				DataHandler(obj, M)
@@ -1475,7 +1475,7 @@ BEGIN
 END NewVec;
 
 (** Low level buffer routines for chunked data *)
-PROCEDURE FindAllocLen* (v: tVector;      VAR l, freetrail: SIGNED32;      VAR firstfree: tBuf);
+PROCEDURE FindAllocLen* (v: tVector;      VAR l, freetrail: SIZE;      VAR firstfree: tBuf);
 	(* find total allocated len and number of trailing free entries. firstfree is the first chunk containing trailing free entries*)
 	VAR chunk: tBuf;
 BEGIN l := 0;      freetrail := 0;      firstfree := NIL;
@@ -1492,9 +1492,9 @@ BEGIN l := 0;      freetrail := 0;      firstfree := NIL;
 END FindAllocLen;
 
 (*?usedentries needs strict control. *)
-PROCEDURE MarkUsed* (count: SIGNED32;      v: tVector);
+PROCEDURE MarkUsed* (count: SIZE;      v: tVector);
 	(*= risky mark routine. only sets the used counts. no fields are updated *)
-	VAR last: tBuf;      l, free, needed, get: SIGNED32;
+	VAR last: tBuf;      l, free, needed, get: SIZE;
 BEGIN
 	IF v.nrData < 0 THEN v.nrData := 0 END;
 	IF count <= v.nrData THEN needed := 0;      v.nrData := count;
@@ -1520,10 +1520,10 @@ BEGIN
 	END
 END MarkUsed;
 
-PROCEDURE Loc* (i: SIGNED32;       v:  tVector;       VAR chunk: tBuf;       VAR loc: SIGNED32);
+PROCEDURE Loc* (i: SIZE;       v:  tVector;       VAR chunk: tBuf;       VAR loc: SIZE);
 	(*= (external world) pos i to internal storage chunk location loc. If space is allocated for element i, chunk reference and location are returned.
 	If i is beyond allocation, the last chunk reference is returned with loc<0; -loc more elements needed *)
-PROCEDURE getChunkLoc (pos: SIGNED32;       chunkstart: SIGNED32;       VAR chunk: tBuf;       VAR loc: SIGNED32);
+PROCEDURE getChunkLoc (pos: SIZE;       chunkstart: SIZE;       VAR chunk: tBuf;       VAR loc: SIZE);
 BEGIN 	loc := pos - chunkstart;
 	WHILE (chunk # NIL) & (loc >= chunk.usedentries) DO
 		IF chunk.next # NIL THEN
@@ -1541,10 +1541,10 @@ BEGIN	ASSERT((v # NIL) & (v.buf # NIL) );    (* gs 20001118 *)
 	getChunkLoc(i, 0, chunk, loc)
 END Loc;
 
-PROCEDURE Pos* (v:  tVector;        chunk: tBuf;        loc: SIGNED32): SIGNED32;
+PROCEDURE Pos* (v:  tVector;        chunk: tBuf;        loc: SIZE): SIZE;
 	(*= internal storage chunk location to (external world) pos*)
-PROCEDURE getPos (chunkstart: SIGNED32;      curchunk: tBuf;      chunk: tBuf;       loc: SIGNED32): SIGNED32;
-	VAR pos: SIGNED32;
+PROCEDURE getPos (chunkstart: SIZE;      curchunk: tBuf;      chunk: tBuf;       loc: SIZE): SIZE;
+	VAR pos: SIZE;
 BEGIN 	pos := chunkstart;
 	WHILE (chunk # curchunk) &  (curchunk.next # NIL)  DO
 	INC(pos, curchunk.usedentries);       curchunk := curchunk.next END;
@@ -1558,7 +1558,7 @@ END Pos;
 (** Abstract variable types *)
 
 (** Enquiry Routines *)
-PROCEDURE Len* (v: tData;      dim: SIGNED16): SIGNED32;
+PROCEDURE Len* (v: tData;      dim: SIGNED16): SIZE;
 	(*! should work for any data structure which has a matrix representation *)
 BEGIN
 	IF v IS tVector THEN WITH
@@ -1596,7 +1596,7 @@ END CloneLayout;
 (*! This procedure must already be available in the compiler.
 PROCEDURE SequentialPos* (layout:tLayout; indices: ARRAY OF Index):Index;
 (*= Calculate sequential offset for indices, taking dimensions and transposed from layout*)
-VAR i:SIGNED32;tempindex,prevsize:SIGNED32;
+VAR i:SIZE;tempindex,prevsize:SIZE;
 BEGIN
 ASSERT(LEN(indices)>=layout.dim,100);i:=layout.dim-1;
 prevsize.len[i]:=layout.; tempindex:=indices[i];
@@ -1606,7 +1606,7 @@ END SequentialPos;
 (** Index calculation - linear storage for matrices *)
 PROCEDURE VecIndex* (VAR lens, indices: ARRAY OF Index): Index;
 	(*! check *)
-	VAR i: SIGNED32;     tempindex: Index;     prevsize: SIGNED32;
+	VAR i: SIZE;     tempindex: Index;     prevsize: SIZE;
 BEGIN
 	tempindex := indices[0];      prevsize := lens[0];
 	FOR i := 1 TO LEN(lens) - 1 DO
@@ -1617,7 +1617,7 @@ END VecIndex;
 
 PROCEDURE VecIndexT* (VAR lens, indices: ARRAY OF Index): Index;
 	(*! check *)
-	VAR i: SIGNED32;     tempindex: Index;     l, prevsize: SIGNED32;
+	VAR i: SIZE;     tempindex: Index;     l, prevsize: SIZE;
 BEGIN l := LEN(lens) - 1;
 	tempindex := indices[l];      prevsize := lens[l];
 	FOR i := l TO 0 BY - 1 DO
@@ -1640,7 +1640,7 @@ END VecIndex2T;
 
 (** Housekeeping - used internally only *)
 
-PROCEDURE GC* (count: SIGNED32;       v: tData;       pos: SIGNED32);
+PROCEDURE GC* (count: SIZE;       v: tData;       pos: SIZE);
 	(*= Do internal garbage collection on v. Do not destroy any valid data. *)
 	(*! interface to be specified *)
 	VAR oldchunk, chunk:  tBuf;
@@ -1681,12 +1681,12 @@ BEGIN WITH src: tVector DO
 	END
 END DoToAllChunks;
 
-PROCEDURE Piece* (VAR count: SIGNED32;
-src: tVector;      srcpos: SIGNED32;
-dest: tVector;      destpos: SIGNED32;
-VAR piececount: SIGNED32;
-VAR srcchunk: tBuf;      VAR srcloc: SIGNED32;
-VAR destchunk: tBuf;      VAR destloc: SIGNED32);
+PROCEDURE Piece* (VAR count: SIZE;
+src: tVector;      srcpos: SIZE;
+dest: tVector;      destpos: SIZE;
+VAR piececount: SIZE;
+VAR srcchunk: tBuf;      VAR srcloc: SIZE;
+VAR destchunk: tBuf;      VAR destloc: SIZE);
 	(*= Find intersection of requested count that fits into src and dest *)
 BEGIN
 	Loc(srcpos, src, srcchunk, srcloc);      ASSERT(srcloc >= 0);
@@ -1698,11 +1698,11 @@ BEGIN
 	count := count - piececount
 END Piece;
 
-PROCEDURE DoToAllPieces* (src, dest: tData;       action: PROCEDURE (VAR piececount: SIGNED32;
-VAR srcchunk: tBuf;      VAR srcloc: SIGNED32;
-VAR destchunk: tBuf;      VAR destloc: SIGNED32));
+PROCEDURE DoToAllPieces* (src, dest: tData;       action: PROCEDURE (VAR piececount: SIZE;
+VAR srcchunk: tBuf;      VAR srcloc: SIZE;
+VAR destchunk: tBuf;      VAR destloc: SIZE));
 	(*= Iterate an action through all pieces of two vectors. Vectors must be of same size *)
-	VAR  srcchunk, destchunk:  tBuf;      oldcount, piececount, count, offs, srcoffs, destoffs: SIGNED32;
+	VAR  srcchunk, destchunk:  tBuf;      oldcount, piececount, count, offs, srcoffs, destoffs: SIZE;
 BEGIN WITH src: tVector DO WITH dest: tVector DO
 			ASSERT(src.nrData = dest.nrData, 100);       offs := 0;      count := dest.nrData;
 			WHILE count > 0 DO oldcount := count;
@@ -1714,7 +1714,7 @@ BEGIN WITH src: tVector DO WITH dest: tVector DO
 END DoToAllPieces;
 
 PROCEDURE ApndChunks* (chunk: tBuf;      o: tVector);
-	VAR temp: tBuf;       count: SIGNED32;
+	VAR temp: tBuf;       count: SIZE;
 BEGIN 	count := 0;       temp := chunk;
 	WHILE temp # NIL DO count := count + temp.usedentries;       temp := temp.next   END;
 	IF o.buf = NIL THEN o.buf := chunk;      o.nrData := count
@@ -1780,7 +1780,7 @@ BEGIN
 	INCL(arg1.status, cNotYetImplemented)
 END HandletOp3;
 
-PROCEDURE GenericCatBuf* (ch: tBuf;       len: SIGNED32;       VAR size: SIGNED32;        VAR first, last: tBuf);
+PROCEDURE GenericCatBuf* (ch: tBuf;       len: SIZE;       VAR size: SIZE;        VAR first, last: tBuf);
 BEGIN
 	ch.usedentries := 0;        ch.len := len;        ch.next := NIL;        size := size - len;
 	IF first = NIL THEN first := ch;        last := ch ELSE last.next := ch;        last := ch END
@@ -1791,17 +1791,17 @@ BEGIN
 	IF c = NIL THEN RETURN NIL ELSE RETURN c.next END
 END NextBuf;
 
-PROCEDURE GetUsedEntries* (c: tBuf): SIGNED32 ;
-	VAR len: SIGNED32;
+PROCEDURE GetUsedEntries* (c: tBuf): SIZE ;
+	VAR len: SIZE;
 BEGIN len := 0;        WHILE(c # NIL) DO INC(len, c.usedentries);        c := NextBuf(c)   END;        RETURN len
 END GetUsedEntries;
 
-PROCEDURE MatrixLayout* (rows, columns: SIGNED32): tArray;
+PROCEDURE MatrixLayout* (rows, columns: SIZE): tArray;
 	VAR l: tArray;
 BEGIN NEW(l);       l.dim := 2;       l.transposed := FALSE;       l.lens[0] := rows;       l.lens[1] := columns;        RETURN l
 END MatrixLayout;
 
-PROCEDURE SetArrayLayout* (sizes: ARRAY OF SIGNED32;       v: tVector;       VAR total: SIGNED32);
+PROCEDURE SetArrayLayout* (sizes: ARRAY OF SIZE;       v: tVector;       VAR total: SIZE);
 	VAR l: tArray;       i, dim: SIGNED16;
 BEGIN
 	NEW(l);       i := 0;        WHILE ( i < LEN(sizes)) & (sizes[i] # 0) DO INC(i) END;
@@ -1823,7 +1823,7 @@ BEGIN
 	END
 END Clear;
 (*
-PROCEDURE HexToStr (pre:ARRAY OF CHAR;i: SIGNED32; VAR s: ARRAY OF CHAR);
+PROCEDURE HexToStr (pre:ARRAY OF CHAR;i: SIZE; VAR s: ARRAY OF CHAR);
 VAR k, j, c: SIGNED16; a: ARRAY 10 OF CHAR;
 BEGIN
 j := 0;
@@ -2070,67 +2070,67 @@ END RunAction;
 (*= tentatively fail safe and efficient copy routines. *)
 
 
-PROCEDURE COPYB* (VAR src: ARRAY OF BOOLEAN;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF BOOLEAN;     destoffs: SIGNED32);
+PROCEDURE COPYB* (VAR src: ARRAY OF BOOLEAN;      srcoffs, len: SIZE;
+VAR dest: ARRAY OF BOOLEAN;     destoffs: SIZE);
 CONST sz = SIZEOF(BOOLEAN);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
-	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
+	ASSERT((len >= 0) & (len < (MAX(SIZE) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYB;
 
-PROCEDURE COPYCHAR* (VAR src: ARRAY OF CHAR;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF CHAR;     destoffs: SIGNED32);
+PROCEDURE COPYCHAR* (VAR src: ARRAY OF CHAR;      srcoffs, len: SIZE;
+VAR dest: ARRAY OF CHAR;     destoffs: SIZE);
 CONST sz = SIZEOF(CHAR);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
-	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
+	ASSERT((len >= 0) & (len < (MAX(SIZE) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYCHAR;
 
-PROCEDURE COPYSHORT* (VAR src: ARRAY OF SIGNED8;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF SIGNED8;     destoffs: SIGNED32);
+PROCEDURE COPYSHORT* (VAR src: ARRAY OF SIGNED8;      srcoffs, len: SIZE;
+VAR dest: ARRAY OF SIGNED8;     destoffs: SIZE);
 CONST sz = SIZEOF(SIGNED8);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
-	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
+	ASSERT((len >= 0) & (len < (MAX(SIZE) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYSHORT;
 
-PROCEDURE COPYI* (VAR src: ARRAY OF SIGNED16;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF SIGNED16;     destoffs: SIGNED32);
+PROCEDURE COPYI* (VAR src: ARRAY OF SIGNED16;      srcoffs, len: SIZE;
+VAR dest: ARRAY OF SIGNED16;     destoffs: SIZE);
 CONST sz = SIZEOF(SIGNED16);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
-	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
+	ASSERT((len >= 0) & (len < (MAX(SIZE) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYI;
 
-PROCEDURE COPYL* (VAR src: ARRAY OF SIGNED32;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF SIGNED32;     destoffs: SIGNED32);
+PROCEDURE COPYL* (VAR src: ARRAY OF SIGNED32;      srcoffs, len: SIZE;
+VAR dest: ARRAY OF SIGNED32;     destoffs: SIZE);
 CONST sz = SIZEOF(SIGNED32);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
-	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
+	ASSERT((len >= 0) & (len < (MAX(SIZE) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYL;
 
-PROCEDURE COPYR* (VAR src: ARRAY OF FLOAT32;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF FLOAT32;     destoffs: SIGNED32);
+PROCEDURE COPYR* (VAR src: ARRAY OF FLOAT32;      srcoffs, len: SIZE;
+VAR dest: ARRAY OF FLOAT32;     destoffs: SIZE);
 CONST sz = SIZEOF(FLOAT32);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
-	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
+	ASSERT((len >= 0) & (len < (MAX(SIZE) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYR;
 
-PROCEDURE COPYX* (VAR src: ARRAY OF FLOAT64;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF FLOAT64;     destoffs: SIGNED32);
+PROCEDURE COPYX* (VAR src: ARRAY OF FLOAT64;      srcoffs, len: SIZE;
+VAR dest: ARRAY OF FLOAT64;     destoffs: SIZE);
 CONST sz = SIZEOF(FLOAT64);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
-	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
+	ASSERT((len >= 0) & (len < (MAX(SIZE) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYX;
 
-PROCEDURE COPYSET* (VAR src: ARRAY OF SET;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF SET;     destoffs: SIGNED32);
+PROCEDURE COPYSET* (VAR src: ARRAY OF SET;      srcoffs, len: SIZE;
+VAR dest: ARRAY OF SET;     destoffs: SIZE);
 CONST sz = SIZEOF(SET);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
-	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
+	ASSERT((len >= 0) & (len < (MAX(SIZE) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYSET;
 PROCEDURE CallWString* (caller, name, pars: ARRAY OF CHAR;    new: BOOLEAN;    VAR res: SIGNED16);

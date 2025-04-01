@@ -494,8 +494,14 @@ TYPE
 
 			D.String("spill stack used in "); Basic.WriteSegmentedName(D.Log, in.name); D.String(": "); D.Int(inPC,1); D.Ln;
 
+			
+			offset :=  ticket.offset+spillStackPosition; (* relative to stack pointer ! *)
+			register := PhysicalRegister(IntermediateCode.SP,Low,offset); 
+			
+			(*
 			offset :=  spillStackPosition-ticket.offset; (* relative to logical frame pointer ! *)
 			register := PhysicalRegister(IntermediateCode.FP,Low,offset);
+			*)
 			instructionSet.InitMemory(mem, register, offset);
 		END GetSpillOperand;
 
@@ -741,7 +747,7 @@ TYPE
 					ImmediateToOperand(size,Low,FALSE,instructionSet.ImmediateFixupBits,sizeOperand)
 				END;
 				Emit2(opSUB, opSP, sizeOperand);
-				IF updateStackSize THEN INC(stackSize, size) END;
+				IF updateStackSize THEN INC(stackSize, size); INC(spillStackPosition,size); END;
 			ELSIF size < 0 THEN
 				size := -size;
 				IF size < ASH(1,instructionSet.ImmediateFixupBits) THEN
@@ -750,7 +756,7 @@ TYPE
 					ImmediateToOperand(size,Low, FALSE, instructionSet.ImmediateFixupBits,sizeOperand);
 				END;
 				Emit2(opADD, opSP, sizeOperand);
-				IF updateStackSize THEN DEC(stackSize, size) END;
+				IF updateStackSize THEN DEC(stackSize, size); DEC(spillStackPosition,size); END;
 			END;
 			inStackAllocation := FALSE;
 		END AllocateStack;
@@ -774,9 +780,13 @@ TYPE
 				spilln <-- SP
 			*)
 			cc := SHORT(instr.op1.intValue);
+			(*
 			spillStackPosition := - SIGNED32(instr.op2.intValue)-1; (* relative to logical frame pointer ! *)
+			*)
+			
 			AllocateStack(SIGNED32(instr.op2.intValue+spillStack.MaxSize()), TRUE);
-		END EmitEnter;
+			spillStackPosition := 0; 
+		END EmitEnter;
 
 		PROCEDURE EmitLeave(CONST instr: IntermediateCode.Instruction);
 		BEGIN
@@ -793,6 +803,7 @@ TYPE
 			Emit2(opLD, opLR, mem);
 			AllocateStack(-1,FALSE);
 			Emit1(opBR, opLR);
+			spillStackPosition := 0;
 		END EmitExit;
 
 		PROCEDURE ResultRegister(part: SIGNED32): InstructionSet.Operand;

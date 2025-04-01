@@ -86,7 +86,7 @@ TYPE
 	real = FLOAT32; (* technical convenience, to avoid duplicate code for FLOAT32 and FLOAT64 *)
 
 
-	index = SIGNED32;
+	index = SIZE;
 	tOp1* = PROCEDURE (VAR arg: real);
 	tOp2* = PROCEDURE (VAR arg1: real;  arg2: real);
 	tOp3* = PROCEDURE (VAR arg1: real;  arg2, arg3: real);
@@ -443,19 +443,19 @@ BEGIN
 	BEGIN
 		(*! add implementations for non plain. form ignored so far *)
 		Files.WriteLInt(R, fmtplain);
-		Files.WriteLInt(R, start);
-		Files.WriteLInt(R, count);
+		Files.WriteLInt(R, SIGNED32(start));
+		Files.WriteLInt(R, SIGNED32(count));
 		Write(R, count, x, start);
 		Files.WriteLInt(R, fmtend)
 	END WriteFmt;
 
 PROCEDURE ReadFmt* (VAR form: SIGNED32; VAR R: Files.Rider;  count: index;  VAR x: ARRAY OF real;  start: index);
-	VAR stop: SIGNED32;
+	VAR stop,t: SIGNED32;
 BEGIN
 	(*! add implementations for non plain. form ignored so far *)
 	Files.ReadLInt(R, form);
-	Files.ReadLInt(R, start);
-	Files.ReadLInt(R, count);
+	Files.ReadLInt(R, t);start := t;
+	Files.ReadLInt(R, t);count := t;
 	Read(R, count, x, start);
 	Files.ReadLInt(R, stop);  ASSERT(stop = fmtend, 100)
 END ReadFmt;
@@ -680,7 +680,7 @@ END MergeSort;
 
 
 
-PROCEDURE SortIndexed* (count: index;  VAR data: ARRAY OF real;  start: index;  VAR Index: ARRAY OF index);
+PROCEDURE SortIndexed* (count: index;  VAR data: ARRAY OF real;  start: index;  VAR Index: ARRAY OF SIGNED32);
 	(*= Natural Mergesort is used for indexed sorting *)
 	(*! PROCEDURE should be excluded, because there is a high risk of using it in a wrong way. SortTwoDepArrays could be used instead*)
 PROCEDURE NMergeIndexed (lo, hi: index);  (* Natural Mergesort *)
@@ -711,7 +711,7 @@ ELSE
 	END
 END;
 FOR h := l TO r DO
-	data[h] := hdata[h - l];  Index[h] := hindex[h - l] 	(* restore the sorted run *)
+	data[h] := hdata[h - l];  Index[h] := SIGNED32(hindex[h - l]) 	(* restore the sorted run *)
 END
 END MergeIndexed;
 
@@ -750,13 +750,13 @@ END SortIndexed;
 (*! add procedure based sorts if necessary *)
 PROCEDURE SortTwoDepArrays* (VAR reg, resp: ARRAY OF real);
 	VAR help: POINTER TO ARRAY OF real;
-	indicator: POINTER TO ARRAY OF index;
+	indicator: POINTER TO ARRAY OF SIGNED32;
 	i, len: index;
 BEGIN
 	len := LEN(reg);
 	NEW(indicator, len); NEW(help, len);
 	FOR i := 0 TO len - 1 DO
-		indicator[i] := i;
+		indicator[i] := SIGNED32(i);
 		help[i] := resp[i]
 	END;
 	SortIndexed(len, reg, 0, indicator^);

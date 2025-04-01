@@ -33,7 +33,7 @@ CONST
 
 TYPE
 	integer* = SIGNED32;
-	index* = SIGNED32;
+	index* = SIZE;
 
 	(* SIGNED32 *)
 	tVector* = POINTER TO tVectorDesc;
@@ -42,12 +42,12 @@ TYPE
 	tLONGINTDesc* = RECORD (vyBase.tDataDesc) i*: SIGNED32 END;
 	tMinMaxCache = POINTER TO tMinMaxCacheDesc;
 	tMinMaxCacheDesc = RECORD (vyBase.tCacheDesc)
-		min, max: integer;  minpos, maxpos, nans: SIGNED32;    	(*convenience. Valid if nans>=0 *)
+		min, max: integer;  minpos, maxpos, nans: SIZE;    	(*convenience. Valid if nans>=0 *)
 	END;
 	tMeanCache = POINTER TO tMeanCacheDesc;
 	tMeanCacheDesc = RECORD (vyBase.tCacheDesc)
 		mean, ssq: FLOAT64;     	(* Valid if nans>=0 & ssq>=0 *)
-		nans: SIGNED32
+		nans: SIZE
 	END;
 
 	tBuf* = POINTER TO tBufDesc;
@@ -132,7 +132,7 @@ END BufMean;
 PROCEDURE NewBufs* (size: index): tBuf;
 	VAR first, last: vyBase.tBuf;
 	chunk: tBuf;
-PROCEDURE generic (ch: tBuf;      len: SIGNED32);
+PROCEDURE generic (ch: tBuf;      len: SIZE);
 BEGIN NEW(ch.data, len);    ch.str := vyBase.dynlrlarray; 	ch.cache := NIL;
 	vyBase.GenericCatBuf(ch, len, size, first, last)
 END generic;
@@ -155,12 +155,12 @@ VAR
 	i: index;
 
 BEGIN
-	Files.WriteLInt(R, o.nrData);
+	Files.WriteLInt(R, SIGNED32(o.nrData));
 	b := o.buf(tBuf);
 	WHILE b # NIL DO
 		IF b.usedentries > 0 THEN
-			Files.WriteLInt(R, b.len);
-			Files.WriteLInt(R, b.usedentries);
+			Files.WriteLInt(R, SIGNED32(b.len));
+			Files.WriteLInt(R, SIGNED32(b.usedentries));
 			i := 0;
 			WHILE i < b.usedentries DO Files.WriteLInt(R, b.data[i]);  INC(i) END
 		END;  (*IF*)
@@ -185,8 +185,8 @@ PROCEDURE Load0 (VAR R: Files.Rider;  o: tVector);
 
 VAR
 	b: tBuf;
-	i, c: index;
-
+	i: index;
+	c: SIGNED32;
 BEGIN
 	Files.ReadLInt(R, c);
 	o.nrData := c;
@@ -304,7 +304,7 @@ BEGIN
 END SetNrData;
 
 
-PROCEDURE New* (size: SIGNED32): tVector;
+PROCEDURE New* (size: SIZE): tVector;
 BEGIN	Gen;   vyBase.ApndChunks( NewBufs(size), newv);    vyBase.MarkUsed(size, newv); RETURN newv
 END New;
 
@@ -324,7 +324,7 @@ BEGIN	Gen;   vyBase.ApndChunks( NewBufs(rows * columns), newv);
 	RETURN newv
 END NewLongintMatrix;
 
-PROCEDURE NewConstVector* (size: SIGNED32; val: integer): vyBase.tVector;
+PROCEDURE NewConstVector* (size: SIZE; val: integer): vyBase.tVector;
 	VAR v: vyBase.tVector; buf: vyBase.tBuf;
 BEGIN	v := New(size);
 	buf := v(tVector).buf;
@@ -342,7 +342,7 @@ PROCEDURE Allocate* (vec: vyBase.tVector;   size: index);
 	(*=  allocate memory for a vector. Do not change information.
 	To reduce size, use SetLen first to trim length
 	*)
-	VAR l, freetrail: SIGNED32;  VAR firstfree: vyBase.tBuf;
+	VAR l, freetrail: SIZE;  VAR firstfree: vyBase.tBuf;
 BEGIN ASSERT(size >= vec.nrData);
 	GC(vec); vyBase.FindAllocLen(vec, l, freetrail, firstfree);
 	IF size > l THEN
@@ -356,13 +356,13 @@ BEGIN
 	vyBase.MarkUsed(size, vec); FlushVecCaches(vec)
 END SetLen;
 
-PROCEDURE Len* (vec: vyBase.tVector): SIGNED32;
+PROCEDURE Len* (vec: vyBase.tVector): SIZE;
 	(*= get total vector length *)
 BEGIN IF vec = NIL THEN RETURN 0 ELSE RETURN vec.nrData END
 END Len;
 
-PROCEDURE NewLongintArray* (sizes: ARRAY OF SIGNED32): vyBase.tVector;
-	VAR size: SIGNED32;
+PROCEDURE NewLongintArray* (sizes: ARRAY OF SIZE): vyBase.tVector;
+	VAR size: SIZE;
 BEGIN Gen;   vyBase.SetArrayLayout(sizes, newv, size);   vyBase.ApndChunks( NewBufs(size), newv);    RETURN newv
 END NewLongintArray;
 
@@ -379,7 +379,7 @@ END NewAlikeVector;
 PROCEDURE Append* (x: SIGNED32;    v: vyBase.tVector);
 	(* Add a data point to a chunk. Append new chunk if necessary *)
 	(*! defensive programming *)
-	VAR l: SIGNED32;    chunk: tBuf;
+	VAR l: SIZE;    chunk: tBuf;
 BEGIN (* find entry which is not full *)
 	IF v.buf = NIL THEN v.buf := NewBufs(1)   END;
 	chunk := v.buf(tBuf);
@@ -396,16 +396,16 @@ BEGIN (* find entry which is not full *)
 	INC(v.nrData)
 END Append;
 
-PROCEDURE Get* (v: vyBase.tVector;   pos: SIGNED32): SIGNED32;
+PROCEDURE Get* (v: vyBase.tVector;   pos: SIZE): SIGNED32;
 	VAR chunk: vyBase.tBuf;
-	loc: SIGNED32;
+	loc: SIZE;
 BEGIN
 	vyBase.Loc(pos, v, chunk, loc);   ASSERT(loc >= 0, 100); ASSERT (loc < chunk.usedentries, 101);  (* added jb 11.11.00 *)
 	RETURN chunk(tBuf).data[loc]
 END Get;
 
-PROCEDURE Set* (val: SIGNED32;   v: vyBase.tVector;   pos: SIGNED32);
-	VAR chunk: vyBase.tBuf;   loc: SIGNED32;
+PROCEDURE Set* (val: SIGNED32;   v: vyBase.tVector;   pos: SIZE);
+	VAR chunk: vyBase.tBuf;   loc: SIZE;
 BEGIN
 	IF pos >= v.nrData THEN  vyBase.MarkUsed(pos + 1, v) END;
 	vyBase.Loc(pos, v, chunk, loc);   ASSERT(loc >= 0);
@@ -449,7 +449,7 @@ BEGIN
 	END (*WITH*)
 END  SetIndexed;
 
-PROCEDURE GetMinMax* (v: vyBase.tVector;   VAR min, max: SIGNED32;   VAR nrNaNs: SIGNED32);
+PROCEDURE GetMinMax* (v: vyBase.tVector;   VAR min, max: SIGNED32;   VAR nrNaNs: SIZE);
 	(*
 	VAR buf:  tBuf;  minpos, maxpos: SIGNED32;
 	BEGIN min := MAX(SIGNED32);  max := MIN(SIGNED32);    buf := v.buf( tBuf);  nrNaNs := 0;
@@ -486,14 +486,14 @@ BEGIN min := MAX(integer);     max := MIN(integer);       buf := v.buf;     nrNa
 
 END GetMinMax;
 
-PROCEDURE GetMeanSsq* (v: vyBase.tVector;  VAR Mean, Ssq: FLOAT64;  VAR nrNaNs: SIGNED32);
+PROCEDURE GetMeanSsq* (v: vyBase.tVector;  VAR Mean, Ssq: FLOAT64;  VAR nrNaNs: SIZE);
 	(*! check handling of 0 len vectors! *)
 
 VAR
 	buf: vyBase.tBuf;
 	mmCache: tMeanCache;
 	MeanAdd, SsqAdd, Sum, SumAdd, temp, temp1: FLOAT64;
-	Count, CountAdd: SIGNED32;
+	Count, CountAdd: SIZE;
 
 BEGIN
 	buf := v.buf;
@@ -543,7 +543,7 @@ BEGIN
 END GetMeanSsq;
 
 PROCEDURE CopyToArray* (v: vyBase.tVector;    VAR A: ARRAY OF SIGNED32);
-	VAR offs: SIGNED32;    buf: vyBase.tBuf;
+	VAR offs: SIZE;    buf: vyBase.tBuf;
 BEGIN offs := 0;
 	ASSERT(v # NIL, 101);   ASSERT(LEN(A) >= v.nrData, 100);
 	buf := v.buf( tBuf);
@@ -557,7 +557,7 @@ END CopyToArray;
 (** Copy *)
 PROCEDURE CopyData* ( (*IN*)src, (*OUT*)dest: vyBase.tVector);
 	(*= copy the data section of a vector. Force dest to same len as src *)
-	VAR  srcchunk, destchunk:  vyBase.tBuf;   oldcount, piececount, count, offs, srcoffs, destoffs: SIGNED32;
+	VAR  srcchunk, destchunk:  vyBase.tBuf;   oldcount, piececount, count, offs, srcoffs, destoffs: SIZE;
 
 BEGIN
 	offs := 0;   count := src.nrData;
@@ -577,8 +577,8 @@ BEGIN
 	FlushVecCaches(dest);     	(*! remove. keep consistent on per buffer basis *)
 END CopyData;
 
-PROCEDURE CopyToVec* (VAR A: ARRAY OF SIGNED32;   v: vyBase.tVector;   len: SIGNED32;   srcoffs, destoffs: SIGNED32);
-	VAR i, j, lim: SIGNED32;
+PROCEDURE CopyToVec* (VAR A: ARRAY OF SIGNED32;   v: vyBase.tVector;   len: SIZE;   srcoffs, destoffs: SIZE);
+	VAR i, j, lim: SIZE;
 BEGIN ASSERT(LEN(A) <= v.nrData);  (* gs *)
 	(*	buf := v.buf( tBuf);
 	WHILE buf # NIL DO bufold := buf;
@@ -680,8 +680,9 @@ PROCEDURE MergeSortedChunkLONGINT (s1, s2:  tBuf): BOOLEAN ;
 	(* d is really a NEW Chunk, i.e. memory is really allocated, be careful with iterative techinques,
 	one could think of changing s1,s2 *)
 
-	VAR i1, i2, r1, r2, lastr, length, i: SIGNED32;
+	VAR i1, i2, r1, r2, lastr: SIGNED32;
 	c1, c2, d:  tBuf;
+	length,i: SIZE;
 	done, c1ended, c2ended, c2used, sorted: BOOLEAN;
 	cinter: vyBase.tBuf;
 	v, v1: tVector;
@@ -765,7 +766,7 @@ PROCEDURE MergeSortedChunkLONGINTWId (s1, s2:  tBuf;    s1id, s2id:  tBuf): BOOL
 	(* d is really a NEW Chunk, i.e. memory is really allocated, be careful with iterative techinques,
 	one could think of changing s1,s2 *)
 
-	VAR i1, i2, r1, r2, lastr, r1id, r2id, length, i: SIGNED32;
+	VAR i1, i2, r1, r2, lastr, r1id, r2id: SIGNED32; length, i: SIZE;
 	c1, c2, d, c1id, c2id, did:  tBuf;
 	done, c1ended, c2ended, c2used, sorted: BOOLEAN;
 	cinter: vyBase.tBuf;

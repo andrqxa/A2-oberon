@@ -229,6 +229,13 @@ BUILDS
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
+	Linux64All {
+		INCLUDE "LINUX UNIX AMD64"
+		COMPILER "Compiler.Compile"
+		COMPILEOPTIONS "-p=Unix64"
+		# EXCLUDEPACKAGES "OberonVoyager OberonAnts"
+		DISABLED "FALSE"
+	}
 	LinuxARM {
 		INCLUDE "LINUX UNIX ARM"
 		COMPILER "Compiler.Compile"
@@ -1604,7 +1611,7 @@ END
 PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon for A2"
 	# emulation modules
 	NATIVE, UNIX { Oberon.Kernel.Mod }
-	NATIVE, WIN { Oberon.Types.Mod }
+	NATIVE, WIN, UNIX { Oberon.Types.Mod }
 	WIN { Windows.Oberon.Kernel.Mod }
 	Oberon.Modules.Mod
 	NATIVE, UNIX { Oberon.FileDir.Mod Oberon.Files.Mod }
@@ -2035,11 +2042,11 @@ PACKAGE OberonAnts ARCHIVE "OberonAnts.zip" SOURCE "OberonAntsSrc.zip" DESCRIPTI
 
 	Oberon.antsPortability.Mod	# Portability
 
-	NATIVE, WIN {
+	NATIVE, WIN, UNIX {
 		Oberon.antsExpressionsObjects.Mod Oberon.antsExpressions.Mod Oberon.antsExpressionsDefaults.Mod	# command prompt interpreter
 		Oberon.antsSecurity.Mod Oberon.antsOrganizers.Mod Oberon.antsMessages.Mod Oberon.antsScriptObjects.Mod
 	}
-	NATIVE, WIN {
+	NATIVE, WIN, UNIX {
 		Oberon.antsContainers.Mod Oberon.antsTexts.Mod Oberon.antsGlobals.Mod Oberon.antsBasicGadgets.Mod Oberon.antsOnTheFly.Mod
 		Oberon.antsConstRandom.Mod Oberon.antsFiles.Mod Oberon.antsCommands.Mod Oberon.ants.fofAutomatic.Mod Oberon.antsArrays.Mod
 		Oberon.antsReadWrite.Mod Oberon.antsCaches.Mod Oberon.antsPictCoordinate.Mod Oberon.antsBellman.Mod Oberon.antsDirSet.Mod
