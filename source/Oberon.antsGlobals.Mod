@@ -51,7 +51,7 @@ VAR
 	debug*: BOOLEAN;
 
 PROCEDURE ParameterHandleAttribute*(VAR M: Objects.AttrMsg;  VAR p: Parameters;  VAR pn: ParameterNames): BOOLEAN;
-	VAR cur: ARRAY 64 OF CHAR;  i: SIGNED32;  len: SIGNED32;
+	VAR cur: ARRAY 64 OF CHAR;  i: SIZE;  len: SIZE;
 BEGIN
 	IF p = NIL THEN RETURN FALSE END;
 	len := LEN(p);
@@ -59,7 +59,7 @@ BEGIN
 		NEW(pn, len);
 		FOR i := 0 TO len - 1 DO
 			COPY("par[", cur);
-			vyHostStrings.AppendInt(i, 1, cur);  vyHostStrings.Append(cur, "]");
+			vyHostStrings.AppendInt(SIGNED32(i), 1, cur);  vyHostStrings.Append(cur, "]");
 			COPY(cur, pn[i])
 		END
 	END;

@@ -758,7 +758,7 @@ END RestoreBackGround;*)
 	END ToggleVisibility;
 
 	PROCEDURE ReplaceSuffix( VAR name: ARRAY OF CHAR;  suffix: ARRAY OF CHAR );   (* replace suffix by stdsuffix will be appended *)
-	VAR i, j, start, pos: SIGNED32;
+	VAR i, j, start, pos: SIZE;
 		name2: ARRAY 256 OF CHAR;
 	BEGIN
 		i := 0;  start := 0;  pos := LEN( name ) - 1;

@@ -66,7 +66,7 @@ VAR
 	Texts.OpenScanner(sc, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(sc);
 	IF sc.class = Texts.Name THEN
-		INC(Oberon.Par.pos, Strings.Length(sc.s) + 1);
+		INC(Oberon.Par.pos, SIGNED32(Strings.Length(sc.s)) + 1);
 		Oberon.Call(sc.s, Oberon.Par, FALSE, res)
 	END
 	END Call;

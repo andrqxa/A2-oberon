@@ -198,15 +198,15 @@ BEGIN RETURN vyPortability.TypeOf(p)
 END TypesTypeOf;
 
 PROCEDURE TypesLevelOf*(t: Type): SIGNED16;
-BEGIN RETURN SHORT(SYSTEM.VAL(SIGNED32, t.flags) MOD AosModules.MaxTags)
+BEGIN RETURN SIGNED16(SYSTEM.VAL(SIZE, t.flags) MOD AosModules.MaxTags)
 END TypesLevelOf;
 
 PROCEDURE TypesBaseOf*(t: Type; level: SIGNED16): Type;
 (*not failsafe, but ok since is system part*)
 BEGIN
-	SYSTEM.GET(SYSTEM.VAL(SIGNED32,t.tag)-8 -4*level, t);
+	SYSTEM.GET(SYSTEM.VAL(SIZE,t.tag)-8 -4*level, t);
 	IF t # NIL THEN
-		SYSTEM.GET(SYSTEM.VAL(SIGNED32, t) - 4, t)
+		SYSTEM.GET(SYSTEM.VAL(SIZE, t) - 4, t)
 	END;
 	RETURN t
 END TypesBaseOf;
@@ -293,9 +293,9 @@ END Test;
 
 (*! use AOSModules.Module *)
 
-PROCEDURE IdentifyCommand*(m: Modules.Module; pc: SIGNED32; VAR pname: ARRAY OF CHAR);
+PROCEDURE IdentifyCommand*(m: Modules.Module; pc: SIZE; VAR pname: ARRAY OF CHAR);
 (* not failsafe, especially not if no command called *)
-VAR codeadr,adr,maxadr,i: SIGNED32; cname: ARRAY 256 OF CHAR;
+VAR codeadr,adr, maxadr: ADDRESS; i: SIZE; cname: ARRAY 256 OF CHAR;
 BEGIN
 	COPY("",pname);
 	IF (m # NIL) & (LEN(m.command)>0) THEN
@@ -303,7 +303,7 @@ BEGIN
 	i := 0; codeadr := ADDRESSOF(m.code[0]);
 	maxadr := 0;
 	WHILE(i<LEN(m.command))  DO
-   	adr := SYSTEM.VAL(SIGNED32,m.command[i].entryAdr)-codeadr;
+   	adr := SYSTEM.VAL(ADDRESS,m.command[i].entryAdr)-codeadr;
 
    	IF (adr < pc) & (adr > maxadr) THEN
    		maxadr := adr;
@@ -316,9 +316,9 @@ BEGIN
  END IdentifyCommand;
 
 
-PROCEDURE IdentifyCaller*(VAR m: Modules.Module; VAR pc: SIGNED32);
+PROCEDURE IdentifyCaller*(VAR m: Modules.Module; VAR pc: ADDRESS);
 (* note: proc works correct only, if caller has been a command *)
-VAR ebp, eip: SIGNED32; i,adr: SIGNED32;
+VAR ebp, eip: SIZE; i,adr: SIGNED32;
 BEGIN
   ebp := SYSTEM.GetFramePointer();
   SYSTEM.GET(ebp, ebp);  (* stack frame of caller *)
@@ -327,7 +327,7 @@ BEGIN
   IF m # NIL THEN
     pc := eip - ADDRESSOF(m.code[0]);
   ELSE
-    pc := MAX(SIGNED32);
+    pc := MAX(SIZE);
   END;
 END IdentifyCaller;
 

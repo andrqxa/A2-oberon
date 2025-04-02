@@ -54,10 +54,10 @@ VAR
 	la*: L1d;
 	ia*: I1d;
 
-PROCEDURE kSmallestX* (VAR a: ARRAY OF FLOAT64;   n, k: SIGNED32): FLOAT64;
+PROCEDURE kSmallestX* (VAR a: ARRAY OF FLOAT64;   n, k: SIZE): FLOAT64;
 	(** caution: modifies a*)
 	(* algorithm of Nikolaus Wirth *)
-	VAR i, j, l, m: SIGNED32;    x: FLOAT64;
+	VAR i, j, l, m: SIZE;    x: FLOAT64;
 PROCEDURE swap (VAR x, y: FLOAT64);
 	VAR z : FLOAT64;
 BEGIN
@@ -179,7 +179,7 @@ END Median1dI;
 
 PROCEDURE Median2dX* (VAR S: ARRAY OF ARRAY OF FLOAT64): FLOAT64;
 	(** does not modify S*)
-	VAR values: POINTER TO ARRAY OF FLOAT64;    w, h, i: SIGNED32;
+	VAR values: POINTER TO ARRAY OF FLOAT64;    w, h, i: SIZE;
 BEGIN
 	h := LEN(S);           w := LEN(S[0]);
 	NEW(values, w * h);
@@ -190,7 +190,7 @@ BEGIN
 END Median2dX;
 
 PROCEDURE MinMax2dX* (VAR S: ARRAY OF ARRAY OF FLOAT64;    VAR min, max: FLOAT64);
-	VAR h, i, minpos, currentminpos, maxpos, currentmaxpos, na: SIGNED32;       currentmax, currentmin: FLOAT64;
+	VAR h, i, minpos, currentminpos, maxpos, currentmaxpos, na: SIZE;       currentmax, currentmin: FLOAT64;
 BEGIN
 	h := LEN(S);
 	min := MAX(FLOAT64);      	max := MIN(FLOAT64);
@@ -202,7 +202,7 @@ BEGIN
 END MinMax2dX;
 
 PROCEDURE Out2dX* (A: ARRAY OF ARRAY OF FLOAT64);
-	VAR i, j: SIGNED32;
+	VAR i, j: SIZE;
 BEGIN
 	FOR i := 0 TO LEN(A) - 1 DO
 		Out.Ln;
@@ -214,7 +214,7 @@ BEGIN
 END Out2dX;
 
 PROCEDURE Transpose2dX* (VAR A: ARRAY OF ARRAY OF FLOAT64): X2d;
-	VAR h, w, i, j: SIGNED32;        Atr: X2d;
+	VAR h, w, i, j: SIZE;        Atr: X2d;
 BEGIN
 	h := LEN(A);             	w := LEN(A[0]);
 	NEW(Atr, w, h);
@@ -226,10 +226,10 @@ BEGIN
 	RETURN Atr;
 END Transpose2dX;
 
-PROCEDURE Uniform1dX* (VAR a: ARRAY OF FLOAT64;  x, w: SIGNED32;  top: FLOAT64);
-	VAR  xx: SIGNED32;
+PROCEDURE Uniform1dX* (VAR a: ARRAY OF FLOAT64;  x, w: SIZE;  top: FLOAT64);
+	VAR  xx: SIZE;
 BEGIN
-	vyRanBase.RandomUVX(w, a, x);
+	vyRanBase.RandomUVX(SIGNED32(w), a, SIGNED32(x));
 	IF top # 1 THEN
 		FOR xx := x TO x + w - 1 DO
 			a[xx] := a[xx] * top
@@ -237,14 +237,14 @@ BEGIN
 	END
 END Uniform1dX;
 
-PROCEDURE Uniform1dL* (VAR a: ARRAY OF SIGNED32;  x, w: SIGNED32;  top: SIGNED32);
+PROCEDURE Uniform1dL* (VAR a: ARRAY OF SIGNED32;  x, w: SIZE;  top: SIGNED32);
 BEGIN
-	vyRanBase.RandomLV(top, TRUE, LEN(a), a, 0);
+	vyRanBase.RandomLV(top, TRUE, SIGNED32(LEN(a)), a, 0);
 	(*antsRandom.gen.GetRandomLV(antsRandom.gen,top,LEN(a),a,0); *)
 END Uniform1dL;
 
-PROCEDURE Uniform1dI* (VAR a: ARRAY OF SIGNED16;  x, w: SIGNED32;  top: SIGNED16);
-	VAR xx: SIGNED32;
+PROCEDURE Uniform1dI* (VAR a: ARRAY OF SIGNED16;  x, w: SIZE;  top: SIGNED16);
+	VAR xx: SIZE;
 BEGIN
 	IF (la = NIL) OR (LEN(la^) # w) THEN NEW(la, w) END;
 	Uniform1dL(la^, 0, w, top);
@@ -253,24 +253,24 @@ BEGIN
 	END
 END Uniform1dI;
 
-PROCEDURE Uniform2dI* (VAR A: ARRAY OF ARRAY OF SIGNED16 ;  top: SIGNED16;  x, y, w, h: SIGNED32);
-	VAR  y0: SIGNED32 ;
+PROCEDURE Uniform2dI* (VAR A: ARRAY OF ARRAY OF SIGNED16 ;  top: SIGNED16;  x, y, w, h: SIZE);
+	VAR  y0: SIZE ;
 BEGIN
 	FOR y0 := y TO y + h - 1 DO
 		Uniform1dI(A[y0], x, w, top)
 	END
 END Uniform2dI;
 
-PROCEDURE Uniform2dL* (VAR A: ARRAY OF ARRAY OF SIGNED32;  top: SIGNED32;  x, y, w, h: SIGNED32);
-	VAR  y0: SIGNED32 ;
+PROCEDURE Uniform2dL* (VAR A: ARRAY OF ARRAY OF SIGNED32;  top: SIGNED32;  x, y, w, h: SIZE);
+	VAR  y0: SIZE ;
 BEGIN
 	FOR y0 := y TO y + h - 1 DO
 		Uniform1dL(A[y0], x, w, top)
 	END
 END Uniform2dL;
 
-PROCEDURE Uniform2dX* (VAR A: ARRAY OF ARRAY OF FLOAT64;  top: FLOAT64;  x, y, w, h: SIGNED32);
-	VAR  y0: SIGNED32 ;
+PROCEDURE Uniform2dX* (VAR A: ARRAY OF ARRAY OF FLOAT64;  top: FLOAT64;  x, y, w, h: SIZE);
+	VAR  y0: SIZE ;
 BEGIN
 	FOR y0 := y TO y + h - 1 DO
 		Uniform1dX(A[y0], x, w, top)
@@ -278,7 +278,7 @@ BEGIN
 END Uniform2dX;
 
 PROCEDURE Uniform3dI* (VAR A: I3d;  top: SIGNED16);
-	VAR l: SIGNED32;
+	VAR l: SIZE;
 BEGIN
 	FOR l := 0 TO LEN(A) - 1 DO
 		Uniform2dI(A[l]^, top, 0, 0, LEN(A[l, 0]), LEN(A[l]))
@@ -286,7 +286,7 @@ BEGIN
 END Uniform3dI;
 
 PROCEDURE Uniform4dI* (VAR A: I4d;  top: SIGNED16);
-	VAR l: SIGNED32;
+	VAR l: SIZE;
 BEGIN
 	FOR l := 0 TO LEN(A) - 1 DO
 		Uniform3dI(A[l], top)
@@ -314,7 +314,7 @@ PROCEDURE FindMaxima1dX* (orig: ARRAY OF FLOAT64;                 		VAR maxima: 
 	if i is a local maximum or orig then maxima[i] = 1 else maxima[i] = 0.
 	local maxima can also be at the beginning or end of the array, local maxima can have a with of more than 2
 	*)
-	VAR i, N, lastuppos: SIGNED32;                 		lastv, thisv: FLOAT64;                 		up: BOOLEAN;
+	VAR i, N, lastuppos: SIZE;                 		lastv, thisv: FLOAT64;                 		up: BOOLEAN;
 BEGIN
 	N := LEN(orig);
 	vyLongreal.Fill(N, maxima, 0, 0);
@@ -337,7 +337,7 @@ END FindMaxima1dX;
 
 PROCEDURE FindMaxima2dXRows* (VAR Orig, Maxima: ARRAY OF ARRAY OF FLOAT64);
 	(* applies FindMaxima1dX on all rows on Orig *)
-	VAR  i, h: SIGNED32;
+	VAR  i, h: SIZE;
 BEGIN
 	h := LEN(Orig);
 	FOR i := 0 TO h - 1 DO
@@ -347,7 +347,7 @@ END FindMaxima2dXRows;
 
 PROCEDURE AndMax* (VAR Max1, Max2, Result: ARRAY OF ARRAY OF FLOAT64);
 	(*berechnet eine Matrix Result, mit Eintrag 1 an den Stellen, an denen Max1 und Max2 ebenfalls Eintrag 1 haben*)
-	VAR  i, j, h, w: SIGNED32;
+	VAR  i, j, h, w: SIZE;
 BEGIN
 	h := LEN(Max1);              		w := LEN(Max1[0]);
 	FOR i := 0 TO h - 1 DO
@@ -384,8 +384,8 @@ END VecFromArrayI;
 
 (*count the number of local maxima*)
 PROCEDURE CountModi* ( x: vyLongrealVec.tVector;  minlen, maxlen: SIGNED32): SIGNED32;
-	VAR i: SIGNED32;              N: SIGNED32;              number: SIGNED32;              last, this: FLOAT64;
-	len, startpoint: SIGNED32;
+	VAR i: SIZE;              N: SIZE;              number: SIGNED32;              last, this: FLOAT64;
+	len, startpoint: SIZE;
 CONST invalid = -1;                       (* original: from=4,to=14 *)
 BEGIN
 	N := vyLongrealVec.Len( x( vyLongrealVec.tVector ) );

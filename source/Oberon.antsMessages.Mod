@@ -46,7 +46,7 @@ VAR
 	mode*: SIGNED16; debug*: BOOLEAN;
 	write: writeProc;
 	w: Texts.Writer;
-	sPatLen: SIGNED32; lTime: SIGNED32; sPat : ARRAY 256 OF CHAR;
+	sPatLen: SIZE; lTime: SIGNED32; sPat : ARRAY 256 OF CHAR;
 			sDv: ARRAY 256 + 1 OF SIGNED16;	(* displacement vector for search pattern *)
 
 PROCEDURE Init(m: SIGNED16): BOOLEAN;
@@ -106,10 +106,10 @@ BEGIN
 END wSSSS;
 
 
-PROCEDURE wSI*(mode: SIGNED16; s1: ARRAY OF CHAR; i: SIGNED32);
+PROCEDURE wSI*(mode: SIGNED16; s1: ARRAY OF CHAR; i: SIZE);
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
-	Texts.WriteString(w,s1); Texts.WriteString(w,sep); Texts.WriteInt(w,i,0);  Texts.WriteLn(w); write(w.buf);
+	Texts.WriteString(w,s1); Texts.WriteString(w,sep); Texts.WriteInt(w,SIGNED32(i),0);  Texts.WriteLn(w); write(w.buf);
 END wSI;
 
 PROCEDURE wSR*(mode: SIGNED16; s: ARRAY OF CHAR; r: FLOAT64);
@@ -118,11 +118,11 @@ BEGIN
 	Texts.WriteString(w,s); Texts.WriteString(w,sep); Texts.WriteReal(w, SHORT(r), 20); Texts.WriteLn(w); write(w.buf);
 END wSR;
 
-PROCEDURE wSISI* (mode: SIGNED16; s1: ARRAY OF CHAR;    i1: SIGNED32;    s2: ARRAY OF CHAR;    i2: SIGNED32 );
+PROCEDURE wSISI* (mode: SIGNED16; s1: ARRAY OF CHAR;    i1: SIZE;    s2: ARRAY OF CHAR;    i2: SIZE );
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
-	Texts.WriteString(w,s1);Texts.WriteString(w,sep);  Texts.WriteInt(w,i1,0);  Texts.WriteString(w,sep);
-	Texts.WriteString(w,s2);  Texts.WriteString(w,sep); Texts.WriteInt(w,i2,0);
+	Texts.WriteString(w,s1);Texts.WriteString(w,sep);  Texts.WriteInt(w,SIGNED32(i1),0);  Texts.WriteString(w,sep);
+	Texts.WriteString(w,s2);  Texts.WriteString(w,sep); Texts.WriteInt(w,SIGNED32(i2),0);
 	Texts.WriteLn(w); write(w.buf);
 END wSISI;
 
@@ -158,13 +158,13 @@ BEGIN	wSSS(normalMode,s1,s2,s3); END SSS;
 PROCEDURE SSSS* (s1, s2,s3,s4: ARRAY OF CHAR);
 BEGIN	wSSSS(normalMode,s1,s2,s3,s4); END SSSS;
 
-PROCEDURE SI* (s1: ARRAY OF CHAR;    i: SIGNED32);
+PROCEDURE SI* (s1: ARRAY OF CHAR;    i: SIZE);
 BEGIN	wSI(normalMode,s1,i); END SI;
 
 PROCEDURE SR* (s1: ARRAY OF CHAR;    R: FLOAT64);
 BEGIN	wSR(normalMode,s1,R); END SR;
 
-PROCEDURE SISI* (s1: ARRAY OF CHAR;    i1: SIGNED32;    s2: ARRAY OF CHAR;    i2: SIGNED32 );
+PROCEDURE SISI* (s1: ARRAY OF CHAR;    i1: SIZE;    s2: ARRAY OF CHAR;    i2: SIZE );
 BEGIN	wSISI(normalMode,s1,i1,s2,i2); END SISI;
 
 PROCEDURE SRSR* (s1: ARRAY OF CHAR;    r1: FLOAT64;   s2: ARRAY OF CHAR;    r2: FLOAT64);
@@ -188,13 +188,13 @@ BEGIN	wSSS(errorMode,s1,s2,s3); END eSSS;
 PROCEDURE eSSSS* (s1, s2,s3,s4: ARRAY OF CHAR);
 BEGIN	wSSSS(errorMode,s1,s2,s3,s4); END eSSSS;
 
-PROCEDURE eSI* (s1: ARRAY OF CHAR;    i: SIGNED32);
+PROCEDURE eSI* (s1: ARRAY OF CHAR;    i: SIZE);
 BEGIN	wSI(errorMode,s1,i); END eSI;
 
 PROCEDURE eSR* (s1: ARRAY OF CHAR;    R: FLOAT64);
 BEGIN	wSR(errorMode,s1,R); END eSR;
 
-PROCEDURE eSISI* (s1: ARRAY OF CHAR;    i1: SIGNED32;    s2: ARRAY OF CHAR;    i2: SIGNED32 );
+PROCEDURE eSISI* (s1: ARRAY OF CHAR;    i1: SIZE;    s2: ARRAY OF CHAR;    i2: SIZE );
 BEGIN	wSISI(errorMode,s1,i1,s2,i2); END eSISI;
 
 PROCEDURE eSRSR* (s1: ARRAY OF CHAR;    r1: FLOAT64;   s2: ARRAY OF CHAR;    r2: FLOAT64);
@@ -218,13 +218,13 @@ BEGIN	wSSS(verboseMode,s1,s2,s3); END vSSS;
 PROCEDURE vSSSS* (s1, s2,s3,s4: ARRAY OF CHAR);
 BEGIN	wSSSS(verboseMode,s1,s2,s3,s4); END vSSSS;
 
-PROCEDURE vSI* (s1: ARRAY OF CHAR;    i: SIGNED32);
+PROCEDURE vSI* (s1: ARRAY OF CHAR;    i: SIZE);
 BEGIN	wSI(verboseMode,s1,i); END vSI;
 
 PROCEDURE vSR* (s1: ARRAY OF CHAR;    R: FLOAT64);
 BEGIN	wSR(verboseMode,s1,R); END vSR;
 
-PROCEDURE vSISI* (s1: ARRAY OF CHAR;    i1: SIGNED32;    s2: ARRAY OF CHAR;    i2: SIGNED32 );
+PROCEDURE vSISI* (s1: ARRAY OF CHAR;    i1: SIZE;    s2: ARRAY OF CHAR;    i2: SIZE );
 BEGIN	wSISI(verboseMode,s1,i1,s2,i2); END vSISI;
 
 PROCEDURE vSRSR* (s1: ARRAY OF CHAR;    r1: FLOAT64;   s2: ARRAY OF CHAR;    r2: FLOAT64);
@@ -248,13 +248,13 @@ BEGIN	wSSS(debugMode,s1,s2,s3); END dSSS;
 PROCEDURE dSSSS* (s1, s2,s3,s4: ARRAY OF CHAR);
 BEGIN	wSSSS(debugMode,s1,s2,s3,s4); END dSSSS;
 
-PROCEDURE dSI* (s1: ARRAY OF CHAR;    i: SIGNED32);
+PROCEDURE dSI* (s1: ARRAY OF CHAR;    i: SIZE);
 BEGIN	wSI(debugMode,s1,i); END dSI;
 
 PROCEDURE dSR* (s1: ARRAY OF CHAR;    R: FLOAT64);
 BEGIN	wSR(debugMode,s1,R); END dSR;
 
-PROCEDURE dSISI* (s1: ARRAY OF CHAR;    i1: SIGNED32;    s2: ARRAY OF CHAR;    i2: SIGNED32 );
+PROCEDURE dSISI* (s1: ARRAY OF CHAR;    i1: SIZE;    s2: ARRAY OF CHAR;    i2: SIZE );
 BEGIN	wSISI(debugMode,s1,i1,s2,i2); END dSISI;
 
 PROCEDURE dSRSR* (s1: ARRAY OF CHAR;    r1: FLOAT64;   s2: ARRAY OF CHAR;    r2: FLOAT64);
@@ -268,7 +268,7 @@ BEGIN
 END usage;
 
 PROCEDURE cmd*;
-VAR m: Modules.Module; pc: SIGNED32; name: ARRAY 256 OF CHAR;
+VAR m: Modules.Module; pc: ADDRESS; name: ARRAY 256 OF CHAR;
 BEGIN
 	IF mode >= debugMode THEN
 		antsPortability.IdentifyCaller(m,pc);
@@ -278,7 +278,7 @@ BEGIN
 END cmd;
 
 PROCEDURE launch*;
-VAR m: Modules.Module; pc: SIGNED32;
+VAR m: Modules.Module; pc: ADDRESS;
 BEGIN
 	IF mode >= verboseMode THEN
 		antsPortability.IdentifyCaller(m,pc);
@@ -484,7 +484,7 @@ BEGIN
 END DownDown;
 
 PROCEDURE ReplaceSuffix (VAR name: ARRAY OF CHAR; suffix: ARRAY OF CHAR);  (* replace suffix by stdsuffix will be appended *)
-	VAR i,start,pos: SIGNED32;
+	VAR i,start,pos: SIZE;
 BEGIN
 	i := 0;start := 0; pos := LEN(name)-1;
 	WHILE(name[i] # 0X) DO
@@ -613,7 +613,7 @@ END ClearLog;
 	END SPatFound;
 
 	PROCEDURE search(VAR S: Attributes.Scanner; tF: TextGadgets.Frame);
-		VAR R: Texts.Reader; text: Texts.Text; pos, beg, end, time: SIGNED32; i: SIGNED16;
+		VAR R: Texts.Reader; text: Texts.Text; pos, beg, end, time: SIGNED32; i: SIZE;
 	BEGIN
 		IF S.class IN {Attributes.Name, Attributes.String} THEN
 			COPY(S.s, sPat); sPatLen := S.len; CalcDispVec(Oberon.Time())	(* calculate displacement vector *)
@@ -628,7 +628,7 @@ END ClearLog;
 		END;
 		IF tF.car THEN pos := tF.carpos.pos ELSE pos := 0 END;
 		IF SPatFound(tF.text, pos) THEN
-			TextGadgets0.ScrollTo(tF,pos-Strings.Length(sPat));
+			TextGadgets0.ScrollTo(tF,pos-SIGNED32(Strings.Length(sPat)));
 		END
 	END search;
 

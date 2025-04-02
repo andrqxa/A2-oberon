@@ -622,8 +622,8 @@ BEGIN
 	FlushVecCaches(v2)
 END DoArrayOp2;
 
-PROCEDURE Fill* (v: vyBase.tVector;   val: SIGNED32;    offs, count: SIGNED32);
-	VAR i: SIGNED32;
+PROCEDURE Fill* (v: vyBase.tVector;   val: SIGNED32;    offs, count: SIZE);
+	VAR i: SIZE;
 BEGIN
 	FOR i := offs TO offs + count - 1 DO Set(val, v, i)   	END;
 	FlushVecCaches(v)
@@ -638,9 +638,9 @@ BEGIN
 	RETURN v
 END NewFilledNamed;
 
-PROCEDURE FillSeq* (v: vyBase.tVector;   startval: SIGNED32;    offs, count: SIGNED32);
+PROCEDURE FillSeq* (v: vyBase.tVector;   startval: SIGNED32;    offs, count: SIZE);
 	(*=  v[offs+i]= startval+i *)
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 BEGIN
 	FOR i := offs TO offs + count - 1 DO Set(startval, v, i);  INC(startval) 	END;
 	FlushVecCaches(v)

@@ -293,7 +293,7 @@ VAR
 	END Scan;
 
 	PROCEDURE ScanFromPar*( usage: ARRAY OF CHAR ): tScanList;
-	VAR sc: vyScanners.Scanner;  m: Modules.Module;  pc: SIGNED32;
+	VAR sc: vyScanners.Scanner;  m: Modules.Module;  pc: ADDRESS;
 	BEGIN
 		IF ~haveCaller THEN antsPortability.IdentifyCaller( m, pc );  antsPortability.IdentifyCommand( m, pc, callerS ) END;
 		COPY( usage, usageS );  aM.vS( callerS );  vyScanners.NewSScanner( sc );  vyScanners.OpenParScanner( sc );
@@ -301,7 +301,7 @@ VAR
 	END ScanFromPar;
 
 	PROCEDURE InitScan*( usage: ARRAY OF CHAR );
-	VAR m: Modules.Module;  pc: SIGNED32;
+	VAR m: Modules.Module;  pc: ADDRESS;
 	BEGIN
 		antsPortability.IdentifyCaller( m, pc );  antsPortability.IdentifyCommand( m, pc, callerS );  haveCaller := TRUE;
 		lastScanned := ScanFromPar( usage );

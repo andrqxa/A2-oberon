@@ -54,18 +54,18 @@ BEGIN
 END Module;
 
 
-PROCEDURE InsertArray (t: Texts.Text;    at: SIGNED32;    Array: ARRAY OF CHAR);
+PROCEDURE InsertArray (t: Texts.Text;    at: SIZE;    Array: ARRAY OF CHAR);
 	VAR w: Texts.Writer;
 BEGIN
 	Texts.OpenWriter(w);
 	Texts.WriteString(w, Array);
-	Texts.Insert(t, at, w.buf)
+	Texts.Insert(t, SIGNED32(at), w.buf)
 END InsertArray;
 
-PROCEDURE Find (a: ARRAY OF CHAR;    t: Texts.Text;    VAR at: SIGNED32): BOOLEAN;
-	VAR b: ARRAY 32 OF CHAR;    r: Texts.Reader;     ch: CHAR;    i: SIGNED32;
+PROCEDURE Find (a: ARRAY OF CHAR;    t: Texts.Text;    VAR at: SIZE): BOOLEAN;
+	VAR b: ARRAY 32 OF CHAR;    r: Texts.Reader;     ch: CHAR;    i: SIZE;
 BEGIN
-	Texts.OpenReader(r, t, at);
+	Texts.OpenReader(r, t, SIGNED32(at));
 	WHILE ~r.eot DO
 		Texts.Read(r, ch);
 		FOR i := 0 TO LEN(a) - 2 DO
@@ -75,7 +75,7 @@ BEGIN
 		b[LEN(a) - 1] := 0X;
 		IF vyHostStrings.Equal(a, b) THEN
 			at := Texts.Pos(r) - LEN(a) + 1;
-			Texts.Delete(t, at, at + LEN(a) - 1);
+			Texts.Delete(t, SIGNED32(at), SIGNED32(at + LEN(a)) - 1);
 			RETURN TRUE
 		END
 	END;
@@ -83,7 +83,7 @@ BEGIN
 END Find;
 
 PROCEDURE Replace (t: Texts.Text;    pattern: ARRAY OF CHAR;    by: ARRAY OF CHAR);
-	VAR at: SIGNED32;
+	VAR at: SIZE;
 BEGIN
 	at := 0;
 	WHILE Find(pattern, t, at) DO InsertArray(t, at, by) END
@@ -325,12 +325,12 @@ BEGIN
 	END
 END TestXd;
 
-PROCEDURE MarkErrorPos(T: Texts.Text; pos: SIGNED32; err: SIGNED16);
+PROCEDURE MarkErrorPos(T: Texts.Text; pos: SIZE; err: SIGNED16);
 VAR obj: Objects.Object;
 BEGIN
 	Builder.NewErrorGadget; obj := Objects.NewObj; obj(Builder.ErrorGadget).errno := err;
 	Texts.WriteObj(W, obj);
-	Texts.Insert(T, pos, W.buf)
+	Texts.Insert(T, SIGNED32(pos), W.buf)
 END MarkErrorPos;
 
 PROCEDURE RemoveErrors(T: Texts.Text);
@@ -357,7 +357,7 @@ BEGIN
 	END
 END RemoveErrors;
 
-PROCEDURE markErrors(VAR S: Texts.Scanner; errtext: Texts.Text; par: Display.Frame; offset,len: SIGNED32);
+PROCEDURE markErrors(VAR S: Texts.Scanner; errtext: Texts.Text; par: Display.Frame; offset,len: SIZE);
 VAR c, err: SIGNED16; pos, beg, l, k: SIGNED32; C: Oberon.CaretMsg;  warn: BOOLEAN;
 	marked: ARRAY 100 OF SIGNED32;
 BEGIN
@@ -396,7 +396,7 @@ END GetModuleName;
 
 
 PROCEDURE CompileText*(t: Texts.Text; inModule,cmd: ARRAY OF CHAR; begpat,endpat: ARRAY OF CHAR): BOOLEAN;
-VAR  buf: Texts.Buffer; T: Texts.Text; pos: SIGNED32; source: Texts.Reader; fbeg: SIGNED32; error: BOOLEAN;
+VAR  buf: Texts.Buffer; T: Texts.Text; pos: SIZE; source: Texts.Reader; fbeg: SIGNED32; error: BOOLEAN;
 S1: Texts.Scanner; m: Modules.Module; p: Modules.Command;name,mn: ARRAY 256 OF CHAR; F: Files.File; res: SIGNED16;
 BEGIN
 	aM.dS("enterCompileText");

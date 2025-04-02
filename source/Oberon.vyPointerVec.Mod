@@ -285,7 +285,7 @@ VAR
 		NEW( o );  o.handle := Handler;  Objects.NewObj := o
 	END GenLongintObject;
 
-	PROCEDURE NewLongintObject*( i: SIGNED32 ): tLONGINT;
+	PROCEDURE NewLongintObject*( i: SIZE ): tLONGINT;
 	VAR o: tLONGINT;
 	BEGIN
 		GenLongintObject;  o := Objects.NewObj( tLONGINT );  o.i := i;  o.type := vyBase.linttyp;

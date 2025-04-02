@@ -115,7 +115,7 @@ TYPE
 		END ReadIntsFix;
 
 		PROCEDURE  (* VAR R: Rider*) ReadIntsLine*( VAR x: vyIntVec.tVector );
-		VAR num: SIGNED32;  val: SIGNED16;
+		VAR num: SIZE;  val: SIGNED16;
 		BEGIN
 			IF x = NIL THEN x := vyIntVec.New( 0 ) ELSE vyIntVec.SetLen( x, 0 ) END;
 			StartReading( SELF );  num := 0;
@@ -139,7 +139,7 @@ TYPE
 		END ReadLIntsFix;
 
 		PROCEDURE  (* VAR R: Rider*) ReadLIntsLine*( VAR x: vyLongintVec.tVector );
-		VAR num: SIGNED32;  val: SIGNED32;
+		VAR num: SIZE;  val: SIGNED32;
 		BEGIN
 			IF x = NIL THEN x := vyLongintVec.New( 0 ) ELSE vyLongintVec.SetLen( x, 0 ) END;
 			StartReading( SELF );  num := 0;
@@ -163,7 +163,7 @@ TYPE
 		END ReadRealsFix;
 
 		PROCEDURE  (* VAR R: Rider*) ReadRealsLine( VAR x: vyRealVec.tVector );
-		VAR num: SIGNED32;  val: FLOAT32;
+		VAR num: SIZE;  val: FLOAT32;
 		BEGIN
 			IF x = NIL THEN x := vyRealVec.New( 0 ) ELSE vyRealVec.SetLen( x, 0 ) END;
 			StartReading( SELF );  num := 0;
@@ -187,7 +187,7 @@ TYPE
 		END ReadLRealsFix;
 
 		PROCEDURE  (* VAR R: Rider*) ReadLRealsLine*( VAR x: vyLongrealVec.tVector );
-		VAR num: SIGNED32;  val: FLOAT64;
+		VAR num: SIZE;  val: FLOAT64;
 		BEGIN
 			IF x = NIL THEN x := vyLongrealVec.New( 0 ) ELSE vyLongrealVec.SetLen( x, 0 ) END;
 			StartReading( SELF );  num := 0;
@@ -278,7 +278,7 @@ END ReadLn;
 		END WriteIntsFix;
 
 		PROCEDURE  (* VAR R: Rider*) WriteIntsLine*( x: vyIntVec.tVector );
-		VAR i, num: SIGNED32;
+		VAR i, num: SIZE;
 		BEGIN
 			IF x = NIL THEN num := 0 ELSE num := vyIntVec.Len( x );  END;
 			StartWriting( SELF, num );  i := 0;
@@ -304,7 +304,7 @@ END ReadLn;
 		END WriteLIntsFix;
 
 		PROCEDURE  (* VAR R: Rider*) WriteLIntsLine*( x: vyLongintVec.tVector );
-		VAR i, num: SIGNED32;
+		VAR i, num: SIZE;
 		BEGIN
 			IF x = NIL THEN num := 0 ELSE num := vyLongintVec.Len( x );  END;
 			StartWriting( SELF, num );  i := 0;
@@ -330,7 +330,7 @@ END ReadLn;
 		END WriteRealsFix;
 
 		PROCEDURE  (* VAR R: Rider*) WriteRealsLine*( x: vyRealVec.tVector );
-		VAR i, num: SIGNED32;
+		VAR i, num: SIZE;
 		BEGIN
 			IF x = NIL THEN num := 0 ELSE num := vyRealVec.Len( x );  END;
 			StartWriting( SELF, num );  i := 0;
@@ -356,7 +356,7 @@ END ReadLn;
 		END WriteLRealsFix;
 
 		PROCEDURE  (* VAR R: Rider*) WriteLRealsLine*( x: vyLongrealVec.tVector );
-		VAR i, num: SIGNED32;
+		VAR i, num: SIZE;
 		BEGIN
 			num := vyLongrealVec.Len( x );  StartWriting( SELF, num );  i := 0;
 			WHILE (i < num) DO SELF.WriteLReal( vyLongrealVec.Get( x, i ) );  INC( i ) END;
@@ -467,7 +467,7 @@ VAR
 		END
 	END StartReading;
 
-	PROCEDURE StopReading( R: Rider;  VAR num: SIGNED32 ): BOOLEAN;
+	PROCEDURE StopReading( R: Rider;  VAR num: SIZE ): BOOLEAN;
 	BEGIN
 		IF R.eot OR R.err THEN num := 0;  RETURN TRUE END;
 		CASE R.type OF
@@ -479,10 +479,10 @@ VAR
 		END
 	END StopReading;
 
-	PROCEDURE StartWriting( R: Rider;  num: SIGNED32 );
+	PROCEDURE StartWriting( R: Rider;  num: SIZE );
 	BEGIN
 		CASE R.type OF
-		bin:  R.WriteLInt( num );
+		bin:  R.WriteLInt( SIGNED32(num) );
 		| ascii:
 		END
 	END StartWriting;
