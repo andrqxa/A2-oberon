@@ -415,6 +415,13 @@ BEGIN
 	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteInt(W, x[start], SIGNED32(n));   INC(start) END
 END WriteLongIntTab;
 
+PROCEDURE WriteSizeTab* (VAR W: Texts.Writer;   len: SIZE ;   x: ARRAY OF SIZE;   start: SIZE ;   n: SIZE );
+BEGIN
+	IF len <= 0 THEN RETURN END;
+	Texts.WriteInt(W, x[start], SIGNED32(n));
+	len := len + start;   INC(start);
+	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteInt(W, x[start], SIGNED32(n));   INC(start) END
+END WriteSizeTab;
 
 PROCEDURE WriteIntTab* (VAR W: Texts.Writer;   len:SIZE ;   x: ARRAY OF SIGNED16;   start: SIZE;   n: SIZE);
 BEGIN
@@ -872,6 +879,17 @@ BEGIN Texts.WriteString(w, "Summary for longinteger array ");
 	END;
 	Texts.WriteLn(w)
 END SummaryLongint;
+
+PROCEDURE SummarySize*(VAR w: Texts.Writer;   count: SIZE;   VAR a: ARRAY OF SIZE;   prec: SIGNED16);
+	VAR i: SIZE;
+BEGIN Texts.WriteString(w, "Summary for longinteger array ");
+	Texts.WriteString(w, " count=");   Texts.WriteInt(w, SIGNED32(count), 0);
+	Texts.WriteLn(w);   i := 0;
+	WHILE i < count DO
+		Texts.WriteInt(w, a[i], prec);   INC(i)
+	END;
+	Texts.WriteLn(w)
+END SummarySize;
 
 BEGIN
 	msgsep := ' ';  hexchars := '0123456789ABCDEF';
