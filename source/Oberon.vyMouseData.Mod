@@ -58,7 +58,7 @@ VAR
 	END DefaultDense;
 
 	PROCEDURE Integral( d: vyBase.tVector ): FLOAT32;
-	VAR sum, dx: FLOAT32;  i: SIGNED32;
+	VAR sum, dx: FLOAT32;  i: SIZE;
 	BEGIN
 		sum := 0;
 		dx := 1 / (d.nrData - 1);   (*interval width*)
@@ -138,7 +138,7 @@ VAR
 	END RandomVector;
 
 	PROCEDURE Recall( denseEditor: vyFctEdit.tLayer );
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	BEGIN
 		vyGraphBase.SetPatternJustification( vyGraphBase.center, vyGraphBase.center );
 		vyGraphBase.SetDisplayMode( vyGraphBase.replace );  vyGraphBase.SetForeColor( vyGraphBase.black );

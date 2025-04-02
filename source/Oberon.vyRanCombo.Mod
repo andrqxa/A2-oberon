@@ -79,7 +79,7 @@ TYPE
 	VAR v: SIGNED32;
 	BEGIN
 		v := x * y;  x := y;  y := v;
-		z := mwcParam * S.VAL( Bits, S.VAL( SET, z ) * SET(sysMaskSecondHalf ) ) + LSH( z, sysBitsTypeSize DIV 2 * sysSHR );
+		z := mwcParam * S.VAL( Bits, S.VAL( SET32, z ) * SET32(sysMaskSecondHalf ) ) + LSH( z, sysBitsTypeSize DIV 2 * sysSHR );
 		RETURN y + z
 	END Combo;
 
@@ -230,7 +230,7 @@ TYPE
 	PROCEDURE DoAsserts;
 	VAR tmp: SIGNED32;
 	BEGIN
-		ASSERT ( SIZEOF( SET ) = sysBitsTypeSize, 100 );
+		ASSERT ( SIZEOF( SET32 ) = sysBitsTypeSize, 100 );
 		tmp := -1;
 		ASSERT ( LSH( tmp, sysSHR ) > 0, 101 )
 	END DoAsserts;

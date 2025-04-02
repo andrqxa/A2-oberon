@@ -90,7 +90,7 @@ VAR
 		WHILE vyParser.Real( sc, x ) DO vyRealVec.Append( x, o ) END;
 		(* Debug *)
 		Texts.WriteString( vyHostTexts.w, name );  Texts.Write( vyHostTexts.w, ":" );
-		Texts.WriteInt( vyHostTexts.w, o.nrData, 8 );  Texts.WriteString( vyHostTexts.w, " numeric values read. " );  Texts.WriteLn( vyHostTexts.w );
+		Texts.WriteInt( vyHostTexts.w, SIGNED32(o.nrData), 8 );  Texts.WriteString( vyHostTexts.w, " numeric values read. " );  Texts.WriteLn( vyHostTexts.w );
 		vyHostTexts.InsertLog( vyHostTexts.w.buf );
 		(* Debug End *)
 		vyName.RegisterNamed( o, name )
@@ -213,7 +213,7 @@ VAR
 	END capsarg;
 (* jb 20.8.01 *)
 	PROCEDURE NextDot( VAR str: ARRAY OF CHAR;  VAR i: SIGNED16;  VAR part: ARRAY OF CHAR ): BOOLEAN;
-	VAR c: CHAR;  partlen: SIGNED32;  j: SIGNED32;
+	VAR c: CHAR;  partlen: SIZE;  j: SIGNED32;
 	BEGIN
 		partlen := LEN( part );
 		IF i >= LEN( str ) THEN COPY( "", part );  RETURN FALSE END;

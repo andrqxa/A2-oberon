@@ -313,12 +313,12 @@ BEGIN
 	NMerge(start, start + count - 1)
 END MergeSort;
 
-PROCEDURE SortIndexed* (count: SIZE;  VAR x: ARRAY OF SIGNED32;  start: SIZE;  VAR index: ARRAY OF SIGNED32);
+PROCEDURE SortIndexed* (count: SIZE;  VAR x: ARRAY OF SIGNED32;  start: SIZE;  VAR index: ARRAY OF SIZE);
 	(** Natural Mergesort is used for indexed sorting *)
 	(* 	Contact	M. Fuchs <fuchs@statlab.uni-heidelberg.de>	*)
 PROCEDURE NMergeIndexed (lo, hi: SIZE);  (* Natural Mergesort *)
 PROCEDURE MergeIndexed (l, m, r: SIZE);  	(* Mixing the preorderd Runs *)
-	VAR hx, hindex : POINTER TO ARRAY OF SIGNED32;  	(* Arrays to store the datas temporary *)
+	VAR hx: POINTER TO ARRAY OF SIGNED32; hindex : POINTER TO ARRAY OF SIZE;  	(* Arrays to store the datas temporary *)
 	h, i, j, k : SIZE;
 BEGIN
 	NEW(hx, r - l + 1);  NEW(hindex, r - l + 1);  	(*Allocation of store *)

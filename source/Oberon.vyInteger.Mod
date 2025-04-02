@@ -314,7 +314,7 @@ BEGIN
 END MergeSort;
 
 
-PROCEDURE SortIndexed* (count: SIZE;  VAR data: ARRAY OF SIGNED16; start: SIZE; VAR index: ARRAY OF SIGNED32);
+PROCEDURE SortIndexed* (count: SIZE;  VAR data: ARRAY OF SIGNED16; start: SIZE; VAR index: ARRAY OF SIZE);
 	(** Natural Mergesort is used for indexed sorting *)
 	(* 	Contact	M. Fuchs <fuchs@statlab.uni-heidelberg.de> *)
 PROCEDURE NMergeIndexed (lo, hi: SIZE); (* Natural Mergesort *)
@@ -345,7 +345,7 @@ BEGIN
 		END
 	END;
 	FOR h := l TO r DO
-		data[h] := hdata[h - l];  index[h] := SIGNED32(hindex[h - l]); 	(* restore the sorted run *)
+		data[h] := hdata[h - l];  index[h] := hindex[h - l]; 	(* restore the sorted run *)
 	END
 END MergeIndexed;
 

@@ -2014,9 +2014,11 @@ PACKAGE OberonVoyager ARCHIVE "OberonVoyager.zip" SOURCE "OberonVoyagerSrc.zip" 
 	Oberon.vyLinks.Mod Oberon.vyHostStrings.Mod Oberon.vyHostTexts.Mod Oberon.vyBase.Mod Oberon.vyName.Mod	# Base and Name
 	Oberon.vyScanners.Mod Oberon.vyParser.Mod Oberon.vyPars.Mod Oberon.vyIn.Mod Oberon.vyOut.Mod Oberon.vyFiles.Mod Oberon.vyTextsCtl.Mod	# In and Output
 	Oberon.vyBoolean.Mod Oberon.vyBit.Mod Oberon.vySet.Mod Oberon.vyReal.Mod Oberon.vyLongreal.Mod
-	Oberon.vyChiSquare.Mod Oberon.vyInteger.Mod Oberon.vyLongint.Mod	# 1d Arrays
+	Oberon.vyChiSquare.Mod 
+	Oberon.vySize.Mod Oberon.vySizeVec.Mod # vectors of base type size (index vectors)	
+	Oberon.vyInteger.Mod Oberon.vyLongint.Mod	# 1d Arrays
 	Oberon.vyLongintVec.Mod Oberon.vyRealVec.Mod Oberon.vyStringVec.Mod Oberon.vyReadMatrix.Mod Oberon.vyConsume.Mod
-	Oberon.vyBooleanVec.Mod Oberon.vyIntVec.Mod Oberon.vyLongrealVec.Mod Oberon.vyTypes.Mod Oberon.vySize.Mod  Oberon.vyPointerVec.Mod	# 1d Vectors
+	Oberon.vyBooleanVec.Mod Oberon.vyIntVec.Mod Oberon.vyLongrealVec.Mod Oberon.vyTypes.Mod Oberon.vyPointerVec.Mod	# 1d Vectors
 	Oberon.vyRanBase.Mod Oberon.vyRanSkeleton.Mod Oberon.vyRanParksMiller.Mod Oberon.vyRandom.Mod Oberon.vyRandu.Mod
 	Oberon.vyRan1.Mod Oberon.vyRanCombo.Mod Oberon.vyRanKiss.Mod Oberon.vyRanMWC.Mod Oberon.vyRanMWC1616.Mod
 	Oberon.vyRanSupr.Mod Oberon.vy.jbrtStdNormal.Mod	# Random number generation

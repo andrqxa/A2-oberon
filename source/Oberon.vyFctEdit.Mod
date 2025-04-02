@@ -313,9 +313,9 @@ VAR
 
 	PROCEDURE Embed*( editor: tLayer;  obj: vyBase.tVector;  x, y, w, h: FLOAT32;  vScale, hScale, hot: BOOLEAN ): vyPort.Picture;
 	(*vs 0.0a1   md  23.06.95 *)
-	VAR N, i: SIGNED32;  X: vyBase.tVector;  pict: vyPort.Picture;  id: vyName.tNameArray;
+	VAR N, i: SIZE;  X: vyBase.tVector;  pict: vyPort.Picture;  id: vyName.tNameArray;
 	BEGIN
-		N := obj.nrData;  editor.ox := obj;  editor.xr := x;  editor.yr := y;  editor.wr := w;  editor.hr := h;  editor.ticks := N - 1;
+		N := obj.nrData;  editor.ox := obj;  editor.xr := x;  editor.yr := y;  editor.wr := w;  editor.hr := h;  editor.ticks := SIGNED32(N - 1);
 		editor.dx := w / (N - 1);  editor.hot := hot;  X := vyLongrealVec.New( N );
 		FOR i := 0 TO N - 1 DO
 			IF X IS vyRealVec.tVector THEN

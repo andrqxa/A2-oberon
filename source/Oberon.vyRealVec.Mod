@@ -24,7 +24,7 @@ Report any problems as soon as possible to voyager@statlab.uni-heidelberg.de
 
 
 
-IMPORT Files, Objects, Texts, vyBase, vyName, vyHostTexts, vyreal := vyReal, vyLongintVec;
+IMPORT Files, Objects, Texts, vyBase, vyName, vyHostTexts, vyreal := vyReal, vyLongintVec := vySizeVec;
 
 CONST
 	idversion* = "vyRealVec 0.0a4";   (* may be maintained or changed by tools *)

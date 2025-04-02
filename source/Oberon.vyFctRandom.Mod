@@ -50,7 +50,7 @@ VAR
 
 	PROCEDURE Integral( d: vyBase.tVector ): FLOAT32;
 	(*vs 0.0d0  md  14.02.95 17:45:03 *)
-	VAR sum, dx: FLOAT32;  i: SIGNED32;
+	VAR sum, dx: FLOAT32;  i: SIZE;
 	BEGIN
 		sum := 0;
 		dx := 1 / (d.nrData - 1);   (*interval width*)
@@ -120,7 +120,7 @@ VAR
 
 	PROCEDURE Recall( denseEditor: vyFctEdit.tLayer );
 	(*vs 0.0d0  md  23.06.95 15:22:19 *)
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	BEGIN
 		vyGraphBase.SetPatternJustification( vyGraphBase.center, vyGraphBase.center );
 		vyGraphBase.SetDisplayMode( vyGraphBase.replace );  vyGraphBase.SetForeColor( 15 );

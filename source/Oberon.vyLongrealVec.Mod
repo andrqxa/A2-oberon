@@ -33,7 +33,7 @@ vy/src/common/vyRealVec.Mod
 COPY procedures are prepared in vyHost.Mod
 *)
 
-IMPORT Files, Objects, vyBase, vyHostTexts, vyName, vyLongintVec, vyreal := vyLongreal;
+IMPORT Files, Objects, vyBase, vyHostTexts, vyName, vyLongintVec := vySizeVec, vyreal := vyLongreal;
 
 CONST
 	idversion* = "vyLongrealVec 0.0a4";   (* may be maintained or changed by tools *)

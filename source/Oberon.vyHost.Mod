@@ -112,7 +112,7 @@ CONST idversion* = "vyHost Oberon S3 0.1d3";   (* may be maintained or changed b
 	*)
 TYPE
 	(** voyager specific **)
-	Index* = SIGNED32;  	(*= index type for open arrays *)
+	Index* = SIZE;  	(*= index type for open arrays *)
 	(*	Coordinate*=SIGNED16; 	(*= type used for output coordinates *)
 	Color*= SIGNED16;
 	RealNumber*=FLOAT64;  (*= base type for numerics and 2d coordinates*)

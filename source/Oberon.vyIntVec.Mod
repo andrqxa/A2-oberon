@@ -24,7 +24,7 @@ Report any problems as soon as possible to voyager@statlab.uni-heidelberg.de
 
 
 
-IMPORT Files, Objects, vyBase,  (*vyHost, *) vyHostTexts, vyinteger := vyInteger, vyLongintVec, vyName;
+IMPORT Files, Objects, vyBase,  (*vyHost, *) vyHostTexts, vyinteger := vyInteger, vyLongintVec, vySizeVec, vyName;
 
 CONST
 	idversion* = "vvyIntVec 0.0a4";   (* may be maintained or changed by tools *)
@@ -511,7 +511,7 @@ TYPE
 	BEGIN
 		ASSERT ( v # NIL , 100 );
 		ASSERT ( indexvec # NIL , 101 );
-		WITH v: tVector DO vyBase.Loc( vyLongintVec.Get( indexvec( vyLongintVec.tVector ), pos ), v, chunk, loc );
+		WITH v: tVector DO vyBase.Loc( vySizeVec.Get( indexvec( vySizeVec.tVector ), pos ), v, chunk, loc );
 			ASSERT ( loc >= 0 );
 			ASSERT ( chunk # NIL );
 			RETURN chunk( tBuf ).data[loc]
@@ -527,7 +527,7 @@ TYPE
 			ASSERT ( v # NIL , 100 );
 			ASSERT ( indexvec # NIL , 101 );
 			ASSERT ( pos < v.nrData, 102 );   (* IF pos >= v.nrData THEN  vyBase.MarkUsed(pos + 1, v) END; *)
-			vyBase.Loc( vyLongintVec.Get( indexvec( vyLongintVec.tVector ), pos ), v, chunk, loc );
+			vyBase.Loc( vySizeVec.Get( indexvec( vySizeVec.tVector ), pos ), v, chunk, loc );
 			ASSERT ( loc >= 0 );
 			WITH chunk: tBuf DO chunk.data[loc] := xval
 			END;
@@ -632,11 +632,11 @@ TYPE
 		END
 	END SortEachChunkINTEGER;
 
-	PROCEDURE SortEachChunkINTEGERWId*( c: tBuf;  cid: vyLongintVec.tBuf );
+	PROCEDURE SortEachChunkINTEGERWId*( c: tBuf;  cid: vySizeVec.tBuf );
 	BEGIN
 		WHILE (c # NIL ) DO
-			vyinteger.SortIndexed( c.usedentries, c.data^, 0, cid( vyLongintVec.tBuf ).data^ );
-			IF c.next = NIL THEN c := NIL ELSE c := c.next( tBuf );  cid := cid.next( vyLongintVec.tBuf ) END
+			vyinteger.SortIndexed( c.usedentries, c.data^, 0, cid( vySizeVec.tBuf ).data^ );
+			IF c.next = NIL THEN c := NIL ELSE c := c.next( tBuf );  cid := cid.next( vySizeVec.tBuf ) END
 		END
 	END SortEachChunkINTEGERWId;
 
@@ -707,7 +707,7 @@ TYPE
 		RETURN TRUE
 	END MergeSortedChunkINTEGER;
 
-	PROCEDURE MergeSortedChunkINTEGERWId( s1, s2: tBuf;  s1id, s2id: vyLongintVec.tBuf ): BOOLEAN;
+	PROCEDURE MergeSortedChunkINTEGERWId( s1, s2: tBuf;  s1id, s2id: vySizeVec.tBuf ): BOOLEAN;
 
 	(* v0r0a1, Felix O. Friedrich 31.8.95 *)
 
@@ -717,37 +717,37 @@ TYPE
 	(* d is really a NEW Chunk, i.e. memory is really allocated, be careful with iterative techinques,
 	one could think of changing s1,s2 *)
 
-	VAR i1, i2, r1id, r2id, length, i: SIZE;  c1, c2, d: tBuf;  c1id, c2id, did: vyLongintVec.tBuf;
+	VAR i1, i2, r1id, r2id, length, i: SIZE;  c1, c2, d: tBuf;  c1id, c2id, did: vySizeVec.tBuf;
 		done, c1ended, c2ended, c2used, sorted: BOOLEAN;  r1, r2, lastr: SIGNED16;  cinter: vyBase.tBuf;  v, v1: tVector;
 
-		PROCEDURE GetNextInteger( VAR c: tBuf;  VAR cid: vyLongintVec.tBuf;  VAR i: SIZE;  VAR r: SIGNED16;  VAR rid: SIZE ): BOOLEAN;
-		VAR ctemp: tBuf;  ctempid: vyLongintVec.tBuf;
+		PROCEDURE GetNextInteger( VAR c: tBuf;  VAR cid: vySizeVec.tBuf;  VAR i: SIZE;  VAR r: SIGNED16;  VAR rid: SIZE ): BOOLEAN;
+		VAR ctemp: tBuf;  ctempid: vySizeVec.tBuf;
 		BEGIN
 			IF c = NIL THEN RETURN FALSE END;
 			WHILE (i = c.usedentries) DO
 				i := 0;  cinter := vyBase.NextBuf( c );  c := tcI( cinter );  cinter := vyBase.NextBuf( cid );
-				cid := vyLongintVec.tcL( cinter );
+				cid := vySizeVec.tcL( cinter );
 				IF c = NIL THEN RETURN FALSE END
 			END;
 			ctemp := c;  ctempid := cid;   (* hack to avoid warnings *)
-			r := ctemp.data[i];  rid := ctempid( vyLongintVec.tBuf ).data[i];  INC( i );
+			r := ctemp.data[i];  rid := ctempid( vySizeVec.tBuf ).data[i];  INC( i );
 			IF i = c.usedentries THEN
 				i := 0;  cinter := vyBase.NextBuf( c );  c := tcI( cinter );  cinter := vyBase.NextBuf( cid );
-				cid := vyLongintVec.tcL( cinter )
+				cid := vySizeVec.tcL( cinter )
 			END;
 			RETURN TRUE
 		END GetNextInteger;
 
 		PROCEDURE store( r: SIGNED16;  rid: SIZE ): BOOLEAN;
 		BEGIN
-			v.buf := d;  Append( r, v );  v.buf := did;  vyLongintVec.Append( SIGNED32(rid), v );
+			v.buf := d;  Append( r, v );  v.buf := did;  vySizeVec.Append( SIGNED32(rid), v );
 			IF lastr <= r THEN lastr := r;  RETURN TRUE ELSE lastr := r;  RETURN FALSE END
 		END store;
 
 	BEGIN
 		i1 := 0;  i2 := 0;  c1 := s1;  c2 := s2;  c1id := s1id;  c2id := s2id;  done := FALSE;  sorted := TRUE;
 		length := vyBase.GetUsedEntries( c1 ) + vyBase.GetUsedEntries( c2 );  d := NewBufs( length );
-		did := vyLongintVec.NewBufs( length );  c1ended := ~GetNextInteger( c1, c1id, i1, r1, r1id );
+		did := vySizeVec.NewBufs( length );  c1ended := ~GetNextInteger( c1, c1id, i1, r1, r1id );
 		c2ended := ~GetNextInteger( c2, c2id, i2, r2, r2id );  lastr := MIN( SIGNED16 );  NEW( v );
 		REPEAT
 			IF c1ended THEN
@@ -769,12 +769,12 @@ TYPE
 			IF vyBase.NextBuf( c1 ) = NIL THEN
 				IF ~c2used THEN c1.next := c2;  c1id.next := c2id;  c2used := TRUE END
 			END;
-			cinter := vyBase.NextBuf( c1 );  c1 := tcI( cinter );  cinter := vyBase.NextBuf( c1id );  c1id := vyLongintVec.tcL( cinter )
+			cinter := vyBase.NextBuf( c1 );  c1 := tcI( cinter );  cinter := vyBase.NextBuf( c1id );  c1id := vySizeVec.tcL( cinter )
 		END;
 		c1 := s1;  c1id := s1id;  i := 0;  NEW( v1 );
 		WHILE (i < length) DO
 			v.buf := c1;  v1.buf := d;  Append( Get( v1, i ), v );  v.buf := c1id;  v1.buf := did;
-			vyLongintVec.Append( vyLongintVec.Get( v1, i ), v );  INC( i )
+			vySizeVec.Append( vySizeVec.Get( v1, i ), v );  INC( i )
 		END;
 		RETURN TRUE
 	END MergeSortedChunkINTEGERWId;
@@ -858,7 +858,7 @@ TYPE
 		chunk := SortTheChunks( root( tBuf ) )
 	END SortBuf;
 
-	PROCEDURE SortBufWId*( VAR chunk: tBuf;  VAR chunkid: vyLongintVec.tBuf );
+	PROCEDURE SortBufWId*( VAR chunk: tBuf;  VAR chunkid: vySizeVec.tBuf );
 
 	(* v0r0a1, Felix O. Friedrich 31.8.95 *)
 
@@ -875,28 +875,28 @@ TYPE
 	*)
 
 
-	VAR this, root, c2, c3, t1, t2: tBuf;  rootid, thisid, c2id, c3id, t1id, t2id: vyLongintVec.tBuf;  cinter: vyBase.tBuf;
+	VAR this, root, c2, c3, t1, t2: tBuf;  rootid, thisid, c2id, c3id, t1id, t2id: vySizeVec.tBuf;  cinter: vyBase.tBuf;
 		c2m, t1m, t2m: tMinMaxCache;
 
-		PROCEDURE SortTheChunksWId( c: tBuf;  VAR cid: vyLongintVec.tBuf ): tBuf;
+		PROCEDURE SortTheChunksWId( c: tBuf;  VAR cid: vySizeVec.tBuf ): tBuf;
 		(* get non-overlapping queues of chunks (c1,c2) and merge sorted afterwards, iterative *)
-		VAR ch1, ch2, tmp1, tmp2, tmp: tBuf;  sorted: BOOLEAN;  ch1id, ch2id, tmp1id, tmp2id, tmpid: vyLongintVec.tBuf;
+		VAR ch1, ch2, tmp1, tmp2, tmp: tBuf;  sorted: BOOLEAN;  ch1id, ch2id, tmp1id, tmp2id, tmpid: vySizeVec.tBuf;
 			tnm, tm: tMinMaxCache;
 		BEGIN
 			ch1 := c;  ch2 := NIL;  tmp1 := ch1;  ch1id := cid;  ch2id := NIL;  tmp1id := ch1id;
 			WHILE (tmp1.next # NIL ) DO
 				cinter := vyBase.NextBuf( tmp1.next );  tmp := tcI( cinter );  cinter := vyBase.NextBuf( tmp1id.next );
-				tmpid := vyLongintVec.tcL( cinter );  tnm := BufMinMax( tmp1.next );  tm := BufMinMax( tmp1 );
+				tmpid := vySizeVec.tcL( cinter );  tnm := BufMinMax( tmp1.next );  tm := BufMinMax( tmp1 );
 
 				IF tnm.min < tm.max THEN
 					IF ch2 = NIL THEN
-						ch2 := tmp1.next( tBuf );  tmp2 := ch2;  ch2id := tmp1id.next( vyLongintVec.tBuf );  tmp2id := ch2id
+						ch2 := tmp1.next( tBuf );  tmp2 := ch2;  ch2id := tmp1id.next( vySizeVec.tBuf );  tmp2id := ch2id
 					ELSE
 						tmp2.next := tmp1.next;  tmp2 := tmp2.next( tBuf );  tmp2id.next := tmp1id.next;
-						tmp2id := tmp2id.next( vyLongintVec.tBuf )
+						tmp2id := tmp2id.next( vySizeVec.tBuf )
 					END;
 					tmp1.next := tmp;  tmp1id.next := tmpid
-				ELSE  tmp1 := tmp1.next( tBuf );  tmp1id := tmp1id.next( vyLongintVec.tBuf )
+				ELSE  tmp1 := tmp1.next( tBuf );  tmp1id := tmp1id.next( vySizeVec.tBuf )
 				END
 			END;
 			IF ch2 = NIL THEN SortEachChunkINTEGERWId( ch1, ch1id );  cid := ch1id;  RETURN ch1
@@ -913,18 +913,18 @@ TYPE
 	IF this = NIL THEN RETURN END;
 	WHILE (this # NIL) & (this.next # NIL) DO
 	c2 := this.next(tBuf);   cinter := vyBase.NextBuf(vyBase.NextBuf(this));   c3 := tcI(cinter);   t1 := root;
-	c2id := thisid.next(vyLongintVec.tBuf);   cinter := vyBase.NextBuf(vyBase.NextBuf(thisid));   c3id := vyLongintVec.tcL(cinter);   t1id := rootid;
+	c2id := thisid.next(vySizeVec.tBuf);   cinter := vyBase.NextBuf(vyBase.NextBuf(thisid));   c3id := vySizeVec.tcL(cinter);   t1id := rootid;
 	IF c2.min <= t1.min THEN
 	c2.next := t1;   root := c2;   this.next := c3;   c2id.next := t1id;   rootid := c2id;   thisid.next := c3id
 	ELSE
 	LOOP
-	cinter := vyBase.NextBuf(t1);   t2 := tcI(cinter);   cinter := vyBase.NextBuf(t1id);   t2id := vyLongintVec.tcL(cinter);
+	cinter := vyBase.NextBuf(t1);   t2 := tcI(cinter);   cinter := vyBase.NextBuf(t1id);   t2id := vySizeVec.tcL(cinter);
 	IF c2.min < t2.min THEN
 	c2.next := t2;   t1.next := c2;   this.next := c3;   c2id.next := t2id;   t1id.next := c2id;   thisid.next := c3id;   EXIT
 	END;
 	t1 := t2;   t1id := t2id;
 	IF (t1 = this.next) THEN
-	cinter := vyBase.NextBuf(this);   this := tcI(cinter);   cinter := vyBase.NextBuf(thisid);   thisid := vyLongintVec.tcL(cinter);   EXIT
+	cinter := vyBase.NextBuf(this);   this := tcI(cinter);   cinter := vyBase.NextBuf(thisid);   thisid := vySizeVec.tcL(cinter);   EXIT
 	END
 	END
 	END
@@ -936,21 +936,21 @@ TYPE
 		IF this = NIL THEN RETURN END;
 		WHILE (this # NIL ) & (this.next # NIL ) DO
 			c2 := this.next( tBuf );  cinter := vyBase.NextBuf( vyBase.NextBuf( this ) );  c3 := tcI( cinter );  t1 := root;
-			c2id := thisid.next( vyLongintVec.tBuf );  cinter := vyBase.NextBuf( vyBase.NextBuf( thisid ) );
-			c3id := vyLongintVec.tcL( cinter );  t1id := rootid;  c2m := BufMinMax( c2 );  t1m := BufMinMax( t1 );
+			c2id := thisid.next( vySizeVec.tBuf );  cinter := vyBase.NextBuf( vyBase.NextBuf( thisid ) );
+			c3id := vySizeVec.tcL( cinter );  t1id := rootid;  c2m := BufMinMax( c2 );  t1m := BufMinMax( t1 );
 			IF c2m.min <= t1m.min THEN
 				c2.next := t1;  root := c2;  this.next := c3;  c2id.next := t1id;  rootid := c2id;  thisid.next := c3id
 			ELSE
 				LOOP
 					cinter := vyBase.NextBuf( t1 );  t2 := tcI( cinter );  cinter := vyBase.NextBuf( t1id );
-					t2id := vyLongintVec.tcL( cinter );  c2m := BufMinMax( c2 );  t2m := BufMinMax( t2 );
+					t2id := vySizeVec.tcL( cinter );  c2m := BufMinMax( c2 );  t2m := BufMinMax( t2 );
 					IF c2m.min < t2m.min THEN
 						c2.next := t2;  t1.next := c2;  this.next := c3;  c2id.next := t2id;  t1id.next := c2id;  thisid.next := c3id;  EXIT
 					END;
 					t1 := t2;  t1id := t2id;
 					IF (t1 = this.next) THEN
 						cinter := vyBase.NextBuf( this );  this := tcI( cinter );  cinter := vyBase.NextBuf( thisid );
-						thisid := vyLongintVec.tcL( cinter );  EXIT
+						thisid := vySizeVec.tcL( cinter );  EXIT
 					END
 				END
 			END
@@ -978,7 +978,7 @@ TYPE
 	PROCEDURE SortWId*( VAR v: vyBase.tVector;  VAR WId: vyBase.tVector );
 	(*= Index must be a longint chunk *)
 	(* ! rearrange a vector by id keys *)
-	VAR chunk, chunkid: vyBase.tBuf;  tcx: tBuf;  tclid: vyLongintVec.tBuf;
+	VAR chunk, chunkid: vyBase.tBuf;  tcx: tBuf;  tclid: vySizeVec.tBuf;
 	BEGIN
 		IF (v = NIL ) OR (v.buf = NIL ) OR (WId = NIL ) OR (WId.buf = NIL ) THEN RETURN END;
 		ASSERT ( v.nrData = WId.nrData, 100 );
@@ -986,7 +986,7 @@ TYPE
 		chunkid := WId.buf;
 		ASSERT ( chunkid IS tBuf, 101 );
 		tcx := v.buf( tBuf );   (* fof for Ob S3 Windows 960528*)
-		tclid := WId.buf( vyLongintVec.tBuf );  SortEachChunkINTEGERWId( tcx, tclid );
+		tclid := WId.buf( vySizeVec.tBuf );  SortEachChunkINTEGERWId( tcx, tclid );
 		IF chunk.next # NIL THEN
 			SortBufWId( tcx, tclid );
 			v.buf := tcx;   (* fof 971006 *)

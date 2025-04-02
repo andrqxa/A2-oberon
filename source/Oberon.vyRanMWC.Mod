@@ -130,8 +130,8 @@ END LongInc;
 	is simply copied from there *)
 	VAR ah, al, bh, bl, t, u, tmp, r: SIGNED32;
 	BEGIN
-		ah := LSH( a, sysSHR * 16 );  al := S.VAL( SIGNED32, S.VAL( SET, a ) * S.VAL( SET, vyRanBase.sysMaxUnsigned ) );
-		bh := LSH( b, sysSHR * 16 );  bl := S.VAL( SIGNED32, S.VAL( SET, b ) * S.VAL( SET, vyRanBase.sysMaxUnsigned ) );
+		ah := LSH( a, sysSHR * 16 );  al := S.VAL( SIGNED32, S.VAL( SET32, a ) * S.VAL( SET32, vyRanBase.sysMaxUnsigned ) );
+		bh := LSH( b, sysSHR * 16 );  bl := S.VAL( SIGNED32, S.VAL( SET32, b ) * S.VAL( SET32, vyRanBase.sysMaxUnsigned ) );
 
 		low := al * bl;  t := ah * bl;  u := al * bh;  high := ah * bh;
 

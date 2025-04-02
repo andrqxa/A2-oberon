@@ -61,11 +61,11 @@ TYPE
 		fcol*, bcol*: Display.Color   ;   (*! fof: fcol read only ?*)
 		mode*: SIGNED16;     (** Display paint mode **)(*! fof: mode read only  ?*)
 		style*: SET;     (** Display styles **)(*! fof:  read only ? *)
-		pattern*: SIGNED32;     (** Display Patterns **)(*! fof:  read only ? *)
+		pattern*: Display.Pattern;     (** Display Patterns **)(*! fof:  read only ? *)
 		pensize* : SIGNED16;   (*! fof:  read only *)
 		fnt*: ARRAY 64 OF CHAR;
 		fillcol*, selectcol*: Display.Color;
-		fillpat*, selectpat*: SIGNED32;
+		fillpat*, selectpat*: Display.Pattern;
 		alpha*: SIGNED16
 	END;
 
@@ -262,15 +262,15 @@ BEGIN
 		ELSIF M.name = "bcol"THEN M.class := Objects.Int;     M.i := s.bcol;     M.res := 0
 		ELSIF M.name = "mode"THEN M.class := Objects.Int;     M.i := s.mode;     M.res := 0
 			(*ELSIF M.name="style" THEN M.class:=Objects.Int; M.i:=s.style; M.res:=0*)
-		ELSIF M.name = "pattern"THEN M.class := Objects.Int;     M.i := s.pattern;     M.res := 0
+		ELSIF M.name = "pattern"THEN M.class := Objects.Int;     M.i := SIGNED32(s.pattern);     M.res := 0
 		ELSIF M.name = "pensize"THEN M.class := Objects.Int;     M.i := s.pensize;     M.res := 0
 		ELSIF M.name = "alpha"THEN M.class := Objects.Int;     M.i := s.alpha;  M.res := 0
 		ELSIF M.name = "style"THEN M.class := Objects.String;  Strings.SetToStr(s.style, M.s);  M.res := 0
 		ELSIF M.name = "fnt"THEN M.class := Objects.String;  COPY(s.fnt, M.s);  M.res := 0
 		ELSIF M.name = "fillcol"THEN M.class := Objects.Int;     M.i := s.fillcol;     M.res := 0
 		ELSIF M.name = "selectcol"THEN M.class := Objects.Int;     M.i := s.selectcol;  M.res := 0
-		ELSIF M.name = "fillpat"THEN M.class := Objects.Int;     M.i := s.fillpat;     M.res := 0
-		ELSIF M.name = "selectpat"THEN M.class := Objects.Int;     M.i := s.selectpat;     M.res := 0
+		ELSIF M.name = "fillpat"THEN M.class := Objects.Int;     M.i := SIGNED32(s.fillpat);     M.res := 0
+		ELSIF M.name = "selectpat"THEN M.class := Objects.Int;     M.i := SIGNED32(s.selectpat);     M.res := 0
 		END
 	ELSIF M.id = Objects.set THEN
 		IF (M.name = "fcol") & (M.class = Objects.Int )THEN  s.fcol := SHORT(M.i);     M.res := 0
@@ -300,7 +300,7 @@ BEGIN
 END HandleStyleAttributes;
 
 PROCEDURE WriteStyle* (VAR R: Files.Rider;    VAR (* IN *)s: Style);
-PROCEDURE PatToId (pat: SIGNED32): SIGNED16;
+PROCEDURE PatToId (pat: ADDRESS): SIGNED16;
 BEGIN
 	IF pat = Display.solid THEN RETURN(1)
 	ELSIF pat = Display.grey0 THEN RETURN(2)
@@ -394,9 +394,9 @@ PROCEDURE SetDisplayStyle* (s: SET);
 BEGIN	S.style := s   ;  vyGraphBase0.SetDisplayStyle(s) 	END SetDisplayStyle;
 PROCEDURE GetDisplayStyle* (VAR s: SET);
 BEGIN	s := S.style  	END GetDisplayStyle;
-PROCEDURE SetDisplayPattern* (p: SIGNED32);
+PROCEDURE SetDisplayPattern* (p: Display.Pattern);
 BEGIN	S.pattern := p  ;  vyGraphBase0.SetDisplayPattern(p)	END SetDisplayPattern;
-PROCEDURE GetDisplayPattern* (VAR p: SIGNED32);
+PROCEDURE GetDisplayPattern* (VAR p: Display.Pattern);
 BEGIN	p := S.pattern  	END GetDisplayPattern;
 PROCEDURE SetFont* (fnt: ARRAY OF CHAR);
 BEGIN	COPY(fnt, S.fnt)  ;  vyGraphBase0.SetFont(fnt)	END SetFont;
@@ -632,10 +632,10 @@ BEGIN
 	END
 END FitFillArea;
 
-PROCEDURE FrameFillArea* (x, y: ARRAY OF SIGNED16;     numPoints: vyHost.Index);
-BEGIN 	FitFillArea(x, y, SHORT(numPoints));     vyGraphBase0.poly(x, y, SHORT(numPoints)) END FrameFillArea;
+PROCEDURE FrameFillArea* (x, y: ARRAY OF SIGNED16;     numPoints: SIGNED16);
+BEGIN 	FitFillArea(x, y, numPoints);     vyGraphBase0.poly(x, y, numPoints) END FrameFillArea;
 
-PROCEDURE FrameFillArea2d* (x, y: ARRAY OF Real;    numPoints: vyBase.Index);
+PROCEDURE FrameFillArea2d* (x, y: ARRAY OF Real;    numPoints: SIGNED16);
 	VAR i, end: vyBase.Index;    X, Y: tPolygon;
 BEGIN end := Min (numPoints, maxNumPoints);
 	FOR i := 0 TO end - 1 DO
@@ -644,9 +644,9 @@ BEGIN end := Min (numPoints, maxNumPoints);
 END FrameFillArea2d;
 
 PROCEDURE PaintFillArea* (x, y: ARRAY OF SIGNED16;     numPoints: vyHost.Index);
-BEGIN FitFillArea(x, y, SHORT(numPoints));
+BEGIN FitFillArea(x, y, SIGNED16(numPoints));
 	vyGraphBase0.SetDisplayStyle({Display3.filled});
-	vyGraphBase0.poly(x, y, SHORT(numPoints)) ;
+	vyGraphBase0.poly(x, y, SIGNED16(numPoints)) ;
 	vyGraphBase0.SetDisplayStyle(S.style)
 
 END PaintFillArea;
@@ -660,7 +660,7 @@ BEGIN end := Min (numPoints, maxNumPoints);
 END PaintFillArea2d;
 
 PROCEDURE EraseFillArea* (x, y: ARRAY OF SIGNED16;     numPoints: vyHost.Index);
-	VAR col:  Display.Color;     pat: SIGNED32;
+	VAR col:  Display.Color;     pat: Display.Pattern;
 BEGIN
 	IF status = display THEN
 		pat := S.pattern;     S.pattern := Display.solid;

@@ -1791,7 +1791,7 @@ END LayerHandleAttributes;*)
 	END Bind;
 
 	PROCEDURE LayerHandler*( o: Objects.Object;  VAR M: Objects.ObjMsg );
-	VAR obj0: tLayer;  obsub: Objects.Object;  minX, minY, maxX, maxY, dy: Real;  nansX, nansY: SIGNED32;  vx, vy: vyBase.tVector;
+	VAR obj0: tLayer;  obsub: Objects.Object;  minX, minY, maxX, maxY, dy: Real;  nansX, nansY: SIZE;  vx, vy: vyBase.tVector;
 		pmsg: Gadgets.PriorityMsg;  p: Picture;
 
 	BEGIN  (*vyHostTexts.Msg(' Enter LayerHandler');*)
@@ -1947,7 +1947,7 @@ END LayerHandleAttributes;*)
 	END NewP;
 
 	PROCEDURE InsertNewVecPicture*( vx, vy: vyBase.tVector ): Picture;
-	VAR minX, minY, maxX, maxY: Real;  nansX, nansY: SIGNED32;
+	VAR minX, minY, maxX, maxY: Real;  nansX, nansY: SIZE;
 	BEGIN
 		IF vx = NIL THEN minX := 0;  maxX := 1;  nansX := 0 ELSE vyTypes.VGetMinMax( vx, minX, maxX, nansX ) END;
 		IF vy = NIL THEN minY := 0;  maxY := 1;  nansY := 0 ELSE vyTypes.VGetMinMax( vy, minY, maxY, nansY ) END;

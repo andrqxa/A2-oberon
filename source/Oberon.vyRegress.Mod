@@ -50,7 +50,7 @@ TYPE
 	Real = vyBase.Real;
 	tRegression = RECORD
 		slope, intercept, errvar: FLOAT64;
-		count: SIGNED32;
+		count: SIZE;
 		ymean, yssq: FLOAT64
 	END;
 	tFBandParameter = POINTER TO tFBandParameterDesc;
@@ -101,7 +101,7 @@ END FBand;
 
 PROCEDURE NewResidualsAndFit* (response, regressor: vyBase.tVector;   offs, slope: FLOAT64;
 VAR residuals, fit: vyBase.tVector);
-	VAR i, nrData: SIGNED32;   curfit: Real;
+	VAR i, nrData: SIZE;   curfit: Real;
 BEGIN
 	ASSERT(regressor IS vyRealVec.tVector , vyBase.precc);
 	ASSERT( (regressor.nrData > 0), 101);
@@ -122,7 +122,7 @@ BEGIN
 END NewResidualsAndFit;
 
 PROCEDURE CalcRegress (response, regressor: vyBase.tVector;    VAR regression: tRegression);
-	VAR	XYSSQ: FLOAT64;    stx, sty: vyQFisher.Stattyp;    nrData, i: SIGNED32;
+	VAR	XYSSQ: FLOAT64;    stx, sty: vyQFisher.Stattyp;    nrData, i: SIZE;
 BEGIN
 	ASSERT(response.nrData = regressor.nrData, 100);
 	nrData := response.nrData;
@@ -142,7 +142,7 @@ END CalcRegress;
 PROCEDURE DoRegress* (response, regressor: vyBase.tVector;    inSim: BOOLEAN);
 VAR
 	Err: SIGNED16;
-	nrData, nans: SIGNED32;
+	nrData, nans: SIZE;
 	minX, maxX, minY, maxY: Real;
 	xyScatter, resScatter: vyScatter2.tLayer;
 	regLine, nullLine: vyLine.tLayer;
@@ -156,7 +156,7 @@ BEGIN ASSERT (response.nrData = regressor.nrData, 100);
 	ReportRegression(namey, namex, para1);
 
 	NewResidualsAndFit(response, regressor, para1.Regression.intercept, para1.Regression.slope, Resid, Fit);
-	para1.F := SHORT(vyQFisher.Qfisher(2, SHORT(nrData - 2), level, Err));   (*  F value *)
+	para1.F := SIGNED16(vyQFisher.Qfisher(2, SIGNED16(nrData - 2), level, Err));   (*  F value *)
 	(* Draw confidence bands. This curve is given by a function *)
 
 	para1.UpBand := 1;    			para2^ := para1^;    	para2.UpBand := - 1;
