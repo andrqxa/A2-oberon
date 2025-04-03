@@ -73,7 +73,7 @@ TYPE
 		END WriteType;
 
 		PROCEDURE  (* VAR R: Rider*) ReadType*;
-		VAR ch: CHAR;  pos: SIGNED32;
+		VAR ch: CHAR;  pos: SIZE;
 		BEGIN
 			pos := SELF.Pos();  SELF.Read( ch );
 			IF ch # 0F1X THEN SELF.SetPos( pos );  SELF.SetAscii;  aM.SI( "Type: ASCII at pos ", pos );  RETURN END;
@@ -91,10 +91,10 @@ TYPE
 			DoRead( SELF, ch )
 		END Read;
 
-		PROCEDURE  (* VAR R: Rider*) ReadBytes*( VAR ch: ARRAY OF SYSTEM.BYTE;  num: SIGNED32 );
+		PROCEDURE  (* VAR R: Rider*) ReadBytes*( VAR ch: ARRAY OF SYSTEM.BYTE;  num: SIZE );
 		BEGIN
-			Files.ReadBytes( SELF.R, ch, num );
-			IF SELF.reverse THEN Turn( ch, num ) END;
+			Files.ReadBytes( SELF.R, ch, SIGNED32(num) );
+			IF SELF.reverse THEN Turn( ch, SIGNED32(num) ) END;
 			SELF.eot := SELF.R.eof
 		END ReadBytes;
 
@@ -107,8 +107,8 @@ TYPE
 			END
 		END ReadInt;
 
-		PROCEDURE  (* VAR R: Rider*) ReadIntsFix*( VAR x: ARRAY OF SIGNED16;  num: SIGNED32 );
-		VAR i: SIGNED32;
+		PROCEDURE  (* VAR R: Rider*) ReadIntsFix*( VAR x: ARRAY OF SIGNED16;  num: SIZE );
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < num) DO SELF.ReadInt( x[i] );  INC( i ) END
@@ -131,8 +131,8 @@ TYPE
 			END
 		END ReadLInt;
 
-		PROCEDURE  (* VAR R: Rider*) ReadLIntsFix*( VAR x: ARRAY OF SIGNED32;  num: SIGNED32 );
-		VAR i: SIGNED32;
+		PROCEDURE  (* VAR R: Rider*) ReadLIntsFix*( VAR x: ARRAY OF SIGNED32;  num: SIZE );
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < num) DO SELF.ReadLInt( x[i] );  INC( i ) END
@@ -155,8 +155,8 @@ TYPE
 			END
 		END ReadReal;
 
-		PROCEDURE  (* VAR R: Rider*) ReadRealsFix*( VAR x: ARRAY OF FLOAT32;  num: SIGNED32 );
-		VAR i: SIGNED32;
+		PROCEDURE  (* VAR R: Rider*) ReadRealsFix*( VAR x: ARRAY OF FLOAT32;  num: SIZE );
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < num) DO SELF.ReadReal( x[i] );  INC( i ) END
@@ -179,8 +179,8 @@ TYPE
 			END
 		END ReadLReal;
 
-		PROCEDURE  (* VAR R: Rider*) ReadLRealsFix*( VAR x: ARRAY OF FLOAT64;  num: SIGNED32 );
-		VAR i: SIGNED32;
+		PROCEDURE  (* VAR R: Rider*) ReadLRealsFix*( VAR x: ARRAY OF FLOAT64;  num: SIZE );
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < num) DO SELF.ReadLReal( x[i] );  INC( i ) END
@@ -245,10 +245,10 @@ END ReadLn;
 			DoWrite( SELF, ch )
 		END Write;
 
-		PROCEDURE  (* VAR R: Rider*) WriteBytes*( VAR ch: ARRAY OF SYSTEM.BYTE;  num: SIGNED32 );
+		PROCEDURE  (* VAR R: Rider*) WriteBytes*( VAR ch: ARRAY OF SYSTEM.BYTE;  num: SIZE );
 		BEGIN
 			IF SELF.reverse THEN Turn( ch, num ) END;
-			Files.WriteBytes( SELF.R, ch, num )
+			Files.WriteBytes( SELF.R, ch, SIGNED32(num) )
 		END WriteBytes;
 
 		PROCEDURE  (* VAR R: Rider*) WriteInt*( x: SIGNED16 );
@@ -269,8 +269,8 @@ END ReadLn;
 			END
 		END WriteEmptyLine;
 
-		PROCEDURE  (* VAR R: Rider*) WriteIntsFix*( VAR x: ARRAY OF SIGNED16;  num: SIGNED32 );
-		VAR i: SIGNED32;
+		PROCEDURE  (* VAR R: Rider*) WriteIntsFix*( VAR x: ARRAY OF SIGNED16;  num: SIZE );
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < num) DO SELF.WriteInt( x[i] );  INC( i ) END;
@@ -295,8 +295,8 @@ END ReadLn;
 			END
 		END WriteLInt;
 
-		PROCEDURE  (* VAR R: Rider*) WriteLIntsFix*( VAR x: ARRAY OF SIGNED32;  num: SIGNED32 );
-		VAR i: SIGNED32;
+		PROCEDURE  (* VAR R: Rider*) WriteLIntsFix*( VAR x: ARRAY OF SIGNED32;  num: SIZE );
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < num) DO SELF.WriteLInt( x[i] );  INC( i ) END;
@@ -321,8 +321,8 @@ END ReadLn;
 			END
 		END WriteReal;
 
-		PROCEDURE  (* VAR R: Rider*) WriteRealsFix*( VAR x: ARRAY OF FLOAT32;  num: SIGNED32 );
-		VAR i: SIGNED32;
+		PROCEDURE  (* VAR R: Rider*) WriteRealsFix*( VAR x: ARRAY OF FLOAT32;  num: SIZE );
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < num) DO SELF.WriteReal( x[i] );  INC( i ) END;
@@ -347,8 +347,8 @@ END ReadLn;
 			END
 		END WriteLReal;
 
-		PROCEDURE  (* VAR R: Rider*) WriteLRealsFix*( VAR x: ARRAY OF FLOAT64;  num: SIGNED32 );
-		VAR i: SIGNED32;
+		PROCEDURE  (* VAR R: Rider*) WriteLRealsFix*( VAR x: ARRAY OF FLOAT64;  num: SIZE );
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < num) DO SELF.WriteLReal( x[i] );  INC( i ) END;
@@ -377,9 +377,9 @@ END ReadLn;
 			SELF.Write( CR )
 		END WriteLn;
 
-		PROCEDURE  (* VAR R: Rider*) SetPos*( pos: SIGNED32 );
+		PROCEDURE  (* VAR R: Rider*) SetPos*( pos: SIZE );
 		BEGIN
-			Files.Set( SELF.R, Files.Base( SELF.R ), pos )
+			Files.Set( SELF.R, Files.Base( SELF.R ), SIGNED32(pos) )
 		END SetPos;
 
 		PROCEDURE  (* VAR R: Rider*) Set*( type: SIGNED16 );
@@ -438,7 +438,7 @@ END ReadLn;
 			IF ~SELF.New( name ) THEN antsSecurity.Halt( "could not open file" ) END;
 		END ForceNew;
 
-		PROCEDURE  (* VAR R: Rider*) Pos*( ): SIGNED32;
+		PROCEDURE  (* VAR R: Rider*) Pos*( ): SIZE;
 		BEGIN
 			RETURN Files.Pos( SELF.R )
 		END Pos;
@@ -931,7 +931,7 @@ D the fixed exponent (printed only when D # 0). *)
 	END WhiteSpace;
 
 	PROCEDURE AsciiReadInt( R: Rider;  VAR x: SIGNED16 );   (* Read Integer Value ignoring Names *)
-	VAR pos: SIGNED32;
+	VAR pos: SIZE;
 	BEGIN
 		pos := R.Pos();  Scan( R );
 		WHILE (R.class = Texts.Name) & (~R.eot) DO Scan( R ) END;
@@ -950,7 +950,7 @@ D the fixed exponent (printed only when D # 0). *)
 	END BinReadInt;
 
 	PROCEDURE AsciiReadLInt( R: Rider;  VAR x: SIGNED32 );   (* Read Integer Value ignoring Names *)
-	VAR pos: SIGNED32;
+	VAR pos: SIZE;
 	BEGIN
 		pos := R.Pos();  Scan( R );
 		WHILE (R.class = Texts.Name) & (~R.eot) DO Scan( R ) END;
@@ -963,7 +963,7 @@ D the fixed exponent (printed only when D # 0). *)
 	END BinReadLInt;
 
 	PROCEDURE AsciiReadReal( R: Rider;  VAR x: FLOAT32 );   (* Read Integer Value ignoring Names *)
-	VAR pos: SIGNED32;
+	VAR pos: SIZE;
 	BEGIN
 		pos := R.Pos();  Scan( R );
 		WHILE (R.class = Texts.Name) & (~R.eot) DO Scan( R ) END;
@@ -980,7 +980,7 @@ D the fixed exponent (printed only when D # 0). *)
 	END BinReadReal;
 
 	PROCEDURE AsciiReadLReal( R: Rider;  VAR x: FLOAT64 );   (* Read Integer Value ignoring Names *)
-	VAR pos: SIGNED32;
+	VAR pos: SIZE;
 	BEGIN
 		pos := R.Pos();  Scan( R );
 		WHILE (R.class = Texts.Name) & (~R.eot) DO Scan( R ) END;
@@ -997,7 +997,7 @@ D the fixed exponent (printed only when D # 0). *)
 	END BinReadLReal;
 
 	PROCEDURE AsciiReadString( R: Rider;  VAR x: ARRAY OF CHAR );
-	VAR pos: SIGNED32;
+	VAR pos: SIZE;
 	BEGIN
 		pos := R.Pos();  Scan( R );
 		IF (R.class = Texts.Name) OR (R.class = Texts.String) THEN COPY( R.s, x ) ELSE R.err := TRUE;  R.SetPos( pos ) END
@@ -1023,8 +1023,8 @@ D the fixed exponent (printed only when D # 0). *)
 		Files.Write( R.R, ch )
 	END DoWrite;
 
-	PROCEDURE Turn( VAR ch: ARRAY OF SYSTEM.BYTE;  num: SIGNED32 );
-	VAR c: SYSTEM.BYTE;  i: SIGNED32;
+	PROCEDURE Turn( VAR ch: ARRAY OF SYSTEM.BYTE;  num: SIZE );
+	VAR c: SYSTEM.BYTE;  i: SIZE;
 	BEGIN
 		FOR i := 0 TO ((num - 1) DIV 2) DO c := ch[i];  ch[i] := ch[num - 1 - i];  ch[num - 1 - i] := c END
 	END Turn;

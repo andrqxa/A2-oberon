@@ -421,7 +421,7 @@ END CreateVector; *)(* for n dimension *)
 PROCEDURE F1Dim* (x: FLOAT64;   VAR  LinMinPCom,
 LinMinXCom: ARRAY OF FLOAT64 ;   fnc: VectorFunction): FLOAT64;
 VAR
-	j, linMinNCom: SIGNED32;
+	j, linMinNCom: SIZE;
 	(* Define the global variables. *)
 	f1dim: FLOAT64;
 BEGIN
@@ -457,7 +457,7 @@ PROCEDURE LinMin* (VAR P, XI: ARRAY OF FLOAT64;   VAR fret: FLOAT64;   vf: Vecto
 CONST
 	tol = 1.0E-4;   (* tol is passed to Brent. *)
 VAR
-	j, n, nXI: SIGNED32;
+	j, n, nXI: SIZE;
 	xx, xmin, fx, fb, fa, bx, ax: FLOAT64;   t1, t2: FLOAT64;
 	(* p, xi: PtrToReals;*)
 BEGIN
@@ -508,7 +508,7 @@ fncP: VectorFunction;  range: FLOAT64);
 CONST
 	itmax = 200;   (* Maximum allowed iterations. *)
 VAR
-	j, ibig, i, n : SIGNED32;
+	j, ibig, i, n : SIZE;
 	t, fptt, fp, del: FLOAT64;
 	(* p, pt, ptt, xit: PtrToReals;  *)
 	(* xi: PtrToLines; *)
@@ -569,7 +569,7 @@ END Powell;
 
 PROCEDURE EasyMinimize* (VAR P: ARRAY OF FLOAT64;  VAR fret: FLOAT64;  ftol: FLOAT64;   fncP: VectorFunction;  init: BOOLEAN);
 CONST range = 100000;
-	VAR n: SIGNED32;  iter: SIGNED32;  i, j: SIGNED32;   tol: FLOAT64;
+	VAR n: SIZE;  iter: SIGNED32;  i, j: SIZE;   tol: FLOAT64;
 BEGIN
 	n := LEN(P);
 	IF (tempXI = NIL) OR (LEN(tempXI^) # n)
@@ -597,7 +597,7 @@ END EasyMinimize;
 
 
 PROCEDURE mfncP ( VAR P: ARRAY OF FLOAT64): FLOAT64;
-	VAR ret: FLOAT64; i: SIGNED32;
+	VAR ret: FLOAT64; i: SIZE;
 BEGIN
 	ret := 1;
 	FOR i := 0 TO LEN(P) - 1 DO

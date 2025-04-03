@@ -79,10 +79,10 @@ BEGIN
 	RETURN a[k]
 END kSmallestX;
 
-PROCEDURE kSmallestL* (VAR a: ARRAY OF SIGNED32;   n, k: SIGNED32): SIGNED32;
+PROCEDURE kSmallestL* (VAR a: ARRAY OF SIGNED32;   n, k: SIZE): SIGNED32;
 	(** caution: modifies a*)
 	(* algorithm of Nikolaus Wirth *)
-	VAR i, j, l, m: SIGNED32;    x: SIGNED32;
+	VAR i, j, l, m: SIZE;    x: SIGNED32;
 PROCEDURE swap (VAR x, y: SIGNED32);
 	VAR z : SIGNED32;
 BEGIN
@@ -104,10 +104,10 @@ BEGIN
 	RETURN a[k]
 END kSmallestL;
 
-PROCEDURE kSmallestI* (VAR a: ARRAY OF SIGNED16;   n, k: SIGNED32): SIGNED16;
+PROCEDURE kSmallestI* (VAR a: ARRAY OF SIGNED16;   n, k: SIZE): SIGNED16;
 	(** caution: modifies a*)
 	(* algorithm of Nikolaus Wirth *)
-	VAR i, j, l, m: SIGNED32;    x: SIGNED16;
+	VAR i, j, l, m: SIZE;    x: SIGNED16;
 PROCEDURE swap (VAR x, y: SIGNED16);
 	VAR z : SIGNED16;
 BEGIN
@@ -117,7 +117,7 @@ BEGIN
 	l := 0;   m := n - 1;
 	WHILE(l < m) DO
 		x := a[k];
-		i := l;   j := m;
+		i := l;   j := m;
 		REPEAT
 			WHILE(a[i] < x)  DO INC(i) END;
 			WHILE(x < a[j])  DO DEC(j) END;
@@ -129,25 +129,25 @@ BEGIN
 	RETURN a[k]
 END kSmallestI;
 
-PROCEDURE Use1dX (VAR a: ARRAY OF FLOAT64;  n: SIGNED32);
+PROCEDURE Use1dX (VAR a: ARRAY OF FLOAT64;  n: SIZE);
 BEGIN
 	IF (ra = NIL) OR (LEN(ra) < n) THEN NEW(ra, n) END;
 	vyLongreal.Copy(n, a, 0, ra^, 0)
 END Use1dX;
 
-PROCEDURE Use1dI (VAR a: ARRAY OF SIGNED16;  n: SIGNED32);
+PROCEDURE Use1dI (VAR a: ARRAY OF SIGNED16;  n: SIZE);
 BEGIN
 	IF (ia = NIL) OR (LEN(ia) < n) THEN NEW(ia, n) END;
 	vyInteger.Copy(n, a, 0, ia^, 0)
 END Use1dI;
 
-PROCEDURE Use1dL (VAR a: ARRAY OF SIGNED32;  n: SIGNED32);
+PROCEDURE Use1dL (VAR a: ARRAY OF SIGNED32;  n: SIZE);
 BEGIN
 	IF (la = NIL) OR (LEN(la) < n) THEN NEW(la, n) END;
 	vyLongint.Copy(n, a, 0, la^, 0)
 END Use1dL;
 
-PROCEDURE Median1dX* (VAR a: ARRAY OF FLOAT64;   n: SIGNED32): FLOAT64;
+PROCEDURE Median1dX* (VAR a: ARRAY OF FLOAT64;   n: SIZE): FLOAT64;
 BEGIN
 	Use1dX(a, n);
 	IF ODD(n) THEN
@@ -157,7 +157,7 @@ BEGIN
 	END
 END Median1dX;
 
-PROCEDURE Median1dL* (VAR a: ARRAY OF SIGNED32;   n: SIGNED32): SIGNED32;
+PROCEDURE Median1dL* (VAR a: ARRAY OF SIGNED32;   n: SIZE): SIGNED32;
 BEGIN
 	Use1dL(a, n);
 	IF ODD(n) THEN
@@ -167,7 +167,7 @@ BEGIN
 	END
 END Median1dL;
 
-PROCEDURE Median1dI* (VAR a: ARRAY OF SIGNED16;   n: SIGNED32): SIGNED16;
+PROCEDURE Median1dI* (VAR a: ARRAY OF SIGNED16;   n: SIZE): SIGNED16;
 BEGIN
 	Use1dI(a, n);
 	IF ODD(n) THEN
