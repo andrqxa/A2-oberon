@@ -35,14 +35,14 @@ TYPE
 	Statistic* = POINTER TO StatisticDesc;
 	StatisticDesc* = RECORD (vyBase.ObjDesc)
 		data*, reko*: aA.X1d;
-		n*: SIGNED32;
+		n*: SIZE;
 	END;
 
 	PROCEDURE tautstring( VAR fdist: ARRAY OF FLOAT64;  VAR t: ARRAY OF FLOAT64;  VAR lower: ARRAY OF FLOAT64;  VAR upper: ARRAY OF FLOAT64;
-									   VAR y1: FLOAT64;  VAR yn: FLOAT64;  n: SIGNED32;  VAR string: ARRAY OF FLOAT64;  VAR knotsind: ARRAY OF SIGNED32;
-									   VAR knotst: ARRAY OF FLOAT64;  VAR knotsy: ARRAY OF FLOAT64;  VAR nknots: SIGNED32 );
+									   VAR y1: FLOAT64;  VAR yn: FLOAT64;  n: SIZE;  VAR string: ARRAY OF FLOAT64;  VAR knotsind: ARRAY OF SIZE;
+									   VAR knotst: ARRAY OF FLOAT64;  VAR knotsy: ARRAY OF FLOAT64;  VAR nknots: SIZE );
 
-	VAR newmaxderiv, newminderiv, maxderiv, minderiv, usualvalue: FLOAT64;  actind, minind, maxind, i, j, lastbound, lastsign, nmax: SIGNED32;  knotssign: aA.L1d;
+	VAR newmaxderiv, newminderiv, maxderiv, minderiv, usualvalue: FLOAT64;  actind, minind, maxind, i, j, lastbound, lastsign, nmax: SIZE;  knotssign: POINTER TO ARRAY OF SIZE;
 
 	BEGIN
 		NEW( knotssign, n );  nmax := 0;  lastbound := 0;  knotssign[0] := lastbound;  knotsind[0] := 1;  knotsy[0] := y1;  knotst[0] := t[0];  nknots := 1;  actind := 2;
@@ -107,9 +107,9 @@ TYPE
 
 	END tautstring;
 
-	PROCEDURE multiwdwr( y: ARRAY OF FLOAT64;  n: SIGNED32;  thresh: FLOAT64;  squeezing: ARRAY OF CHAR ): aA.L1d;
+	PROCEDURE multiwdwr( y: ARRAY OF FLOAT64;  n: SIZE;  thresh: FLOAT64;  squeezing: ARRAY OF CHAR ): POINTER TO ARRAY OF SIZE;
 
-	VAR z: aA.L1d;
+	VAR z: POINTER TO ARRAY OF SIZE;
 
 	BEGIN
 		IF (squeezing # "local") & (squeezing # "global") THEN antsSecurity.Halt( "Squeezing must be local or global !!!" );  END;
@@ -145,7 +145,7 @@ TYPE
 	PROCEDURE CreateTautString*( VAR s: Statistic;  degraded: vyBase.Object;  thr: FLOAT64;  squfac: FLOAT64;  squeezing: ARRAY OF CHAR );
 	(* Mit dieser Methode wird die Berechnung gestartet, die Felder des Objekts Statistic werden initialisiert. *)
 
-	VAR n, i: SIGNED32;
+	VAR n, i: SIZE;
 
 	BEGIN
 		n := vyLongrealVec.Len( degraded( vyLongrealVec.tVector ) );  NEW( s.data, n );  NEW( s.reko, n );  s.n := n;
@@ -156,8 +156,8 @@ TYPE
 	PROCEDURE GetTautString*( data: ARRAY OF FLOAT64;  VAR s: Statistic;  thr: FLOAT64;  squfac: FLOAT64;  squeezing: ARRAY OF CHAR );
 	(* Eigentliche Methode zur Berechnung des TautString. *)
 
-	VAR dataSum, dataSumX, eps, upper, lower, residuals, string, knotst, knotsy: aA.X1d;  ind, ind2, knotsind: aA.L1d;  dist, sigma, mean, sum, sqthr: FLOAT64;
-		i, nknots: SIGNED32;
+	VAR dataSum, dataSumX, eps, upper, lower, residuals, string, knotst, knotsy: aA.X1d;  ind, ind2, knotsind: POINTER TO ARRAY OF SIZE;  dist, sigma, mean, sum, sqthr: FLOAT64;
+		i, nknots: SIZE;
 
 	BEGIN
 		NEW( dataSum, s.n + 1 );  dataSum := cumsum( data );  NEW( dataSumX, s.n + 1 );  dataSumX := MakeXInterval( LEN( dataSum ) );
@@ -198,13 +198,13 @@ TYPE
 	END GetTautString;
 
 	PROCEDURE DoGetTautString( VAR fdistx: ARRAY OF FLOAT64;  VAR fdist: ARRAY OF FLOAT64;  VAR lower: ARRAY OF FLOAT64;  VAR upper: ARRAY OF FLOAT64;
-												   start: FLOAT64;  ende: FLOAT64;  VAR string: ARRAY OF FLOAT64;  VAR knotsind: ARRAY OF SIGNED32;
-												   VAR knotst: ARRAY OF FLOAT64;  VAR knotsy: ARRAY OF FLOAT64;  VAR nknots: SIGNED32;  VAR s: Statistic );
+												   start: FLOAT64;  ende: FLOAT64;  VAR string: ARRAY OF FLOAT64;  VAR knotsind: ARRAY OF SIZE;
+												   VAR knotst: ARRAY OF FLOAT64;  VAR knotsy: ARRAY OF FLOAT64;  VAR nknots: SIZE;  VAR s: Statistic );
 	(* Methode zur Neuberechnung des TautStrings. Wird in der Schleife von GetTautString aufgerufen.
 	Falls das Minimum der oberen Schranke noch zu weit von Maximum der unteren Schranke entfernt ist,
 	wird der TautString neu berechnet. *)
 
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 
 	BEGIN
 		IF (ABS( Min( upper ) - Max( lower ) ) < (1 / 100000000)) THEN
@@ -217,7 +217,7 @@ TYPE
 	PROCEDURE Mad*( y: ARRAY OF FLOAT64 ): FLOAT64;
 	(* Berechnung des MAD der Zahlen in y. *)
 
-	VAR i, len: SIGNED32;  med, mad: FLOAT64;  z: aA.X1d;
+	VAR i, len: SIZE;  med, mad: FLOAT64;  z: aA.X1d;
 
 	BEGIN
 		len := LEN( y ) - 1;  NEW( z, len );
@@ -236,7 +236,7 @@ TYPE
 	PROCEDURE Median( y: ARRAY OF FLOAT64 ): FLOAT64;
 	(* Berechnung des Medians der Zahlen in y. *)
 
-	VAR len: SIGNED32;
+	VAR len: SIZE;
 
 	BEGIN
 		len := LEN( y );  RETURN aA.Median1dX( y, len );
@@ -245,7 +245,7 @@ TYPE
 	PROCEDURE Mean( y: ARRAY OF FLOAT64 ): FLOAT64;
 	(* Berechnung des Durchschnitts der Zahlen in y. *)
 
-	VAR len, i, length: SIGNED32;  x, diff, mean: FLOAT64;
+	VAR len, i, length: SIZE;  x, diff, mean: FLOAT64;
 
 	BEGIN
 		len := LEN( y );  length := 1;  mean := 0;
@@ -259,7 +259,7 @@ TYPE
 	(* Berechnet eine kumulierte Summe.
 	In z[n] steht der Ausdruck Summe von 0 bis n-1 über y geteilt durch Länge von y. *)
 
-	VAR len, i: SIGNED32;  z: aA.X1d;
+	VAR len, i: SIZE;  z: aA.X1d;
 
 	BEGIN
 		len := LEN( y );  NEW( z, len + 1 );  z[0] := 0;
@@ -269,10 +269,10 @@ TYPE
 		RETURN z;
 	END cumsum;
 
-	PROCEDURE MakeXInterval( len: SIGNED32 ): aA.X1d;
+	PROCEDURE MakeXInterval( len: SIZE ): aA.X1d;
 	(* Erzeugung von äquidistanten Abständen der Anzahl len auf dem Intervall [0;1]. *)
 
-	VAR ret: aA.X1d;  i: SIGNED32;
+	VAR ret: aA.X1d;  i: SIZE;
 
 	BEGIN
 		NEW( ret, len );
@@ -285,7 +285,7 @@ TYPE
 	PROCEDURE Min*( x: ARRAY OF FLOAT64 ): FLOAT64;
 	(* Berechnet das Minimum der Einträge in x. *)
 
-	VAR min: FLOAT64;  i, len: SIGNED32;
+	VAR min: FLOAT64;  i, len: SIZE;
 
 	BEGIN
 		min := MAX( FLOAT64 );  len := LEN( x ) - 1;
@@ -300,7 +300,7 @@ TYPE
 	PROCEDURE Max*( x: ARRAY OF FLOAT64 ): FLOAT64;
 	(* Berechnet das Maximum der Einträge in x. *)
 
-	VAR max: FLOAT64;  i, len: SIGNED32;
+	VAR max: FLOAT64;  i, len: SIZE;
 
 	BEGIN
 		max := MIN( FLOAT64 );  len := LEN( x ) - 1;

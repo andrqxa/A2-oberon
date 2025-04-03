@@ -172,8 +172,8 @@ antsRegions.Gen; region := Objects.NewObj(antsRegions.tRegion);
 A := antsRegions.A;
 antsRegions.DoSelectRegion(region);
 B:= antsArrayObjects.NewObject(A.w,A.h,c.modelcount);
-FOR y := 0 TO SHORT(A.h-1) DO
-FOR x := 0 TO SHORT(A.w-1) DO
+FOR y := 0 TO SIGNED16(A.h-1) DO
+FOR x := 0 TO SIGNED16(A.w-1) DO
 region.y := y-region.h DIV 2;
 region.x := x-region.w DIV 2;
 i := 0;
@@ -217,14 +217,14 @@ BEGIN
 		antsRegions.Gen;   region := Objects.NewObj(antsRegions.tRegion);
 		antsRegions.DoSelectRegion(region);
 		A := antsRegions.A;
-		vyRectangles.RectIntersection(region.x, region.y, region.w, region.h, 0, 0, SHORT(A.w), SHORT(A.h));
+		vyRectangles.RectIntersection(region.x, region.y, region.w, region.h, 0, 0, SIGNED16(A.w), SIGNED16(A.h));
 		link := c.ModelClass;    NEW(tac);   taccur := tac;
 		WHILE link # NIL DO
 			NEW(taccur.A, region.h, region.w);
 			m := link.obj(antsMDimDiscreteIsingS.tModel);
 			m.region := region;
 
-			taccur.msize := SHORT(m.dim);
+			taccur.msize := SIGNED16(m.dim);
 			antsMDimDiscreteIsingS.PseudoLikTab(A, m, taccur.A^);
 			link := link.link;
 			IF link # NIL THEN NEW(taccur.next);   taccur := taccur.next END
@@ -233,8 +233,8 @@ BEGIN
 		FOR curs :=  size TO to DO
 			B := antsArrayObjects.NewINTEGERObject(region.w, region.h, c.ModelClassCount);
 
-			FOR y := 0 TO SHORT(region.h - 1) DO
-				FOR x := 0 TO SHORT(region.w - 1) DO
+			FOR y := 0 TO SIGNED16(region.h - 1) DO
+				FOR x := 0 TO SIGNED16(region.w - 1) DO
 					i := 0;
 					min := MAX(FLOAT64);
 					taccur := tac;

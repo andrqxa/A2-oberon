@@ -1018,31 +1018,31 @@ BEGIN
 	END
 END ComputeMeanStat2d;
 
-PROCEDURE GetMean1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
+PROCEDURE GetMean1d* (s: Statistic;   from, to: SIZE): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMean1d);
 	RETURN s.m[from, to]
 END GetMean1d;
 
-PROCEDURE GetMedian1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
+PROCEDURE GetMedian1d* (s: Statistic;   from, to: SIZE): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMedian);
 	RETURN s.m[from, to]
 END GetMedian1d;
 
-PROCEDURE GetSsq1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
+PROCEDURE GetSsq1d* (s: Statistic;   from, to: SIZE): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMean1d);
 	RETURN s.s[from, to]
 END GetSsq1d;
 
-PROCEDURE GetSAbs1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
+PROCEDURE GetSAbs1d* (s: Statistic;   from, to: SIZE): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMedian);
 	RETURN s.s[from, to]
 END GetSAbs1d;
 
-PROCEDURE GetMean2d* (s: Statistic;   	fromx, fromy, tox, toy: SIGNED32): FLOAT64;
+PROCEDURE GetMean2d* (s: Statistic;   	fromx, fromy, tox, toy: SIZE): FLOAT64;
 VAR factor, mean: FLOAT64;    Akum: antsArrays.X2d;
 BEGIN
 	Akum := s.m;
@@ -1053,7 +1053,7 @@ BEGIN
 	RETURN mean
 END GetMean2d;
 
-PROCEDURE GetSsq2d* (s: Statistic;   	fromx, fromy, tox, toy: SIGNED32): FLOAT64;
+PROCEDURE GetSsq2d* (s: Statistic;   	fromx, fromy, tox, toy: SIZE): FLOAT64;
 VAR Sum, SumSq, L, factor: FLOAT64;    Akum, AkumSq: antsArrays.X2d;
 BEGIN
 	Akum := s.m;   AkumSq := s.s;

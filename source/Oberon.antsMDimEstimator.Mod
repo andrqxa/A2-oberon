@@ -51,7 +51,7 @@ VAR
 	n: antsNeighbourhoods.Neighbours;
 
 	PROCEDURE tabelize( o: antsArrayObjects.tINTEGERObject;  dim: SIGNED32 );
-	VAR x, y, i, j, k: SIGNED32;  pos: SIGNED32;  px, py: SIGNED32;  val: SIGNED32; xx,yy: SIGNED32;
+	VAR x, y, i, j, k: SIGNED32;  pos: SIGNED32;  px, py: SIGNED32;  val: SIGNED32; xx,yy: SIZE;
 	BEGIN
 		IF (temptable = NIL ) OR (LEN( temptable^ ) # tw * th) OR (LEN( temptable[0] ) # dim + 1) THEN NEW( temptable, tw * th, dim + 1 ) END;
 		FOR x := tx TO tx + tw - 1 DO
@@ -230,7 +230,7 @@ VAR
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectObjectFromKeyword( l, "from", obj1 ) THEN
 			init := antsCommands.FindKeyword( l, "init" );  e := obj( Estimator );  tempO := obj1( antsArrayObjects.tINTEGERObject );
 			IF tempO.depth > 2 THEN aM.eS( "antsMDimEstimator: Sorry, can only estimate binary (extended) Ising models" );  RETURN END;
-			dim := e.lowdim;  listi := e.Isotropic;  listn := e.NonIsotropic;  tx := 0;  ty := 0;  tw := tempO.w;  th := tempO.h;
+			dim := e.lowdim;  listi := e.Isotropic;  listn := e.NonIsotropic;  tx := 0;  ty := 0;  tw := SIGNED32(tempO.w);  th := SIGNED32(tempO.h);
 
 			n := antsNeighbourhoods.NewL2( e.highdim, TRUE );  tabelize( tempO, e.highdim - 1 );  dim := e.lowdim;
 			miniso := MAX( FLOAT64 );
