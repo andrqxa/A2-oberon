@@ -36,7 +36,7 @@ TYPE
 	tObjectDesc* = RECORD (vyBase.ObjDesc)
 		synced-: BOOLEAN;
 		vec-: vyLongrealVec.tVector;
-		w-, depth-: antsObjects.Index;   (* cache *)
+		w-: SIZE; depth-: antsObjects.Index;   (* cache *)
 		A-: ants1dArrayObjects.tObject;
 		trans*: antsObjects.PAConsistTrafoProc
 	END;
@@ -47,7 +47,7 @@ TYPE
 			M.Enum( "Gen" );  M.Enum( "w" );  M.Enum( "depth" );  M.Enum( "synced" );  M.Enum( "ARRAY" );  vyBase.objecthandle( o, M )
 		ELSIF M.id = Objects.get THEN
 			IF M.name = "Gen" THEN COPY( 'ants1dArrayVectors.Gen', M.s );  M.class := Objects.String;  M.res := 0
-			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := o.w;  M.res := 0
+			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := SIGNED32(o.w);  M.res := 0
 			ELSIF M.name = "depth" THEN M.class := Objects.Int;  M.i := o.depth;  M.res := 0
 			ELSIF M.name = "synced" THEN M.class := Objects.Bool;  M.b := o.synced;  M.res := 0
 			ELSIF M.name = "ARRAY" THEN
@@ -81,7 +81,7 @@ TYPE
 			Gadgets.ReadRef( msg.R, obj.lib, objsub );
 			IF (objsub # NIL ) & (objsub IS ants1dArrayObjects.tObject) THEN obj.A := objsub( ants1dArrayObjects.tObject ) END
 		ELSIF msg.id = Objects.store THEN
-			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, obj.w );
+			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, SIGNED32(obj.w) );
 			Files.WriteLInt( msg.R, obj.depth );  Gadgets.WriteRef( msg.R, obj.lib, obj.vec );
 			Gadgets.WriteRef( msg.R, obj.lib, obj.A )
 		ELSE vyBase.objecthandle( obj, msg )
@@ -98,7 +98,7 @@ TYPE
 	END CheckDimensions;
 
 	PROCEDURE Sync*( obj: tObject );
-	VAR A: ants1dArrayObjects.tArray;  i: SIGNED32;
+	VAR A: ants1dArrayObjects.tArray;  i: SIZE;
 	BEGIN
 		IF obj.A # NIL THEN
 			CheckDimensions( obj );  A := obj.A.A;

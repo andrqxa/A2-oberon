@@ -57,7 +57,7 @@ VAR
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel;  metropolis: BOOLEAN );
 	VAR o: tModel;  O: vyBase.Object;  v, ov: vyLongrealVec.tVector;  orig: Objects.Object;  last, this, next, thiso, new: FLOAT64;
-		i, j, len: SIGNED32;  alpha, lambda: FLOAT64;  gen: vyRanBase.tRandom;
+		i, j, len: SIZE;  alpha, lambda: FLOAT64;  gen: vyRanBase.tRandom;
 
 		(*
 	AO: antsArrayObjects.tObject;
@@ -114,7 +114,7 @@ VAR
 		v := O( vyLongrealVec.tVector );  ov := orig( vyLongrealVec.tVector );  len := vyLongrealVec.Len( v );
 		gen := vyRanBase.RandomGenerator;
 
-		FOR j := 0 TO len DO i := gen.GetRandomL( gen, len );
+		FOR j := 0 TO len DO i := gen.GetRandomL( gen, SIGNED32(len) );
 
 			thiso := vyLongrealVec.Get( ov, i );  this := vyLongrealVec.Get( v, i );
 			IF i = 0 THEN last := this ELSE last := vyLongrealVec.Get( v, i - 1 ) END;

@@ -54,7 +54,7 @@ Last date: August 2, 2002
 
 IMPORT Math := MathL IN A2, vyLongreal, vyLongrealVec, vyBase, antsCommands, Input, vyName, Display3, vyLinks, vyPort,
 	aM := antsMessages, vyHostStrings, antsReadWrite, Objects, antsSecurity, Texts, vyHostTexts, Gadgets, Attributes,
-	antsBellman, antsArrays, antsVecOpt;
+	antsBellman, antsArrays, antsVecOpt, vySize;
 
 CONST
 	cMedian* = 0;  cMean* = 1;  cHampel* = 2;  cSaegezahn* = 3;  cHuber* = 4;  cAbs* = 0;  cLog* = 1;  cGaussML* = 0;
@@ -72,12 +72,12 @@ TYPE
 		gamma*: antsArrays.X1d;
 		jumps*: antsArrays.I1d;
 		InterLength*: antsArrays.I2d;
-		aiciOpt*, aicEstOpt*, aiccOpt*, schwarzOpt*, schwarzEstOpt*, schwarzCorOpt*, scanningOpt*, scanningLogOpt*, scanningVarOpt*, VarDiffOpt*, KneeCheckOpt*, MultiResOpt*, LongestRunOpt*: SIGNED32;
+		aiciOpt*, aicEstOpt*, aiccOpt*, schwarzOpt*, schwarzEstOpt*, schwarzCorOpt*, scanningOpt*, scanningLogOpt*, scanningVarOpt*, VarDiffOpt*, KneeCheckOpt*, MultiResOpt*, LongestRunOpt*: SIZE;
 		mad*: FLOAT64;
 		reko*: antsArrays.X1d;   (*for fixed gamma*)
 	END;
 
-	ArrayFunction = PROCEDURE ( VAR f: ARRAY OF FLOAT64;  i: SIGNED32 ): FLOAT64;
+	ArrayFunction = PROCEDURE ( VAR f: ARRAY OF FLOAT64;  i: SIZE ): FLOAT64;
 
 VAR
 	globalS: antsBellman.Statistic;  globalG: FLOAT64;
@@ -85,7 +85,7 @@ VAR
 	(* *****************************************************************************)
 
 	PROCEDURE Sprungzaehler*;
-	VAR obj: vyBase.Object;  sprungzahl: SIGNED32;
+	VAR obj: vyBase.Object;  sprungzahl: SIZE;
 
 	BEGIN
 		antsCommands.InitScan( "data=OBJ" );
@@ -93,8 +93,8 @@ VAR
 
 	END Sprungzaehler;
 
-	PROCEDURE DoSprungzaehler*( obj: vyBase.Object;  VAR sprungzahl: SIGNED32 );
-	VAR i, n: SIGNED32;
+	PROCEDURE DoSprungzaehler*( obj: vyBase.Object;  VAR sprungzahl: SIZE );
+	VAR i, n: SIZE;
 	BEGIN
 		sprungzahl := 0;  n := vyLongrealVec.Len( obj( vyLongrealVec.tVector ) );
 
@@ -108,22 +108,22 @@ VAR
 
 (* *****************************************************************************)
 
-	PROCEDURE SsqFct( k, n: SIGNED32 ): FLOAT64;
+	PROCEDURE SsqFct( k, n: SIZE ): FLOAT64;
 	BEGIN
 		RETURN globalS.s[k, n]
 	END SsqFct;
 
-	PROCEDURE SsqFctGamma( k, n: SIGNED32 ): FLOAT64;
+	PROCEDURE SsqFctGamma( k, n: SIZE ): FLOAT64;
 	BEGIN
 		RETURN globalS.s[k, n] + globalG;
 	END SsqFctGamma;
 
 	PROCEDURE BellmanFunction( VAR Bellman: antsArrays.X2d;  VAR rstern: antsArrays.I2d;  s: antsBellman.Statistic );
 	BEGIN
-		globalS := s;  antsBellman.BellmanMatrix( rstern, Bellman, s.N, SsqFct )
+		globalS := s;  antsBellman.BellmanMatrix( rstern, Bellman, SIGNED32(s.N), SsqFct )
 	END BellmanFunction;
 
-	PROCEDURE getMean( k, n: SIGNED32 ): FLOAT64;
+	PROCEDURE getMean( k, n: SIZE ): FLOAT64;
 	BEGIN
 		RETURN globalS.m[k, n]
 	END getMean;
@@ -134,7 +134,7 @@ VAR
 	END Parti;
 
 (*Procedure finding the minimium and minimum position of a vector*)
-	PROCEDURE Minimize( VAR this: ARRAY OF FLOAT64;  VAR kmin: SIGNED32 );
+	PROCEDURE Minimize( VAR this: ARRAY OF FLOAT64;  VAR kmin: SIZE );
 	VAR min: FLOAT64;
 	BEGIN
 		min := vyLongreal.Min( LEN( this ), this, 0, kmin );
@@ -157,7 +157,7 @@ AIC(k) = - loglikelihood function(k) + k
  (*The produre called Akaike does NOT realize Akaike's Information Criterion, the penalty for the number of jumps is arbitrary*)
 
 	PROCEDURE Akaike( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  sigmaqu: FLOAT64 );
-	VAR k, N: SIGNED32;
+	VAR k, N: SIZE;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
@@ -169,7 +169,7 @@ This is indeed a realization of Akaike's Information Criterion (AIC) if the vari
 AIC(k) = 1/(2 sigmaqu) * Bellman^[k - 1][N - 1] + k
 *)
 	PROCEDURE AkaikeIndependent( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  sigmaqu: FLOAT64 );
-	VAR k, N: SIGNED32;
+	VAR k, N: SIZE;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
@@ -182,7 +182,7 @@ sigmaqu = 1/N Bellman[k-1][N-1] and AIC becomes
 AIC(k) = N/2 * ln(Bellman[k-1][N-1]) + k
 *)
 	PROCEDURE AkaikeIndependentEst( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d );
-	VAR k, N: SIGNED32;
+	VAR k, N: SIZE;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
@@ -197,7 +197,7 @@ Corrected version of AIC for short time series when the parameter mu and the als
 AICC(k) = N/2 ln(sigmaqu) + (N(N+k))/(2(N-k-2))
 *)
 	PROCEDURE AkaikeCor( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d );
-	VAR k, N: SIGNED32;
+	VAR k, N: SIZE;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N - 2) THEN NEW( Vals, N - 2 ) END;
@@ -217,7 +217,7 @@ If the variance is assumed to be known we get
 SIC(k) = 1/(2 sigmaqu) * Bellman^[k - 1][N - 1] + k/2 ln(N)
 *)
 	PROCEDURE SchwarzIndependent( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  sigmaqu: FLOAT64 );
-	VAR k, N: SIGNED32;
+	VAR k, N: SIZE;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
@@ -229,7 +229,7 @@ If we use the maximum likelihood estimator for the variance sigmaqu we arrive at
 SIC(k) = N/2 ln(Bellman[k-1][N-1]) + k/2 ln(N)
 *)
 	PROCEDURE SchwarzIndependentEst( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d );
-	VAR k, N: SIGNED32;
+	VAR k, N: SIZE;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
@@ -247,7 +247,7 @@ SICC(k) = (N-k-2)/2 ln(2 pi sigmaqu) - 1/2 sum_(l=1)^k ln(|I_l|)
 (*? Vals^[k - 1] := (N - k - 1)  ... ? *)
 
 	PROCEDURE SchwarzCor( Bellman: antsArrays.X2d;  InterLength: antsArrays.I2d;  VAR Vals: antsArrays.X1d );
-	VAR k, N, l: SIGNED32;  lnsum: antsArrays.X1d;
+	VAR k, N, l: SIZE;  lnsum: antsArrays.X1d;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
@@ -259,8 +259,8 @@ SICC(k) = (N-k-2)/2 ln(2 pi sigmaqu) - 1/2 sum_(l=1)^k ln(|I_l|)
 		FOR k := 1 TO N DO Vals^[k - 1] := (N - k - 2) * Math.ln( 2 * 3.14 * 1 / N * Bellman^[k - 1][N - 1] ) + lnsum^[k - 1] END
 	END SchwarzCor;
 
-	PROCEDURE MaxPosArrayFunction( VAR f: ARRAY OF FLOAT64;  VAR values: antsArrays.X1d;  p: ArrayFunction;  value: FLOAT64 ): SIGNED32;
-	VAR i, maxpos: SIGNED32;
+	PROCEDURE MaxPosArrayFunction( VAR f: ARRAY OF FLOAT64;  VAR values: antsArrays.X1d;  p: ArrayFunction;  value: FLOAT64 ): SIZE;
+	VAR i, maxpos: SIZE;
 	BEGIN
 		NEW( values, LEN( f ) - 1 );
 		FOR i := 0 TO LEN( f ) - 2 DO  (*! caution: we only take n-1 elements *)
@@ -269,7 +269,7 @@ SICC(k) = (N-k-2)/2 ln(2 pi sigmaqu) - 1/2 sum_(l=1)^k ln(|I_l|)
 		value := vyLongreal.Max( LEN( f ) - 1, values^, 0, maxpos );  RETURN maxpos + 1
 	END MaxPosArrayFunction;
 
-	PROCEDURE ARatio( VAR f: ARRAY OF FLOAT64;  i: SIGNED32 ): FLOAT64;
+	PROCEDURE ARatio( VAR f: ARRAY OF FLOAT64;  i: SIZE ): FLOAT64;
 	BEGIN
 		IF i = LEN( f ) - 1 THEN RETURN MIN( FLOAT64 ) ELSE RETURN f[i] / f[i + 1] END
 	END ARatio;
@@ -286,12 +286,12 @@ BEGIN
 END ALen;
 *)
 
-	PROCEDURE ALen( VAR f: ARRAY OF FLOAT64;  i: SIGNED32 ): FLOAT64;
+	PROCEDURE ALen( VAR f: ARRAY OF FLOAT64;  i: SIZE ): FLOAT64;
 	BEGIN
 		IF i = LEN( f ) - 1 THEN RETURN MIN( FLOAT64 ) ELSE RETURN ABS( f[i] - f[i + 1] ) END
 	END ALen;
 
-	PROCEDURE MaxLenPos( VAR f: ARRAY OF FLOAT64;  p: ArrayFunction ): SIGNED32;
+	PROCEDURE MaxLenPos( VAR f: ARRAY OF FLOAT64;  p: ArrayFunction ): SIZE;
 	VAR values: antsArrays.X1d;  value: FLOAT64;
 	BEGIN
 		RETURN MaxPosArrayFunction( f, values, p, value )
@@ -302,8 +302,8 @@ Finding the highest gain in the variance comparing the difference of two subsequ
 in the gamma-scanning
 (depending on type maximum likelihood estimator or the common unbiased variance estimator 1/(N-1) \sum_{i=1}^N (y_i - \bar{y} )^2 is taken)
 *)
-	PROCEDURE VarianceGain( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  VAR kstern: SIGNED32 );
-	VAR k, N: SIGNED32;  jumpN: SIGNED32;  Vals: antsArrays.X1d;  diff: FLOAT64;  b: FLOAT64;
+	PROCEDURE VarianceGain( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  VAR kstern: SIZE );
+	VAR k, N: SIZE;  jumpN: SIZE;  Vals: antsArrays.X1d;  diff: FLOAT64;  b: FLOAT64;
 	BEGIN
 		jumpN := LEN( jumps^ );  NEW( Vals, jumpN );  b := EstimatedVariance( Xstern^[jumps^[0]], data^, type );
 		diff := b - EstimatedVariance( Xstern^[jumps^[1]], data^, type );  Vals^[0] := diff;  kstern := jumps^[1];  k := 1;
@@ -332,8 +332,8 @@ The estimated variances (depending on type the maximum likelihood estimator or a
 for the reconstructions in the gamma-scanning
 *)
 	PROCEDURE VarianceEstimatorScanning( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;
-																	  gamma: antsArrays.X1d;  gammalen: SIGNED32;  VAR Vals: antsArrays.X1d );
-	VAR k: SIGNED32;
+																	  gamma: antsArrays.X1d;  gammalen: SIZE;  VAR Vals: antsArrays.X1d );
+	VAR k: SIZE;
 	BEGIN
 		IF (Vals = NIL ) OR (LEN( Vals ) # gammalen) THEN NEW( Vals, gammalen ) END;
 		FOR k := 1 TO gammalen DO Vals[k - 1] := EstimatedVariance( Xstern^[jumps^[k - 1]], data^, type ) END
@@ -344,7 +344,7 @@ Depending on type the unbiased estimator 1/(N-1) sum_{i=1}^N (y_i - bar{y} )^2 o
 for every number of intervals and check for which number of intervals this estimator is closest to the given variance
 *)
 	PROCEDURE VarianceTest( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  variance: FLOAT64 );
-	VAR k, N: SIGNED32;
+	VAR k, N: SIZE;
 	BEGIN
 		N := LEN( data^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
@@ -358,7 +358,7 @@ and check for which number of intervals this estimator is closest to the given v
 *)
 	PROCEDURE VarianceTestScanning( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;
 															 VAR Vals: antsArrays.X1d;  variance: FLOAT64 );
-	VAR k, jumpN: SIGNED32;
+	VAR k, jumpN: SIZE;
 	BEGIN
 		jumpN := LEN( jumps^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # jumpN) THEN NEW( Vals, jumpN ) END;
@@ -369,7 +369,7 @@ and check for which number of intervals this estimator is closest to the given v
 We compute the second differences for the variance estimator N*Bellman[k-1][N-1] .
 *)
 	PROCEDURE SecondDiff( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d );
-	VAR k, N: SIGNED32;
+	VAR k, N: SIZE;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
@@ -380,7 +380,7 @@ We compute the second differences for the variance estimator N*Bellman[k-1][N-1]
 Compute multiresolution coefficients
 *)
 	PROCEDURE MultiCoefficients( y: ARRAY OF FLOAT64;  Xstern: ARRAY OF FLOAT64;  VAR Coeff: antsArrays.X2d );
-	VAR cumsum: antsArrays.X1d;  i, j, N: SIGNED32;
+	VAR cumsum: antsArrays.X1d;  i, j, N: SIZE;
 	BEGIN
 		N := LEN( y );
 
@@ -404,7 +404,7 @@ The median absolute deviation is defined as
 MAD(z) = median(z_i - median(z))
 *)
 	PROCEDURE MAD*( y: vyLongrealVec.tVector ): FLOAT64;
-	VAR N, i: SIGNED32;  val: FLOAT64;  z: vyLongrealVec.tVector;  mad: FLOAT64;  len: SIGNED32;  median: FLOAT64;
+	VAR N, i: SIZE;  val: FLOAT64;  z: vyLongrealVec.tVector;  mad: FLOAT64;  len: SIZE;  median: FLOAT64;
 	BEGIN
 		N := vyLongrealVec.Len( y( vyLongrealVec.tVector ) );  len := N - 1;  z := vyLongrealVec.New( len );
 
@@ -425,8 +425,8 @@ MAD(z) = median(z_i - median(z))
 Using MAD estimator for the variance and the Davies/Kovac criterion for the wavelet coefficients
 *)
 	PROCEDURE MultiResCheck( data: ARRAY OF FLOAT64;  mad: FLOAT64;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  factor: FLOAT64;
-												 VAR ksterndl: SIGNED32 );
-	VAR const: FLOAT64;  N: SIGNED32;  xsterndl: antsArrays.X1d;  i, j, k: SIGNED32;  toobig: BOOLEAN;  kstern: SIGNED16;  Coeff: antsArrays.X2d;  estimatedsigma: FLOAT64;
+												 VAR ksterndl: SIZE );
+	VAR const: FLOAT64;  N: SIZE;  xsterndl: antsArrays.X1d;  i, j, k: SIZE;  toobig: BOOLEAN;  kstern: SIGNED16;  Coeff: antsArrays.X2d;  estimatedsigma: FLOAT64;
 
 	BEGIN
 		N := LEN( Xstern );
@@ -476,10 +476,10 @@ Using MAD estimator for the variance and the Davies/Kovac criterion for the wave
 
 	END MultiResCheck;
 
-	PROCEDURE LongestRunCheck( data: ARRAY OF FLOAT64;  mad: FLOAT64;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  VAR kstern: SIGNED32 );
-	VAR const: SIGNED32;  N: SIGNED32;  residuals: antsArrays.X1d;
-		(* j, k: SIGNED32; *)
-		maxrun: SIGNED32;  toobig: BOOLEAN;  i, j, k: SIGNED32;
+	PROCEDURE LongestRunCheck( data: ARRAY OF FLOAT64;  mad: FLOAT64;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  VAR kstern: SIZE );
+	VAR const: SIZE;  N: SIZE;  residuals: antsArrays.X1d;
+		(* j, k: SIZE; *)
+		maxrun: SIZE;  toobig: BOOLEAN;  i, j, k: SIZE;
 	BEGIN
 		N := LEN( Xstern );
 
@@ -521,7 +521,7 @@ Using MAD estimator for the variance and the Davies/Kovac criterion for the wave
 Procedure to compare MAD of data and height of jump in reconstruction
 *)
 	PROCEDURE LargestJump( reconstruction: vyBase.Object;  VAR maxjump: FLOAT64 );
-	VAR N: SIGNED32;  rec: antsArrays.X1d;  maxpos: SIGNED32;
+	VAR N: SIZE;  rec: antsArrays.X1d;  maxpos: SIZE;
 	BEGIN
 		N := vyLongrealVec.Len( reconstruction( vyLongrealVec.tVector ) );
 		IF (rec = NIL ) OR (LEN( rec ) # N) THEN NEW( rec, N ) END;
@@ -529,8 +529,8 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		maxjump := rec[maxpos]
 	END LargestJump;
 
-	PROCEDURE LargestJumpPos*( reconstruction: vyBase.Object;  VAR maxjump: FLOAT64;  VAR maxpos: SIGNED32 );
-	VAR N: SIGNED32;  rec: antsArrays.X1d;
+	PROCEDURE LargestJumpPos*( reconstruction: vyBase.Object;  VAR maxjump: FLOAT64;  VAR maxpos: SIZE );
+	VAR N: SIZE;  rec: antsArrays.X1d;
 	BEGIN
 		N := vyLongrealVec.Len( reconstruction( vyLongrealVec.tVector ) );
 		IF (rec = NIL ) OR (LEN( rec ) # N) THEN NEW( rec, N ) END;
@@ -539,7 +539,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END LargestJumpPos;
 
 	PROCEDURE CreateStatistics*( VAR s: StatisticObj;  degraded: vyBase.Object;  type: SIGNED32 );
-	VAR N: SIGNED32;  outputMAD: Objects.Object;
+	VAR N: SIZE;  outputMAD: Objects.Object;
 	BEGIN
 		ASSERT ( (degraded # NIL ) & (degraded IS vyLongrealVec.tVector), 109 );
 		N := vyLongrealVec.Len( degraded( vyLongrealVec.tVector ) );
@@ -570,7 +570,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END CreateStatistics;
 
 	PROCEDURE CreateScaledStatisticsGamma*( VAR s: StatisticObj;  degraded: vyBase.Object;  gamma: FLOAT64 );
-	VAR N, j, k: SIGNED32;  rstern: antsArrays.I1d;  bellman, reko: antsArrays.X1d;
+	VAR N, j, k: SIZE;  rstern: antsArrays.I1d;  bellman, reko: antsArrays.X1d;
 	BEGIN
 		ASSERT ( (degraded # NIL ) & (degraded IS vyLongrealVec.tVector), 109 );
 		N := vyLongrealVec.Len( degraded( vyLongrealVec.tVector ) );
@@ -589,7 +589,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 
 		(*hier soll s.jumps den Vektor der argmin darstellen und s.gamma den Vektor der Minimalwerte!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*)
 		(* und s.reko ist Vektor für Rekonstruktion bei festem gamma*)
-		globalG := gamma;  antsBellman.Bellman( s.jumps, s.gamma, SHORT( N ), 0, MAX( SIGNED32 ), SsqFctGamma, -globalG );
+		globalG := gamma;  antsBellman.Bellman( s.jumps, s.gamma, SIGNED16( N ), 0, MAX( SIGNED32 ), SsqFctGamma, -globalG );
 		antsBellman.Partition( s.jumps, s.reko, getMean );
 
 	END CreateScaledStatisticsGamma;
@@ -601,13 +601,13 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		vyBase.ForUsersHandle( vec, msg )
 	END LineToVec;
 
-	PROCEDURE GetColumn*( VAR A: ARRAY OF ARRAY OF FLOAT64;  column: SIGNED32;  VAR col: ARRAY OF FLOAT64 );
-	VAR i: SIGNED32;
+	PROCEDURE GetColumn*( VAR A: ARRAY OF ARRAY OF FLOAT64;  column: SIZE;  VAR col: ARRAY OF FLOAT64 );
+	VAR i: SIZE;
 	BEGIN
 		FOR i := 1 TO LEN( A ) DO col[i - 1] := A[i - 1][column] END
 	END GetColumn;
 
-	PROCEDURE GetColumnVec*( VAR A: ARRAY OF ARRAY OF FLOAT64;  column: SIGNED32;  VAR vec: vyBase.Object );
+	PROCEDURE GetColumnVec*( VAR A: ARRAY OF ARRAY OF FLOAT64;  column: SIZE;  VAR vec: vyBase.Object );
 	VAR col: antsArrays.X1d;
 	BEGIN
 		GetColumn( A, column, col^ );  LineToVec( col^, vec )
@@ -638,7 +638,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END ViewArray;
 
 	PROCEDURE DoViewScannings( degraded: vyBase.Object;  statistic: StatisticObj );
-	VAR N, i, jumpN: SIGNED32;  intervals: antsArrays.X1d;  index: antsArrays.L1d;  maxquot: FLOAT64;  maxquotpos: SIGNED32;
+	VAR N, i, jumpN: SIZE;  intervals: antsArrays.X1d;  index: POINTER TO ARRAY OF SIZE;  maxquot: FLOAT64;  maxquotpos: SIGNED32;
 		name: ARRAY 64 OF CHAR;
 		type: SIGNED16;
 	BEGIN
@@ -647,7 +647,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		WITH statistic: StatisticObj DO N := LEN( statistic.Xstern );  jumpN := LEN( statistic.jumps );
 
 			NEW( intervals, LEN( statistic.gamma ) );  NEW( index, LEN( statistic.gamma ) );  intervals[0] := 0;  index[0] := 0;
-			FOR i := 1 TO LEN( statistic.gamma ) - 1 DO intervals[i] := -statistic.gamma[i - 1] + statistic.gamma[i];  index[i] := i END;
+			FOR i := 1 TO LEN( statistic.gamma ) - 1 DO intervals[i] := -statistic.gamma[i - 1] + statistic.gamma[i];  index[i] := SIGNED32(i) END;
 
 			IF antsCommands.Find( "sort" ) THEN vyLongreal.SortIndexed( LEN( intervals ), intervals^, 0, index^ )
 			END;
@@ -655,7 +655,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 			maxquot := 0;
 			FOR i := 0 TO LEN( statistic.gamma ) - 2 DO
 				aM.vSR( "quotient", intervals[i] / intervals[i + 1] );
-				IF intervals[i] / intervals[i + 1] > maxquot THEN maxquot := intervals[i] / intervals[i + 1];  maxquotpos := i END
+				IF intervals[i] / intervals[i + 1] > maxquot THEN maxquot := intervals[i] / intervals[i + 1];  maxquotpos := SIGNED32(i) END
 			END;
 
 			i := 0;
@@ -671,7 +671,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 				ELSE aM.vSI( "gamma of ", i );  aM.vSR( "is", statistic.gamma[i] );  aM.vS( "" );  aM.vSI( "nr:", i );  aM.vSR( "first interval: infinity --", statistic.gamma[i] );  aM.vS( "" )
 				END;
 
-				name := "Scanning:";  vyHostStrings.AppendInt( index[i], 2, name );
+				name := "Scanning:";  vyHostStrings.AppendInt( SIGNED32(index[i]), 2, name );
 				ViewArray( statistic.Xstern[statistic.jumps[index[i]]], "vyLinePlot", name );
 
 				(*
@@ -974,7 +974,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END MakeKneeCheck;
 
 	PROCEDURE DoMultiCoeff*( statistic: StatisticObj;  vec: vyBase.Object;  factor: FLOAT64 );
-	VAR ksterndl: SIGNED32;
+	VAR ksterndl: SIZE;
 	BEGIN
 		antsBellman.gammaScanning( statistic.Bellman, statistic.jumps, statistic.gamma );
 		MultiResCheck( statistic.data^, statistic.mad, statistic.Xstern, statistic.jumps, factor, ksterndl );
@@ -982,7 +982,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END DoMultiCoeff;
 
 	PROCEDURE MakeMultiCoeff*;
-	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  factor: FLOAT64;  ksterndl: SIGNED32;
+	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  factor: FLOAT64;  ksterndl: SIZE;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 
@@ -994,7 +994,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END MakeMultiCoeff;
 
 	PROCEDURE DoLongestRun*( statistic: StatisticObj;  vec: vyBase.Object );
-	VAR kstern: SIGNED32;
+	VAR kstern: SIZE;
 	BEGIN
 		antsBellman.gammaScanning( statistic.Bellman, statistic.jumps, statistic.gamma );
 		LongestRunCheck( statistic.data^, statistic.mad, statistic.Xstern, statistic.jumps, kstern );
@@ -1013,7 +1013,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END MakeLongestRun;
 
 	PROCEDURE DoIterativePotts*( input: vyBase.Object;  vec, res: vyLongrealVec.tVector;  type: SIGNED16;  factor: FLOAT64 );
-	VAR i, N, j, k: SIGNED32;  alarm: SIGNED32;
+	VAR i, N, j, k: SIZE;  alarm: SIGNED32;
 		(* ch: CHAR; *)
 		msg: vyPort.AdjustCoordMsg;
 		(* NumOfJumps: SIGNED32;
@@ -1169,7 +1169,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 
 	PROCEDURE MakeModiMatrix*;
 	VAR slicename, matrixname: ARRAY 64 OF CHAR;
-		dimx, dimy: SIGNED32;  Matrix: antsArrays.X2d;  columns: SIGNED32;  from, to: SIGNED32;  type: SIGNED16;  offset: SIGNED32;  R: antsReadWrite.Rider;
+		dimx, dimy: SIGNED32;  Matrix: antsArrays.X2d;  columns: SIZE;  from, to: SIGNED32;  type: SIGNED16;  offset: SIGNED32;  R: antsReadWrite.Rider;
 	BEGIN
 		antsCommands.InitScan( "slice=STR nx=INT ny=INT matrix=STR [from=INT to=INT] [offset=INT] (>median|>mean)" );
 
@@ -1202,9 +1202,9 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		DoModiMatrix( columns, offset, dimx, dimy, Matrix, type, from, to, matrixname )
 	END MakeModiMatrix;
 
-	PROCEDURE DoModiMatrix( columns, offset: SIGNED32;  dimx, dimy: SIGNED32;  Matrix: antsArrays.X2d;  type: SIGNED16;  from, to: SIGNED32;
+	PROCEDURE DoModiMatrix( columns, offset: SIZE;  dimx, dimy: SIGNED32;  Matrix: antsArrays.X2d;  type: SIGNED16;  from, to: SIZE;
 											   matrixname: ARRAY OF CHAR );
-	VAR pixeldata: vyLongrealVec.tVector;  nx, ny, t, rownum: SIGNED32;  statistic: StatisticObj;  vec: vyBase.Object;  modi: SIGNED32;
+	VAR pixeldata: vyLongrealVec.tVector;  nx, ny, t, rownum: SIZE;  statistic: StatisticObj;  vec: vyBase.Object;  modi: SIGNED32;
 		OrderMatrix: antsArrays.I2d;  R: antsReadWrite.Rider;
 	BEGIN
 		NEW( OrderMatrix, dimx, dimy );  pixeldata := vyLongrealVec.New( columns - offset );
@@ -1226,10 +1226,10 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 				antsBellman.gammaScanning( statistic.Bellman, statistic.jumps, statistic.gamma );
 				statistic.scanningOpt := statistic.jumps[MaxLenPos( statistic.gamma^, ALen )];
 				vec := vyLongrealVec.New( LEN( statistic.data ) );  LineToVec( statistic.Xstern[statistic.scanningOpt], vec );
-				modi := antsArrays.CountModi( vec( vyLongrealVec.tVector ), from, to );
+				modi := antsArrays.CountModi( vec( vyLongrealVec.tVector ), SIGNED32(from), SIGNED32(to) );
 
 				(* number of modi of pixel (ny,nx) *)
-				OrderMatrix[nx][ny] := SHORT( modi )
+				OrderMatrix[nx][ny] := SIGNED16( modi )
 			END
 		END;
 		R.ForceNew( matrixname );
@@ -1238,7 +1238,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END DoModiMatrix;
 
 	PROCEDURE DoRecursiveScanning( degraded: vyBase.Object;  vec, res: vyLongrealVec.tVector;  type: SIGNED16 );
-	VAR i, N: SIGNED32;  alarm: SIGNED32;  ch: CHAR;  msg: vyPort.AdjustCoordMsg;  NumOfJumps: SIGNED32;  lastval: FLOAT64;  statistic: StatisticObj;
+	VAR i, N: SIZE;  alarm: SIGNED32;  ch: CHAR;  msg: vyPort.AdjustCoordMsg;  NumOfJumps: SIGNED32;  lastval: FLOAT64;  statistic: StatisticObj;
 	BEGIN
 		alarm := 0;  Input.Read( ch );
 
@@ -1283,7 +1283,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END sgn;
 
 	PROCEDURE MaxRun( x: ARRAY OF FLOAT64 ): SIGNED32;
-	VAR i, N: SIGNED32;  runlength: SIGNED32;  last, this: SIGNED16;  startpoint: SIGNED32;  len: SIGNED32;
+	VAR i, N: SIZE;  runlength: SIGNED32;  last, this: SIGNED16;  startpoint: SIGNED32;  len: SIGNED32;
 	CONST invalid = -1;
 	BEGIN
 		N := LEN( x );  runlength := 1;  len := 1;  last := sgn( x[0] );
@@ -1364,7 +1364,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END EmpiricalVariance;
 
 	PROCEDURE DoEmpiricalVariance( obj1: vyBase.Object;  variance: FLOAT64;  n: SIGNED32;  type, type2: SIGNED16;  vv2, vv: vyLongrealVec.tVector );
-	VAR i, m, N: SIGNED32;  statistic: StatisticObj;  gammalen: SIGNED32;  obj2: vyBase.Object;
+	VAR i, m, N: SIZE;  statistic: StatisticObj;  gammalen: SIGNED32;  obj2: vyBase.Object;
 	BEGIN
 		N := vyLongrealVec.Len( obj1( vyLongrealVec.tVector ) );  obj2 := vyLongrealVec.New( N );
 		FOR i := 1 TO n DO
@@ -1402,8 +1402,8 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 (****)
 	PROCEDURE DoConsistencySimulation( obj1: vyBase.Object;  variance: FLOAT64;  n: SIGNED32;  gamma: FLOAT64;
 																  heightvec, posvec: vyLongrealVec.tVector );
-	VAR i, j, k, N: SIGNED32;  statistic: StatisticObj;  obj2: vyBase.Object;  rstern: antsArrays.I1d;  rek: antsArrays.X1d;
-		bellman: antsArrays.X1d;  maxjump: FLOAT64;  maxpos: SIGNED32;  vec2: vyBase.Object;
+	VAR i, j, k, N: SIZE;  statistic: StatisticObj;  obj2: vyBase.Object;  rstern: antsArrays.I1d;  rek: antsArrays.X1d;
+		bellman: antsArrays.X1d;  maxjump: FLOAT64;  maxpos: SIZE;  vec2: vyBase.Object;
 		(*stat: antsBellman.Statistic;*)
 	BEGIN
 		(*vyHostTexts.DoOpenLog("ViewReko"); vyHostTexts.SetCaret;*)
@@ -1475,7 +1475,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END ConsistencySimulation;
 
 	PROCEDURE EmpiricalGamma*;
-	VAR obj1, obj2: vyBase.Object;  variance: FLOAT64;  N, n: SIGNED32;  vv1, vv2, vv3: vyLongrealVec.tVector;  type, type2: SIGNED16;
+	VAR obj1, obj2: vyBase.Object;  variance: FLOAT64;  N: SIZE; n: SIGNED32;  vv1, vv2, vv3: vyLongrealVec.tVector;  type, type2: SIGNED16;
 		gammavecname, numbervecname, partivecname: ARRAY 64 OF CHAR;
 		this, old: Texts.Text;
 	BEGIN
@@ -1525,9 +1525,9 @@ This whole procedure is repeated with the signal n times. The gamma_vector could
 	PROCEDURE DoEmpiricalGamma( obj1, obj2: vyBase.Object;  variance: FLOAT64;  n: SIGNED32;  type, type2: SIGNED16;  vv2: vyLongrealVec.tVector;
 													    vecname: ARRAY OF CHAR;  intervalnumbervec: vyLongrealVec.tVector;
 													    numbervecname: ARRAY OF CHAR;  partivec: vyLongrealVec.tVector;  partivecname: ARRAY OF CHAR );
-	VAR i, j: SIGNED32;  statistic: StatisticObj;  mean, ssq, median: FLOAT64;  maxjump: FLOAT64;  lens: antsArrays.X1d;  nrNaNs: SIGNED32;  maxjumpPos: SIGNED32;
+	VAR i, j: SIZE;  statistic: StatisticObj;  mean, ssq, median: FLOAT64;  maxjump: FLOAT64;  lens: antsArrays.X1d;  nrNaNs: SIZE;  maxjumpPos: SIZE;
 		gammalen: SIGNED32;  gammaneu: antsArrays.X1d;  vv2array, partiarray, numberarray: antsArrays.X1d;
-		R: antsReadWrite.Rider;  min, max: FLOAT64;  N: SIGNED32;
+		R: antsReadWrite.Rider;  min, max: FLOAT64;  N: SIZE;
 	BEGIN
 		N := vyLongrealVec.Len( obj1( vyBase.tVector ) );
 		FOR i := 1 TO n DO  (* Out.Int( i, 5 ); Out.Ln(); *)
@@ -1620,7 +1620,7 @@ This whole procedure is repeated with the signal n times. The gamma_vector could
 
 	END DoEmpiricalGamma;
 
-	PROCEDURE UpdateMSSQ( val: FLOAT64;  at: SIGNED32;  VAR mean, var: FLOAT64 );
+	PROCEDURE UpdateMSSQ( val: FLOAT64;  at: SIZE;  VAR mean, var: FLOAT64 );
 	VAR diff: FLOAT64;
 	BEGIN
 		diff := val - mean;  mean := mean + diff / at;  var := var + diff * (val - mean)
@@ -1629,12 +1629,12 @@ This whole procedure is repeated with the signal n times. The gamma_vector could
 (*
 Survey of different properties of the gamma values in the scanning
 *)
-	PROCEDURE DoGammaStatistics( from, to, step, n, jumps1: SIGNED32;  variance: FLOAT64;  type: SIGNED16 );
+	PROCEDURE DoGammaStatistics( from, to, step, n, jumps1: SIZE;  variance: FLOAT64;  type: SIGNED16 );
 	VAR minmean, maxmean, meanmean, minvar, maxvar, meanvar, MeanLenMean, MeanLenVar, max2mean, max2var: FLOAT64;
-		i, j, k: SIGNED32;  statistic: StatisticObj;  lengamma: SIGNED32;  truejumpInter: SIGNED32;  IntervalLen, TrueIntervalLen: FLOAT64;
+		i, j, k: SIZE;  statistic: StatisticObj;  lengamma: SIZE;  truejumpInter: SIZE;  IntervalLen, TrueIntervalLen: FLOAT64;
 		min, max, max2, mean, Ratio, MeanLen: FLOAT64;  MaxInt, Max2Int: FLOAT64;
 		minmeanvec, maxmeanvec, meanmeanvec, minvarvec, maxvarvec, meanvarvec, MeanLenMeanvec, MeanLenVarvec, max2meanvec, max2varvec: vyLongrealVec.tVector;
-		len: SIGNED32;  obj: vyBase.Object;  datavec: vyLongrealVec.tVector;
+		len: SIZE;  obj: vyBase.Object;  datavec: vyLongrealVec.tVector;
 	BEGIN
 		(*generation of vectors*)
 		minmeanvec := vyLongrealVec.New( 0 );  maxmeanvec := vyLongrealVec.New( 0 );
@@ -1772,7 +1772,7 @@ Survey of different properties of the gamma values in the scanning
 (*
 Survey of the reconstruction for fixed gamma for increasing length of the signal
 *)
-PROCEDURE DoFixedGammaStatistics (from, to, step, n, jumps1: SIGNED32 ; variance: FLOAT64; type: SIGNED16 );
+PROCEDURE DoFixedGammaStatistics (from, to, step, n, jumps1: SIZE ; variance: FLOAT64; type: SIGNED16 );
 VAR (*minmean, maxmean, meanmean, minvar, maxvar, meanvar, MeanLenMean, MeanLenVar, max2mean, max2var: FLOAT64; *)
 i, j, k: SIGNED32;
 statistic: StatisticObj;
@@ -1834,7 +1834,7 @@ antsBellman.InitStatistic1d(globalS,N);
 antsBellman.ComputeMeanStat1d(data^,globalS);
 
 (* globalGamma := gamma; *)
-antsBellman.Bellman(rstern, bellman, SHORT(N), 0, MAX(SIGNED32), Function1d, - globalGamma);
+antsBellman.Bellman(rstern, bellman, SIGNED16(N), 0, MAX(SIGNED32), Function1d, - globalGamma);
 
 antsBellman.Partition(rstern,data,statMean);
 
@@ -1851,8 +1851,8 @@ END DoFixedGammaStatistics;
 *)
 
 
-	PROCEDURE Regression( y: vyLongrealVec.tVector;  start, end: SIGNED32;  VAR a, b, residuum: FLOAT64 );
-	VAR number, i: SIGNED32;  sumsimple, sumwith, sumsquare: FLOAT64;
+	PROCEDURE Regression( y: vyLongrealVec.tVector;  start, end: SIZE;  VAR a, b, residuum: FLOAT64 );
+	VAR number, i: SIZE;  sumsimple, sumwith, sumsquare: FLOAT64;
 	BEGIN
 		number := end - start + 1;
 
@@ -1876,8 +1876,8 @@ END DoFixedGammaStatistics;
 (*
 procedure to compute the sum of squares for the regression with two linear regression curves
 *)
-	PROCEDURE SumofResiduals( y: vyLongrealVec.tVector;  knee: SIGNED32;  VAR totalresi: FLOAT64 );
-	VAR N: SIGNED32;  start, end: SIGNED32;  a1, b1, a2, b2, resi1, resi2: FLOAT64;
+	PROCEDURE SumofResiduals( y: vyLongrealVec.tVector;  knee: SIZE;  VAR totalresi: FLOAT64 );
+	VAR N: SIZE;  start, end: SIZE;  a1, b1, a2, b2, resi1, resi2: FLOAT64;
 
 	BEGIN
 		N := vyLongrealVec.Len( y( vyLongrealVec.tVector ) );
@@ -1898,7 +1898,7 @@ procedure to compute the sum of squares for the regression with two linear regre
 This procedure stores the residuals for an approximation to the time series by two linear fits with break point at k
 *)
 	PROCEDURE KneeCheck( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d );
-	VAR k, N: SIGNED32;  totalresi, a1, a2, b1, b2, resi1, resi2: FLOAT64;  BellmanVec: vyBase.Object;  Column: antsArrays.X1d;
+	VAR k, N: SIZE;  totalresi, a1, a2, b1, b2, resi1, resi2: FLOAT64;  BellmanVec: vyBase.Object;  Column: antsArrays.X1d;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;

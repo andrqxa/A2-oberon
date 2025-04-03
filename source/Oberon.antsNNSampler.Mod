@@ -66,7 +66,7 @@ VAR
 	A: antsArrayObjects.tArray
 	*)
 		A: antsArrayObjects.tINTEGERObject;  Ao: antsArrayObjects.tINTEGERObject;
-		AA, AAo: antsArrayObjects.tINTEGERArray;  y, W, H: SIGNED32;  ran: FLOAT64;  depth: SIGNED32;  n1, n2, n3, n4, nd, nh: SIGNED16;  h, h1, h2, cooling: FLOAT64;
+		AA, AAo: antsArrayObjects.tINTEGERArray;  y, W, H: SIZE;  ran: FLOAT64;  depth: SIGNED32;  n1, n2, n3, n4, nd, nh: SIGNED16;  h, h1, h2, cooling: FLOAT64;
 		gen: vyRanBase.tRandom;  zvax, zvay, zva: SIGNED32;  orig: Objects.Object;
 
 	BEGIN
@@ -77,7 +77,7 @@ VAR
 		IF ~o.synced THEN Sync( o, A.depth );  o.synced := TRUE END;
 		H := A.h;  W := A.w;  depth := A.depth;  AA := A.A;  AAo := Ao.A;  gen := vyRanBase.RandomGenerator;
 		FOR y := 0 TO (W * H) - 1 DO
-			ran := vyRandom.Uniform();  zvax := gen.GetRandomL( gen, W );  zvay := gen.GetRandomL( gen, H );
+			ran := vyRandom.Uniform();  zvax := gen.GetRandomL( gen, SIGNED32(W) );  zvay := gen.GetRandomL( gen, SIGNED32(H) );
 			zva := gen.GetRandomL( gen, depth - 1 );  n1 := AA[zvay, (zvax - 1) MOD W];  n2 := AA[zvay, (zvax + 1) MOD W];
 			n3 := AA[(zvay - 1) MOD H, zvax];  n4 := AA[(zvay + 1) MOD H, zvax];  nd := AAo[zvay, zvax];  nh := AA[zvay, zvax];
 
@@ -101,7 +101,7 @@ VAR
 	A: antsArrayObjects.tArray
 	*)
 		A: antsArrayObjects.tINTEGERObject;  Ao: antsArrayObjects.tINTEGERObject;
-		AA, AAo: antsArrayObjects.tINTEGERArray;  y, x, W, H: SIGNED32;  ran, this, z: FLOAT64;  depth, i: SIGNED32;  n1, n2, n3, n4, nd: SIGNED16;
+		AA, AAo: antsArrayObjects.tINTEGERArray;  y, x, W, H: SIZE;  ran, this, z: FLOAT64;  depth, i: SIGNED32;  n1, n2, n3, n4, nd: SIGNED16;
 		orig: Objects.Object;
 	BEGIN
 		o := s.par( tModel );  A := s.A( antsArrayObjects.tINTEGERObject );  Links.GetLink( A, "orig", orig );

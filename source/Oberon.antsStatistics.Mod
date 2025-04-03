@@ -28,7 +28,7 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT antsMessages, antsArrayObjects, antsCommands, vyBase, vyLongrealVec := vyRealVec, Math := MathL IN A2, antsDirSet, aM := antsMessages;
 
 VAR
-	v1, v2: vyBase.tVector;  t1d, t2d, ph1, ph2: FLOAT64;  wd, hd: SIGNED32;
+	v1, v2: vyBase.tVector;  t1d, t2d, ph1, ph2: FLOAT64;  wd, hd: SIZE;
 	t1, t2: POINTER TO ARRAY OF FLOAT64;
 
 	PROCEDURE bin( x: SIGNED16 ): SIGNED16;
@@ -37,7 +37,7 @@ VAR
 	END bin;
 
 	PROCEDURE t1t2*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  x, y: SIGNED32;  t1, t2: FLOAT64;  b: BOOLEAN;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  x, y: SIZE;  t1, t2: FLOAT64;  b: BOOLEAN;
 	BEGIN
 		l := antsCommands.ScanFromPar( "from=OBJ" );  b := antsCommands.ExpectObjectFromKeyword( l, "from", obj );
 		WITH obj: antsArrayObjects.tINTEGERObject DO
@@ -61,7 +61,7 @@ VAR
 	END Max;
 
 	PROCEDURE est( VAR A: ARRAY OF FLOAT64 ): FLOAT64;
-	VAR i: SIGNED32;  dd: FLOAT64;  a1, a2: FLOAT64;  max, exp, val: FLOAT64;  len: SIGNED32;
+	VAR i: SIZE;  dd: FLOAT64;  a1, a2: FLOAT64;  max, exp, val: FLOAT64;  len: SIZE;
 	BEGIN
 		a1 := A[0];  a2 := A[1];  len := vyLongrealVec.Len( v1 );
 		ASSERT ( len > 0 );
@@ -80,12 +80,12 @@ VAR
 	END est;
 
 	PROCEDURE DefineValues*;
-	VAR l: antsCommands.tScanList;  obj1, obj2: vyBase.Object;  i: SIGNED32;  b: BOOLEAN;
+	VAR l: antsCommands.tScanList;  obj1, obj2: vyBase.Object;  i: SIZE;  b: BOOLEAN;c: SIGNED32;
 	BEGIN
 		l := antsCommands.ScanFromPar( "t1=OBJ t2=OBJ t1d=FLOAT32 t2d=FLOAT32 wd=INT hd=INT ph1=FLOAT32 ph2=FLOAT32" );  b := antsCommands.ExpectObjectFromKeyword( l, "t1", obj1 );
 		v1 := obj1( vyBase.tVector );  b := antsCommands.ExpectObjectFromKeyword( l, "t2", obj2 );  v2 := obj2( vyBase.tVector );
 		b := antsCommands.ExpectRealFromKeyword( l, "t1d", t1d );  b := antsCommands.ExpectRealFromKeyword( l, "t2d", t2d );
-		b := antsCommands.ExpectNumberFromKeyword( l, "wd", wd );  b := antsCommands.ExpectNumberFromKeyword( l, "hd", hd );
+		b := antsCommands.ExpectNumberFromKeyword( l, "wd", c ); wd := c;  b := antsCommands.ExpectNumberFromKeyword( l, "hd", c ); hd := c;
 		b := antsCommands.ExpectRealFromKeyword( l, "ph1", ph1 );  b := antsCommands.ExpectRealFromKeyword( l, "ph2", ph2 );
 		NEW( t1, vyLongrealVec.Len( v1 ) );  NEW( t2, vyLongrealVec.Len( v2 ) );
 		FOR i := 0 TO vyLongrealVec.Len( v1 ) - 1 DO t1[i] := vyLongrealVec.Get( v1, i );  t2[i] := vyLongrealVec.Get( v2, i ) END
@@ -102,7 +102,7 @@ VAR
 	END Estimate;
 
 	PROCEDURE WriteOutInter*;
-	VAR obj: vyBase.Object;  i, j,k : SIGNED32;  count, count2: SIGNED32;
+	VAR obj: vyBase.Object;  i, j,k : SIZE;  count, count2: SIGNED32;
 	BEGIN
 		antsCommands.InitScan( "name=OBJ" );
 		IF antsCommands.ExpectObject( "name", obj ) THEN

@@ -71,9 +71,9 @@ TYPE
 	END FillCache;
 
 	PROCEDURE WritePars( VAR R: Files.Rider;  par: pars );
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	BEGIN
-		Files.WriteInt( R, 0 );  Files.WriteLInt( R, LEN( par^ ) );
+		Files.WriteInt( R, 0 );  Files.WriteLInt( R, SIGNED32(LEN( par^ )) );
 		FOR i := 0 TO LEN( par^ ) - 1 DO Files.WriteLReal( R, par[i] ) END
 	END WritePars;
 
@@ -237,13 +237,13 @@ TYPE
 		Gen;  n := Objects.NewObj( Neighbours );  n.handle := Handler;  OpenL2( n, dim, isotropic );  RETURN n
 	END NewL2;
 
-	PROCEDURE Min( x, y: SIGNED32 ): SIGNED32;
+	PROCEDURE Min( x, y: SIZE ): SIZE;
 	BEGIN
 		IF x < y THEN RETURN x ELSE RETURN y END
 	END Min;
 
 	PROCEDURE ChangeDim*( n: Neighbours;  newdim: SIGNED16 );
-	VAR i: SIGNED32;  par: pars;
+	VAR i: SIZE;  par: pars;
 	BEGIN
 		IF newdim > 55 THEN newdim := 55 END;
 		IF newdim < 1 THEN newdim := 1 END;
@@ -304,7 +304,7 @@ TYPE
 	END SortTable;
 
 	PROCEDURE st( VAR A, B: ARRAY OF SIGNED32;  VAR equal: BOOLEAN ): BOOLEAN;
-	VAR i, len: SIGNED32;
+	VAR i, len: SIZE;
 	BEGIN
 		i := 0;  len := LEN( A );
 		WHILE (i < len) & (A[i] = B[i]) DO INC( i ) END;
@@ -315,8 +315,8 @@ TYPE
 		END
 	END st;
 
-	PROCEDURE Insert( VAR A: ARRAY OF SIGNED32;  VAR to: ARRAY OF ARRAY OF SIGNED32;  VAR len: SIGNED32 );
-	VAR i, j, pos: SIGNED32;  equal: BOOLEAN;
+	PROCEDURE Insert( VAR A: ARRAY OF SIGNED32;  VAR to: ARRAY OF ARRAY OF SIGNED32;  VAR len: SIZE );
+	VAR i, j, pos: SIZE;  equal: BOOLEAN;
 	BEGIN
 		(* LEN of A is one less then LEN of to[i] ! *)
 		i := 0;
@@ -339,7 +339,7 @@ TYPE
 															    n: Neighbours ): NeighbourTable;
 	VAR table: NeighbourTable;
 		val: POINTER TO ARRAY OF SIGNED32;
-		x, y, i: SIGNED32;  tlen: SIGNED32;  exceeded: BOOLEAN;
+		x, y, i: SIZE;  tlen: SIZE;  exceeded: BOOLEAN;
 	BEGIN
 		antsMessages.SISI( "W0", w0, "h0", h0 );  NEW( table, w0 * h0 + 1, n.clen + 1 );  antsMessages.SI( "Making a table, max len: ", LEN( table ) - 1 );
 

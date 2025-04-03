@@ -115,7 +115,7 @@ TYPE
 	END CopyMatrixArray;
 
 	PROCEDURE Fill( a: MatrixArray;  with: FLOAT64 );
-	VAR y, x: SIGNED32;
+	VAR y, x: SIZE;
 	BEGIN
 		FOR y := 0 TO LEN( a ) - 1 DO
 			FOR x := 0 TO LEN( a[0] ) - 1 DO a[y, x] := with END

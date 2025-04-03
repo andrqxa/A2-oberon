@@ -97,8 +97,8 @@ TYPE
 	END CheckCaches;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, w, h, maxx, maxy: SIGNED32;  A, AOrig: ants3dArrayObjects.tArray;  model: tModel;  AO: ants3dArrayObjects.tObject;
-		Random: RandomArray;  ran: FLOAT64;  cpos: SIGNED32;  u: FLOAT64;  orig: Objects.Object;  l, maxl, ll: SIGNED32;
+	VAR x, y, w, h, maxx, maxy: SIZE;  A, AOrig: ants3dArrayObjects.tArray;  model: tModel;  AO: ants3dArrayObjects.tObject;
+		Random: RandomArray;  ran: FLOAT64;  cpos: SIGNED32;  u: FLOAT64;  orig: Objects.Object;  l, maxl, ll: SIZE;
 		a: ARRAY 8 OF SIGNED16;
 		scaletemp: BOOLEAN;
 	BEGIN

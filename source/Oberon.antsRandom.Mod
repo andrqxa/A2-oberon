@@ -361,14 +361,14 @@ BEGIN
 	Attributes.SetLongReal(obj, "u", 0);
 END NewDynamicRNG;
 
-PROCEDURE Max(i1,i2: SIGNED32): SIGNED32;
+PROCEDURE Max(i1,i2: SIZE): SIZE;
 BEGIN
 	IF i1>i2 THEN RETURN i1 ELSE RETURN i2 END;
 END Max;
 
 
 PROCEDURE MakeShifted*;
-	VAR o, o1, o2, o3: vyBase.Object;  v, v1, v2, v3: vyLongrealVec.tVector;  i: SIGNED32;
+	VAR o, o1, o2, o3: vyBase.Object;  v, v1, v2, v3: vyLongrealVec.tVector;  i: SIZE;
 BEGIN
 	antsCommands.InitScan("vec=OBJ vec1=OBJ vec2=OBJ [vec3=OBJ]");
 	IF antsCommands.ExpectObject("vec", o) &  antsCommands.ExpectObject("vec1", o1) & antsCommands.ExpectObject("vec2", o2) THEN
@@ -403,7 +403,7 @@ BEGIN
 END MakeShifted;
 
 PROCEDURE MakePaired*;
-	VAR o, o1, o2,o3: vyBase.Object;  v, v1, v2,v3: vyLongrealVec.tVector;  i: SIGNED32;
+	VAR o, o1, o2,o3: vyBase.Object;  v, v1, v2,v3: vyLongrealVec.tVector;  i: SIZE;
 BEGIN
 	antsCommands.InitScan("vec=OBJ vec1=OBJ vec2=OBJ");
 	IF antsCommands.ExpectObject("vec", o) &  antsCommands.ExpectObject("vec1", o1) & antsCommands.ExpectObject("vec2", o2) THEN

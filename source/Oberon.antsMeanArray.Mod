@@ -34,11 +34,11 @@ TYPE
 	tMean* = POINTER TO tMeanDesc;
 	tMeanDesc = RECORD (vyBase.ObjDesc)
 		A: tMeanArray;
-		count: SIGNED32
+		count: SIZE
 	END;
 
 	PROCEDURE Add*( A: tArray;  to: tMean );
-	VAR y, x: SIGNED32;
+	VAR y, x: SIZE;
 	BEGIN
 		IF to.A = NIL THEN
 			NEW( to.A, LEN( A^ ), LEN( A[0] ) );
@@ -54,7 +54,7 @@ TYPE
 	END Add;
 
 	PROCEDURE Get*( from: tMean;  to: tArray;  depth: SIGNED32 );
-	VAR y, x: SIGNED32;
+	VAR y, x: SIZE;
 	BEGIN
 		FOR y := 0 TO LEN( to^ ) - 1 DO
 			FOR x := 0 TO LEN( to[0] ) - 1 DO to[y, x] := SHORT( ENTIER( (from.A[y, x] * (depth - 1)) / from.count + 0.5 ) ) END
@@ -77,7 +77,7 @@ TYPE
 		IF M.id = Objects.enum THEN M.Enum( "Gen" );  M.Enum( "count" );  vyBase.objecthandle( o, M )
 		ELSIF M.id = Objects.get THEN
 			IF M.name = "Gen" THEN COPY( 'antsMeanArray.Gen', M.s );  M.class := Objects.String;  M.res := 0
-			ELSIF M.name = "count" THEN M.i := o.count;  M.class := Objects.Int;  M.res := 0
+			ELSIF M.name = "count" THEN M.i := SIGNED32(o.count);  M.class := Objects.Int;  M.res := 0
 			ELSE vyBase.objecthandle( o, M )
 			END
 		ELSIF M.id = Objects.set THEN vyBase.objecthandle( o, M )

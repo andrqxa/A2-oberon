@@ -88,7 +88,7 @@ END Penalize;
 	BEGIN
 
 		f := M.f;  z := 0;
-		FOR count := 0 TO SHORT( o.depth - 1 ) DO z := z + Math.exp( M.coolingTemp * (U( y, x, count ) (* + Penalize(y, x, count) *) ) ) END;
+		FOR count := 0 TO SIGNED16( o.depth - 1 ) DO z := z + Math.exp( M.coolingTemp * (U( y, x, count ) (* + Penalize(y, x, count) *) ) ) END;
 		ran := vyRanBase.RandomU();  u := 0;  count := 0;
 		u := Math.exp( M.coolingTemp * (U( y, x, count ) (* + Penalize(y, x, count) *) ) ) / z;
 		WHILE ran > u DO INC( count );  u := u + Math.exp( M.coolingTemp * (U( y, x, count ) (* + Penalize(y, x, count)*) ) ) / z END;
@@ -98,16 +98,16 @@ END Penalize;
 
 	PROCEDURE Sync( m: tModel;  depth: SIGNED32 );
 	BEGIN
-		IF (m.f.dimx # depth) OR (m.f.dimy # depth) THEN antsMatrixPar.ChangeDim( m.f, SHORT( depth ), SHORT( depth ) ) END;
-		IF (m.l.dimy # depth) OR (m.l.dimx # 1) THEN antsMatrixPar.ChangeDim( m.l, SHORT( depth ), 1 ) END
+		IF (m.f.dimx # depth) OR (m.f.dimy # depth) THEN antsMatrixPar.ChangeDim( m.f, SIGNED16( depth ), SIGNED16( depth ) ) END;
+		IF (m.l.dimy # depth) OR (m.l.dimx # 1) THEN antsMatrixPar.ChangeDim( m.l, SIGNED16( depth ), 1 ) END
 	END Sync;
 
 	PROCEDURE OneSweep*( s: antsKernel.Kernel );
 	VAR A, Cache: antsArrayObjects.tINTEGERObject;  par: array;  model: tModel;  dim, x, y: SIGNED32;  x0, y0, w0, h0: SIGNED16;
 
 	BEGIN
-		A := s.A( antsArrayObjects.tINTEGERObject );  model := s.par( tModel );  x0 := 0;  y0 := 0;  w0 := SHORT( A.w - 1 );
-		h0 := SHORT( A.h - 1 );
+		A := s.A( antsArrayObjects.tINTEGERObject );  model := s.par( tModel );  x0 := 0;  y0 := 0;  w0 := SIGNED16( A.w - 1 );
+		h0 := SIGNED16( A.h - 1 );
 		IF model.region # NIL THEN
 			vyRectangles.RectIntersection( x0, y0, w0, h0, model.region.x, model.region.y, model.region.w - 1,
 															   model.region.h - 1 )

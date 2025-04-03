@@ -78,7 +78,7 @@ VAR
 	END Binomial;
 
 	PROCEDURE OneSweep*( s: antsKernel.Kernel;  visit: antsKernel.visitingScheme );
-	VAR A, Orig: antsArrayObjects.tINTEGERObject;  AA: antsArrayObjects.tINTEGERArray;  model: tModel;  dim, x, y, w, h: SIGNED32;
+	VAR A, Orig: antsArrayObjects.tINTEGERObject;  AA: antsArrayObjects.tINTEGERArray;  model: tModel;  dim, x, y, w, h: SIZE;
 		x0, y0, w0, h0: SIGNED32;  orig: Objects.Object;  count: SIGNED16;  nb: intArray;  cooling: FLOAT64;  max: SIGNED16;  nclen: SIGNED32;
 		cx, cy: antsNeighbourhoods.Index;  i: SIGNED32;  pars: antsNeighbourhoods.pars;  theta: FLOAT64;  position, posi: SIGNED32;
 	BEGIN

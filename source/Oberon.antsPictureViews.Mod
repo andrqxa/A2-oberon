@@ -62,16 +62,16 @@ VAR
 
 		vx := c.vx;  vy := c.vy;   (* coordinates of first visible point in array coordinates*)
 		vpx := c.px;  vpy := c.py;  vpw := c.pw;  vph := c.ph;   (* coordinates of visible area in display-array coordinates (with stretching) *)
-		pw := SHORT( layer.E.w );  ph := SHORT( layer.E.h );   (* array width and height *)
-		c.pictW := pw;  c.pictH := ph;  vyRectangles.RectIntersection( vpx, vpy, vpw, vph, 0, 0, SHORT( layer.E.w ), SHORT( layer.E.h ) );
+		pw := SIGNED16( layer.E.w );  ph := SIGNED16( layer.E.h );   (* array width and height *)
+		c.pictW := pw;  c.pictH := ph;  vyRectangles.RectIntersection( vpx, vpy, vpw, vph, 0, 0, SIGNED16( layer.E.w ), SIGNED16( layer.E.h ) );
 
 		pict := layer.E.pict;  c.p := pict;  vpx := c.px;  vpy := c.py;  vpw := c.pw;  vph := c.ph;
 		vyRectangles.RectIntersection( vpx, vpy, vpw, vph, 0, 0, pict.width, pict.height );
 		IF c.fixed THEN
 			vyGraphBase.SetRealWorldRgn( 0, 0, layer.E.w, layer.E.h, 0 );
-			vyGraphBase.StretchedPict2d( layer.E.pict, 0, 0, SHORT( layer.E.w ), SHORT( layer.E.h ), 0, 0, layer.E.w, layer.E.h );  vpx := 0;
-			vpy := 0;  vpw := SHORT( layer.E.w );  vph := SHORT( layer.E.h )
-		ELSIF c.free THEN vyGraphBase.StretchedPict2d( layer.E.pict, 0, 0, SHORT( layer.E.w ), SHORT( layer.E.h ), 0, 0, layer.E.w, layer.E.h );
+			vyGraphBase.StretchedPict2d( layer.E.pict, 0, 0, SIGNED16( layer.E.w ), SIGNED16( layer.E.h ), 0, 0, layer.E.w, layer.E.h );  vpx := 0;
+			vpy := 0;  vpw := SIGNED16( layer.E.w );  vph := SIGNED16( layer.E.h )
+		ELSIF c.free THEN vyGraphBase.StretchedPict2d( layer.E.pict, 0, 0, SIGNED16( layer.E.w ), SIGNED16( layer.E.h ), 0, 0, layer.E.w, layer.E.h );
 		ELSE
 			IF (c.dx = 1) & (c.dy = 1) THEN vyGraphBase.Pict( layer.E.pict, vpx, vpy, vpw, vph, c.vx, c.vy )
 			ELSE vyGraphBase.StretchedPict( layer.E.pict, vpx, vpy, vpw, vph, c.vx, c.vy, vpw * c.dx, vph * c.dy )
@@ -99,7 +99,7 @@ VAR
 	VAR tempLayer: tLayer;
 	BEGIN
 		tempLayer := antsViews.tempLayer( tLayer );
-		antsPictCoordinate.Center( SHORT( tempLayer.E.w ), SHORT( tempLayer.E.h ), antsPictCoordinate.tc );  vyBase.Update( tempLayer )
+		antsPictCoordinate.Center( SIGNED16( tempLayer.E.w ), SIGNED16( tempLayer.E.h ), antsPictCoordinate.tc );  vyBase.Update( tempLayer )
 	END Center;
 
 	PROCEDURE HandleFileMsg( obj: tLayer;  VAR msg: Objects.FileMsg );
@@ -221,7 +221,7 @@ VAR
 		ELSIF msg IS antsToolbox.GetCoordMsg THEN
 			WITH msg: antsToolbox.GetCoordMsg DO
 				IF msg.update THEN vyBase.Update( layer ) END;
-				vyGraphBase.PointToPoint2d( msg.x, msg.y, msg.xr, msg.yr );  msg.w := layer.E.w;  msg.h := layer.E.h;
+				vyGraphBase.PointToPoint2d( msg.x, msg.y, msg.xr, msg.yr );  msg.w := SIGNED32(layer.E.w);  msg.h := SIGNED32(layer.E.h);
 				msg.layer := layer;  msg.a := layer.E.A;
 			END;
 		ELSIF msg IS vyBase.UpdateMessage THEN
@@ -278,7 +278,7 @@ VAR
 	VAR id: vyName.tNameArray;
 	BEGIN
 		Init( layer );  id := "ViewP:";  vyName.AppendObjId( E, id );  vyPort.OpenLayer( layer, id );  layer.E := E;
-		IF E.A # NIL THEN layer.pal.first := 0;  layer.pal.last := SHORT( E.depth - 1 );
+		IF E.A # NIL THEN layer.pal.first := 0;  layer.pal.last := SIGNED16( E.depth - 1 );
 
 			antsViews.DefaultPath( layer, texture );  texture := FALSE
 		END;
@@ -300,7 +300,7 @@ VAR
 		IF c = NIL THEN NEW( c );  antsPictCoordinate.OpenC( c, 1, 1 )
 		END;
 		IF ~add THEN
-			w := SHORT( E.w );  h := SHORT( E.h );
+			w := SIGNED16( E.w );  h := SIGNED16( E.h );
 			IF w > maxw THEN w := maxw END;
 			IF h > maxh THEN h := maxh END;
 			port := vyPort.XNewFrame( w + 2 * vyPort.Border, h + 2 * vyPort.Border );  port.W := (w + 2 * vyPort.Border);
@@ -323,7 +323,7 @@ VAR
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) THEN
 			add := antsCommands.FindKeyword( l, "add" );  obj := vyName.FindObj( name );  o := obj;
 			IF antsCommands.FindKeyword( l, "texture" ) THEN texture := TRUE END;
-			IF antsCommands.GetNumberFromKeyword( l, "gridsize", dx ) THEN NEW( c );  antsPictCoordinate.OpenC( c, SHORT( dx ), SHORT( dx ) ) END;
+			IF antsCommands.GetNumberFromKeyword( l, "gridsize", dx ) THEN NEW( c );  antsPictCoordinate.OpenC( c, SIGNED16( dx ), SIGNED16( dx ) ) END;
 			IF o IS antsArrayPictures.tObject THEN la := DoShow( o( antsArrayPictures.tObject ), add, c )
 			ELSIF o IS antsArrayObjects.tINTEGERObject THEN
 				antsArrayPictures.Gen;  pobj := Objects.NewObj( antsArrayPictures.tObject );

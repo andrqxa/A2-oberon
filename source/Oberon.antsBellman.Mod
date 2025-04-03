@@ -30,7 +30,7 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT antsArrays, vyLongreal, aM := antsMessages;
 
 TYPE
-	Function* = PROCEDURE (k, n: SIGNED32): FLOAT64;
+	Function* = PROCEDURE (k, n: SIZE): FLOAT64;
 
 	Statistic* = POINTER TO StatisticDesc;
 	StatisticDesc* = RECORD
