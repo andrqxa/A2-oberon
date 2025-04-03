@@ -174,7 +174,7 @@ END ImageToPict;
 
 (** initialize image from picture by copying picture contents **)
 	PROCEDURE PictToImage*( pict: Pictures.Picture;  img: Images.Image );
-	VAR idx, max, dr, dg, db, pr, pg, pb, y, x0, x1: SIGNED16;  default: BOOLEAN;  pal: Images.Palette;  fmt: Images.Format;  adr: SIGNED32;
+	VAR idx, max, dr, dg, db, pr, pg, pb, y, x0, x1: SIGNED16;  default: BOOLEAN;  pal: Images.Palette;  fmt: Images.Format;  adr: ADDRESS;
 	BEGIN
 		(* check if palette matches fixed palette *)
 		idx := 0;  max := SHORT( ASH( 1, pict.depth ) );  default := TRUE;
@@ -972,7 +972,7 @@ END LoadPictureDialoged;
 
 	PROCEDURE ReplaceTextPart*;
 	VAR name, filename: ARRAY 128 OF CHAR;
-		C, T: Texts.Text;  B: Texts.Buffer;  F: Files.File;  len: SIGNED32;  pos0: SIGNED32;
+		C, T: Texts.Text;  B: Texts.Buffer;  F: Files.File;  len: SIGNED32;  pos0: SIZE;
 		begpat, endpat: ARRAY 32 OF CHAR;
 		W: Texts.Writer;
 

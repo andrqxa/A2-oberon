@@ -78,7 +78,7 @@ TYPE
 	*)
 
 	PROCEDURE GetInterpolated( f: Function;  at: FLOAT64 ): FLOAT64;
-	VAR len, lp, up, mp: SIGNED32;  lx, ux, mx: FLOAT64;
+	VAR len, lp, up, mp: SIZE;  lx, ux, mx: FLOAT64;
 	BEGIN
 		(*
 		mind := MAX( FLOAT64 );
@@ -138,7 +138,7 @@ TYPE
 	END GetDefaultXd;
 
 	PROCEDURE SetValue( f: Function;  at, val: FLOAT64 );
-	VAR i, len, pos: SIGNED32;  lp, mp, up: SIGNED32;  lx, ux, mx: FLOAT64;
+	VAR i, len, pos: SIZE;  lp, mp, up: SIZE;  lx, ux, mx: FLOAT64;
 	BEGIN
 		len := vyLongrealVec.Len( f.x );
 		IF len = 0 THEN vyLongrealVec.Append( val, f.val );  vyLongrealVec.Append( at, f.x );  RETURN END;

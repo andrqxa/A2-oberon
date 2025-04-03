@@ -34,7 +34,7 @@ TYPE
 	tObjectDesc* = RECORD (vyBase.ObjDesc)
 		synced-: BOOLEAN;
 		img*: Images.Image;
-		w*, h*, depth*: antsObjects.Index;   (* cache *)
+		w*, h*: SIZE; depth*: antsObjects.Index;   (* cache *)
 		A*: antsArrayObjects.tINTEGERObject;
 		trans*: antsObjects.PAConsistTrafoProc
 	END;
@@ -45,8 +45,8 @@ TYPE
 			M.Enum( "Gen" );  M.Enum( "w" );  M.Enum( "h" );  M.Enum( "depth" );  M.Enum( "synced" );  M.Enum( "ARRAY" );  vyBase.objecthandle( o, M )
 		ELSIF M.id = Objects.get THEN
 			IF M.name = "Gen" THEN COPY( 'antsArrayImages.Gen', M.s );  M.class := Objects.String;  M.res := 0
-			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := o.w;  M.res := 0
-			ELSIF M.name = "h" THEN M.class := Objects.Int;  M.i := o.h;  M.res := 0
+			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := SIGNED32(o.w);  M.res := 0
+			ELSIF M.name = "h" THEN M.class := Objects.Int;  M.i := SIGNED32(o.h);  M.res := 0
 			ELSIF M.name = "depth" THEN M.class := Objects.Int;  M.i := o.depth;  M.res := 0
 			ELSIF M.name = "synced" THEN M.class := Objects.Bool;  M.b := o.synced;  M.res := 0
 			ELSIF M.name = "ARRAY" THEN
@@ -84,8 +84,8 @@ TYPE
 			Gadgets.ReadRef( msg.R, obj.lib, objsub );
 			IF (objsub # NIL ) & (objsub IS antsArrayObjects.tObject) THEN obj.A := objsub( antsArrayObjects.tINTEGERObject ) END
 		ELSIF msg.id = Objects.store THEN
-			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, obj.w );
-			Files.WriteLInt( msg.R, obj.h );  Files.WriteLInt( msg.R, obj.depth );  Gadgets.WriteRef( msg.R, obj.lib, obj.img );
+			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, SIGNED32(obj.w) );
+			Files.WriteLInt( msg.R, SIGNED32(obj.h) );  Files.WriteLInt( msg.R, obj.depth );  Gadgets.WriteRef( msg.R, obj.lib, obj.img );
 			Gadgets.WriteRef( msg.R, obj.lib, obj.A )
 		ELSE vyBase.objecthandle( obj, msg )
 		END
@@ -95,7 +95,7 @@ TYPE
 	VAR fmt: Images.Format;
 	BEGIN
 		IF (obj.w # obj.A.w) OR (obj.h # obj.A.h) THEN
-			fmt := obj.img.fmt;  obj.w := obj.A.w;  obj.h := obj.A.h;  Images.Create( obj.img, SHORT( obj.w ), SHORT( obj.h ), fmt )
+			fmt := obj.img.fmt;  obj.w := obj.A.w;  obj.h := obj.A.h;  Images.Create( obj.img, SIGNED16( obj.w ), SIGNED16( obj.h ), fmt )
 		END;
 		IF (obj.depth # obj.A( antsArrayObjects.tINTEGERObject ).depth) THEN
 			obj.depth := obj.A( antsArrayObjects.tINTEGERObject ).depth
@@ -112,7 +112,7 @@ TYPE
 	END MinMax;
 
 	PROCEDURE Sync*( obj: tObject );
-	VAR y, x: SIGNED16;  A: antsArrayObjects.tINTEGERArray;  adr: SIGNED32;  depth: SIGNED16;
+	VAR y, x: SIGNED16;  A: antsArrayObjects.tINTEGERArray;  adr: ADDRESS;  depth: SIGNED16;
 	BEGIN
 		(* caution: Don't send any update messages, Sync is called while writing to double buffer *)
 		IF obj.A # NIL THEN
@@ -191,7 +191,7 @@ TYPE
 		FOR i := 0 TO obj.depth - 1 DO r := SHORT( (i) * 255 DIV (obj.depth - 1) );  g := r;  b := r;  Images.SetRGB( pal.col[i], r, g, b ) END;
 		FOR i := obj.depth TO 255 DO Images.SetRGB( pal.col[i], 255, 0, 0 ) END;
 		Images.InitPalette( pal, 255, 4 );  Images.InitPaletteFormat( fmt, pal );  NEW( obj.img );
-		Images.Create( obj.img, SHORT( obj.w ), SHORT( obj.h ), fmt );  vyBase.Subscribe( obj.A, obj );  Sync( obj )
+		Images.Create( obj.img, SIGNED16( obj.w ), SIGNED16( obj.h ), fmt );  vyBase.Subscribe( obj.A, obj );  Sync( obj )
 	END FromArray;
 
 	PROCEDURE New*;
@@ -213,7 +213,7 @@ TYPE
 	BEGIN
 		IF obj.A # NIL THEN aM.S( "overwriting existing ARRAY" ) END;
 		img := obj.img;  NEW( pal );  Images.InitPalette( pal, 255, 4 );  Images.InitPaletteFormat( fmt, pal );  NEW( obj.img );
-		Images.Create( obj.img, SHORT( obj.w ), SHORT( obj.h ), fmt );
+		Images.Create( obj.img, SIGNED16( obj.w ), SIGNED16( obj.h ), fmt );
 		Images.Copy( img, obj.img, 0, 0, img.width - 1, img.height - 1, 0, 0, Images.SrcCopy );
 		(* NEW Image in palette Format *)
 		(* Now: new Array object*)
