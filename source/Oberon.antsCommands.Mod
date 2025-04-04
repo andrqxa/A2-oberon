@@ -421,11 +421,24 @@ VAR
 		END;
 		RETURN FALSE
 	END GetNumberFromKeyword;
+	
+	PROCEDURE GetSizeFromKeyword*(list: tScanList;  key: ARRAY OF CHAR;  VAR l: SIZE ): BOOLEAN;
+	VAR c: SIGNED32; result: BOOLEAN; 	
+	BEGIN
+		result := GetNumberFromKeyword(list,key,c);
+		l := c;
+		RETURN result;
+	END GetSizeFromKeyword;
 
 	PROCEDURE GetNumber*( key: ARRAY OF CHAR;  VAR l: SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN GetNumberFromKeyword( lastScanned, key, l )
 	END GetNumber;
+
+	PROCEDURE GetSize*( key: ARRAY OF CHAR;  VAR l: SIZE ): BOOLEAN;
+	BEGIN
+		RETURN GetSizeFromKeyword( lastScanned, key, l )
+	END GetSize;
 
 	PROCEDURE GetStringFromKeyword*( list: tScanList;  key: ARRAY OF CHAR;  VAR name: ARRAY OF CHAR ): BOOLEAN;
 	VAR p: tParameter;
@@ -536,6 +549,22 @@ VAR
 	BEGIN
 		RETURN ExpectNumberFromKeyword( lastScanned, key, l )
 	END ExpectNumber;
+
+	PROCEDURE ExpectSizeFromKeyword*( list: tScanList;  key: ARRAY OF CHAR;  VAR l: SIZE ): BOOLEAN;
+	VAR c: SIGNED32;
+	BEGIN
+		IF ~GetSizeFromKeyword( list, key, l ) THEN
+			aM.eSS( "antsCommands: Number expected, key:", key );  aM.eSI( "or expected at Position", list.spos );  aM.usage( callerS, usageS );  RETURN FALSE
+		ELSE 
+			RETURN TRUE
+		END
+	END ExpectSizeFromKeyword;
+
+	PROCEDURE ExpectSize*( key: ARRAY OF CHAR;  VAR l: SIZE ): BOOLEAN;
+	BEGIN
+		RETURN ExpectSizeFromKeyword( lastScanned, key, l )
+	END ExpectSize;	
+	
 
 	PROCEDURE ExpectStringFromKeyword*( list: tScanList;  key: ARRAY OF CHAR;  VAR name: ARRAY OF CHAR ): BOOLEAN;
 	BEGIN

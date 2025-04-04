@@ -47,8 +47,8 @@ END IsProtected;
 PROCEDURE TypeOf* (o: ANY): Type;
 	VAR type: Type;
 BEGIN
-	S.GET(S.VAL(ADDRESS, o)-4, type);
-	S.GET(S.VAL(ADDRESS, type)-4, type);
+	S.GET(S.VAL(ADDRESS, o)-SIZEOF(ADDRESS), type);
+	S.GET(S.VAL(ADDRESS, type)-SIZEOF(ADDRESS), type);
 	RETURN type
 END TypeOf;
 
