@@ -708,7 +708,7 @@ ELSE
 	END
 END;
 FOR h := l TO r DO
-	data[h] := hdata[h - l];  Index[h] := SIGNED32(hindex[h - l]) 	(* restore the sorted run *)
+	data[h] := hdata[h - l];  Index[h] := hindex[h - l] 	(* restore the sorted run *)
 END
 END MergeIndexed;
 
@@ -753,7 +753,7 @@ BEGIN
 	len := LEN(reg);
 	NEW(indicator, len); NEW(help, len);
 	FOR i := 0 TO len - 1 DO
-		indicator[i] := SIGNED32(i);
+		indicator[i] := i;
 		help[i] := resp[i]
 	END;
 	SortIndexed(len, reg, 0, indicator^);

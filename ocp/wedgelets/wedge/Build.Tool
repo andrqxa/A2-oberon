@@ -1,22 +1,26 @@
+Files.AddSearchPath ../../ocp/wedgelets/wedge ~
+Files.AddSearchPath ../../ocp/wedgelets/images ~ 
+Oberon.Start Oberon 0x0 ~ 
+
 Compiler.Compile 
-	wedge/wedgeLinearEq.Mod
-	wedge/wedgeQuadraticEq.Mod
-	wedge/wedgeGenericEq.Mod
-	wedge/wedgeArrays.Mod
-	wedge/wedgeTrees.Mod
-	wedge/wedgeConstantModels.Mod
-	wedge/wedgeLinearModels.Mod
-	wedge/wedgeQuadraticModels.Mod
-	wedge/wedgeHierarchicModel.Mod
-	wedge/wedgeFunctions2d.Mod
-	wedge/wedgeGenericModels.Mod
-	wedge/wedgeTreePlot.Mod
-	wedge/wedgeCommands.Mod
-	wedge/antsGammaShooting.Mod
-	wedge/wedgeLog.Mod
-	wedge/wedgeNumOps.Mod
-	wedge/Miniscript.Mod
-	wedge/CumulativeMatrices.Mod
-	wedge/Wedgelets.Mod
-	wedge/Arclets.Mod
+	wedgeLinearEq.Mod
+	wedgeQuadraticEq.Mod
+	wedgeGenericEq.Mod
+	wedgeArrays.Mod
+	wedgeTrees.Mod
+	wedgeConstantModels.Mod
+	wedgeLinearModels.Mod
+	wedgeQuadraticModels.Mod
+	wedgeHierarchicModel.Mod
+	wedgeFunctions2d.Mod
+	wedgeGenericModels.Mod
+	wedgeTreePlot.Mod
+	wedgeCommands.Mod
+	antsGammaShooting.Mod
+	wedgeLog.Mod
+	wedgeNumOps.Mod
+	Miniscript.Mod
+	CumulativeMatrices.Mod
+	Wedgelets.Mod
+	Arclets.Mod
 ~
