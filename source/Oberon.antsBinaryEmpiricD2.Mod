@@ -95,8 +95,8 @@ BEGIN
 END F;
 
 
-PROCEDURE EmpiricalDistribute (VAR E: EmpiricalDistribution;   A: antsArrayObjects.tINTEGERArray;   Sx, Sy, Sw, Sh: SIGNED32);
-	VAR x, y: SIGNED32 ;   xt, vt: Index;
+PROCEDURE EmpiricalDistribute (VAR E: EmpiricalDistribution;   A: antsArrayObjects.tINTEGERArray;   Sx, Sy, Sw, Sh: SIZE);
+	VAR x, y: SIZE ;   xt, vt: Index;
 BEGIN
 	IF E = NIL THEN NEW(E) END;
 	InitED(E);
@@ -131,7 +131,7 @@ BEGIN
 	EmpiricalDistribute (ed, par.A.A, 1, 1, par.A.w - 4, par.A.h - 4);
 	(* EmpiricalDistributeC(par.CEDo(EmpiricalDistribution),par.CEDe(EmpiricalDistribution),
 	par.A.A, 1,1,par.A.w-4,par.A.h-4); *)
-	par.x := 1;  par.y := 1;  par.w := par.A.w - 4;  par.h := par.A.h - 4
+	par.x := 1;  par.y := 1;  par.w := SIGNED32(par.A.w - 4);  par.h := SIGNED32(par.A.h - 4)
 END GenerateED;
 
 

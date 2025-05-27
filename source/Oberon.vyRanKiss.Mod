@@ -71,9 +71,9 @@ TYPE
 	VAR j: SIGNED32;  k, m: Bits;
 	BEGIN
 		FOR j := start TO start + count - 1 DO
-			x := 69069 * x + 1;  y := S.VAL( Bits, S.VAL( SET, y ) / S.VAL( SET, LSH( y, sysSHL * 13 ) ) );
-			y := S.VAL( Bits, S.VAL( SET, y ) / S.VAL( SET, LSH( y, sysSHR * 17 ) ) );
-			y := S.VAL( Bits, S.VAL( SET, y ) / S.VAL( SET, LSH( y, sysSHL * 5 ) ) );
+			x := 69069 * x + 1;  y := S.VAL( Bits, S.VAL( SET32, y ) / S.VAL( SET32, LSH( y, sysSHL * 13 ) ) );
+			y := S.VAL( Bits, S.VAL( SET32, y ) / S.VAL( SET32, LSH( y, sysSHR * 17 ) ) );
+			y := S.VAL( Bits, S.VAL( SET32, y ) / S.VAL( SET32, LSH( y, sysSHL * 5 ) ) );
 			k := LSH( z, sysSHR * 2 ) + LSH( w, sysSHR * 3 ) + LSH( carry, sysSHR * 2 );  m := w + w + z + carry;  z := w;
 			w := m;  carry := LSH( k, sysSHR * 30 );
 
@@ -265,7 +265,7 @@ TYPE
 		ASSERT ( bits < 0, 102 );
 
 		ASSERT ( SIZEOF( SIGNED32 ) = 4, 103 );
-		ASSERT ( SIZEOF( SET ) = 4, 104 )
+		ASSERT ( SIZEOF( SET32 ) = 4, 104 )
 	END DoAsserts;
 
 BEGIN

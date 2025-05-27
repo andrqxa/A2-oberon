@@ -62,7 +62,7 @@ VAR
 	END Copy;
 
 	PROCEDURE Recall( scatter: tLayer );
-	VAR nrData, i: SIGNED32;  sel: vyBase.tVector;  xx, yy: Coordinate;  b, lastb: BOOLEAN;  lastx, lasty: Coordinate;  width: SIGNED16;
+	VAR nrData, i: SIZE;  sel: vyBase.tVector;  xx, yy: Coordinate;  b, lastb: BOOLEAN;  lastx, lasty: Coordinate;  width: SIGNED16;
 		pattern: ARRAY 256 OF CHAR;
 	BEGIN
 		Attributes.GetString( scatter, "plotpattern", pattern );
@@ -133,7 +133,7 @@ VAR
 	PROCEDURE Actor( layer: vyPort.tLayer;  sel: vyBase.tVector;  x0O, y0O, x1O, y1O, x0N, y0N, x1N, y1N: Real;
 								VAR somethingChanged: BOOLEAN );
 	(*vs 0.0a1	md  16.08.94 *)
-	VAR scatter: tLayer;  nrData, i: SIGNED32;  new: BOOLEAN;  X, Y: Real;
+	VAR scatter: tLayer;  nrData, i: SIZE;  new: BOOLEAN;  X, Y: Real;
 
 		PROCEDURE PointInRect( px, py, x0, y0, x1, y1: Real ): BOOLEAN;
 		BEGIN
@@ -156,7 +156,7 @@ VAR
 	PROCEDURE Select( scatter: tLayer;  VAR event: vyEvents.EventMsg );
 	VAR selector: vyHighlight.tSelector;
 	BEGIN
-		vyHighlight.OpenSelector( scatter, scatter.x.nrData, Vizor, Actor, event );
+		vyHighlight.OpenSelector( scatter, SIGNED32(scatter.x.nrData), Vizor, Actor, event );
 		selector := scatter.highlight( vyHighlight.tSelector );  selector.do( selector, event )
 	END Select;
 
@@ -164,7 +164,7 @@ VAR
 	(*? should be supported as the selections with an abstract identifier *)
 	(*vs 0.0a1 *)  (* md  04.06.95 *)
 	CONST toleranz = 2 * vyHostDisplay.pixel;
-	VAR p: vyPort.Picture;  found, i, nrData: SIGNED32;  r: Real;  lx, ly, x0, y0: Coordinate;  id, val: vyName.tNameArray;
+	VAR p: vyPort.Picture;  found, i, nrData: SIZE;  r: Real;  lx, ly, x0, y0: Coordinate;  id, val: vyName.tNameArray;
 	BEGIN
 		vyHostDisplay.SetCursor( vyHostDisplay.Wheel );  found := -1;  nrData := scatter.x.nrData;
 		p := event.dlink( vyPort.Picture );  id := "";
@@ -175,7 +175,7 @@ VAR
 					vyHostDisplay.InvertString( lx, ly, "Syntax10.Scn.Fnt", id );  found := i;  id := "(";  val := "";
 					(*! label *)
 
-					Out.Ln;  Out.String( "at: " );  Out.Int( i, 10 );  r := vyTypes.VGetR( scatter.x, i );  Out.Ln;  Out.String( "x=" );
+					Out.Ln;  Out.String( "at: " );  Out.Int( SIGNED32(i), 10 );  r := vyTypes.VGetR( scatter.x, i );  Out.Ln;  Out.String( "x=" );
 					Out.LongReal( r, 40 );  vyHostStrings.AppendRealFix( r, 4, 2, 5, val );  vyHostStrings.Append( id, val );
 					vyHostStrings.Append( id, ", " );  val := "";  r := vyTypes.VGetR( scatter.y, i );  Out.Ln;  Out.String( "y=" );
 					Out.LongReal( r, 40 );
@@ -196,7 +196,7 @@ VAR
 
 		PROCEDURE InScatter( x, y: Coordinate ): BOOLEAN;
 		CONST eps = 3;
-		VAR minX, minY, maxX, maxY: Real;  x0, y0, x1, y1: Coordinate;  nans: SIGNED32;
+		VAR minX, minY, maxX, maxY: Real;  x0, y0, x1, y1: Coordinate;  nans: SIZE;
 
 		BEGIN
 			vyTypes.VGetMinMax( scatter.x, minX, maxX, nans );  vyTypes.VGetMinMax( scatter.y, minY, maxY, nans );
@@ -215,7 +215,7 @@ VAR
 	END Responsible;
 
 	PROCEDURE Consume( o: tLayer;  msg: Display.ConsumeMsg );
-	VAR v, w: vyBase.tVector;  minX, maxX, minY, maxY: Real;  pict: vyPort.Picture;  data: Objects.Object;  nans: SIGNED32;
+	VAR v, w: vyBase.tVector;  minX, maxX, minY, maxY: Real;  pict: vyPort.Picture;  data: Objects.Object;  nans: SIZE;
 	BEGIN
 		pict := msg.dlink( vyPort.Picture );  data := msg.obj;  v := vyBase.GetVFromObj( data );  data := data.slink;
 		w := vyBase.GetVFromObj( data );
@@ -251,7 +251,7 @@ VAR
 	END HandleAttributes;
 
 	PROCEDURE AdjustCoord( pict: vyPort.Picture;  obj: tLayer );
-	VAR minX, maxX, minY, maxY: FLOAT32;  nans: SIGNED32;
+	VAR minX, maxX, minY, maxY: FLOAT32;  nans: SIZE;
 	BEGIN
 		IF pict # NIL THEN
 			IF (obj.x # NIL ) & (obj.y # NIL ) THEN

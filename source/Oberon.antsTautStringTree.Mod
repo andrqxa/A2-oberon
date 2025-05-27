@@ -42,10 +42,10 @@ TYPE
 	NodeDesc = RECORD
 		left, right: Node;
 		value: FLOAT64;
-		start, ende: SIGNED32;
+		start, ende: SIZE;
 	END;
 
-	PROCEDURE InitWithLength( t: Tree; n: SIGNED32;  y: ARRAY OF FLOAT64 );
+	PROCEDURE InitWithLength( t: Tree; n: SIZE;  y: ARRAY OF FLOAT64 );
 	(* Initialisierung des Baumes mit festgelegter Länge.
 	Die Werte in y werden als Werte in den Blättern des Baumes gespeichert.
 	Rekursiv werden dann alle weiteren Werte berchnet bis zur Wurzel des Baumes. *)
@@ -56,7 +56,7 @@ TYPE
 		NEW( this );  t.root := this;  Set( this, y, n, 0, n - 1 );  this := t.root;  this.value := SetValue( t.root );
 	END InitWithLength;
 
-	PROCEDURE Init*( VAR z: ARRAY OF SIGNED32;  n: SIGNED32;  y: ARRAY OF FLOAT64;  thr: FLOAT64;  squeezing: ARRAY OF CHAR );
+	PROCEDURE Init*( VAR z: ARRAY OF SIZE;  n: SIZE;  y: ARRAY OF FLOAT64;  thr: FLOAT64;  squeezing: ARRAY OF CHAR );
 	(* Initialisierung des Baumes. *)
 
 	VAR t: Tree;
@@ -66,10 +66,10 @@ TYPE
 	END Init;
 
 
-	PROCEDURE Set( VAR x: Node;  y: ARRAY OF FLOAT64;  n: SIGNED32;  start: SIGNED32;  ende: SIGNED32 );
+	PROCEDURE Set( VAR x: Node;  y: ARRAY OF FLOAT64;  n: SIZE;  start: SIZE;  ende: SIZE );
 	(* Setzt die Werte in den Blättern des Baumes mit den Werten in y. *)
 
-	VAR left, right: Node;  j, k: SIGNED32;
+	VAR left, right: Node;  j, k: SIZE;
 
 	BEGIN
 		x.start := start;  x.ende := ende;
@@ -90,7 +90,7 @@ TYPE
 		RETURN x.value;
 	END SetValue;
 
-	PROCEDURE CheckThresh( t: Tree; VAR z: ARRAY OF SIGNED32;  thr: FLOAT64;  squeezing: ARRAY OF CHAR );
+	PROCEDURE CheckThresh( t: Tree; VAR z: ARRAY OF SIZE;  thr: FLOAT64;  squeezing: ARRAY OF CHAR );
 	(* Überprüft, ob der aktuelle Wert in einem Knoten bereits einen bestimmten Wert überschreitet.
 	Ruft die rekursive Prozedur CheckNode auf. *)
 
@@ -101,11 +101,11 @@ TYPE
 	END CheckThresh;
 
 
-	PROCEDURE CheckNode( VAR z: ARRAY OF SIGNED32;  VAR x: Node;  thr: FLOAT64;  squeezing: ARRAY OF CHAR );
+	PROCEDURE CheckNode( VAR z: ARRAY OF SIZE;  VAR x: Node;  thr: FLOAT64;  squeezing: ARRAY OF CHAR );
 	(* Überprüft rekursiv, ob ein Wert in einem Knoten einen bestimmten kritischen Wert überschreitet.
 	Wenn ja wird im Überprüfungsvektor z alle Blätter, die an diesem Knoten hängen mit 1 gekennzeichnet. *)
 
-	VAR check: FLOAT64;  i, n: SIGNED32;
+	VAR check: FLOAT64;  i, n: SIZE;
 
 	BEGIN
 		n := x.ende - x.start + 1;  check := ABS( x.value / math.sqrt( n ) );

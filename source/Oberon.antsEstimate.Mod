@@ -102,7 +102,7 @@ VAR
 	END New;
 
 	PROCEDURE func( VAR Par: ARRAY OF FLOAT64 ): FLOAT64;
-	VAR i, time: SIGNED32;
+	VAR i: SIZE; time: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN( Par ) - 1 DO gM.n.par[i] := Par[i] END;
 		antsNeighbourhoods.FillCache( gM.n );  time := Oberon.Time();

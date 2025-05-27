@@ -46,7 +46,7 @@ TYPE
 		enumsize-: SIGNED16;
 		posy-, posx-: SIGNED16;  (* mask position *)
 		on-: antsArrayObjects.tINTEGERObject;
-		Ax*, Ay*, Aw*, Ah*: SIGNED32;
+		Ax*, Ay*, Aw*, Ah*: SIZE;
 		onA: antsArrayObjects.tINTEGERArray;
 
 		(* visible: POINTER TO ARRAY OF ARRAY OF BOOLEAN;

@@ -99,7 +99,7 @@ VAR
 	PROCEDURE Show*;
 	VAR data: Objects.Object;  layer: tLayer;  minX, maxX: FLOAT32;
 		recallProc: ARRAY 32 OF CHAR;
-		s: vyParser.Scanner;  nans: SIGNED32;
+		s: vyParser.Scanner;  nans: SIZE;
 	BEGIN
 		vyParser.OpenParScanner( s );
 		IF ~vyParser.Name( s, recallProc ) THEN vyHostTexts.NoteSS( vyHostTexts.cAlert, idversion, "recall procedure expected" );  RETURN END;

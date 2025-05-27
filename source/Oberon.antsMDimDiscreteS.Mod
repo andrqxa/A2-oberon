@@ -97,7 +97,7 @@ TYPE
 	END PseudoLikPrepare;
 
 	PROCEDURE PseudoLik*( o: antsNeighbourhoods.NeighbourTable;  M: tModel;  AIC: BOOLEAN ): FLOAT64;
-	VAR sum: FLOAT64;  u, z: FLOAT64;  len, i: SIGNED32;  center: SIGNED32;  count: SIGNED16;  id: SIGNED16;  clen: SIGNED32;
+	VAR sum: FLOAT64;  u, z: FLOAT64;  len, i: SIZE;  center: SIGNED32;  count: SIGNED16;  id: SIGNED16;  clen: SIGNED32;
 
 		PROCEDURE U( VAR values: ARRAY OF SIGNED32;  M: tModel ): FLOAT64;
 		VAR i: SIGNED32;  theta: FLOAT64;  pars: antsNeighbourhoods.pars;  val: SIGNED32;  interactionFcache: realArrayArray;
@@ -196,7 +196,7 @@ TYPE
 	END Sync;
 
 	PROCEDURE OneSweep*( M: antsKernel.samplingMsg );
-	VAR A, Orig: antsArrayObjects.tINTEGERObject;  model: tModel;  dim, x, y, w, h: SIGNED32;  x0, y0, w0, h0: SIGNED32;  orig: Objects.Object;
+	VAR A, Orig: antsArrayObjects.tINTEGERObject;  model: tModel;  dim, x, y, w, h: SIZE;  x0, y0, w0, h0: SIGNED32;  orig: Objects.Object;
 		count: SIGNED16;  uv: realArray;  nb: intArray;  z, cooling, ran: FLOAT64;  max: SIGNED16;  cpos, nclen: SIGNED32;  cache: antsCaches.FullCache;
 		cx, cy: antsNeighbourhoods.Index;  i: SIGNED32;  pars: antsNeighbourhoods.pars;  theta: FLOAT64;  position, posi: SIGNED32;  s: antsKernel.Kernel;
 		visit: antsKernel.visitingScheme;  parallel: BOOLEAN;  destA, srcA: antsArrayObjects.tINTEGERArray;  externalFcache: realArray;
@@ -295,7 +295,7 @@ TYPE
 
 	PROCEDURE Metropolis( msg: antsKernel.samplingMsg );
 	VAR A, Ao: antsArrayObjects.tINTEGERObject;  model: tModel;  dim: SIGNED32;  x0, y0, w0, h0: SIGNED32;  zvax, zvay, zva: SIGNED32;  M: tModel;
-		gen: vyRanBase.tRandom;  h, h1, h2, cooling: FLOAT64;  AA: antsArrayObjects.tINTEGERArray;  W, H, depth: SIGNED32;
+		gen: vyRanBase.tRandom;  h, h1, h2, cooling: FLOAT64;  AA: antsArrayObjects.tINTEGERArray;  W, H, depth: SIZE;
 		orig: antsArrayObjects.tINTEGERObject;  obj: Objects.Object;  cv: intArray;  posi, position: SIGNED32;
 
 		s: antsKernel.Kernel;  visit: antsKernel.visitingScheme;  parallel: BOOLEAN;
@@ -344,7 +344,7 @@ TYPE
 
 	PROCEDURE Exchange( msg: antsKernel.samplingMsg );
 	VAR A, Ao: antsArrayObjects.tINTEGERObject;  model: tModel;  dim: SIGNED32;  x0, y0, w0, h0: SIGNED32;  M: tModel;
-		gen: vyRanBase.tRandom;  h, h1, h2, cooling: FLOAT64;  AA: antsArrayObjects.tINTEGERArray;  W, H, depth: SIGNED32;
+		gen: vyRanBase.tRandom;  h, h1, h2, cooling: FLOAT64;  AA: antsArrayObjects.tINTEGERArray;  W, H, depth: SIZE;
 		orig: antsArrayObjects.tINTEGERObject;  obj: Objects.Object;  cv: intArray;  posi, position: SIGNED32;
 		zvax1, zvay1, zvax2, zvay2, zva1, zva2: SIGNED32;  s: antsKernel.Kernel;  visit: antsKernel.visitingScheme;  parallel: BOOLEAN;
 	BEGIN

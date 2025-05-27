@@ -35,7 +35,7 @@ CONST
 	(*invalNrNans = -1;  	(* nan count to flag invalid min/max/nans for a buffer *)
 	invalSsq = -1.0;    (* ssq value to flag mean/ssq as invalid *)*)
 TYPE
-	index* = SIGNED32;
+	index* = SIZE;
 
 	(* FLOAT32 *)  (* preferred chunk sizes: 128, 1024, 8192 *)
 	nameptr* = vyName.tName;   (* technical convenience, to avoid duplicate code for FLOAT32 and FLOAT64 *)
@@ -105,7 +105,7 @@ END NewBufs;
 	PROCEDURE NewBufs( size: index ): tBuf;
 	VAR first, last: vyBase.tBuf;  chunk: tBuf;
 
-		PROCEDURE generic( ch: tBuf;  len: SIGNED32 );
+		PROCEDURE generic( ch: tBuf;  len: SIZE );
 		VAR i: index;
 		BEGIN
 			NEW( ch.data, len );
@@ -184,7 +184,7 @@ END SetNrData; *)
 	(*=  allocate memory for a vector. Do not change information.
 	To reduce size, use SetLen first to trim length
 	*)
-	VAR l, freetrail: SIGNED32;
+	VAR l, freetrail: SIZE;
 	VAR firstfree: vyBase.tBuf;
 	BEGIN
 		ASSERT ( size >= vec.nrData );
@@ -199,7 +199,7 @@ END SetNrData; *)
 		vyBase.MarkUsed( size, vec );  FlushVecCaches( vec )
 	END SetLen;
 
-	PROCEDURE Len*( vec: vyBase.tVector ): SIGNED32;
+	PROCEDURE Len*( vec: vyBase.tVector ): SIZE;
 	(*= get total vector length *)
 	BEGIN
 		IF vec = NIL THEN RETURN 0 ELSE RETURN vec.nrData END
@@ -211,10 +211,10 @@ END SetNrData; *)
 	VAR b: tBuf;  i: index;  M: Objects.FileMsg;
 
 	BEGIN
-		Files.WriteLInt( R, o.nrData );  b := o.buf( tBuf );  M.id := Objects.store;
+		Files.WriteLInt( R, SIGNED32(o.nrData) );  b := o.buf( tBuf );  M.id := Objects.store;
 		WHILE b # NIL DO
 			IF b.usedentries > 0 THEN
-				Files.WriteLInt( R, b.len );  Files.WriteLInt( R, b.usedentries );  i := 0;
+				Files.WriteLInt( R, SIGNED32(b.len) );  Files.WriteLInt( R, SIGNED32(b.usedentries) );  i := 0;
 				WHILE i < b.usedentries DO b.data[i].handle( b.data[i], M );  INC( i ) END
 			END;   (*IF*)
 			IF b.next # NIL THEN b := b.next( tBuf ) ELSE b := NIL END
@@ -224,7 +224,7 @@ END SetNrData; *)
 
 	PROCEDURE Load0( VAR R: Files.Rider;  o: tVector );
 
-	VAR b: tBuf;  i, c: index;  M: Objects.FileMsg;
+	VAR b: tBuf;  i: index;  M: Objects.FileMsg; c: SIGNED32;
 
 	BEGIN
 		Files.ReadLInt( R, c );  o.nrData := c;  Files.ReadLInt( R, c );  M.id := Objects.load;
@@ -382,7 +382,7 @@ END SetNrData; *)
 		FOR i := offs TO offs + count - 1 DO Set( val, v, i ) END
 	END Fill;
 
-	PROCEDURE NewFilledNamed*( count: SIGNED32;  val: nameptr;  name: ARRAY OF CHAR ): tVector;
+	PROCEDURE NewFilledNamed*( count: SIZE;  val: nameptr;  name: ARRAY OF CHAR ): tVector;
 	VAR v: tVector;
 	BEGIN
 		v := New( count );  Fill( v, val, 0, count );  vyName.Register( vyName.NameBase, v, name );  RETURN v

@@ -104,7 +104,7 @@ VAR
 		IF steps <= 0 THEN RETURN END;
 		pos := 0;
 		WHILE (pos <= steps) DO
-			x := fx + (tx - fx) * pos DIV steps;  y := fy + (ty - fy) * pos DIV steps;  Pictures.Dot( p, col, SHORT( x ), SHORT( y ), Display.replace );
+			x := fx + (tx - fx) * pos DIV steps;  y := fy + (ty - fy) * pos DIV steps;  Pictures.Dot( p, col, SIGNED16( x ), SIGNED16( y ), Display.replace );
 			INC( pos )
 		END
 
@@ -143,12 +143,12 @@ VAR
 		vyGraphBase.Rect2dToRect( 0, 0, 1, 1, X, Y, dX, dY );  dXl := dX * fac DIV div;  dYl := dX * fac DIV div;
 
 		vyGraphBase.Rect2dToRect( 0, 0, 1, 1, X, Y, W, H );   (* layer.E.d -> layer.E.h ? *)
-		W := SHORT( W * layer.E.w DIV (layer.E.w + fac * layer.E.h DIV div) );
-		H := SHORT( H * layer.E.d DIV (layer.E.d + fac * layer.E.h DIV div) );
+		W := SIGNED16( W * layer.E.w DIV (layer.E.w + fac * layer.E.h DIV div) );
+		H := SIGNED16( H * layer.E.d DIV (layer.E.d + fac * layer.E.h DIV div) );
 
 		ox := X;  oy := Y;
 
-		height := SHORT( layer.E.d );  width := SHORT( layer.E.w );  depth := SHORT( layer.E.h );
+		height := SIGNED16( layer.E.d );  width := SIGNED16( layer.E.w );  depth := SIGNED16( layer.E.h );
 
 		xx[0] := X;  yy[0] := Y;  xx[1] := X + fac * W DIV div;  yy[1] := Y + fac * W DIV div;  xx[2] := xx[1];  yy[2] := yy[1] + H;
 		xx[3] := xx[1] + W;  yy[3] := yy[1];
@@ -360,7 +360,7 @@ VAR
 	VAR id: vyName.tNameArray;
 	BEGIN
 		Init( layer );  id := "ViewI:";  vyName.AppendObjId( E, id );  vyPort.OpenLayer( layer, id );  layer.E := E;  layer.pal.first := 0;
-		layer.pal.last := SHORT( E.depth - 1 );  antsViews.DefaultPath( layer, texture );  texture := FALSE;
+		layer.pal.last := SIGNED16( E.depth - 1 );  antsViews.DefaultPath( layer, texture );  texture := FALSE;
 
 		layer.type := type;  vyBase.Subscribe( layer.E, layer )
 	END Open;
@@ -376,7 +376,7 @@ VAR
 		NEW( layer );  Open( layer, E, type );
 		IF c = NIL THEN NEW( c );  vyDisplay2d.OpenC2d( c, 0, 0, E.w + E.h / 2, E.d + E.h / 2 ) END;
 		IF ~add THEN
-			w := SHORT( E.w + 10 );  h := SHORT( E.h + 10 );
+			w := SIGNED16( E.w + 10 );  h := SIGNED16( E.h + 10 );
 			IF w > maxw THEN w := maxw END;
 			IF h > maxh THEN h := maxh END;
 			port := vyPort.XNewFrame( w + 2 * vyPort.Border, h + 2 * vyPort.Border );  port.W := (w + 2 * vyPort.Border);

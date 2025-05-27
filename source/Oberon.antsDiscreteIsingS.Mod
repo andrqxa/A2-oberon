@@ -172,10 +172,10 @@ END CachedE;
 	END CheckDepth;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, w, h: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  p: RandomArray;  xv: SIGNED16;  v1, v2, v3, v4: SIGNED32;  cdf: FLOAT64;
+	VAR x, y, w, h: SIZE;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  p: RandomArray;  xv: SIGNED16;  v1, v2, v3, v4: SIGNED32;  cdf: FLOAT64;
 		AO: antsArrayObjects.tINTEGERObject;  t1, t2, t3, t4: SIGNED32;  ran: FLOAT64;  d: SIGNED16;
 
-		PROCEDURE DistriFromLocalChar( VAR x, y: SIGNED32 );
+		PROCEDURE DistriFromLocalChar( VAR x, y: SIZE );
 		BEGIN
 			v1 := A[y, (x - 1) MOD w];  v2 := A[(y - 1) MOD h, x];  v3 := A[y, (x + 1) MOD w];  v4 := A[(y + 1) MOD h, x];
 			ran := p[x];  xv := 0;  cdf := model.Cdf[xv, v1, v2, v3, v4];

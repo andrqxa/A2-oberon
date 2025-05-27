@@ -63,13 +63,13 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 
 	END LoadM;
 
-	PROCEDURE Range( x, y, w, h: SIGNED32 ): BOOLEAN;
+	PROCEDURE Range( x, y, w, h: SIZE ): BOOLEAN;
 	BEGIN
 		IF (x < 0) OR (y < 0) OR (x >= w) OR (y >= h) THEN RETURN FALSE ELSE RETURN TRUE END
 	END Range;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR w, h: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  i: SIGNED32;  x, y: FLOAT64;
+	VAR w, h: SIZE;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  i: SIGNED32;  x, y: FLOAT64;
 		xi, yi: SIGNED16;  xa, ya, mass: LRA;  dr: FLOAT64;  K1, K: FLOAT64;  nuM, variance: FLOAT64;  vv: SIGNED16;
 
 		PROCEDURE drift( mass: FLOAT64 ): FLOAT64;

@@ -30,13 +30,13 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT antsArrays, vyLongreal, aM := antsMessages;
 
 TYPE
-	Function* = PROCEDURE (k, n: SIGNED32): FLOAT64;
+	Function* = PROCEDURE (k, n: SIZE): FLOAT64;
 
 	Statistic* = POINTER TO StatisticDesc;
 	StatisticDesc* = RECORD
 		type*: SIGNED16;    (* median, mean *)
 		m*, s*: antsArrays.X2d;    (* m= mean, s=ssq for type = cMean; m=median, s=sumabs for type = cMedian*)
-		n*, N*: SIGNED32;             (* N: Size of Data , n: Number of current Observation *)
+		n*, N*: SIZE;             (* N: Size of Data , n: Number of current Observation *)
 		(*
 		in case of 1d Data:
 		mean[l][k] = mean of Data in the interval [l,l+k-1]
@@ -137,13 +137,13 @@ BEGIN
 END BellmanMatrix;
 
 PROCEDURE PartitionMatrix* (argmin: antsArrays.I2d;   VAR result: antsArrays.X2d;   p: Function);
-VAR k, l, N: SIGNED32;            start, stop: SIGNED16;            mean: FLOAT64;
+VAR k, l, N: SIZE;            start, stop: SIGNED16;            mean: FLOAT64;
 BEGIN
 	N := LEN(argmin);
 	IF (result = NIL) OR (LEN(result) # N) THEN NEW(result, N, N) END;
 
 	FOR k := 1 TO N DO  (* num of intervals in the minimizing partition *)
-		stop := SHORT( N );
+		stop := SIGNED16( N );
 		FOR l := 0 TO k - 2 DO
 			start := (argmin^[k - l - 1][stop - 1]) + 1;
 			mean := p(start - 1, stop - 1);
@@ -166,13 +166,13 @@ BEGIN
 END PartitionMatrix;
 
 PROCEDURE IntervalLenMatrix* (argmin: antsArrays.I2d;   VAR result: antsArrays.I2d);
-VAR k, l, N: SIGNED32;            start, stop: SIGNED16;
+VAR k, l, N: SIZE;            start, stop: SIGNED16;
 	(* writes the length of intervals consecutive in result, first row of result corresponds to one interval, last row to N intervals *)
 BEGIN
 	N := LEN(argmin);
 	IF (result = NIL) OR (LEN(result) # N) THEN NEW(result, N, N) END;
 	FOR k := 1 TO N DO  (* num of intervals in the minimizing partition *)
-		stop := SHORT( N );
+		stop := SIGNED16( N );
 		FOR l := 0 TO k - 2 DO
 			start := (argmin^[k - l - 1][stop - 1]) + 1;
 			result[k -  l - 1] [k - 1] := stop - start + 1;
@@ -188,12 +188,12 @@ END IntervalLenMatrix;
 
 PROCEDURE InterVarMatrix* ( rstern: antsArrays.I2d;               s: Statistic;               VAR intVar: antsArrays.X2d );
 	(** compute the unbiased  variance estimator for every interval in the minimizing partiton*)
-VAR k, l, N: SIGNED32;               start, stop: SIGNED16;               length: SIGNED32;
+VAR k, l, N: SIZE;               start, stop: SIGNED16;               length: SIZE;
 BEGIN
 	N := s.N;
 	IF (intVar = NIL ) OR (LEN( intVar ) # N) THEN NEW( intVar, N, N ) END;
 	FOR k := 1 TO N DO  (* num of intervals in the minimizing partition *)
-		stop := SHORT( N );
+		stop := SIGNED16( N );
 		FOR l := 0 TO k - 2 DO
 			start := (rstern^[k - l - 1][stop - 1]) + 1;               length := stop - start + 1;
 			intVar[k - 1 - l][k - 1] := 1 / (length - 1) * s.s[start - 1][stop - 1];               stop := start - 1
@@ -207,7 +207,7 @@ BEGIN
 END InterVarMatrix;
 
 PROCEDURE IntervalLen* (argmin: antsArrays.I1d;   VAR result: antsArrays.I1d);
-VAR N, k, next, pos: SIGNED32;
+VAR N, k, next, pos: SIZE;
 	(* writes the length of intervals consecutive in result, end signalized by value 0 *)
 BEGIN
 	N := LEN(argmin);
@@ -215,27 +215,27 @@ BEGIN
 	k := N;    pos := 0;
 	WHILE(k  >  0) DO
 		next := argmin[k];
-		result[pos] := SHORT(k - next);   INC(pos);
+		result[pos] := SIGNED16(k - next);   INC(pos);
 		k := next
 	END;
 	result[pos] := 0
 END IntervalLen;
 
 PROCEDURE Partition* (argmin: antsArrays.I1d;   VAR result: antsArrays.X1d;   p: Function);
-VAR N, k, next: SIGNED32;
+VAR N, k, next: SIZE;
 BEGIN
 	N := LEN(argmin)-1;
 	IF (result = NIL) OR (LEN(result) # N) THEN NEW(result, N) END;
 	k := N;
 	WHILE(k  >  0) DO
 		next := argmin[k];
-		vyLongreal.Fill(k - next, result^, next, p(next, k - 1));
+		vyLongreal.Fill(k - next, result^, next, p(SIGNED32(next), SIGNED32(k - 1)));
 		k := next
 	END
 END Partition;
 
-PROCEDURE InitStatistic1d* (VAR statistic: Statistic;   N: SIGNED32);
-VAR i: SIGNED32;
+PROCEDURE InitStatistic1d* (VAR statistic: Statistic;   N: SIZE);
+VAR i: SIZE;
 BEGIN
 	IF statistic = NIL THEN NEW(statistic) END;
 	IF (statistic.m = NIL ) OR (statistic.N # N) THEN
@@ -249,8 +249,8 @@ BEGIN
 	statistic.type := cInval
 END InitStatistic1d;
 
-PROCEDURE InitStatistic2d* (VAR statistic: Statistic;   N, M: SIGNED32);
-VAR i: SIGNED32;
+PROCEDURE InitStatistic2d* (VAR statistic: Statistic;   N, M: SIZE);
+VAR i: SIZE;
 BEGIN
 	IF statistic = NIL THEN NEW(statistic) END;
 	IF (statistic.m = NIL ) OR (statistic.N # N) OR (LEN(statistic.m[0]) # M) THEN
@@ -265,7 +265,7 @@ BEGIN
 END InitStatistic2d;
 
 PROCEDURE ComputeMeanStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
-VAR i, j, n, nm1, len, N: SIGNED32;            factor, provmean, provssq, diff, x: FLOAT64;            ssq, mean: antsArrays.X2d;
+VAR i, j, n, nm1, len, N: SIZE;            factor, provmean, provssq, diff, x: FLOAT64;            ssq, mean: antsArrays.X2d;
 BEGIN
 	IF s = NIL THEN InitStatistic1d( s, LEN( A ) ) END;
 	IF s.type = cInval THEN s.type := cMean1d END;
@@ -285,8 +285,8 @@ BEGIN
 	END
 END ComputeMeanStat1d;
 
-PROCEDURE median ( y: ARRAY OF FLOAT64;            start, ende: SIGNED32 ): FLOAT64;
-VAR len: SIGNED32;
+PROCEDURE median ( y: ARRAY OF FLOAT64;            start, ende: SIZE ): FLOAT64;
+VAR len: SIZE;
 	yneu: POINTER TO ARRAY OF FLOAT64;
 BEGIN
 	len := ende - start + 1;            NEW( yneu, len );            vyLongreal.Copy( len, y, start, yneu^, 0 );
@@ -294,7 +294,7 @@ BEGIN
 END median;
 
 PROCEDURE ComputeMedianStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
-VAR i, j, n, nm1, t: SIGNED32;            factor, sum, m: FLOAT64;            sabs, med: antsArrays.X2d;
+VAR i, j, n, nm1, t: SIZE;            factor, sum, m: FLOAT64;            sabs, med: antsArrays.X2d;
 BEGIN
 	InitStatistic1d( s, LEN( A ) );
 	IF s.type = cInval THEN s.type := cMedian END;
@@ -316,7 +316,7 @@ END ComputeMedianStat1d;
 
 PROCEDURE ComputeHampelStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
 
-VAR i, j, d, m, f, n, N, len1, len2: SIGNED32;
+VAR i, j, d, m, f, n, N, len1, len2: SIZE;
 	x, y, t1, t2, fail1, fail2, tmin, failmin, prtrmean1,prtrmean2, prtrssq1, prtrssq2, diff1, diff2: FLOAT64;
 	trssq, trmean: antsArrays.X2d;
 	sortedArray: antsArrays.X1d;
@@ -343,7 +343,7 @@ BEGIN
 				len1 := 1; 	prtrssq1 := 0; 	prtrmean1 := 0;
 				NEW(I, 4);
 				m := d;
-				I^[0] := m;
+				I^[0] := SIGNED32(m);
 
 				WHILE (m < LEN(sortedArray)) & ((sortedArray[m] - sortedArray[d]) <= 2) DO
 					x := sortedArray[m];            diff1 := (x - prtrmean1);            prtrmean1 := prtrmean1 + diff1 / len1;
@@ -352,12 +352,12 @@ BEGIN
 					INC(m);
 				END;
 
-				I^[1] := m - 1;
+				I^[1] := SIGNED32(m - 1);
 				t1 := prtrmean1;
 				fail1 := prtrssq1 + (j - i + 1) - (len1 - 1);
 				len2 := 1; 	prtrssq2 := 0; 	prtrmean2 := 0;
 				m := d;
-				I^[3] := m;
+				I^[3] := SIGNED32(m);
 
 				WHILE (m >= 0) & ((sortedArray[d] - sortedArray[m]) <= 2) DO
 					y := sortedArray[m];            diff2 := (y - prtrmean2);            prtrmean2 := prtrmean2 + diff2 / len2;
@@ -366,7 +366,7 @@ BEGIN
 					DEC(m);
 				END;
 
-				I^[2] := m + 1;
+				I^[2] := SIGNED32(m + 1);
 				t2 := prtrmean2;
 				fail2 := prtrssq2 + (j - i + 1) - (len2 - 1);
 				ok1 := TRUE;
@@ -441,7 +441,7 @@ END ComputeHampelStat1d;
 
 PROCEDURE ComputeSaegezahnStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
 
-VAR i, j, d, m, f, k, n, N: SIGNED32;
+VAR i, j, d, m, f, k, n, N: SIZE;
 	t1, t2, fail, tmin, failmin: FLOAT64;
 	trsum, trmed: antsArrays.X2d;
 	sortedArray: antsArrays.X1d;
@@ -467,21 +467,21 @@ BEGIN
 			FOR d := 0 TO j-i DO
 				NEW(I, 4);
 				m := d;
-				I^[0] := m;
+				I^[0] := SIGNED32(m);
 
 				WHILE (m < LEN(sortedArray)) & ((sortedArray[m] - sortedArray[d]) <= 2) DO
 					INC(m);
 				END;
 
-				I^[1] := m - 1;
+				I^[1] := SIGNED32(m - 1);
 				m := d;
-				I^[3] := m;
+				I^[3] := SIGNED32(m);
 
 				WHILE (m >= 0) & ((sortedArray[d] - sortedArray[m]) <= 2) DO
 					DEC(m);
 				END;
 
-				I^[2] := m + 1;
+				I^[2] := SIGNED32(m + 1);
 
 				t1 := median(sortedArray^, I^[0], I^[1]);
 				t2 := median(sortedArray^, I^[2], I^[3]);
@@ -571,7 +571,7 @@ END ComputeSaegezahnStat1d;
 
 PROCEDURE ComputeHuberStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
 
-VAR i, j, d, m, f, h, k, n, N, len1, len2: SIGNED32;
+VAR i, j, d, m, f, h, k, n, N, len1, len2: SIZE;
 	x, y, t1, t2, fail, tmin, failmin, prtrmeanmed1, prtrmeanmed2, prtrssqsum1, prtrssqsum2: FLOAT64;
 	trssqsum, trmeanmed: antsArrays.X2d;
 	sortedArray: antsArrays.X1d;
@@ -598,7 +598,7 @@ BEGIN
 				len1 := 1; 	prtrssqsum1 := 0; 	prtrmeanmed1 := 0;
 				NEW(I, 4);
 				m := d;
-				I^[0] := m;
+				I^[0] := SIGNED32(m);
 
 				WHILE (m < LEN(sortedArray)) & ((sortedArray[m] - sortedArray[d]) <= 2) DO
 					x := sortedArray[m]; 	prtrmeanmed1 := prtrmeanmed1 + x;
@@ -607,11 +607,11 @@ BEGIN
 					INC(m);
 				END;
 
-				I^[1] := m - 1;
+				I^[1] := SIGNED32(m - 1);
 				t1 := (prtrmeanmed1 - (I^[0]) + (j - i - I^[1])) / (len1 - 1);
 				len2 := 1; 	prtrssqsum2 := 0; 	prtrmeanmed2 := 0;
 				m := d;
-				I^[3] := m;
+				I^[3] := SIGNED32(m);
 
 				WHILE (m >= 0) & ((sortedArray[d] - sortedArray[m]) <= 2) DO
 					y := sortedArray[m]; 	prtrmeanmed2 := prtrmeanmed2 + y;
@@ -620,7 +620,7 @@ BEGIN
 					DEC(m);
 				END;
 
-				I^[2] := m + 1;
+				I^[2] := SIGNED32(m + 1);
 				ok1 := TRUE;
 				ok2 := TRUE;
 
@@ -974,8 +974,8 @@ BEGIN
 END ComputeHuberStat1d;
 *)
 
-PROCEDURE CreateSortedArray(y: ARRAY OF FLOAT64;  start, ende: SIGNED32): antsArrays.X1d;
-VAR len: SIGNED32;  yneu: antsArrays.X1d;
+PROCEDURE CreateSortedArray(y: ARRAY OF FLOAT64;  start, ende: SIZE): antsArrays.X1d;
+VAR len: SIZE;  yneu: antsArrays.X1d;
 
 BEGIN
 	len := ende - start + 1;
@@ -989,7 +989,7 @@ BEGIN
 END CreateSortedArray;
 
 PROCEDURE ComputeMeanStat2d* (VAR A: ARRAY OF ARRAY OF FLOAT64;   VAR s: Statistic);
-VAR i, j, h, w: SIGNED32;
+VAR i, j, h, w: SIZE;
 BEGIN
 	h := LEN(A);   w := LEN(A[0]);
 	InitStatistic2d(s, h + 1, w + 1);
@@ -1018,31 +1018,31 @@ BEGIN
 	END
 END ComputeMeanStat2d;
 
-PROCEDURE GetMean1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
+PROCEDURE GetMean1d* (s: Statistic;   from, to: SIZE): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMean1d);
 	RETURN s.m[from, to]
 END GetMean1d;
 
-PROCEDURE GetMedian1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
+PROCEDURE GetMedian1d* (s: Statistic;   from, to: SIZE): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMedian);
 	RETURN s.m[from, to]
 END GetMedian1d;
 
-PROCEDURE GetSsq1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
+PROCEDURE GetSsq1d* (s: Statistic;   from, to: SIZE): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMean1d);
 	RETURN s.s[from, to]
 END GetSsq1d;
 
-PROCEDURE GetSAbs1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
+PROCEDURE GetSAbs1d* (s: Statistic;   from, to: SIZE): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMedian);
 	RETURN s.s[from, to]
 END GetSAbs1d;
 
-PROCEDURE GetMean2d* (s: Statistic;   	fromx, fromy, tox, toy: SIGNED32): FLOAT64;
+PROCEDURE GetMean2d* (s: Statistic;   	fromx, fromy, tox, toy: SIZE): FLOAT64;
 VAR factor, mean: FLOAT64;    Akum: antsArrays.X2d;
 BEGIN
 	Akum := s.m;
@@ -1053,7 +1053,7 @@ BEGIN
 	RETURN mean
 END GetMean2d;
 
-PROCEDURE GetSsq2d* (s: Statistic;   	fromx, fromy, tox, toy: SIGNED32): FLOAT64;
+PROCEDURE GetSsq2d* (s: Statistic;   	fromx, fromy, tox, toy: SIZE): FLOAT64;
 VAR Sum, SumSq, L, factor: FLOAT64;    Akum, AkumSq: antsArrays.X2d;
 BEGIN
 	Akum := s.m;   AkumSq := s.s;
@@ -1066,7 +1066,7 @@ END GetSsq2d;
 
 
 PROCEDURE gammaScanning* ( min: antsArrays.X2d;             VAR jumps: antsArrays.I1d;             VAR gamma: antsArrays.X1d );
-VAR N: SIGNED32;             n, nn, m: SIGNED32;             h, s: FLOAT64;
+VAR N: SIZE;             n, nn, m: SIZE;             h, s: FLOAT64;
 BEGIN
 	N := LEN( min );
 	IF (jumps = NIL ) OR (LEN( jumps ) # N) THEN NEW( jumps, N ) END;
@@ -1083,7 +1083,7 @@ BEGIN
 			END;
 			INC( m );             INC( nn );             gamma[m] := (min[jumps[nn], N - 1] - h) / (n - jumps[nn]);
 			INC( m );             gamma[m] := 0;
-			jumps[m] := SHORT( n )
+			jumps[m] := SIGNED16( n )
 		END
 	END
 	(*	aM.SR("largest gamma: ",gamma[0]); *)

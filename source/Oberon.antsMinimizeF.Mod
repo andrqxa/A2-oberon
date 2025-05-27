@@ -57,14 +57,14 @@ TYPE
 	VAR Y: 			ARRAY OF FLOAT64;
 	VAR sum: 		ARRAY OF FLOAT64;
 	ndim,
-	ihi: 		SIGNED32;
+	ihi: 		SIZE;
 	func: 	 Function;
-	VAR nfunc: 	SIGNED32;
+	VAR nfunc: 	SIZE;
 fac: 		FLOAT64): 	 FLOAT64;
 	(*     Extrapolates by a factor FAC through the face of the simplex across from the high point, tries it, and replaces the high point
 	if the new point is better.   *)
 VAR
-	j : SIGNED32;
+	j : SIZE;
 	fac1, fac2, ytry: FLOAT64;
 	(* PTRY: POINTER TO ARRAY OF FLOAT64; *)
 	PTRY: ARRAY 2 OF FLOAT64;
@@ -98,7 +98,7 @@ BEGIN
 END swap;
 
 PROCEDURE swapv* (VAR y1, y2: ARRAY OF FLOAT64);
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 BEGIN
 	FOR i := 0 TO LEN(y1) - 1 DO
 		swap(y1[i], y2[i])
@@ -111,7 +111,7 @@ VAR Y: 		 ARRAY OF FLOAT64;
 ndim: 	SIGNED32;
 ftol: 	FLOAT64;
 func: 	Function;
-VAR nfunc: SIGNED32);
+VAR nfunc: SIZE);
 CONST
 	nfuncmax = 5000;      (* The maximum allowed
 	number of function evaluations, and three parameters
@@ -120,7 +120,7 @@ CONST
 	beta = 0.5;
 	gamma = 2.0;
 	VAR t1, t2: FLOAT64;
-	mpts, nY, j, inhi, ilo, ihi, i : SIGNED32;
+	mpts, nY, j, inhi, ilo, ihi, i : SIZE;
 	ytry, ysave, sum, rtol: FLOAT64;
 	(*  PSUM: POINTER TO ARRAY OF FLOAT64;*)
 	PSUM: ARRAY 2 OF FLOAT64;      (* dim assumed to be 2 *)

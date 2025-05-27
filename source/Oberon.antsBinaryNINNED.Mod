@@ -78,8 +78,8 @@ BEGIN
 END InitED;
 
 
-PROCEDURE EmpiricalDistribute (VAR E: EmpiricalDistribution;   A: antsArrayObjects.tINTEGERArray;   Sx, Sy, Sw, Sh: SIGNED32);
-	VAR x, y: SIGNED32 ;   xt: Index;    conf: SIGNED32;
+PROCEDURE EmpiricalDistribute (VAR E: EmpiricalDistribution;   A: antsArrayObjects.tINTEGERArray;   Sx, Sy, Sw, Sh: SIZE);
+	VAR x, y: SIZE ;   xt: Index;    conf: SIGNED32;
 BEGIN
 	IF E = NIL THEN NEW(E) END;
 	InitED(E);
@@ -123,7 +123,7 @@ BEGIN
 	ProbA(par.ED(EmpiricalDistribution), lastprob);
 	(*		EmpiricalDistributeC(par.CEDo(EmpiricalDistribution),par.CEDe(EmpiricalDistribution), par.A.A, 1,1,par.A.w-3,par.A.h-3);
 	*)
-	par.x := 1;  par.y := 1;  par.w := par.A.w - 2;  par.h := par.A.h - 2
+	par.x := 1;  par.y := 1;  par.w := SIGNED32(par.A.w - 2);  par.h := SIGNED32(par.A.h - 2)
 	(* msg.val := par;
 	vyBase.ForUsersHandle(g,msg)*)
 END GenerateED;

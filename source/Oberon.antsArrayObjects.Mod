@@ -37,7 +37,7 @@ TYPE
 
 	tObject* = POINTER TO tObjectDesc;
 	tObjectDesc* = RECORD (vyBase.ObjDesc);
-		w*, h*: SIGNED32
+		w*, h*: SIZE
 	END;
 
 	tINTEGERObject* = POINTER TO tINTEGERObjectDesc;
@@ -146,8 +146,8 @@ VAR
 		END
 	END UniformO;
 
-	PROCEDURE CopyII*( a: tINTEGERArray;  VAR A: tINTEGERArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyII*( a: tINTEGERArray;  VAR A: tINTEGERArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -156,8 +156,8 @@ VAR
 		END
 	END CopyII;
 
-	PROCEDURE CopyLI*( a: tLONGINTArray;  VAR A: tINTEGERArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyLI*( a: tLONGINTArray;  VAR A: tINTEGERArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -166,8 +166,8 @@ VAR
 		END
 	END CopyLI;
 
-	PROCEDURE CopyRI*( a: tLONGREALArray;  VAR A: tINTEGERArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyRI*( a: tLONGREALArray;  VAR A: tINTEGERArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -176,8 +176,8 @@ VAR
 		END
 	END CopyRI;
 
-	PROCEDURE CopyIL*( a: tINTEGERArray;  VAR A: tLONGINTArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyIL*( a: tINTEGERArray;  VAR A: tLONGINTArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -186,8 +186,8 @@ VAR
 		END
 	END CopyIL;
 
-	PROCEDURE CopyUnsignedIL*( a: tINTEGERArray;  VAR A: tLONGINTArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyUnsignedIL*( a: tINTEGERArray;  VAR A: tLONGINTArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -199,8 +199,8 @@ VAR
 		END
 	END CopyUnsignedIL;
 
-	PROCEDURE CopyLL*( a: tLONGINTArray;  VAR A: tLONGINTArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyLL*( a: tLONGINTArray;  VAR A: tLONGINTArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -209,8 +209,8 @@ VAR
 		END
 	END CopyLL;
 
-	PROCEDURE CopyRL*( a: tLONGREALArray;  VAR A: tLONGINTArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyRL*( a: tLONGREALArray;  VAR A: tLONGINTArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -219,8 +219,8 @@ VAR
 		END
 	END CopyRL;
 
-	PROCEDURE CopyIR*( a: tINTEGERArray;  VAR A: tLONGREALArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyIR*( a: tINTEGERArray;  VAR A: tLONGREALArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -229,8 +229,8 @@ VAR
 		END
 	END CopyIR;
 
-	PROCEDURE CopyUnsignedIR*( a: tINTEGERArray;  VAR A: tLONGREALArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyUnsignedIR*( a: tINTEGERArray;  VAR A: tLONGREALArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -242,8 +242,8 @@ VAR
 		END
 	END CopyUnsignedIR;
 
-	PROCEDURE CopyLR*( a: tLONGINTArray;  VAR A: tLONGREALArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyLR*( a: tLONGINTArray;  VAR A: tLONGREALArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -252,8 +252,8 @@ VAR
 		END
 	END CopyLR;
 
-	PROCEDURE CopyRR*( a: tLONGREALArray;  VAR A: tLONGREALArray;  sx, sy, w, h, dx, dy: SIGNED32 );
-	VAR y, x: SIGNED32;
+	PROCEDURE CopyRR*( a: tLONGREALArray;  VAR A: tLONGREALArray;  sx, sy, w, h, dx, dy: SIZE );
+	VAR y, x: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dy + h) OR (LEN( A[0] ) < dx + w) THEN NEW( A, dy + h, dx + w ) END;
@@ -262,26 +262,26 @@ VAR
 		END
 	END CopyRR;
 
-	PROCEDURE FillIntArray*( val: SIGNED16;  A: tINTEGERArray;  x, y, w, h: SIGNED32 );
-	VAR curline: SIGNED32;
+	PROCEDURE FillIntArray*( val: SIGNED16;  A: tINTEGERArray;  x, y, w, h: SIZE );
+	VAR curline: SIZE;
 	BEGIN
 		FOR curline := y TO y + h - 1 DO vyInteger.Fill( w, A[curline], x, val ) END
 	END FillIntArray;
 
-	PROCEDURE FillLongintArray*( val: SIGNED32;  A: tLONGINTArray;  x, y, w, h: SIGNED32 );
-	VAR curline: SIGNED32;
+	PROCEDURE FillLongintArray*( val: SIGNED32;  A: tLONGINTArray;  x, y, w, h: SIZE );
+	VAR curline: SIZE;
 	BEGIN
 		FOR curline := y TO y + h - 1 DO vyLongint.Fill( w, A[curline], x, val ) END
 	END FillLongintArray;
 
-	PROCEDURE FillLongrealArray*( val: FLOAT64;  A: tLONGREALArray;  x, y, w, h: SIGNED32 );
-	VAR curline: SIGNED32;
+	PROCEDURE FillLongrealArray*( val: FLOAT64;  A: tLONGREALArray;  x, y, w, h: SIZE );
+	VAR curline: SIZE;
 	BEGIN
 		FOR curline := y TO y + h - 1 DO vyLongreal.Fill( w, A[curline], x, val ) END
 	END FillLongrealArray;
 
 	OPERATOR "+"*( a, b: tLONGREALArray ): tLONGREALArray;
-	VAR y, x: SIGNED32;  res: tLONGREALArray;  w, h: SIGNED32;
+	VAR y, x: SIZE;  res: tLONGREALArray;  w, h: SIZE;
 	BEGIN
 		IF (a = NIL ) OR (b = NIL ) THEN RETURN NIL END;
 		h := Min( LEN( a ), LEN( b ) );  w := Min( LEN( a[0] ), LEN( b[0] ) );  NEW( res, h, w );
@@ -290,7 +290,7 @@ VAR
 	END "+";
 
 	OPERATOR "-"*( a, b: tLONGREALArray ): tLONGREALArray;
-	VAR y, x: SIGNED32;  res: tLONGREALArray;  w, h: SIGNED32;
+	VAR y, x: SIZE;  res: tLONGREALArray;  w, h: SIZE;
 	BEGIN
 		IF (a = NIL ) OR (b = NIL ) THEN RETURN NIL END;
 		h := Min( LEN( a ), LEN( b ) );  w := Min( LEN( a[0] ), LEN( b[0] ) );  NEW( res, h, w );
@@ -299,7 +299,7 @@ VAR
 	END "-";
 
 	OPERATOR "*"*( a, b: tLONGREALArray ): tLONGREALArray;
-	VAR y, x: SIGNED32;  res: tLONGREALArray;  w, h: SIGNED32;
+	VAR y, x: SIZE;  res: tLONGREALArray;  w, h: SIZE;
 	BEGIN
 		IF (a = NIL ) OR (b = NIL ) THEN RETURN NIL END;
 		h := Min( LEN( a ), LEN( b ) );  w := Min( LEN( a[0] ), LEN( b[0] ) );  NEW( res, h, w );
@@ -308,7 +308,7 @@ VAR
 	END "*";
 
 	OPERATOR "/"*( a, b: tLONGREALArray ): tLONGREALArray;
-	VAR y, x: SIGNED32;  res: tLONGREALArray;  w, h: SIGNED32;
+	VAR y, x: SIZE;  res: tLONGREALArray;  w, h: SIZE;
 	BEGIN
 		IF (a = NIL ) OR (b = NIL ) THEN RETURN NIL END;
 		h := Min( LEN( a ), LEN( b ) );  w := Min( LEN( a[0] ), LEN( b[0] ) );  NEW( res, h, w );
@@ -317,7 +317,7 @@ VAR
 	END "/";
 
 	OPERATOR "+"*( a: tLONGREALArray;  b: FLOAT64 ): tLONGREALArray;
-	VAR y, x: SIGNED32;  res: tLONGREALArray;
+	VAR y, x: SIZE;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN NIL END;
 		NEW( res, LEN( a ), LEN( a[0] ) );
@@ -326,7 +326,7 @@ VAR
 	END "+";
 
 	OPERATOR "-"*( a: tLONGREALArray;  b: FLOAT64 ): tLONGREALArray;
-	VAR y, x: SIGNED32;  res: tLONGREALArray;
+	VAR y, x: SIZE;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN NIL END;
 		NEW( res, LEN( a ), LEN( a[0] ) );
@@ -335,7 +335,7 @@ VAR
 	END "-";
 
 	OPERATOR "*"*( a: tLONGREALArray;  b: FLOAT64 ): tLONGREALArray;
-	VAR y, x: SIGNED32;  res: tLONGREALArray;
+	VAR y, x: SIZE;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN NIL END;
 		NEW( res, LEN( a ), LEN( a[0] ) );
@@ -344,7 +344,7 @@ VAR
 	END "*";
 
 	OPERATOR "/"*( a: tLONGREALArray;  b: FLOAT64 ): tLONGREALArray;
-	VAR y, x: SIGNED32;  res: tLONGREALArray;
+	VAR y, x: SIZE;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN NIL END;
 		NEW( res, LEN( a ), LEN( a[0] ) );
@@ -377,7 +377,7 @@ VAR
 	END "-";
 
 	OPERATOR ":="*( VAR a: tLONGREALArray;  b: FLOAT64 );
-	VAR y, x: SIGNED32;  res: tLONGREALArray;
+	VAR y, x: SIZE;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN END;
 		NEW( res, LEN( a ), LEN( a[0] ) );
@@ -457,7 +457,7 @@ VAR
 	PROCEDURE SetDepth*( obj: tINTEGERObject;  depth: SIGNED32 );
 	(*= Set depth of an object. While any connected objects become consistent with respect to their depth, you will have to
 	call Update(obj) to get a consistent array - picture connection. *)
-	VAR olddepth: SIGNED32;  y, x: SIGNED32;  orig: Objects.Object;
+	VAR olddepth: SIGNED32;  y, x: SIZE;  orig: Objects.Object;
 	BEGIN
 		ASSERT ( obj # NIL , 100 );
 		ASSERT ( depth > 1, 101 );
@@ -528,35 +528,35 @@ VAR
 	END LoadLONGREALArray;
 
 	PROCEDURE IntObj*( A: tINTEGERArray;  depth: SIGNED32 ): tINTEGERObject;
-	VAR AA: tINTEGERObject;  W, H: SIGNED32;
+	VAR AA: tINTEGERObject;  W, H: SIZE;
 	BEGIN
 		H := LEN( A );  W := LEN( A[0] );  AA := NewINTEGERObject( W, H, depth );  vyName.RegisterNamed( AA, "genericArrayConv" );  SetInt( AA, A );
 		RETURN AA
 	END IntObj;
 
 	PROCEDURE IntObjR*( A: tLONGREALArray;  depth: SIGNED32 ): tINTEGERObject;
-	VAR AA: tINTEGERObject;  W, H: SIGNED32;
+	VAR AA: tINTEGERObject;  W, H: SIZE;
 	BEGIN
 		H := LEN( A );  W := LEN( A[0] );  AA := NewINTEGERObject( W, H, depth );  vyName.RegisterNamed( AA, "genericArrayConv" );
 		SetLongreal( AA, A );  RETURN AA
 	END IntObjR;
 
 	PROCEDURE IntObjL*( A: tLONGINTArray;  depth: SIGNED32 ): tINTEGERObject;
-	VAR AA: tINTEGERObject;  W, H: SIGNED32;
+	VAR AA: tINTEGERObject;  W, H: SIZE;
 	BEGIN
 		H := LEN( A );  W := LEN( A[0] );  AA := NewINTEGERObject( W, H, depth );  vyName.RegisterNamed( AA, "genericArrayConv" );
 		SetLongint( AA, A );  RETURN AA
 	END IntObjL;
 
 	PROCEDURE LIntObj*( A: tLONGINTArray;  depth: SIGNED32 ): tLONGINTObject;
-	VAR AA: tLONGINTObject;  W, H: SIGNED32;
+	VAR AA: tLONGINTObject;  W, H: SIZE;
 	BEGIN
 		H := LEN( A );  W := LEN( A[0] );  AA := NewLONGINTObject( W, H, depth );  vyName.RegisterNamed( AA, "genericArrayConv" );
 		SetLongint( AA, A );  RETURN AA
 	END LIntObj;
 
 	PROCEDURE RealObj*( A: tLONGREALArray;  depth: SIGNED32 ): tLONGREALObject;
-	VAR AA: tLONGREALObject;  W, H: SIGNED32;
+	VAR AA: tLONGREALObject;  W, H: SIZE;
 	BEGIN
 		H := LEN( A );  W := LEN( A[0] );  AA := NewLONGREALObject( W, H, depth );  vyName.RegisterNamed( AA, "genericArrayConv" );
 		SetLongreal( AA, A );  RETURN AA
@@ -577,7 +577,7 @@ VAR
 		o.A := A;  o.h := LEN( A^ );  o.w := LEN( A[0] );  Refresh( o )
 	END EmbedLONGREALArray;
 
-	PROCEDURE NewINTEGERArray*( w, h: SIGNED32 ): tINTEGERArray;
+	PROCEDURE NewINTEGERArray*( w, h: SIZE ): tINTEGERArray;
 	VAR a: tINTEGERArray;
 	BEGIN
 		ASSERT ( w > 0, 100 );
@@ -585,7 +585,7 @@ VAR
 		NEW( a, h, w );  FillIntArray( 0, a, 0, 0, w, h );  RETURN a
 	END NewINTEGERArray;
 
-	PROCEDURE NewLONGINTArray*( w, h: SIGNED32 ): tLONGINTArray;
+	PROCEDURE NewLONGINTArray*( w, h: SIZE ): tLONGINTArray;
 	VAR a: tLONGINTArray;
 	BEGIN
 		ASSERT ( w > 0, 100 );
@@ -593,7 +593,7 @@ VAR
 		NEW( a, h, w );  FillLongintArray( 0, a, 0, 0, w, h );  RETURN a
 	END NewLONGINTArray;
 
-	PROCEDURE NewLONGREALArray*( w, h: SIGNED32 ): tLONGREALArray;
+	PROCEDURE NewLONGREALArray*( w, h: SIZE ): tLONGREALArray;
 	VAR a: tLONGREALArray;
 	BEGIN
 		ASSERT ( w > 0, 100 );
@@ -601,7 +601,7 @@ VAR
 		NEW( a, h, w );  FillLongrealArray( 0, a, 0, 0, w, h );  RETURN a
 	END NewLONGREALArray;
 
-	PROCEDURE NewINTEGERObject*( w, h, d: SIGNED32 ): tINTEGERObject;
+	PROCEDURE NewINTEGERObject*( w, h: SIZE; d: SIGNED32 ): tINTEGERObject;
 	(*= create a new instance of an array within an array object *)
 	VAR a: tINTEGERArray;  A: tINTEGERObject;
 	BEGIN
@@ -609,7 +609,7 @@ VAR
 		EmbedINTEGERArray( a, A );  RETURN A
 	END NewINTEGERObject;
 
-	PROCEDURE NewLONGINTObject*( w, h, d: SIGNED32 ): tLONGINTObject;
+	PROCEDURE NewLONGINTObject*( w, h: SIZE; d: SIGNED32 ): tLONGINTObject;
 	(*= create a new instance of an array within an array object *)
 	VAR a: tLONGINTArray;  A: tLONGINTObject;
 	BEGIN
@@ -617,7 +617,7 @@ VAR
 		EmbedLONGINTArray( a, A );  RETURN A
 	END NewLONGINTObject;
 
-	PROCEDURE NewLONGREALObject*( w, h: SIGNED32;  d: FLOAT64 ): tLONGREALObject;
+	PROCEDURE NewLONGREALObject*( w, h: SIZE;  d: FLOAT64 ): tLONGREALObject;
 	(*= create a new instance of an array within an array object *)
 	VAR a: tLONGREALArray;  A: tLONGREALObject;
 	BEGIN
@@ -625,13 +625,13 @@ VAR
 		A.depth := d;  EmbedLONGREALArray( a, A );  RETURN A
 	END NewLONGREALObject;
 
-	PROCEDURE Min( x, y: SIGNED32 ): SIGNED32;
+	PROCEDURE Min( x, y: SIZE ): SIZE;
 	BEGIN
 		IF x < y THEN RETURN x ELSE RETURN y END
 	END Min;
 
-	PROCEDURE ChangeSize*( o: tObject;  w, h: SIGNED32 );
-	VAR oldw, oldh, y: SIGNED32;  ia: tINTEGERArray;  lia: tLONGINTArray;  lra: tLONGREALArray;
+	PROCEDURE ChangeSize*( o: tObject;  w, h: SIZE );
+	VAR oldw, oldh, y: SIZE;  ia: tINTEGERArray;  lia: tLONGINTArray;  lra: tLONGREALArray;
 	BEGIN
 		oldw := o.w;  oldh := o.h;
 		IF (oldw = w) & (oldh = h) THEN RETURN END;
@@ -663,7 +663,7 @@ VAR
 				o.w := w;  o.h := h
 			END;
 		END;
-		vyHostTexts.NoteSISI( vyHostTexts.cWarning, "antsArrayObjects Warning: Changed PictSize ", w, " / ", h )
+		vyHostTexts.NoteSISI( vyHostTexts.cWarning, "antsArrayObjects Warning: Changed PictSize ", SIGNED32( w), " / ", SIGNED32(h) )
 	END ChangeSize;
 
 	PROCEDURE HandleAttributes( o: tObject;  VAR M: Objects.AttrMsg );
@@ -684,8 +684,8 @@ VAR
 					WITH o: tLONGREALObject DO COPY( 'antsArrayObjects.GenLONGREALObj', M.s );  M.class := Objects.String;  M.res := 0
 					END;
 				END
-			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := o.w;  M.res := 0
-			ELSIF M.name = "h" THEN M.class := Objects.Int;  M.i := o.h;  M.res := 0
+			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := SIGNED32(o.w);  M.res := 0
+			ELSIF M.name = "h" THEN M.class := Objects.Int;  M.i := SIGNED32(o.h);  M.res := 0
 			ELSIF M.name = "depth" THEN
 				IF o IS tINTEGERObject THEN
 					WITH o: tINTEGERObject DO M.class := Objects.Int;  M.i := o.depth;  M.res := 0
@@ -732,9 +732,9 @@ VAR
 				ELSE
 				END
 			ELSIF M.name = "w" THEN
-				IF M.class = Objects.Int THEN ChangeSize( o, SHORT( M.i ), SHORT( o.h ) );  vyBase.Update( o );  M.res := 0 END
+				IF M.class = Objects.Int THEN ChangeSize( o, SIGNED16( M.i ), SIGNED16( o.h ) );  vyBase.Update( o );  M.res := 0 END
 			ELSIF M.name = "h" THEN
-				IF M.class = Objects.Int THEN ChangeSize( o, SHORT( o.w ), SHORT( M.i ) );  vyBase.Update( o );  M.res := 0 END
+				IF M.class = Objects.Int THEN ChangeSize( o, SIGNED16( o.w ), SIGNED16( M.i ) );  vyBase.Update( o );  M.res := 0 END
 			ELSE vyBase.objecthandle( o, M )
 			END
 		ELSE vyBase.objecthandle( o, M )
@@ -770,8 +770,8 @@ VAR
 				END;
 			END
 		ELSIF msg.id = Objects.store THEN
-			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, obj.w );
-			Files.WriteLInt( msg.R, obj.h );
+			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, SIGNED32(obj.w) );
+			Files.WriteLInt( msg.R, SIGNED32(obj.h) );
 			IF obj IS tINTEGERObject THEN
 				WITH obj: tINTEGERObject DO Files.WriteLInt( msg.R, obj.depth );  StoreINTEGERArray( msg.R, obj.A );
 				END;
@@ -887,7 +887,7 @@ VAR
 	END ObjectCopy;
 
 	PROCEDURE upsidedown;
-	VAR temp: SIGNED16;  y, x: SIGNED32;
+	VAR temp: SIGNED16;  y, x: SIZE;
 	BEGIN
 		IF globalobj # NIL THEN
 			WITH globalobj: tINTEGERObject DO
@@ -903,7 +903,7 @@ VAR
 	END upsidedown;
 
 	PROCEDURE leftsideright;
-	VAR temp: SIGNED16;  y, x: SIGNED32;
+	VAR temp: SIGNED16;  y, x: SIZE;
 	BEGIN
 		IF globalobj # NIL THEN
 			WITH globalobj: tINTEGERObject DO
@@ -941,7 +941,7 @@ VAR
 					msg.Enum( "upside down", upsidedown, obj );  msg.Enum( "leftside right", leftsideright, obj );
 					IF (antsPictCoordinate.currentsel # NIL ) THEN
 						sel := antsPictCoordinate.currentsel;
-						IF ~vyRectangles.EmptyIntersection( sel.px, sel.py, sel.pw, sel.ph, 0, 0, SHORT( obj.w ), SHORT( obj.h ) ) THEN
+						IF ~vyRectangles.EmptyIntersection( sel.px, sel.py, sel.pw, sel.ph, 0, 0, SIGNED16( obj.w ), SIGNED16( obj.h ) ) THEN
 							msg.Enum( "Store Selection as PGM", storepgmsel, obj );  msg.Enum( "Cut to Selection (!)", cutsel, obj )
 						END
 					END;
@@ -999,7 +999,7 @@ VAR
 	END Uniform;
 
 	PROCEDURE Channel*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  y, x: SIGNED32;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  y, x: SIZE;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ p=FLOAT32" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "p", p ) THEN
@@ -1021,7 +1021,7 @@ VAR
 	END Channel;
 
 	PROCEDURE GetRowCol*( x, y: SIGNED32;  o: tObject;  col, row: vyBase.tVector );
-	VAR val: SIGNED32;  i: SIGNED32;
+	VAR val: SIGNED32;  i: SIZE;
 	BEGIN
 		WITH o: tINTEGERObject DO
 			WITH col: vyLongrealVec.tVector DO
@@ -1059,7 +1059,7 @@ VAR
 	END ReadASCII;
 
 	PROCEDURE ReadPGM*( VAR o: tINTEGERObject;  fname: ARRAY OF CHAR );
-	VAR A: tLONGINTArray;  h, w, depth: SIGNED32;
+	VAR A: tLONGINTArray;  h, w: SIZE; depth: SIGNED32;
 	BEGIN
 		IF ~antsReadWrite.ReadPGM( A, fname, depth ) OR (A = NIL ) THEN o := NIL;  RETURN END;
 		w := LEN( A[0] );  h := LEN( A^ );
@@ -1068,10 +1068,10 @@ VAR
 	END ReadPGM;
 
 	PROCEDURE StorePGMAscii*( A: tINTEGERObject;  VAR FR: Files.Rider );
-	VAR R: antsReadWrite.Rider;  x, y: SIGNED32;
+	VAR R: antsReadWrite.Rider;  x, y: SIZE;
 	BEGIN
 		NEW(R); R.Enter( FR );  R.SetAscii;  R.WriteString( "P2" );  R.Write( antsFiles.LF );  R.Write( antsFiles.CR );  R.WriteString( "# by Oberon" );
-		R.Write( antsFiles.LF );  R.Write( antsFiles.CR );  R.WriteLInt( A.w );  R.WriteLInt( A.h );  R.Write( antsFiles.LF );
+		R.Write( antsFiles.LF );  R.Write( antsFiles.CR );  R.WriteLInt( SIGNED32(A.w) );  R.WriteLInt( SIGNED32(A.h) );  R.Write( antsFiles.LF );
 		R.Write( antsFiles.CR );  R.WriteLInt( A.depth - 1 );  R.Write( antsFiles.LF );  R.Write( antsFiles.CR );
 		FOR y := A.h - 1 TO 0 BY -1 DO
 			FOR x := 0 TO A.w - 1 DO R.WriteInt( A.A[y, x] );  END;
@@ -1082,7 +1082,7 @@ VAR
 
 	PROCEDURE ReadPGMAscii*( VAR A: tINTEGERObject;  VAR FR: Files.Rider ): BOOLEAN;
 	VAR name: ARRAY 64 OF CHAR;
-		ch: CHAR;  pos: SIGNED32;  w, h, d: SIGNED32;  x, y: SIGNED32;  R: antsFiles.Rider;  int: SIGNED16;  lint: SIGNED32;
+		ch: CHAR;  pos: SIGNED32;  w, h, d: SIGNED32;  x, y: SIZE;  R: antsFiles.Rider;  int: SIGNED16;  lint: SIGNED32;
 	BEGIN
 		NEW(R); R.Enter( FR );  R.SetAscii;  R.ReadString( name );
 		IF (R.err) OR (name # "P2") THEN aM.eSS( "could not load PGM Ascii image, header=", name );  RETURN FALSE ELSE aM.S( "Loading PGM Ascii" );  END;
@@ -1131,7 +1131,7 @@ VAR
 	PROCEDURE GetSel( VAR x, y, w, h: SIGNED16 );
 	VAR sel: antsPictCoordinate.Selection;
 	BEGIN
-		sel := antsPictCoordinate.currentsel;  w := SHORT( globalobj.w );  h := SHORT( globalobj.h );  x := 0;  y := 0;
+		sel := antsPictCoordinate.currentsel;  w := SIGNED16( globalobj.w );  h := SIGNED16( globalobj.h );  x := 0;  y := 0;
 		vyRectangles.RectIntersection( x, y, w, h, sel.px, sel.py, sel.pw, sel.ph )
 	END GetSel;
 

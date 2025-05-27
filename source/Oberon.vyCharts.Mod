@@ -55,9 +55,9 @@ VAR
 	slink*, dlink*: Objects.Object;
 
 	PROCEDURE Recall( chart: tLayer );
-	VAR i: SIGNED32;  closed: BOOLEAN;   (* fof 020624 *)
+	VAR i: SIZE;  closed: BOOLEAN;   (* fof 020624 *)
 
-		PROCEDURE Min( x, y: SIGNED32 ): SIGNED32;
+		PROCEDURE Min( x, y: SIZE ): SIZE;
 		BEGIN
 			IF (x < y) THEN RETURN x ELSE RETURN y END;
 		END Min;
@@ -134,7 +134,7 @@ END Copy; *)
 	END Responsible;
 
 	PROCEDURE Consume( o: tLayer;  msg: Display.ConsumeMsg );
-	VAR v, w: vyBase.tVector;  minX, maxX, minY, maxY: FLOAT32;  pict: vyPort.Picture;  data: Objects.Object;  nans: SIGNED32;
+	VAR v, w: vyBase.tVector;  minX, maxX, minY, maxY: FLOAT32;  pict: vyPort.Picture;  data: Objects.Object;  nans: SIZE;
 	BEGIN
 		pict := msg.dlink( vyPort.Picture );  data := msg.obj;  v := vyBase.GetVFromObj( data );  data := data.slink;
 		w := vyBase.GetVFromObj( data );

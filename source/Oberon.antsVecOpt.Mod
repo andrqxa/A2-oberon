@@ -37,7 +37,7 @@ CONST
           cscalepar*="scale parameter";
 
 PROCEDURE DoAddConst* (data, result: vyBase.tVector;  const: FLOAT64);
-	VAR i: SIGNED32;             val: FLOAT64;
+	VAR i: SIZE;             val: FLOAT64;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH result: vyLongrealVec.tVector DO
@@ -50,7 +50,7 @@ BEGIN
 END DoAddConst;
 
 PROCEDURE DoAddGaussNoise* (data, degraded: vyBase.tVector;  mu, sigmasq: FLOAT64);
-	VAR i: SIGNED32;             val: FLOAT64;
+	VAR i: SIZE;             val: FLOAT64;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -63,7 +63,7 @@ BEGIN
 END DoAddGaussNoise;
 
 PROCEDURE DoAddCauchyNoise* (data, degraded: vyBase.tVector);
-	VAR i: SIGNED32;             val: FLOAT64;
+	VAR i: SIZE;             val: FLOAT64;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -76,7 +76,7 @@ BEGIN
 END DoAddCauchyNoise;
 
 PROCEDURE DoAddLaplaceNoise* (data, degraded: vyBase.tVector;             mu: FLOAT64 ); (*! exchange mu by lambda ! *)
-	VAR i: SIGNED32;             val: FLOAT64;
+	VAR i: SIZE;             val: FLOAT64;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -90,7 +90,7 @@ BEGIN
 END DoAddLaplaceNoise;
 
 PROCEDURE DoAddExpNoise* (data, degraded: vyBase.tVector;             mu: FLOAT64 ); (*! exchange mu by lambda ! *)
-	VAR i: SIGNED32;             val: FLOAT64;
+	VAR i: SIZE;             val: FLOAT64;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -104,7 +104,7 @@ BEGIN
 END DoAddExpNoise;
 
 PROCEDURE DoAddUniformNoise* (data, degraded: vyBase.tVector;             len: FLOAT64 );
-	VAR i: SIGNED32;             val: FLOAT64;
+	VAR i: SIZE;             val: FLOAT64;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -199,8 +199,8 @@ BEGIN
 	END
 END AddConst;
 
-PROCEDURE Mean (VAR a: ARRAY OF FLOAT64;   n: SIGNED32): FLOAT64;
-	VAR sum: FLOAT64;  i: SIGNED32;
+PROCEDURE Mean (VAR a: ARRAY OF FLOAT64;   n: SIZE): FLOAT64;
+	VAR sum: FLOAT64;  i: SIZE;
 BEGIN
 	sum := 0;
 	FOR i := 0 TO n - 1 DO
@@ -209,8 +209,8 @@ BEGIN
 	RETURN sum / n
 END Mean;
 
-PROCEDURE DoUMA (len: SIGNED32;   v: vyLongrealVec.tVector);
-	VAR a, to: POINTER TO ARRAY OF FLOAT64;  i, j, mlen, vlen: SIGNED32;
+PROCEDURE DoUMA (len: SIZE;   v: vyLongrealVec.tVector);
+	VAR a, to: POINTER TO ARRAY OF FLOAT64;  i, j, mlen, vlen: SIZE;
 BEGIN
 	NEW(a, 2 * len + 1);   vlen := vyLongrealVec.Len(v);
 	NEW(to, vlen);
@@ -228,7 +228,7 @@ BEGIN
 END DoUMA;
 
 PROCEDURE UniformMovingAverage*;
-	VAR v1, v2: vyBase.Object;  i, iter, len: SIGNED32;
+	VAR v1, v2: vyBase.Object;  i: SIZE; iter, len: SIGNED32;
 BEGIN
 	antsCommands.InitScan("src=OBJ dest=OBJ len=INT iter=INT");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2)  & antsCommands.ExpectNumber("len", len) &
@@ -245,8 +245,8 @@ END UniformMovingAverage;
 
 
 (* Median Filter with cut data *)
-PROCEDURE DoCutMedian* (len: SIGNED32;  v: vyLongrealVec.tVector);
-	VAR a, to: POINTER TO ARRAY OF FLOAT64;  i, j, mlen, vlen: SIGNED32;
+PROCEDURE DoCutMedian* (len: SIZE;  v: vyLongrealVec.tVector);
+	VAR a, to: POINTER TO ARRAY OF FLOAT64;  i, j, mlen, vlen: SIZE;
 BEGIN
 	NEW(a, 2 * len + 1);   vlen := vyLongrealVec.Len(v);
 	NEW(to, vlen);
@@ -265,9 +265,9 @@ END DoCutMedian;
 
 (**************************************************************************************)
 (*realization of median filter of length len, data are tapered (mirrored) at the boundaries *)
-PROCEDURE DoTaperedMedian* ( len: SIGNED32;  v: vyLongrealVec.tVector );
+PROCEDURE DoTaperedMedian* ( len: SIZE;  v: vyLongrealVec.tVector );
 	VAR x: POINTER TO ARRAY OF FLOAT64;
-	i, j, N: SIGNED32;
+	i, j, N: SIZE;
 BEGIN
 	NEW( x, len );             N := vyLongrealVec.Len( v( vyLongrealVec.tVector ) );
 	FOR i := 0 TO len DIV 2 - 1 DO
@@ -285,7 +285,7 @@ BEGIN
 END DoTaperedMedian;
 
 PROCEDURE MedianFilter*;
-	VAR v1, v2: vyBase.Object;  i, iter, len: SIGNED32;
+	VAR v1, v2: vyBase.Object;  i: SIZE; len: SIGNED32; iter: SIGNED32;
 BEGIN
 	antsCommands.InitScan("src=OBJ dest=OBJ len=INT iter=INT");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2) & antsCommands.ExpectNumber("len", len) &
@@ -301,7 +301,7 @@ BEGIN
 END MedianFilter;
 
 PROCEDURE TaperedMedianFilter*;
-	VAR v1, v2: vyBase.Object;  i, iter, len: SIGNED32;
+	VAR v1, v2: vyBase.Object;  i: SIZE; iter, len: SIGNED32;
 BEGIN
 	antsCommands.InitScan("src=OBJ dest=OBJ len=INT iter=INT");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2) & antsCommands.ExpectNumber("len", len) & antsCommands.ExpectNumber("iter", iter) THEN
@@ -344,7 +344,7 @@ BEGIN
 END AppendValue;
 (******************************integrated process******************************************************************)
 PROCEDURE PartialSums* ( y: vyBase.tVector;             yint: vyBase.tVector );
-	VAR N, i: SIGNED32;             sum: FLOAT64;
+	VAR N, i: SIZE;             sum: FLOAT64;
 BEGIN
 	WITH y: vyLongrealVec.tVector DO
 		WITH yint: vyLongrealVec.tVector DO
@@ -359,7 +359,7 @@ BEGIN
 END PartialSums;
 (**************************cumulative sum************************************************************************************)
 PROCEDURE CumSum* ( y: vyBase.tVector;             ysum: vyBase.tVector );
-	VAR N, l: SIGNED32;             sum: FLOAT64;
+	VAR N, l: SIZE;             sum: FLOAT64;
 BEGIN
 	WITH y: vyLongrealVec.tVector DO
 		WITH ysum: vyLongrealVec.tVector DO

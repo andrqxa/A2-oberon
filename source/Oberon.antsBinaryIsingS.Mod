@@ -63,12 +63,12 @@ TYPE
 	END LoadM;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, w, h, maxx, maxy: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  model: tModel;
+	VAR x, y, w, h, maxx, maxy: SIZE;  A: antsArrayObjects.tINTEGERArray;  model: tModel;
 		AO: antsArrayObjects.tINTEGERObject;  nsums: antsArrayObjects.tINTEGERArray;  prob: ProbVec;
 		Random: RandomArray;  ran: SIGNED32;
 
 		PROCEDURE Cache( ): antsArrayObjects.tINTEGERArray;
-		VAR x, y: SIGNED32;
+		VAR x, y: SIZE;
 		BEGIN
 			IF AO.Cache = NIL THEN
 				AO.Cache := antsArrayObjects.NewINTEGERArray( AO.w, AO.h );  nsums := AO.Cache;

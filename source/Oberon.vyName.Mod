@@ -461,7 +461,7 @@ END FixupObj;
 PROCEDURE IsExtName* (VAR name: tNameArray;  ext: tNameArray;  VAR stub: tNameArray;  VAR extnum: SIGNED32): BOOLEAN;  (*vs 0.0d0 gs *)
 	(* test  whether name is a generic name based on ext. Format: <stub><ext><extnum>
 	where extnum is numeric or empty. Empty is interpreted as 0  *)
-	VAR pos, l: SIGNED32;
+	VAR pos, l: SIZE;
 BEGIN
 	pos := vyHostStrings.Pos(ext, name, 0);
 	IF pos < 0 THEN stub := name;  extnum := 0;  RETURN FALSE

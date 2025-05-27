@@ -54,7 +54,7 @@ VAR
 	END LoadM;
 
 	PROCEDURE Length( vx, vy: vyLongrealVec.tVector ): FLOAT64;
-	VAR i: SIGNED32;  len: FLOAT64;  x0, x1, y0, y1: FLOAT64;
+	VAR i: SIZE;  len: FLOAT64;  x0, x1, y0, y1: FLOAT64;
 	BEGIN
 		len := 0;  x0 := vyLongrealVec.Get( vx, 0 );  y0 := vyLongrealVec.Get( vy, 0 );
 		FOR i := 1 TO vyLongrealVec.Len( vx ) - 1 DO
@@ -86,7 +86,7 @@ VAR
 		lenvec := antsVectors.GetVector( container, 2 );
 		WITH vx: vyLongrealVec.tVector DO
 			WITH vy: vyLongrealVec.tVector DO
-				len := vyLongrealVec.Len( vx );  len1 := Length( vx, vy );  ran1 := ENTIER( vyRandom.Uniform() * len );
+				len := SIGNED32(vyLongrealVec.Len( vx ));  len1 := Length( vx, vy );  ran1 := ENTIER( vyRandom.Uniform() * len );
 				ran2 := ENTIER( vyRandom.Uniform() * len );  Swap( vx, vy, ran1, ran2 );  len2 := Length( vx, vy );
 				IF len2 <= len1 THEN
 					o.curlen := len2;   (* accept *)
@@ -240,7 +240,7 @@ VAR
 			WITH vx: vyLongrealVec.tVector DO
 				WITH vy: vyLongrealVec.tVector DO
 					IF antsCommands.GetNumber( "len", len ) THEN vyLongrealVec.SetLen( vx, len );  vyLongrealVec.SetLen( vy, len );
-					ELSE len := vyLongrealVec.Len( vx );
+					ELSE len := SIGNED32(vyLongrealVec.Len( vx ));
 					END;
 					FOR i := 0 TO len - 1 DO
 						vyLongrealVec.Set( Math.sin( 2 * Math.pi * i / len ), vx, i );
@@ -259,9 +259,9 @@ VAR
 		IF antsCommands.ExpectObject( "vx", vx ) & antsCommands.ExpectObject( "vy", vy ) THEN
 			WITH vx: vyLongrealVec.tVector DO
 				WITH vy: vyLongrealVec.tVector DO
-					len := vyLongrealVec.Len( vx );
+					len := SIGNED32(vyLongrealVec.Len( vx ));
 					IF antsCommands.GetNumber( "len", len ) THEN vyLongrealVec.SetLen( vx, len );  vyLongrealVec.SetLen( vy, len );
-					ELSE len := vyLongrealVec.Len( vx );
+					ELSE len := SIGNED32(vyLongrealVec.Len( vx ));
 					END;
 					FOR i := 0 TO len - 1 DO
 						ran1 := -1 + 2 * vyRandom.Uniform();  ran2 := -1 + 2 * vyRandom.Uniform();
@@ -281,7 +281,7 @@ VAR
 		IF antsCommands.ExpectObject( "vx", vx ) & antsCommands.ExpectObject( "vy", vy ) THEN
 			WITH vx: vyLongrealVec.tVector DO
 				WITH vy: vyLongrealVec.tVector DO
-					len := vyLongrealVec.Len( vx );
+					len := SIGNED32(vyLongrealVec.Len( vx ));
 					FOR i := 0 TO len - 1 DO ran1 := ENTIER( vyRandom.Uniform() * len );  ran2 := ENTIER( vyRandom.Uniform() * len );
 
 						Swap( vx, vy, ran1, ran2 );

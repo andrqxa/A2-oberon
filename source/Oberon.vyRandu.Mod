@@ -36,7 +36,7 @@ IMPORT SYSTEM, vyRanBase, Objects;
 CONST
 	cModuleName = "vyRandu";  (* jb 30.11.00 *)
 	idversion* = 'vyRandu 0.0d1';
-	cut =  {2* MAX(SET) DIV 3};
+	cut =  {2* MAX(SET32) DIV 3};
 
 TYPE
 	Bits = vyRanBase.Bits;
@@ -45,13 +45,13 @@ TYPE
 
 VAR
 	cuti : SIGNED32;
-	maxsi: SIGNED32; 	(* maxs: SET; *)	(* jb 30.3.00 *)
+	maxsi: SIGNED32; 	(* maxs: SET32; *)	(* jb 30.3.00 *)
 
-PROCEDURE Add (VAR x: SET;     y: SET;       shift: SIGNED32);
+PROCEDURE Add (VAR x: SET32;     y: SET32;       shift: SIGNED32);
 	VAR carry: BOOLEAN;     i: SIGNED32;
 BEGIN
 	carry := FALSE;
-	FOR i := MAX(SET) - shift TO 1 BY - 1 DO
+	FOR i := MAX(SET32) - shift TO 1 BY - 1 DO
 		IF i IN x THEN
 			IF (i + shift) IN y THEN
 				IF carry THEN (* INCL(x,i) *)ELSE EXCL(x, i);     carry := TRUE   END
@@ -69,10 +69,10 @@ BEGIN
 END Add;
 
 PROCEDURE TruncatedProd (x, y: SIGNED32 ): SIGNED32;
-	VAR ySET, ySET1, ySET2, ySET3 : SET;    ytemp, y1, y2, y3: SIGNED32;
+	VAR ySET32, ySET321, ySET322, ySET323 : SET32;    ytemp, y1, y2, y3: SIGNED32;
 BEGIN
 	ytemp := y;
-	ySET := SYSTEM.VAL(SET, ytemp);
+	ySET32 := SYSTEM.VAL(SET32, ytemp);
 	y1 := ytemp MOD cuti;
 	ytemp := ytemp  DIV cuti;
 	y2 := ytemp MOD cuti;
@@ -85,13 +85,13 @@ BEGIN
 	y1 := y1 * x;
 	y2 := y2 * x;
 	y3 := y3 * x;
-	ySET1 := SYSTEM.VAL(SET, y1);
-	ySET2 := SYSTEM.VAL(SET, y2);
-	ySET3 := SYSTEM.VAL(SET, y3);
-	ySET := ySET1;
-	Add(ySET, ySET2, MAX(SET) DIV 3 + 1);
-	Add(ySET, ySET3, 2 * MAX(SET) DIV 3 + 2);
-	RETURN SYSTEM.VAL(SIGNED32, ySET)
+	ySET321 := SYSTEM.VAL(SET32, y1);
+	ySET322 := SYSTEM.VAL(SET32, y2);
+	ySET323 := SYSTEM.VAL(SET32, y3);
+	ySET32 := ySET321;
+	Add(ySET32, ySET322, MAX(SET32) DIV 3 + 1);
+	Add(ySET32, ySET323, 2 * MAX(SET32) DIV 3 + 2);
+	RETURN SYSTEM.VAL(SIGNED32, ySET32)
 END TruncatedProd;
 
 PROCEDURE Randu* (VAR s: SIGNED32);
@@ -250,11 +250,11 @@ END Install;
 
 PROCEDURE InitConst;
 	VAR i: SIGNED32;
-	maxs: SET;
+	maxs: SET32;
 BEGIN
 	cuti := SYSTEM.VAL(SIGNED32, cut);
 	maxs := {};
-	FOR i := 1 TO MAX(SET) DO
+	FOR i := 1 TO MAX(SET32) DO
 		INCL(maxs, i)
 	END;
 	maxsi := SYSTEM.VAL (SIGNED32, maxs)
@@ -274,35 +274,35 @@ Voyager.Random 1000 ~
 
 (* debugging versions *)
 
-PROCEDURE Debug (a, b, c, d: SET);
+PROCEDURE Debug (a, b, c, d: SET32);
 	VAR i: SIGNED32;
 BEGIN
-	vyOut.Ln();     vyOut.String("val");     vyOut.Ln();    FOR i := 0 TO 2 * MAX(SET) DIV 3 + 1 DO vyOut.String("#")   END;
-	FOR i := 0 TO MAX(SET) DO
+	vyOut.Ln();     vyOut.String("val");     vyOut.Ln();    FOR i := 0 TO 2 * MAX(SET32) DIV 3 + 1 DO vyOut.String("#")   END;
+	FOR i := 0 TO MAX(SET32) DO
 		IF i IN a THEN vyOut.String("+") ELSE vyOut.String("-") END
 	END;
-	vyOut.Ln();      FOR i := 0 TO 2 * MAX(SET) DIV 3 + 1 DO vyOut.String("#")   END;
-	FOR i := 0 TO MAX(SET) DO
+	vyOut.Ln();      FOR i := 0 TO 2 * MAX(SET32) DIV 3 + 1 DO vyOut.String("#")   END;
+	FOR i := 0 TO MAX(SET32) DO
 		IF i IN b THEN vyOut.String("+") ELSE vyOut.String("-") END
 	END;
-	vyOut.Ln();    FOR i := 0 TO MAX(SET) DIV 3 DO vyOut.String("#")   END;
-	FOR i := 0 TO MAX(SET) DO
+	vyOut.Ln();    FOR i := 0 TO MAX(SET32) DIV 3 DO vyOut.String("#")   END;
+	FOR i := 0 TO MAX(SET32) DO
 		IF i IN c THEN vyOut.String("+") ELSE vyOut.String("-") END
 	END;
 	vyOut.Ln();
-	FOR i := 0 TO MAX(SET) DO
+	FOR i := 0 TO MAX(SET32) DO
 		IF i IN d THEN vyOut.String("+") ELSE vyOut.String("-") END
 	END
 END Debug;
 
 PROCEDURE TruncatedProdD (x, y: SIGNED32 ): SIGNED32;
-	VAR ySET, ySET1, ySET2, ySET3, cut : SET;     i: SIGNED32;     ytemp, y1, y2, y3, cuti: SIGNED32;
+	VAR ySET32, ySET321, ySET322, ySET323, cut : SET32;     i: SIGNED32;     ytemp, y1, y2, y3, cuti: SIGNED32;
 BEGIN
 	cut := {};
-	INCL(cut, 2 * MAX(SET) DIV 3);
+	INCL(cut, 2 * MAX(SET32) DIV 3);
 	cuti := SYSTEM.VAL(SIGNED32, cut);      (*! to const *)
 	ytemp := y;
-	ySET := SYSTEM.VAL(SET, ytemp);
+	ySET32 := SYSTEM.VAL(SET32, ytemp);
 	y1 := ytemp MOD cuti;
 	ytemp := ytemp  DIV cuti;
 	y2 := ytemp MOD cuti;
@@ -310,28 +310,28 @@ BEGIN
 	IF y2 # 0 THEN
 		y3 := ytemp MOD y2
 	ELSE y3  := ytemp END;
-	ySET1 := SYSTEM.VAL(SET, y1);
-	ySET2 := SYSTEM.VAL(SET, y2);
-	ySET3 := SYSTEM.VAL(SET, y3);
+	ySET321 := SYSTEM.VAL(SET32, y1);
+	ySET322 := SYSTEM.VAL(SET32, y2);
+	ySET323 := SYSTEM.VAL(SET32, y3);
 
 	(*
-	ySET1 := {}; ySET2 := {}; ySET3 := {};
-	FOR i := 0 TO MAX(SET) DIV 3-1  DO
-	IF i IN ySET THEN INCL(ySET1,i) END;
+	ySET321 := {}; ySET322 := {}; ySET323 := {};
+	FOR i := 0 TO MAX(SET32) DIV 3-1  DO
+	IF i IN ySET32 THEN INCL(ySET321,i) END;
 	END;
-	FOR i := MAX(SET) DIV 3  TO 2* MAX(SET) DIV 3-1 DO
-	IF i IN ySET THEN INCL(ySET2,i-MAX(SET) DIV 3) END;
+	FOR i := MAX(SET32) DIV 3  TO 2* MAX(SET32) DIV 3-1 DO
+	IF i IN ySET32 THEN INCL(ySET322,i-MAX(SET32) DIV 3) END;
 	END;
-	FOR i := 2* MAX(SET) DIV 3 TO MAX(SET) DO
-	IF i IN ySET THEN INCL(ySET3,i-2*MAX(SET) DIV 3) END;
+	FOR i := 2* MAX(SET32) DIV 3 TO MAX(SET32) DO
+	IF i IN ySET32 THEN INCL(ySET323,i-2*MAX(SET32) DIV 3) END;
 	END;
 	*)
 
-	Debug(ySET, ySET1, ySET2, ySET3);
+	Debug(ySET32, ySET321, ySET322, ySET323);
 	ytemp := y1 + y2 * cuti + y3 * cuti * cuti;
 	ASSERT(ytemp = y, 103);
-	ySET := SYSTEM.VAL(SET, ytemp);
-	Debug(ySET, ySET1, ySET2, ySET3);
+	ySET32 := SYSTEM.VAL(SET32, ytemp);
+	Debug(ySET32, ySET321, ySET322, ySET323);
 
 	(* prod  res := y1*x+y2*x*cuti+y3*x*cuti*cuti *)
 
@@ -341,22 +341,22 @@ BEGIN
 
 	ytemp := y1 + y2 * cuti + y3 * cuti * cuti;
 	ytemp := y * x;     (*!!!! warum bleibt das Programm hier nicht stehen ???? *)(* overflow wird ins Vorzeichen geschrieben !*)
-	ySET1 := SYSTEM.VAL(SET, y1);
-	ySET2 := SYSTEM.VAL(SET, y2);
-	ySET3 := SYSTEM.VAL(SET, y3);
-	ySET := SYSTEM.VAL(SET, ytemp);
-	Debug(ySET, ySET1, ySET2, ySET3);
+	ySET321 := SYSTEM.VAL(SET32, y1);
+	ySET322 := SYSTEM.VAL(SET32, y2);
+	ySET323 := SYSTEM.VAL(SET32, y3);
+	ySET32 := SYSTEM.VAL(SET32, ytemp);
+	Debug(ySET32, ySET321, ySET322, ySET323);
 
-	ySET1 := SYSTEM.VAL(SET, y1);
-	ySET2 := SYSTEM.VAL(SET, y2);
-	ySET3 := SYSTEM.VAL(SET, y3);
-	ySET := ySET1;
-	Add(ySET, ySET2, MAX(SET) DIV 3 + 1);
-	Debug(ySET, ySET1, ySET2, ySET3);
-	Add(ySET, ySET3, 2 * MAX(SET) DIV 3 + 2);
-	Debug(ySET, ySET1, ySET2, ySET3);
-	vyOut.Int(ytemp, 20);     vyOut.Int(SYSTEM.VAL(SIGNED32, ySET), 20);
-	ASSERT(ytemp = SYSTEM.VAL(SIGNED32, ySET), 105);
+	ySET321 := SYSTEM.VAL(SET32, y1);
+	ySET322 := SYSTEM.VAL(SET32, y2);
+	ySET323 := SYSTEM.VAL(SET32, y3);
+	ySET32 := ySET321;
+	Add(ySET32, ySET322, MAX(SET32) DIV 3 + 1);
+	Debug(ySET32, ySET321, ySET322, ySET323);
+	Add(ySET32, ySET323, 2 * MAX(SET32) DIV 3 + 2);
+	Debug(ySET32, ySET321, ySET322, ySET323);
+	vyOut.Int(ytemp, 20);     vyOut.Int(SYSTEM.VAL(SIGNED32, ySET32), 20);
+	ASSERT(ytemp = SYSTEM.VAL(SIGNED32, ySET32), 105);
 	RETURN 0
 END TruncatedProdD;
 

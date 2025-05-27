@@ -47,15 +47,15 @@ IMPORT antsToolbox, antsArrayObjects, Strings := vyHostStrings, antsCommands, vy
 VAR
 	globalStat: antsBellman.Statistic;
 	globalGamma: FLOAT64;
-	globaly1, globaly2: SIGNED32;
+	globaly1, globaly2: SIZE;
 	globalRstern: antsArrays.I1d;      globalBellman: antsArrays.X1d;
-	globalMinWeite, globalMaxWeite: SIGNED32;
+	globalMinWeite, globalMaxWeite: SIZE;
 	inDirectory, outDirectory: ARRAY 256 OF CHAR;
 
 	(* Interaktive Routine zum Anwenden des Minimierers auf Array oder Teil davon per Mausklick *)
 PROCEDURE ApplyInteractively*;
 VAR   		A: antsArrayObjects.tObject;            		r: antsRegions.tRegion;            		gamma: FLOAT64;
-	w, h, minweit, maxweit, 			this, last: SIGNED32;
+	w, h: SIZE; minweit, maxweit: SIGNED32;  			this, last: SIZE;
 	Aorig, Aorigtr, APott1, Apotttr, APott2: antsArrayObjects.tLONGREALArray;
 	lengths: BOOLEAN;
 BEGIN
@@ -151,8 +151,8 @@ BEGIN
 END ApplyInteractively;
 
 	(* Routine um Minimierer auf ganze Verzeichnisse anzuwenden *)
-PROCEDURE PottsFile (in, out: ARRAY OF CHAR;               		minWeite, maxWeite: SIGNED32);
-VAR A: antsArrayObjects.tLONGREALArray;                o: antsArrayObjects.tINTEGERObject;                AL: antsArrayObjects.tLONGINTArray;                 w, h: SIGNED32;
+PROCEDURE PottsFile (in, out: ARRAY OF CHAR;               		minWeite, maxWeite: SIZE);
+VAR A: antsArrayObjects.tLONGREALArray;                o: antsArrayObjects.tINTEGERObject;                AL: antsArrayObjects.tLONGINTArray;                 w, h: SIZE;
 	Aorigtr, APott1, Apotttr, APott2: antsArrayObjects.tLONGREALArray;                       gamma: FLOAT64;
 BEGIN
 	antsArrayObjects.ReadPGM(o, in);
@@ -171,8 +171,8 @@ BEGIN
 	gamma := globalGamma;
 	ScaleMatrix(A^, globalGamma);
 
-	MatrixPottsLongreal(A^, APott1^, minWeite, maxWeite, FALSE);
-	MatrixPottsLongreal(Aorigtr^, APott2^,  minWeite, maxWeite, FALSE);
+	MatrixPottsLongreal(A^, APott1^, SIGNED32(minWeite), SIGNED32(maxWeite), FALSE);
+	MatrixPottsLongreal(Aorigtr^, APott2^,  SIGNED32(minWeite), SIGNED32(maxWeite), FALSE);
 
 	globalGamma := gamma;              (* rücksetzen, da nächstes File denselben Wert benutzt *)
 
@@ -204,14 +204,16 @@ END FileEnum;
 
 	(* Kommando um Minimierer auf ganze Verzeichnisse von Bildern des Typs PGM anzuwenden *)
 PROCEDURE OnDirectory*;
-VAR       done: BOOLEAN;               path: ARRAY 256 OF CHAR;
+VAR       done: BOOLEAN;               path: ARRAY 256 OF CHAR; minw, maxw: SIGNED32;
 BEGIN
 	antsCommands.InitScan("inDirectory=STR outDirectory=STR gamma=FLOAT32 minWidth=INT maxWidth=INT");
 	IF antsCommands.ExpectString("inDirectory", inDirectory) &
 		antsCommands.ExpectString("outDirectory",  outDirectory) &
 		antsCommands.ExpectReal( "gamma", globalGamma) &
-		antsCommands.ExpectNumber( "minWidth", globalMinWeite) &
-		antsCommands.ExpectNumber("maxWidth",  globalMaxWeite) THEN
+		antsCommands.ExpectNumber( "minWidth", minw) &
+		antsCommands.ExpectNumber("maxWidth",  maxw) THEN
+		globalMinWeite := minw; 
+		globalMaxWeite := maxw;
 		antsPortability.GetWorkingDirectory(path);
 		antsPortability.ChangeDirectory(inDirectory, done);
 		IF ~done THEN antsSecurity.Halt("in Directory not found")        	 END;
@@ -224,46 +226,47 @@ BEGIN
 END OnDirectory;
 
 	(* gamma + ssq (aus statistic)*)
-PROCEDURE Function1d (from, to: SIGNED32): FLOAT64;
+PROCEDURE Function1d (from, to: SIZE): FLOAT64;
 BEGIN
 	RETURN globalStat.s[from, to] + globalGamma
 END Function1d;
 
 	(* gamma + ssq (aus Matrix der kumulativen Summen)*)
-PROCEDURE CumFunction (from, to: SIGNED32): FLOAT64;
+PROCEDURE CumFunction (from, to: SIZE): FLOAT64;
 BEGIN
 	RETURN globalGamma + antsBellman.GetSsq2d(globalStat, from, globaly1, to, globaly2)
 END CumFunction;
 
-PROCEDURE MatrixFunction (from, to: SIGNED32): FLOAT64;
+PROCEDURE MatrixFunction (from, to: SIZE): FLOAT64;
 BEGIN
 	globaly1 := from;            		globaly2 := to;
-	antsSecurity.SetProgress(SHORT(ENTIER(to / globalStat.N * 100)));
+	antsSecurity.SetProgress(SIGNED16(ENTIER(to / globalStat.N * 100)));
 
 	antsBellman.Bellman(globalRstern, globalBellman, SIGNED32(LEN(globalStat.m[0])) - 1, 0, MAX(SIGNED32), CumFunction, - globalGamma);                (*  frage: setzen wir hier nicht lieber auch minweite und maxweite ein ? *)
 	RETURN globalBellman[LEN(globalStat.m[0]) - 1] (* fof 020709, -1 -> -2 *)
 END MatrixFunction;
 
-PROCEDURE CumFunction2 (from, to: SIGNED32): FLOAT64;
+PROCEDURE CumFunction2 (from, to: SIZE): FLOAT64;
 BEGIN
 	RETURN globalGamma * (globaly2 - globaly1 + 1) + antsBellman.GetSsq2d(globalStat, from, globaly1, to, globaly2)
 END CumFunction2;
 
-PROCEDURE MatrixFunction2 (from, to: SIGNED32): FLOAT64;
+PROCEDURE MatrixFunction2 (from, to: SIZE): FLOAT64;
 BEGIN
 	globaly1 := from;            		globaly2 := to;
-	antsSecurity.SetProgress(SHORT(ENTIER(to / LEN(globalStat.m) * 100)));
+	antsSecurity.SetProgress(SIGNED16(ENTIER(to / LEN(globalStat.m) * 100)));
 
 	antsBellman.Bellman(globalRstern, globalBellman, SIGNED32(LEN(globalStat.m[0])) - 1, 0, MAX(SIGNED32), CumFunction2, - globalGamma);                (*  frage: setzen wir hier nicht lieber auch minweite und maxweite ein ? *)
 	RETURN globalBellman[LEN(globalStat.m[0]) - 1] + globalGamma * LEN(globalStat.m[0])
 END MatrixFunction2;
 
-PROCEDURE statMean (k1, k2: SIGNED32): FLOAT64;
+PROCEDURE statMean (k1, k2: SIZE): FLOAT64;
 BEGIN RETURN globalStat.m[k1, k2]
 END statMean;
 
 	(* Berechnen der besten Partition fuer Matrix mit Mittelwert aus den kumulativen Summen*)
-PROCEDURE CumWritePartition* (s: antsBellman.Statistic;         VAR   Parti: ARRAY OF ARRAY OF FLOAT64;                   		rstern: antsArrays.I1d;                   		y1, y2: SIGNED32);                      VAR k, next, y: SIGNED32;                   		mean: FLOAT64;
+PROCEDURE CumWritePartition* (s: antsBellman.Statistic;         VAR   Parti: ARRAY OF ARRAY OF FLOAT64;                   		
+	rstern: antsArrays.I1d;                   		y1, y2: SIZE);                      VAR k, next, y: SIZE;                   		mean: FLOAT64;
 BEGIN
 	k := LEN(s.m[0]) - 1;          (* fof 020709 *)
 	WHILE(k > 0) DO
@@ -277,14 +280,14 @@ BEGIN
 END CumWritePartition;
 
 PROCEDURE MatrixWritePartition* (s: antsBellman.Statistic;         VAR Parti: ARRAY OF ARRAY OF FLOAT64;            		rstern: antsArrays.I1d);
-VAR k, next: SIGNED32;                   		bellmanneu: antsArrays.X1d;                   		rsternneu : antsArrays.I1d;
+VAR k, next: SIZE;                   		bellmanneu: antsArrays.X1d;                   		rsternneu : antsArrays.I1d;
 BEGIN
 	k := LEN(s.m) - 1;
 	WHILE(k > 0) DO
 		next := rstern[k];
 		globaly1 := next;                  		globaly2 := k - 1;
 		(* fuer jedes Intervall der besten zeilenweise Partition nochmal bellmann...*)
-		antsBellman.Bellman(rsternneu, bellmanneu, LEN(s.m[0]) - 1, 0, MAX(SIGNED32), CumFunction, - globalGamma);
+		antsBellman.Bellman(rsternneu, bellmanneu, SIGNED32(LEN(s.m[0]) - 1), 0, MAX(SIGNED32), CumFunction, - globalGamma);
 		(* und die beste Partition*)
 		CumWritePartition(s, Parti, rsternneu, globaly1, globaly2);
 		k := next
@@ -294,7 +297,7 @@ END MatrixWritePartition;
 
 	(* Skalieren von gamma  mit Min und Max von einem Vektor orig*)
 PROCEDURE Scale* (VAR orig: ARRAY OF FLOAT64;                  		VAR gamma: FLOAT64);
-VAR max, min: FLOAT64;                  		na, minpos, maxpos: SIGNED32;
+VAR max, min: FLOAT64;                  		na, minpos, maxpos: SIZE;
 BEGIN
 	vyLongreal.MinMax(LEN(orig), orig, 0, min, minpos, max, maxpos, na);
 	gamma := gamma * (max - min) * (max - min)
@@ -310,7 +313,7 @@ END ScaleMatrix;
 
 	(* Potts auf Matrix Orig mit statistic (ssq, median)*)
 PROCEDURE PottsStatLongreal* (VAR Orig, Pott: ARRAY OF ARRAY OF FLOAT64);
-VAR i, h, w: SIGNED32;           parti: antsArrays.X1d;       		this, last: SIGNED32;
+VAR i, h, w: SIZE;           parti: antsArrays.X1d;       		this, last: SIGNED32;
 BEGIN
 	h := LEN(Orig);            		w := LEN(Orig[0]);
 	FOR i := 0 TO h - 1 DO
@@ -325,7 +328,7 @@ BEGIN
 		*)
 		antsBellman.InitStatistic1d(globalStat, w);
 		antsBellman.ComputeMeanStat1d(Pott[i], globalStat);
-		antsBellman.Bellman(globalRstern, globalBellman, SHORT(w), 0, MAX(SIGNED32), Function1d, - globalGamma);
+		antsBellman.Bellman(globalRstern, globalBellman, SIGNED16(w), 0, MAX(SIGNED32), Function1d, - globalGamma);
 		antsBellman.Partition(globalRstern, parti, statMean);      vyLongreal.Copy(LEN(parti), parti^, 0, Pott[i], 0)
 		(*
 		WritePartition(Pott[i], globalRstern, globalStat, w)
@@ -339,7 +342,7 @@ END PottsStatLongreal;
 
 	(* Potts2 auf Matrix Orig mit ssq und median aus Matrix mit kumulativen Summen*)
 PROCEDURE MatrixPottsLongreal* (VAR Orig, Pott: ARRAY OF ARRAY OF FLOAT64;    minweit, maxweit: SIGNED32;    lengths: BOOLEAN);
-VAR i, h, w: SIGNED32;                   	  	(* 	Akum, AkumSq: antsArrayObjects.tLONGREALArray;     *)		this, last: SIGNED32;
+VAR i, h, w: SIZE;                   	  	(* 	Akum, AkumSq: antsArrayObjects.tLONGREALArray;     *)		this, last: SIGNED32;
 	Rstern: antsArrays.I1d;                Bellman: antsArrays.X1d;          s: antsBellman.Statistic;
 BEGIN
 	h := LEN(Orig);                                w := LEN(Orig[0]);
@@ -367,9 +370,9 @@ BEGIN
 	last := Oberon.Time();
 
 	IF lengths THEN
-		antsBellman.Bellman(Rstern, Bellman, SHORT(h), minweit, maxweit, MatrixFunction2, - globalGamma)
+		antsBellman.Bellman(Rstern, Bellman, SIGNED16(h), minweit, maxweit, MatrixFunction2, - globalGamma)
 	ELSE
-		antsBellman.Bellman(Rstern, Bellman, SHORT(h), minweit, maxweit, MatrixFunction, - globalGamma)
+		antsBellman.Bellman(Rstern, Bellman, SIGNED16(h), minweit, maxweit, MatrixFunction, - globalGamma)
 	END;
 	MatrixWritePartition(globalStat, Pott, Rstern);
 
@@ -379,7 +382,7 @@ END MatrixPottsLongreal;
 
 PROCEDURE PottsToVec*;
 VAR          		obj1, obj2, obj3: vyBase.Object;                  		vec1, vec2, vec3: vyLongrealVec.tVector;
-	i, N, this, last: SIGNED32;                  		rstern: antsArrays.I1d;                  		bellman, maxima, maxima2, data: antsArrays.X1d;                  		gamma: FLOAT64;
+	i, N, this, last: SIZE;                  		rstern: antsArrays.I1d;                  		bellman, maxima, maxima2, data: antsArrays.X1d;                  		gamma: FLOAT64;
 BEGIN
 	antsCommands.InitScan("data=OBJ rek=OBJ gamma=FLOAT32");
 	IF antsCommands.ExpectObject( "data",  obj1) &
@@ -412,7 +415,7 @@ BEGIN
 		antsBellman.ComputeMeanStat1d(data^,globalStat);
 		END;
 		globalGamma := gamma;
-		antsBellman.Bellman(rstern, bellman, SHORT(N), 0, MAX(SIGNED32), Function1d, - globalGamma);
+		antsBellman.Bellman(rstern, bellman, SIGNED16(N), 0, MAX(SIGNED32), Function1d, - globalGamma);
 
 		antsBellman.Partition(rstern,data,statMean);
 
@@ -472,7 +475,7 @@ UpdateStatistic(data^, globalStat);
 Scale(data^, gamma);
 
 globalGamma := gamma;
-antsBellman.Bellman(rstern, bellman, SHORT(N), 0, MAX(SIGNED32), Function1d, - globalGamma);
+antsBellman.Bellman(rstern, bellman, SIGNED16(N), 0, MAX(SIGNED32), Function1d, - globalGamma);
 
 this := Oberon.Time();
 IF antsCommands.Find( "time") THEN Out.Ln;         		Out.String("Katrin, time ellapsed :");         		Out.LongReal((this - last) / Input.TimeUnit, 10);         		Out.String(" sec")
@@ -514,7 +517,7 @@ NEW(A, rows, cols);
 pos := 0;
 FOR j := 0 TO rows-1 DO
 FOR i := 0 TO cols-1 DO
-IF ~antsCommands.ExpectRealFromKeyword(sc, "", SHORT(3 + pos), A[j, i]) THEN RETURN END;
+IF ~antsCommands.ExpectRealFromKeyword(sc, "", SIGNED16(3 + pos), A[j, i]) THEN RETURN END;
 INC(pos)
 END;
 END;

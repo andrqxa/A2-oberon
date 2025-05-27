@@ -198,7 +198,7 @@ END CLocal;
 
 
 	PROCEDURE Sync1( m: tModel );
-	VAR i, max: SIGNED32;
+	VAR i, max: SIZE;
 	BEGIN
 		max := LEN( m.fcache ) - 1;
 		FOR i := 0 TO max DO m.fcache[i] := m.f.get( m.f, i / max ) END;
@@ -255,7 +255,7 @@ END CLocal;
 	END Sync;
 
 	PROCEDURE OneSweep*( M: antsKernel.samplingMsg );
-	VAR A, Orig: antsArrayObjects.tINTEGERObject;  model: tModel;  dim, x, y, w, h: SIGNED32;  x0, y0, w0, h0: SIGNED32;  orig: Objects.Object;
+	VAR A, Orig: antsArrayObjects.tINTEGERObject;  model: tModel;  dim, x, y, w, h: SIZE;  x0, y0, w0, h0: SIGNED32;  orig: Objects.Object;
 		count: SIGNED16;  uv: realArray;  nb: intArray;  z, cooling, ran: FLOAT64;  max: SIGNED16;  cpos, nclen: SIGNED32;  cache: antsCaches.FullCache;
 		cx, cy: antsNeighbourhoods.Index;  i: SIGNED32;  pars: antsNeighbourhoods.pars;  theta: FLOAT64;  fcache, datafcache: realArray;
 		position, posi: SIGNED32;  s: antsKernel.Kernel;  visit: antsKernel.visitingScheme;  parallel: BOOLEAN;
@@ -351,7 +351,7 @@ END CLocal;
 
 	PROCEDURE Metropolis( msg: antsKernel.samplingMsg );
 	VAR A, Ao: antsArrayObjects.tINTEGERObject;  model: tModel;  dim: SIGNED32;  x0, y0, w0, h0: SIGNED32;  zvax, zvay, zva: SIGNED32;  M: tModel;
-		gen: vyRanBase.tRandom;  h, h1, h2, cooling: FLOAT64;  AA: antsArrayObjects.tINTEGERArray;  W, H, depth: SIGNED32;
+		gen: vyRanBase.tRandom;  h, h1, h2, cooling: FLOAT64;  AA: antsArrayObjects.tINTEGERArray;  W, H, depth: SIZE;
 		orig: antsArrayObjects.tINTEGERObject;  obj: Objects.Object;  cv: intArray;  posi, position: SIGNED32;  bool: BOOLEAN;  start, stop: SIGNED32;
 		s: antsKernel.Kernel;  visit: antsKernel.visitingScheme;  parallel: BOOLEAN;
 	BEGIN
@@ -408,7 +408,7 @@ END CLocal;
 
 	PROCEDURE Exchange( msg: antsKernel.samplingMsg );
 	VAR A, Ao: antsArrayObjects.tINTEGERObject;  model: tModel;  dim: SIGNED32;  x0, y0, w0, h0: SIGNED32;  M: tModel;
-		gen: vyRanBase.tRandom;  h, h1, h2, cooling: FLOAT64;  AA: antsArrayObjects.tINTEGERArray;  W, H, depth: SIGNED32;
+		gen: vyRanBase.tRandom;  h, h1, h2, cooling: FLOAT64;  AA: antsArrayObjects.tINTEGERArray;  W, H, depth: SIZE;
 		orig: antsArrayObjects.tINTEGERObject;  obj: Objects.Object;  cv: intArray;  posi, position: SIGNED32;
 		zvax1, zvay1, zvax2, zvay2, zva1, zva2: SIGNED32;  s: antsKernel.Kernel;  visit: antsKernel.visitingScheme;  parallel: BOOLEAN;
 	BEGIN

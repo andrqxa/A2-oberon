@@ -149,8 +149,8 @@ TYPE
 		GetRandomLV*: PROCEDURE ( gen: tRandom;  top: SIGNED32;  count: SIGNED32;  VAR nrs: ARRAY OF SIGNED32;  start: SIGNED32 );
 
 		(* deprecated *)
-		GetRandomSet*: PROCEDURE ( gen: tRandom ): SET;
-		MAXSet*: PROCEDURE ( gen: tRandom ): SET;
+		GetRandomSet*: PROCEDURE ( gen: tRandom ): SET32;
+		MAXSet*: PROCEDURE ( gen: tRandom ): SET32;
 
 		(*= general purpose hook for extensions *)
 		RandomHandler*: PROCEDURE ( r: tRandom;  VAR msg: tMsg );
@@ -400,16 +400,16 @@ END DefaultRandomV;
 		FOR i := start TO start + count - 1 DO nrs[i] := gen.GetRandomU( gen ) END
 	END DefaultRandomUVX;
 
-(* default routines which return SET, jb 28.3.00*)
+(* default routines which return SET32, jb 28.3.00*)
 
-	PROCEDURE DefaultGetSet*( gen: tRandom ): SET;
+	PROCEDURE DefaultGetSet*( gen: tRandom ): SET32;
 	BEGIN
-		RETURN SYSTEM.VAL( SET, gen.GetRandom( gen ) )
+		RETURN SYSTEM.VAL( SET32, gen.GetRandom( gen ) )
 	END DefaultGetSet;
 
-	PROCEDURE DefaultMAXSet*( gen: tRandom ): SET;
+	PROCEDURE DefaultMAXSet*( gen: tRandom ): SET32;
 	BEGIN
-		RETURN SYSTEM.VAL( SET, gen.Max( gen ) )
+		RETURN SYSTEM.VAL( SET32, gen.Max( gen ) )
 	END DefaultMAXSet;
 
 	PROCEDURE GetSeed( r: tRandom;  VAR s: tSeed );
@@ -552,7 +552,7 @@ END Store;
 	BEGIN
 		v := x * y;  x := y;  y := v;
 		z :=
-			mwcParam * Bits(SET(z ) * SET(sysMaskSecondHalf ) ) +
+			mwcParam * Bits(SET32(z ) * SET32(sysMaskSecondHalf ) ) +
 			LSH( z, sysBitsTypeSize DIV 2 * sysSHR );
 		RETURN y + z
 	END Combo;
@@ -687,7 +687,7 @@ END FixDefaults;
 		ASSERT ( LSH( tmp, sysSHL ) = 2, 103 );   (* jb 2.3.01 *)
 		tmp := -1;
 		ASSERT ( LSH( tmp, sysSHR ) > 0, 104 );   (* jb 2.3.01 - assert shift is unsigned *)
-		ASSERT ( SIZEOF( SET ) = SIZEOF( SIGNED32 ), 105 )
+		ASSERT ( SIZEOF( SET32 ) = SIZEOF( SIGNED32 ), 105 )
 	END DoAsserts;
 
 BEGIN

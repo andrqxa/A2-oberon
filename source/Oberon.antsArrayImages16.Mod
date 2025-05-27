@@ -44,7 +44,7 @@ CONST
 	maxHistogramLen = 1000;
 
 	PROCEDURE SetHisto( obj: tObject );
-	VAR y, x: SIGNED32;  val, pos: SIGNED32;  len: SIGNED32;  nrNaNs: SIGNED32;  min, max: FLOAT64;
+	VAR y, x: SIZE;  val, pos: SIGNED32;  len: SIGNED32;  nrNaNs: SIZE;  min, max: FLOAT64;
 	BEGIN
 		IF obj.A.depth > maxHistogramLen THEN len := maxHistogramLen ELSE len := obj.A.depth END;
 		(* len := maxHistogramLen;  *)
@@ -151,7 +151,7 @@ CONST
 	END Handler;
 
 	PROCEDURE A2P*( o: Objects.Object );
-	VAR x, y: SIGNED32;  r, b, g: SIGNED16;  obj: tObject;  pix: Images.Pixel;  val: SIGNED32;  valr: FLOAT64;  temp: FLOAT64;  len: SIGNED32;
+	VAR x, y: SIZE;  r, b, g: SIGNED16;  obj: tObject;  pix: Images.Pixel;  val: SIGNED32;  valr: FLOAT64;  temp: FLOAT64;  len: SIGNED32;
 	BEGIN
 		obj := o( tObject );
 		IF obj.A.depth > maxHistogramLen THEN len := maxHistogramLen ELSE len := obj.A.depth END;
@@ -193,7 +193,7 @@ CONST
 			END;
 			*)
 				(* r := SHORT(val DIV (65535 DIV 255)); *) g := r;  b := r;  Images.SetRGB( pix, r, g, b );
-				Images.Put( obj.img, SHORT( x ), SHORT( y ), pix, Images.SrcCopy );
+				Images.Put( obj.img, SIGNED16( x ), SIGNED16( y ), pix, Images.SrcCopy );
 			END;
 		END;
 	END A2P;
@@ -230,7 +230,7 @@ CONST
 	BEGIN
 		obj.A := A;  obj.w := A.w;  obj.h := A.h;  obj.depth := A.depth;
 
-		NEW( obj.img );  Images.Create( obj.img, SHORT( obj.w ), SHORT( obj.h ), Images.BGR888 );  vyBase.Subscribe( obj.A, obj );
+		NEW( obj.img );  Images.Create( obj.img, SIGNED16( obj.w ), SIGNED16( obj.h ), Images.BGR888 );  vyBase.Subscribe( obj.A, obj );
 		SetHisto( obj );
 		(*AdjustCurve(obj);*)
 		antsArrayImages.Sync( obj );

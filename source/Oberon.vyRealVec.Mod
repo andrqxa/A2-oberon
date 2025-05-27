@@ -24,12 +24,12 @@ Report any problems as soon as possible to voyager@statlab.uni-heidelberg.de
 
 
 
-IMPORT Files, Objects, Texts, vyBase, vyName, vyHostTexts, vyreal := vyReal, vyLongintVec;
+IMPORT Files, Objects, Texts, vyBase, vyName, vyHostTexts, vyreal := vyReal, vyLongintVec := vySizeVec;
 
 CONST
 	idversion* = "vyRealVec 0.0a4";   (* may be maintained or changed by tools *)
 TYPE
-	index* = SIGNED32;
+	index* = SIZE;
 
 	(* FLOAT32 *)  (* preferred chunk sizes: 128, 1024, 8192 *)
 	real* = FLOAT32;   (* technical convenience, to avoid duplicate code for FLOAT32 and FLOAT64 *)
@@ -47,13 +47,13 @@ TYPE
 	tMinMaxCache* = POINTER TO tMinMaxCacheDesc;
 	tMinMaxCacheDesc* = RECORD (vyBase.tCacheDesc)
 		min-, max-: real;
-		minpos, maxpos, nans: SIGNED32;   (*convenience. Valid if nans>=0 *)
+		minpos, maxpos, nans: SIZE;   (*convenience. Valid if nans>=0 *)
 	END;
 
 	tMeanCache* = POINTER TO tMeanCacheDesc;
 	tMeanCacheDesc* = RECORD (vyBase.tCacheDesc)
 		mean-, ssq-: FLOAT64;   (* Valid if nans>=0 & ssq>=0 *)
-		nans-: SIGNED32
+		nans-: SIZE
 	END;
 
 	tBuf* = POINTER TO tBufDesc;
@@ -122,7 +122,7 @@ END NewBufs;
 	PROCEDURE NewBufs( size: index ): tBuf;
 	VAR first, last: vyBase.tBuf;  chunk: tBuf;
 
-		PROCEDURE generic( ch: tBuf;  len: SIGNED32 );
+		PROCEDURE generic( ch: tBuf;  len: SIZE );
 		BEGIN
 			NEW( ch.data, len );  ch.str := vyBase.dynlrlarray;  ch.cache := NIL;  vyBase.GenericCatBuf( ch, len, size, first, last )
 		END generic;
@@ -245,10 +245,10 @@ END FillBufMeanCache;
 	(*! use vyReal Store*)
 	VAR b: tBuf;  i: index;
 	BEGIN
-		Files.WriteLInt( R, o.nrData );  b := o.buf( tBuf );
+		Files.WriteLInt( R, SIGNED32(o.nrData) );  b := o.buf( tBuf );
 		WHILE b # NIL DO
 			IF b.usedentries > 0 THEN
-				Files.WriteLInt( R, b.len );  Files.WriteLInt( R, b.usedentries );  i := 0;
+				Files.WriteLInt( R, SIGNED32(b.len) );  Files.WriteLInt( R, SIGNED32(b.usedentries) );  i := 0;
 				WHILE i < b.usedentries DO Files.WriteReal( R, b.data[i] );  INC( i ) END
 			END;
 			IF b.next # NIL THEN b := b.next( tBuf ) ELSE b := NIL END
@@ -264,7 +264,7 @@ END FillBufMeanCache;
 	PROCEDURE Store0ChunkedMatrix( VAR R: Files.Rider;  o: tChunkedMatrix );
 
 	BEGIN
-		Files.WriteLInt( R, o.buf.row );  Files.WriteLInt( R, o.buf.col )
+		Files.WriteLInt( R, SIGNED32(o.buf.row) );  Files.WriteLInt( R, SIGNED32(o.buf.col) )
 	END Store0ChunkedMatrix;
 
 	PROCEDURE Load0( VAR R: Files.Rider;  o: tVector );
@@ -282,13 +282,13 @@ END FillBufMeanCache;
 	PROCEDURE Load0REAL( VAR R: Files.Rider;  o: tREAL );
 	BEGIN
 		Files.ReadReal( R, o.x )
-	END Load0REAL;
+	END Load0REAL;
 
 	PROCEDURE Load0ChunkedMatrix( VAR R: Files.Rider;  o: tChunkedMatrix );
-
+	VAR t: SIGNED32;
 	BEGIN
 		IF o.buf = NIL THEN NEW( o.buf ) END;
-		Files.ReadLInt( R, o.buf.row );  Files.ReadLInt( R, o.buf.col )
+		Files.ReadLInt( R, t); o.buf.row := t;  Files.ReadLInt( R, t); o.buf.col := t;
 	END Load0ChunkedMatrix;
 
 	PROCEDURE HandleAttributes( o: tVector;  VAR M: Objects.AttrMsg );
@@ -297,7 +297,7 @@ END FillBufMeanCache;
 			IF M.name = "Gen" THEN COPY( 'vyRealVec.Gen', M.s );  M.class := Objects.String;  M.res := 0 ELSE vyBase.VectorHandler( o, M ) END
 		ELSIF M.id = Objects.set THEN vyBase.VectorHandler( o, M )
 		ELSIF M.id = Objects.enum THEN vyBase.VectorHandler( o, M )
-		ELSE vyBase.VectorHandler( o, M )
+		ELSE vyBase.VectorHandler( o, M )
 		END
 	END HandleAttributes;
 
@@ -443,7 +443,7 @@ END FillBufMeanCache;
 	(*=  allocate memory for a vector. Do not change information.
 	To reduce size, use SetLen first to trim length
 	*)
-	VAR l, freetrail: SIGNED32;
+	VAR l, freetrail: SIZE;
 	VAR firstfree: vyBase.tBuf;
 	BEGIN
 		ASSERT ( size >= vec.nrData );
@@ -458,7 +458,7 @@ END FillBufMeanCache;
 		vyBase.MarkUsed( size, vec );  FlushVecCaches( vec )
 	END SetLen;
 
-	PROCEDURE Len*( vec: vyBase.tVector ): SIGNED32;
+	PROCEDURE Len*( vec: vyBase.tVector ): SIZE;
 	(*= get total vector length *)
 	BEGIN
 		IF vec = NIL THEN RETURN 0 ELSE RETURN vec.nrData END
@@ -570,7 +570,7 @@ END FillBufMeanCache;
 (** Copy *)
 	PROCEDURE CopyData*( (*IN*) src,  (*OUT*) dest: vyBase.tVector );
 	(*= copy the data section of a vector. Force dest to same len as src *)
-	VAR srcchunk, destchunk: vyBase.tBuf;  oldcount, piececount, count, offs, srcoffs, destoffs: SIGNED32;
+	VAR srcchunk, destchunk: vyBase.tBuf;  oldcount, piececount, count, offs, srcoffs, destoffs: SIZE;
 
 	BEGIN
 		offs := 0;  count := src.nrData;
@@ -593,7 +593,7 @@ END FillBufMeanCache;
 	END CopyData;
 
 (** Enquiry routines *)
-	PROCEDURE GetMinMax*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE GetMinMax*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIZE );
 	(*! check handling of 0 len vectors! *)
 	(*? should this return MIN/MAX(FLOAT64) on eror? *)
 	VAR buf: vyBase.tBuf;  mmCache: tMinMaxCache;
@@ -619,9 +619,9 @@ END FillBufMeanCache;
 		END
 	END GetMinMax;
 
-	PROCEDURE GetMeanSsq*( v: vyBase.tVector;  VAR Mean, Ssq: FLOAT64;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE GetMeanSsq*( v: vyBase.tVector;  VAR Mean, Ssq: FLOAT64;  VAR nrNaNs: SIZE );
 	(*! check handling of 0 len vectors! *)
-	VAR buf: vyBase.tBuf;  mmCache: tMeanCache;  Sum, temp, temp1: FLOAT64;  SsqAdd, MeanAdd, SumAdd: FLOAT64;  Count, CountAdd: SIGNED32;
+	VAR buf: vyBase.tBuf;  mmCache: tMeanCache;  Sum, temp, temp1: FLOAT64;  SsqAdd, MeanAdd, SumAdd: FLOAT64;  Count, CountAdd: SIZE;
 	BEGIN
 		buf := v.buf;  nrNaNs := 0;  Ssq := 0.0;  Mean := 0.0;  Count := 0;  Sum := 0.0;
 		WITH v: tVector DO
@@ -767,7 +767,7 @@ END FillBufMeanCache;
 
 		PROCEDURE store( r: real;  rid: index ): BOOLEAN;
 		BEGIN
-			v.buf := d;  Append( r, v );  v.buf := did;  vyLongintVec.Append( rid, v );
+			v.buf := d;  Append( r, v );  v.buf := did;  vyLongintVec.Append( SIGNED32(rid), v );
 			IF lastr <= r THEN lastr := r;  RETURN TRUE ELSE lastr := r;  RETURN FALSE END
 		END store;
 
@@ -1308,7 +1308,7 @@ END SortBufWId;
 		FOR i := offs TO offs + count - 1 DO Set( val, v, i ) END
 	END Fill;
 
-	PROCEDURE NewFilledNamed*( count: SIGNED32;  val: real;  name: ARRAY OF CHAR ): tVector;
+	PROCEDURE NewFilledNamed*( count: SIZE;  val: real;  name: ARRAY OF CHAR ): tVector;
 	VAR v: tVector;
 	BEGIN
 		v := New( count );  Fill( v, val, 0, count );  vyName.Register( vyName.NameBase, v, name );  RETURN v
@@ -1569,7 +1569,7 @@ END SSQ;
 	END Norm2Sq;
 
 	PROCEDURE NormSup*( v: vyBase.tVector ): FLOAT64;
-	VAR min, max: FLOAT64;  nrNaNs: SIGNED32;
+	VAR min, max: FLOAT64;  nrNaNs: SIZE;
 	BEGIN
 		IF v = NIL THEN RETURN 0 END;
 		ASSERT ( v IS tVector, 100 );
@@ -1577,7 +1577,7 @@ END SSQ;
 		IF min < -max THEN RETURN -min ELSE RETURN max END
 	END NormSup;
 
-	PROCEDURE adddist1( VAR piececount: SIGNED32;  VAR srcchunk: vyBase.tBuf;  VAR srcloc: SIGNED32;  VAR destchunk: vyBase.tBuf;  VAR destloc: SIGNED32 );
+	PROCEDURE adddist1( VAR piececount: SIZE;  VAR srcchunk: vyBase.tBuf;  VAR srcloc: SIZE;  VAR destchunk: vyBase.tBuf;  VAR destloc: SIZE );
 	BEGIN
 		globallongreal :=
 			globallongreal + vyreal.Dist1( piececount, srcchunk( tBuf ).data^, srcloc, destchunk( tBuf ).data^, destloc )
@@ -1590,7 +1590,7 @@ END SSQ;
 		globallongreal := 0;  vyBase.DoToAllPieces( v, w, adddist1 );  RETURN globallongreal
 	END Dist1;
 
-	PROCEDURE adddist2( VAR piececount: SIGNED32;  VAR srcchunk: vyBase.tBuf;  VAR srcloc: SIGNED32;  VAR destchunk: vyBase.tBuf;  VAR destloc: SIGNED32 );
+	PROCEDURE adddist2( VAR piececount: SIZE;  VAR srcchunk: vyBase.tBuf;  VAR srcloc: SIZE;  VAR destchunk: vyBase.tBuf;  VAR destloc: SIZE );
 	BEGIN
 		globallongreal :=
 			globallongreal + vyreal.Dist2Sq( piececount, srcchunk( tBuf ).data^, srcloc, destchunk( tBuf ).data^, destloc )
@@ -1603,8 +1603,8 @@ END SSQ;
 		globallongreal := 0;  vyBase.DoToAllPieces( v, w, adddist2 );  RETURN globallongreal
 	END Dist2Sq;
 
-	PROCEDURE adddistsup( VAR piececount: SIGNED32;  VAR srcchunk: vyBase.tBuf;  VAR srcloc: SIGNED32;  VAR destchunk: vyBase.tBuf;
-										  VAR destloc: SIGNED32 );
+	PROCEDURE adddistsup( VAR piececount: SIZE;  VAR srcchunk: vyBase.tBuf;  VAR srcloc: SIZE;  VAR destchunk: vyBase.tBuf;
+										  VAR destloc: SIZE );
 	VAR temp: FLOAT64;
 	BEGIN
 		temp := vyreal.Dist1( piececount, srcchunk( tBuf ).data^, srcloc, destchunk( tBuf ).data^, destloc );
@@ -1748,7 +1748,7 @@ END SSQ;
 	VAR i: index;
 	BEGIN
 		FOR i := 1 TO m.row DO
-			Texts.WriteInt( vyHostTexts.w, i - 1, 3 );  Texts.WriteString( vyHostTexts.w, ")   " );  DumpRow( m, i - 1 )
+			Texts.WriteInt( vyHostTexts.w, SIGNED32(i) - 1, 3 );  Texts.WriteString( vyHostTexts.w, ")   " );  DumpRow( m, i - 1 )
 		END
 	END DumpMatrix;
 
@@ -1815,9 +1815,9 @@ END ChunkSummary;
 	BEGIN
 		WHILE buf # NIL DO
 			WITH buf: tBuf DO
-				mm := BufMinMax( buf );  mean := BufMean( buf );  vyHostTexts.WriteInt( w, buf.len );
-				vyHostTexts.WriteInt( w, buf.usedentries );  vyHostTexts.WriteReal( w, mm.min );
-				vyHostTexts.WriteReal( w, mm.max );  vyHostTexts.WriteInt( w, mm.nans );
+				mm := BufMinMax( buf );  mean := BufMean( buf );  vyHostTexts.WriteInt( w, SIGNED32(buf.len) );
+				vyHostTexts.WriteInt( w, SIGNED32(buf.usedentries) );  vyHostTexts.WriteReal( w, mm.min );
+				vyHostTexts.WriteReal( w, mm.max );  vyHostTexts.WriteInt( w, SIGNED32(mm.nans) );
 				vyHostTexts.WriteReal( w, mean.mean );  vyHostTexts.WriteReal( w, mean.ssq )
 
 				(*

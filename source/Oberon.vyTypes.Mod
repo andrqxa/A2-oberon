@@ -52,7 +52,7 @@ R FLOAT32
 X FLOAT64
 *)
 (*! move merge routines to type specific bases *)
-IMPORT Texts, vyHostTexts, vyHost, vyBase, vyLongintVec, vyBooleanVec, vyIntVec, vyRealVec, vyLongrealVec;
+IMPORT Texts, vyHostTexts, vyHost, vyBase, vyLongintVec, vySizeVec, vyBooleanVec, vyIntVec, vyRealVec, vyLongrealVec;
 
 CONST
 	(*= Voyager specific constants *)
@@ -129,10 +129,10 @@ TYPE
 		END
 	END NumForm;
 
-	PROCEDURE NrNaNs*( data: vyBase.tData ): SIGNED32;
+	PROCEDURE NrNaNs*( data: vyBase.tData ): SIZE;
 	(*= structure form from SInt=4 to LReal=8 if  data can be read as a numeric vector; undef=0 else *)
 	BEGIN
-		IF NumForm( data ) = 0 THEN RETURN MAX( SIGNED32 ) END;
+		IF NumForm( data ) = 0 THEN RETURN MAX( SIZE ) END;
 		(*! not yet implemented*)
 	END NrNaNs;
 
@@ -211,7 +211,7 @@ END CollectReal;
 	(** Read/set from/to vector *)
 (*= Use cenversion if a save and reliable implementation is possible *)
 
-	PROCEDURE VGetR*( v: vyBase.tVector;  pos: SIGNED32 ): FLOAT32;
+	PROCEDURE VGetR*( v: vyBase.tVector;  pos: SIZE ): FLOAT32;
 	BEGIN
 		ASSERT ( v # NIL , 100 );
 		IF v IS vyIntVec.tVector THEN
@@ -298,7 +298,7 @@ END CollectReal;
 	(*= Sorts a longint chunk by a longint chunk *)
 	(*! sort and generate a vector of id keys *)
 	(*! check. misnomer ? *)
-	VAR chunk, chunkid: vyBase.tBuf;  tcI, tcIid: vyLongintVec.tBuf;
+	VAR chunk, chunkid: vyBase.tBuf;  tcI: vyLongintVec.tBuf; tcIid: vySizeVec.tBuf;
 	BEGIN
 		IF (v = NIL ) OR (v.buf = NIL ) OR (WId = NIL ) OR (WId.buf = NIL ) THEN RETURN END;
 		ASSERT ( v.nrData = WId.nrData );
@@ -307,8 +307,8 @@ END CollectReal;
 		IF (chunk.next # NIL ) & ~(chunkid IS vyLongintVec.tBuf) & ~(chunk IS vyLongintVec.tBuf) THEN Dummy( TRUE ) END;
 		IF (chunk IS vyLongintVec.tBuf) THEN
 			tcI := v.buf( vyLongintVec.tBuf );   (* fof for Ob S3 Windows 960528*)
-			tcIid := WId.buf( vyLongintVec.tBuf );  vyLongintVec.SortEachChunkLONGINTWId( tcIid, tcI );
-			IF chunk.next # NIL THEN vyLongintVec.SortBufWId( tcIid, tcI ) END
+			tcIid := WId.buf( vySizeVec.tBuf );  vyLongintVec.SortEachChunkLONGINTWId( tcI, tcIid );
+			IF chunk.next # NIL THEN vyLongintVec.SortBufWId( tcI, tcIid ) END
 		ELSE v.status := v.status + {cBadType}
 		END
 	END SortById;
@@ -317,7 +317,7 @@ END CollectReal;
 	(*= Index must be a longint chunk *)
 	(* ! rearrange a vector by id keys *)
 	VAR chunk, chunkid: vyBase.tBuf;  tcr: vyRealVec.tBuf;  tcx: vyLongrealVec.tBuf;  tci: vyIntVec.tBuf;  tcl: vyLongintVec.tBuf;
-		tclid: vyLongintVec.tBuf;
+		tclid: vySizeVec.tBuf;
 	BEGIN
 		IF (v = NIL ) OR (v.buf = NIL ) OR (WId = NIL ) OR (WId.buf = NIL ) THEN RETURN END;
 		ASSERT ( v.nrData = WId.nrData );
@@ -329,7 +329,7 @@ END CollectReal;
 		END;
 		IF (chunk IS vyRealVec.tBuf) THEN
 			tcr := v.buf( vyRealVec.tBuf );   (* fof for Ob S3 Windows 960528*)
-			tclid := WId.buf( vyLongintVec.tBuf );  vyRealVec.SortEachChunkREALWId( tcr, tclid );
+			tclid := WId.buf( vySizeVec.tBuf );  vyRealVec.SortEachChunkREALWId( tcr, tclid );
 			IF chunk.next # NIL THEN
 				vyRealVec.SortBufWId( tcr, tclid );
 				v.buf := tcr;   (* fof 971006 *)
@@ -337,7 +337,7 @@ END CollectReal;
 			END
 		ELSIF (chunk IS vyLongrealVec.tBuf) THEN
 			tcx := v.buf( vyLongrealVec.tBuf );   (* fof for Ob S3 Windows 960528*)
-			tclid := WId.buf( vyLongintVec.tBuf );  vyLongrealVec.SortEachChunkLONGREALWId( tcx, tclid );
+			tclid := WId.buf( vySizeVec.tBuf );  vyLongrealVec.SortEachChunkLONGREALWId( tcx, tclid );
 			IF chunk.next # NIL THEN
 				vyLongrealVec.SortBufWId( tcx, tclid );
 				v.buf := tcx;   (* fof 971006 *)
@@ -345,7 +345,7 @@ END CollectReal;
 			END
 		ELSIF (chunk IS vyIntVec.tBuf) THEN
 			tci := v.buf( vyIntVec.tBuf );   (* fof for Ob S3 Windows 960528*)
-			tclid := WId.buf( vyLongintVec.tBuf );  vyIntVec.SortEachChunkINTEGERWId( tci, tclid );
+			tclid := WId.buf( vySizeVec.tBuf );  vyIntVec.SortEachChunkINTEGERWId( tci, tclid );
 			IF chunk.next # NIL THEN
 				vyIntVec.SortBufWId( tci, tclid );
 				v.buf := tci;   (* fof 971006 *)
@@ -353,7 +353,7 @@ END CollectReal;
 			END
 		ELSIF (chunk IS vyLongintVec.tBuf) THEN
 			tcl := v.buf( vyLongintVec.tBuf );   (* fof for Ob S3 Windows 960528*)
-			tclid := WId.buf( vyLongintVec.tBuf );  vyLongintVec.SortEachChunkLONGINTWId( tcl, tclid );
+			tclid := WId.buf( vySizeVec.tBuf );  vyLongintVec.SortEachChunkLONGINTWId( tcl, tclid );
 			IF chunk.next # NIL THEN
 				vyLongintVec.SortBufWId( tcl, tclid );
 				v.buf := tcl;   (* fof 971006 *)
@@ -408,7 +408,7 @@ END GetIndex;
 *)
 (** Minimum and maximum *)
 
-	PROCEDURE VGetMinMax*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE VGetMinMax*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIZE );
 	VAR imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
 	BEGIN
 		IF v = NIL THEN min := MIN( FLOAT64 );  max := MAX( FLOAT64 );  nrNaNs := 0;  RETURN END;
@@ -428,7 +428,7 @@ END GetIndex;
 		END
 	END VGetMinMax;
 
-	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: FLOAT32;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: FLOAT32;  VAR nrNaNs: SIZE );
 	(*! check. if ok: move this model to other variants *)
 	VAR xmin, xmax: FLOAT64;  imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
 	BEGIN
@@ -451,7 +451,7 @@ END GetIndex;
 		rmin := SHORT( xmin );  rmax := SHORT( xmax )
 	END VGetMinMaxR;
 
-	PROCEDURE VGetMinMaxX*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE VGetMinMaxX*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIZE );
 	VAR imin, imax: SIGNED16;  lmin, lmax: SIGNED32;  rmin, rmax: FLOAT64;
 	BEGIN
 		min := MAX( FLOAT64 );  max := MIN( FLOAT64 );  nrNaNs := 0;
@@ -472,7 +472,7 @@ END GetIndex;
 
 (** Dyadic operators *)
 	PROCEDURE Sub*( x, y: vyBase.tVector;  diff: vyBase.tVector );
-	VAR i: SIGNED32;  chx: vyBase.tBuf;
+	VAR i: SIZE;  chx: vyBase.tBuf;
 	BEGIN
 		IF (x.nrData) # (y.nrData) THEN diff.status := diff.status + {cBadLen} ELSE
 			IF diff = NIL THEN NEW( diff ) END;
@@ -611,20 +611,20 @@ END VectorType;
 	END Compatible;
 
 	PROCEDURE Summary*( VAR w: vyBase.TextsWriter;  v: vyBase.tData );
-	VAR i: SIGNED32;  min, max: FLOAT64;  nrNaNs: SIGNED32;
+	VAR i: SIGNED32;  min, max: FLOAT64;  nrNaNs: SIZE;
 	BEGIN
 		IF v IS vyBase.tVector THEN
 			IF v IS vyBase.tVector THEN
 				WITH v: vyBase.tVector DO
-					Texts.WriteString( w, ' Summary for vector. nrData=' );  Texts.WriteInt( w, v.nrData, 0 );  VGetMinMax( v, min, max, nrNaNs );
+					Texts.WriteString( w, ' Summary for vector. nrData=' );  Texts.WriteInt( w, SIGNED32(v.nrData), 0 );  VGetMinMax( v, min, max, nrNaNs );
 					Texts.WriteString( w, ' Min=' );  vyHostTexts.WReal( w, min, 12 );  Texts.WriteString( w, ' Max=' );
 					vyHostTexts.WReal( w, max, 12 );
-					IF nrNaNs > 0 THEN Texts.WriteString( w, ' NaNs=' );  Texts.WriteInt( w, nrNaNs, 12 ) END;
+					IF nrNaNs > 0 THEN Texts.WriteString( w, ' NaNs=' );  Texts.WriteInt( w, SIGNED32(nrNaNs), 12 ) END;
 					IF v.Layout # NIL THEN
 						IF v.Layout IS vyBase.tArray THEN
 							Texts.WriteString( w, ' [' );
-							FOR i := 0 TO v.Layout.dim - 2 DO Texts.WriteInt( w, v.Layout( vyBase.tArray ).lens[i], 0 );  Texts.Write( w, ',' ) END;
-							Texts.WriteInt( w, v.Layout( vyBase.tArray ).lens[v.Layout.dim - 1], 0 );  Texts.Write( w, ']' )
+							FOR i := 0 TO v.Layout.dim - 2 DO Texts.WriteInt( w, SIGNED32(v.Layout( vyBase.tArray ).lens[i]), 0 );  Texts.Write( w, ',' ) END;
+							Texts.WriteInt( w, SIGNED32(v.Layout( vyBase.tArray ).lens[v.Layout.dim - 1]), 0 );  Texts.Write( w, ']' )
 						ELSE Texts.WriteString( w, ' dim=' );  Texts.WriteInt( w, v.Layout.dim, 0 )
 						END;
 						IF v.Layout.transposed THEN Texts.WriteString( w, ' stored in transposed form' ) END
@@ -645,15 +645,15 @@ END VectorType;
 		IF v IS vyBase.tVector THEN
 			v1 := v;
 			WITH v1: vyBase.tVector DO
-				Texts.WriteString( vyHostTexts.w, " is vector. nrData:" );  Texts.WriteInt( vyHostTexts.w, v1( vyBase.tVector ).nrData, 0 );
+				Texts.WriteString( vyHostTexts.w, " is vector. nrData:" );  Texts.WriteInt( vyHostTexts.w, SIGNED32(v1( vyBase.tVector ).nrData), 0 );
 				Summary( vyHostTexts.w, v1( vyBase.tVector ) );
 				IF (v1.buf # NIL ) (* & ((v1.buf IS vyRealVec.tBuf) OR (v1.buf IS tBuf) OR (v1.buf IS tBuf)
 				OR (v1.buf IS vyLongintVec.tBuf) OR (v1.buf IS tBuf))*)
 				THEN
 					c := v1.buf;
 					WHILE c # NIL DO
-						Texts.WriteString( vyHostTexts.w, 'len:' );  Texts.WriteInt( vyHostTexts.w, c.len, 0 );
-						Texts.WriteString( vyHostTexts.w, ' used:' );  Texts.WriteInt( vyHostTexts.w, c.usedentries, 0 );
+						Texts.WriteString( vyHostTexts.w, 'len:' );  Texts.WriteInt( vyHostTexts.w, SIGNED32(c.len), 0 );
+						Texts.WriteString( vyHostTexts.w, ' used:' );  Texts.WriteInt( vyHostTexts.w, SIGNED32(c.usedentries), 0 );
 						IF c IS vyBooleanVec.tBuf THEN
 							WITH c: vyBooleanVec.tBuf DO vyBooleanVec.ChunkSummary( vyHostTexts.w, c )
 							END;
@@ -689,7 +689,7 @@ END VectorType;
 (** Conversion *)
 	PROCEDURE Short*( from: vyBase.tData ): vyBase.tData;
 	(*! speedup: use chunk structure *)
-	VAR fromv, v: vyBase.tVector;  i: SIGNED32;  len: SIGNED32;
+	VAR fromv, v: vyBase.tVector;  i: SIZE;  len: SIZE;
 	BEGIN
 		ASSERT ( from # NIL , 100 );
 		ASSERT ( (from IS vyBase.tVector), 101 );
@@ -710,7 +710,7 @@ END VectorType;
 	PROCEDURE Entier*( from: vyBase.tData;  offs, factor: FLOAT64 ): vyBase.tData;
 	(*= offs and factor are included to allow some scaling *)
 	(*! speedup: use chunk structure *)
-	VAR fromv, v: vyBase.tVector;  i: SIGNED32;  len: SIGNED32;
+	VAR fromv, v: vyBase.tVector;  i: SIZE;  len: SIZE;
 	BEGIN
 		ASSERT ( from # NIL , 100 );
 		ASSERT ( (from IS vyBase.tVector), 101 );
@@ -730,7 +730,7 @@ END VectorType;
 
 	PROCEDURE CvtReal*( src: vyBase.tData ): vyBase.tData;
 	(*= Convert any src to FLOAT32, if safe and reliable *)
-	VAR temp: vyBase.tData;  i: SIGNED32;  len: SIGNED32;  from, v: vyBase.tVector;
+	VAR temp: vyBase.tData;  i: SIZE;  len: SIZE;  from, v: vyBase.tVector;
 	BEGIN
 		ASSERT ( (src # NIL ), 100 );
 		ASSERT ( (src IS vyBase.tVector), 101 );

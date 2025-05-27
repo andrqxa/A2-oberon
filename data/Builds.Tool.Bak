@@ -187,9 +187,9 @@ WIN64 -- 64-bit windows a2
 		Linker Compiler FoxOberonFrontend FoxARMBackend FoxAMDBackend ~	
 	
 -----
+	FSTools.CreateDirectory NewAos ~ 
 
 	System.DoCommands	
-		FSTools.CreateDirectory NewAos ~ 
 		FSTools.DeleteFiles -s NewAos/* ~
 		Release.Build --build --path=NewAos/ Linux64 ~
 		Linker.Link -p=Linux64 --path=NewAos/
@@ -242,3 +242,4 @@ WIN64 -- 64-bit windows a2
 		FSTools.CopyFiles -o oberon => ../../LinuxARM/oberon ~
 	~ 
 
+Release.Build Linux64All --only="OberonVoyager OberonAnts"

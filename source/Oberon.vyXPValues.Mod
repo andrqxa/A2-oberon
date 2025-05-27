@@ -166,9 +166,9 @@ TYPE
 	KolSmirXPDesc* = RECORD (ActiveXPValueDesc)*)
 	(ActiveXPValue)
 	VAR source-: vyLongrealVec.tLONGREAL;
-		n-: SIGNED32;
+		n-: SIZE;
 		values: POINTER TO ARRAY OF Real;
-		cur: SIGNED32;
+		cur: SIZE;
 		PROCEDURE (* VAR xp: KolSmirXPDesc*)GetGenString*( VAR s: ARRAY OF CHAR );
 	BEGIN
 		COPY( "vyXPValues.AllocKolSmirXP", s )
@@ -194,22 +194,22 @@ TYPE
 		END
 	END TakeNewSource;
 	PROCEDURE (*v: KolSmirXP*)Store*( VAR M: Objects.FileMsg );
-	VAR i, len: SIGNED32;
+	VAR i, len: SIZE;
 	BEGIN
-		Gadgets.WriteRef( M.R, SELF.lib, SELF.source );  Files.WriteLInt( M.R, SELF.n );  len := LEN( SELF.values^ );  Files.WriteLInt( M.R, len );
+		Gadgets.WriteRef( M.R, SELF.lib, SELF.source );  Files.WriteLInt( M.R, SIGNED32(SELF.n) );  len := LEN( SELF.values^ );  Files.WriteLInt( M.R, SIGNED32(len) );
 		FOR i := 0 TO len - 1 DO Files.WriteLReal( M.R, SELF.values[i] ) END;
-		Files.WriteLInt( M.R, SELF.cur );  SELF.Store^( M )
+		Files.WriteLInt( M.R, SIGNED32(SELF.cur) );  SELF.Store^( M )
 	END Store;
 
 	PROCEDURE (*v: KolSmirXP*)Load*( VAR M: Objects.FileMsg );
-	VAR i, len: SIGNED32;  objsub: Objects.Object;
+	VAR i, len: SIZE;  objsub: Objects.Object; c: SIGNED32;
 	BEGIN
 		Gadgets.ReadRef( M.R, SELF.lib, objsub );
 		WITH objsub: vyLongrealVec.tLONGREAL DO SELF.source := objsub
 		END;
-		Files.ReadLInt( M.R, SELF.n );  Files.ReadLInt( M.R, len );  NEW( SELF.values, len );
+		Files.ReadLInt( M.R, c); SELF.n := c;  Files.ReadLInt( M.R, c); len := c; NEW( SELF.values, len );
 		FOR i := 0 TO len - 1 DO Files.ReadLReal( M.R, SELF.values[i] ) END;
-		Files.ReadLInt( M.R, SELF.cur );  SELF.Load^( M )
+		Files.ReadLInt( M.R, c); SELF.cur := c;  SELF.Load^( M )
 	END Load;
 
 	END KolSmirXP;
@@ -218,7 +218,7 @@ TYPE
 	KolSmirVecXPDesc* = RECORD (ActiveXPValueDesc)*)
 	(ActiveXPValue)
 	VAR source-: vyBase.tVector;
-		n-: SIGNED32;
+		n-: SIZE;
 		a: POINTER TO ARRAY OF Real;
 	PROCEDURE (* VAR xp: KolSmirVecXPDesc*)GetGenString*( VAR s: ARRAY OF CHAR );
 	BEGIN
@@ -226,20 +226,20 @@ TYPE
 	END GetGenString;
 
 	PROCEDURE (*v: KolSmirVecXP*)Store*( VAR M: Objects.FileMsg );
-	VAR len, i: SIGNED32;
+	VAR len, i: SIZE;
 	BEGIN
-		Gadgets.WriteRef( M.R, SELF.lib, SELF.source );  Files.WriteLInt( M.R, SELF.n );  len := LEN( SELF.a^ );  Files.WriteLInt( M.R, len );
+		Gadgets.WriteRef( M.R, SELF.lib, SELF.source );  Files.WriteLInt( M.R, SIGNED32(SELF.n) );  len := LEN( SELF.a^ );  Files.WriteLInt( M.R, SIGNED32(len) );
 		FOR i := 0 TO len - 1 DO Files.WriteLReal( M.R, SELF.a[i] ) END;
 		SELF.Store^( M )
 	END Store;
 
 	PROCEDURE (*v: KolSmirVecXP*)Load*( VAR M: Objects.FileMsg );
-	VAR objsub: Objects.Object;  len, i: SIGNED32;
+	VAR objsub: Objects.Object;  len, i: SIZE; c: SIGNED32;
 	BEGIN
 		Gadgets.ReadRef( M.R, SELF.lib, objsub );
 		WITH objsub: vyBase.tVector DO SELF.source := objsub
 		END;
-		Files.ReadLInt( M.R, SELF.n );  Files.ReadLInt( M.R, len );  NEW( SELF.a, len );
+		Files.ReadLInt( M.R, c); SELF.n := c; Files.ReadLInt( M.R, c); len := c;  NEW( SELF.a, len );
 		FOR i := 0 TO len - 1 DO Files.ReadLReal( M.R, SELF.a[i] ) END;
 		SELF.Load^( M )
 	END Load;
@@ -427,10 +427,10 @@ END GenXPValue;
 (** KolSmirXP *)
 
 
-	PROCEDURE KolSmirXPGetName( VAR s: ARRAY OF CHAR;  n: SIGNED32 );
+	PROCEDURE KolSmirXPGetName( VAR s: ARRAY OF CHAR;  n: SIZE );
 	VAR t: ARRAY 16 OF CHAR;
 	BEGIN
-		COPY( "KS (", s );  Strings.IntToStr( n, t );  Strings.Append( s, t );  Strings.Append( s, ")" )
+		COPY( "KS (", s );  Strings.IntToStr( SIGNED32(n), t );  Strings.Append( s, t );  Strings.Append( s, ")" )
 	END KolSmirXPGetName;
 
 	PROCEDURE KolSmirXPClear*( obj: KolSmirXP );
@@ -447,7 +447,7 @@ END GenXPValue;
 		END
 	END HandleKolSmirXP;
 
-	PROCEDURE InitKolSmirXP*( obj: KolSmirXP;  n: SIGNED32;  source, x, p: vyLongrealVec.tLONGREAL );
+	PROCEDURE InitKolSmirXP*( obj: KolSmirXP;  n: SIZE;  source, x, p: vyLongrealVec.tLONGREAL );
 	BEGIN
 		IF obj.handle = NIL THEN obj.handle := HandleKolSmirXP END;
 		InitActiveXPValue( obj, x, p );  KolSmirXPGetName( obj.distrName, n );  obj.n := n;  obj.source := source;
@@ -464,14 +464,14 @@ END GenXPValue;
 (** KolSmirVecXP *)
 
 
-	PROCEDURE KolSmirVecXPGetName( VAR s: ARRAY OF CHAR;  n: SIGNED32 );
+	PROCEDURE KolSmirVecXPGetName( VAR s: ARRAY OF CHAR;  n: SIZE );
 	VAR t: ARRAY 16 OF CHAR;
 	BEGIN
-		COPY( "KS (", s );  Strings.IntToStr( n, t );  Strings.Append( s, t );  Strings.Append( s, ")" )
+		COPY( "KS (", s );  Strings.IntToStr( SIGNED32(n), t );  Strings.Append( s, t );  Strings.Append( s, ")" )
 	END KolSmirVecXPGetName;
 
 	PROCEDURE KolSmirVecXPNewSource( obj: KolSmirVecXP;  source: vyBase.tVector );
-	VAR n: SIGNED32;
+	VAR n: SIZE;
 	BEGIN
 		n := source.nrData;  KolSmirVecXPGetName( obj.distrName, n );  obj.n := n;  obj.source := source;  NEW( obj.a, n )
 	END KolSmirVecXPNewSource;

@@ -72,7 +72,7 @@ TYPE
 	END HandleFileMsg;
 
 	PROCEDURE Sync*( obj: Object );
-	VAR i: SIGNED32;  get, at: FLOAT64;
+	VAR i: SIZE;  get, at: FLOAT64;
 	BEGIN
 		IF obj.f # NIL THEN
 			FOR i := 0 TO obj.x.nrData - 1 DO
@@ -255,7 +255,7 @@ END New;
 	END DoNewVec1;
 
 	PROCEDURE DoNewVec2*( from: vyBase.Object;  VAR vec: vyLongrealVec.tVector );
-	VAR i: SIGNED32;  val: FLOAT64;
+	VAR i: SIZE;  val: FLOAT64;
 	BEGIN
 		IF from IS vyLongrealVec.tVector THEN
 			WITH from: vyLongrealVec.tVector DO

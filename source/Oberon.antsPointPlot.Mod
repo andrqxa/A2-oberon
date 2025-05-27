@@ -47,7 +47,7 @@ VAR
 	END Copy;
 
 	PROCEDURE Recall( scatter: tLayer );
-	VAR nrData, i: SIGNED32;  sel: vyBase.tVector;  xx, yy: SIGNED16;  b: BOOLEAN;
+	VAR nrData, i: SIZE;  sel: vyBase.tVector;  xx, yy: SIGNED16;  b: BOOLEAN;
 	BEGIN
 		IF (scatter.x # NIL ) THEN
 			IF (scatter.x.nrData > 0) THEN
@@ -86,7 +86,7 @@ VAR
 
 	PROCEDURE Actor( layer: vyPort.tLayer;  sel: vyBase.tVector;  x0O, y0O, x1O, y1O, x0N, y0N, x1N, y1N: Real;
 								VAR somethingChanged: BOOLEAN );
-	VAR scatter: tLayer;  nrData, i: SIGNED32;  new: BOOLEAN;  X, Y: Real;
+	VAR scatter: tLayer;  nrData, i: SIZE;  new: BOOLEAN;  X, Y: Real;
 
 		PROCEDURE PointInRect( px, py, x0, y0, x1, y1: Real ): BOOLEAN;
 		BEGIN
@@ -109,13 +109,13 @@ VAR
 	PROCEDURE Select( scatter: tLayer;  VAR event: vyEvents.EventMsg );
 	VAR selector: vyHighlight.tSelector;
 	BEGIN
-		vyHighlight.OpenSelector( scatter, scatter.x.nrData, Vizor, Actor, event );
+		vyHighlight.OpenSelector( scatter, SIGNED32(scatter.x.nrData), Vizor, Actor, event );
 		selector := scatter.highlight( vyHighlight.tSelector );  selector.do( selector, event )
 	END Select;
 
 	PROCEDURE Prompt( scatter: tLayer;  VAR event: vyEvents.EventMsg );
 	CONST toleranz = 2 * vyHostDisplay.pixel;
-	VAR p: vyPort.Picture;  found, i, nrData: SIGNED32;  r: Real;  lx, ly, x0, y0: SIGNED16;  id, val: vyName.tNameArray;
+	VAR p: vyPort.Picture;  found, i, nrData: SIZE;  r: Real;  lx, ly, x0, y0: SIGNED16;  id, val: vyName.tNameArray;
 	BEGIN
 		vyHostDisplay.SetCursor( vyHostDisplay.Wheel );  found := -1;  nrData := scatter.x.nrData;
 		p := event.dlink( vyPort.Picture );  id := "";
@@ -143,7 +143,7 @@ VAR
 
 		PROCEDURE InScatter( x, y: SIGNED16 ): BOOLEAN;
 		CONST eps = 3;
-		VAR minX, minY, maxX, maxY: Real;  x0, y0, x1, y1: SIGNED16;  nans: SIGNED32;
+		VAR minX, minY, maxX, maxY: Real;  x0, y0, x1, y1: SIGNED16;  nans: SIZE;
 
 		BEGIN
 			vyTypes.VGetMinMax( scatter.x, minY, maxY, nans );  minX := 0;  maxX := scatter.x.nrData;
@@ -160,7 +160,7 @@ VAR
 	END Responsible;
 
 	PROCEDURE Consume( o: tLayer;  msg: Display.ConsumeMsg );
-	VAR v: vyBase.tVector;  minX, maxX: Real;  pict: vyPort.Picture;  nans: SIGNED32;
+	VAR v: vyBase.tVector;  minX, maxX: Real;  pict: vyPort.Picture;  nans: SIZE;
 	BEGIN
 		pict := msg.dlink( vyPort.Picture );  v := vyBase.GetVFromObj( msg.obj );
 		IF v # NIL THEN vyBase.UnSubscribe( o.x, o );
@@ -299,7 +299,7 @@ VAR
 
 	PROCEDURE ShowP*;
 	VAR data: Objects.Object;  linePlot: tLayer;  pict: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  minX, maxX: Real;
-		nans: SIGNED32;
+		nans: SIZE;
 	BEGIN
 		aM.vS( "antsPointPlot.Show" );  data := vyBase.NextParObj();
 		WHILE data # NIL DO
@@ -314,7 +314,7 @@ VAR
 	END ShowP;
 
 	PROCEDURE ShowL*( list: vyLinks.Link );
-	VAR linePlot: tLayer;  pict: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  minX, maxX: Real;  nans: SIGNED32;
+	VAR linePlot: tLayer;  pict: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  minX, maxX: Real;  nans: SIZE;
 	BEGIN
 		WHILE list # NIL DO
 			Alloc;  linePlot := Objects.NewObj( tLayer );  Open( linePlot, list.obj );
@@ -328,7 +328,7 @@ VAR
 	END ShowL;
 
 	PROCEDURE ShowO*( obj: Objects.Object );
-	VAR linePlot: tLayer;  pict: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  minX, maxX: Real;  nans: SIGNED32;
+	VAR linePlot: tLayer;  pict: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  minX, maxX: Real;  nans: SIZE;
 	BEGIN
 		Alloc;  linePlot := Objects.NewObj( tLayer );  Open( linePlot, obj );
 		vyTypes.VGetMinMax( linePlot.x, minX, maxX, nans );

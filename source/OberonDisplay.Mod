@@ -85,6 +85,22 @@ TYPE
 			IF flags * Inputs.Shift # {} THEN INCL(keys, Inputs.SHIFT) END;
 			IF flags * Inputs.Ctrl # {} THEN INCL(keys, Inputs.CTRL) END;
 			IF flags * Inputs.Alt # {} THEN INCL(keys, Inputs.ALT) END;
+			TRACE(keysym); 
+			IF keysym = Inputs.KsBackSpace THEN ch := 7FX; (* delete *) 
+			ELSIF keysym = Inputs.KsDelete THEN ch := 0A1X; (* delete *) 
+			ELSIF keysym = Inputs.KsUp THEN ch := 0C1X; (* up *) 
+			ELSIF keysym = Inputs.KsDown THEN ch := 0C2X; (* down *) 
+			ELSIF keysym = Inputs.KsRight THEN ch := 0C3X; (* right *) 
+			ELSIF keysym = Inputs.KsLeft THEN ch := 0C4X; (* left *) 
+			ELSIF keysym = Inputs.KsPageUp THEN ch := 0A2X; (* page up *) 
+			ELSIF keysym = Inputs.KsPageDown THEN ch := 0A3X; (* page down *) 
+			ELSIF keysym = Inputs.KsHome THEN ch := 0A8X; (* home *) 
+			ELSIF keysym = Inputs.KsEnd THEN ch := 0A9X; (* end *)
+			ELSIF keysym = Inputs.KsF3 THEN ch := 0A6X; (* F3 *)
+			ELSIF keysym = 27 (*Inputs.KsEscape*) THEN ch := 0A5X; (* Neutralize  *)
+			ELSIF keysym = Inputs.KsInsert THEN ch := 0A4X; (* Setup *)
+			END; 
+			
 			IF ch # 0X THEN
 				IF (keytail+1) MOD KeyBufSize # keyhead THEN
 					keybuf[keytail] := ch; keytail := (keytail+1) MOD KeyBufSize
@@ -146,7 +162,7 @@ TYPE
 
 		PROCEDURE Read*(VAR ch : CHAR; VAR b : BOOLEAN);
 		BEGIN
-			window.Read(ch, b)
+			window.Read(ch, b);
 		END Read;
 
 		PROCEDURE Available*(VAR num : SIGNED16; VAR b : BOOLEAN);
@@ -443,7 +459,7 @@ OberonDisplay.Install 1024 768;Oberon.Call System.Init ~
 
 OberonDisplay.Remove ~
 
-System.Free OberonDisplay ~
+System.FreeDownTo OberonDisplay ~
 
 
 (*

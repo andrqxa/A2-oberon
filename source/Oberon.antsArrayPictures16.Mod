@@ -45,7 +45,7 @@ CONST
 	maxHistogramLen* = 1000;
 
 	PROCEDURE SetHisto( obj: tObject );
-	VAR y, x: SIGNED32;  val, pos: SIGNED32;  len: SIGNED32;  nrNaNs: SIGNED32;  min, max: FLOAT64;
+	VAR y, x: SIZE;  val, pos: SIGNED32;  len: SIGNED32;  nrNaNs: SIZE;  min, max: FLOAT64;
 	BEGIN
 		IF obj.A.depth > maxHistogramLen THEN len := maxHistogramLen ELSE len := obj.A.depth END;
 		(* len := maxHistogramLen;  *)
@@ -152,7 +152,7 @@ CONST
 	END Handler;
 
 	PROCEDURE A2P*( o: Objects.Object );
-	VAR x, y: SIGNED32;  obj: tObject;   (* pix: Images.Pixel; *) val: SIGNED32;  valr: FLOAT64;  len: SIGNED32;  r: SIGNED16;
+	VAR x, y: SIZE;  obj: tObject;   (* pix: Images.Pixel; *) val: SIGNED32;  valr: FLOAT64;  len: SIGNED32;  r: SIGNED16;
 	BEGIN
 
 		obj := o( tObject );
@@ -186,7 +186,7 @@ CONST
 				ELSIF r > (obj.depth - 1) THEN r := SHORT( obj.depth - 1 )
 				END;
 				IF r = 255 THEN r := 254 END;   (* bug in pictures *)
-				Pictures.Dot( obj.pict, r, SHORT( x ), SHORT( y ), 0 )
+				Pictures.Dot( obj.pict, r, SIGNED16( x ), SIGNED16( y ), 0 )
 				(*
 			Images.SetRGB(pix,r,g,b);
 			Images.Put(obj.img,SHORT(x),SHORT(y),pix,Images.SrcCopy);
@@ -227,7 +227,7 @@ CONST
 	VAR r, g, b: SIGNED16;  i: SIGNED32;   (* pal: Images.Palette; fmt: Images.Format; *)
 	BEGIN
 		obj.A := A;  obj.w := A.w;  obj.h := A.h;  obj.depth := Min( A.depth, 256 );  NEW( obj.pict );
-		Pictures.Create( obj.pict, SHORT( obj.w ), SHORT( obj.h ), 8 );
+		Pictures.Create( obj.pict, SIGNED16( obj.w ), SIGNED16( obj.h ), 8 );
 
 		FOR i := 0 TO obj.depth - 1 DO r := SHORT( (i) * 255 DIV (obj.depth - 1) );  g := r;  b := r;  Pictures.SetColor( obj.pict, SHORT( i ), r, g, b ) END;
 

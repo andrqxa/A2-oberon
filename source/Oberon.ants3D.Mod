@@ -31,7 +31,7 @@ IMPORT vyLinks, antsArrayObjects, antsCommands, vyRealVec, vyBase, vyCG := vyNam
 TYPE
 	ConsistencyObject= OBJECT (antsHybridObjects.Object)
 	VAR in: antsArrayObjects.tINTEGERObject;
-		out: vyRealVec.tChunkedMatrix;  x0, y0, w0, h0: SIGNED32;
+		out: vyRealVec.tChunkedMatrix;  x0, y0, w0, h0: SIZE;
 
 	PROCEDURE Update*;
 	BEGIN
@@ -45,10 +45,10 @@ TYPE
 	END Bind;
 
 	PROCEDURE Load*(VAR R: Files.Rider);
-	VAR obj: Objects.Object;
+	VAR obj: Objects.Object; c: SIGNED32;
 	BEGIN
 		Load^(R);
-		Files.ReadLInt(R,x0); Files.ReadLInt(R,y0);Files.ReadLInt(R,w0); Files.ReadLInt(R,h0);
+		Files.ReadLInt(R,c); x0:=c; Files.ReadLInt(R,c); y0:= c;Files.ReadLInt(R,c); w0:= c; Files.ReadLInt(R,c); h0:=c;
 		Gadgets.ReadRef(R,lib,obj); IF obj # NIL THEN in := obj(antsArrayObjects.tINTEGERObject) END;
 		Gadgets.ReadRef(R,lib,obj); IF obj # NIL THEN out := obj(vyRealVec.tChunkedMatrix) END;
 
@@ -57,7 +57,7 @@ TYPE
 	PROCEDURE Store*(VAR R: Files.Rider);
 	BEGIN
 		Store^(R);
-		Files.WriteLInt(R,x0); Files.WriteLInt(R,y0); Files.WriteLInt(R,w0); Files.WriteLInt(R,h0);
+		Files.WriteLInt(R,SIGNED32(x0)); Files.WriteLInt(R,SIGNED32(y0)); Files.WriteLInt(R,SIGNED32(w0)); Files.WriteLInt(R,SIGNED32(h0));
 		Gadgets.WriteRef(R,lib,in); Gadgets.WriteRef(R,lib,out);
 	END Store;
 
@@ -70,8 +70,8 @@ BEGIN
 	NEW(c); Objects.NewObj := c;
 END GenConsistencyObject;
 
-PROCEDURE UpdateMatrix(A: antsArrayObjects.tINTEGERObject;  VAR m: vyRealVec.tMatrixChunk;  x0, y0, w0, h0: SIGNED32;  scaleminmax: BOOLEAN);
-	VAR min, max: SIGNED32;  x, y: SIGNED32;
+PROCEDURE UpdateMatrix(A: antsArrayObjects.tINTEGERObject;  VAR m: vyRealVec.tMatrixChunk;  x0, y0, w0, h0: SIZE;  scaleminmax: BOOLEAN);
+	VAR min, max: SIGNED32;  x, y: SIZE;
 BEGIN
 	IF scaleminmax THEN
 		min := MAX(SIGNED16);  max := MIN(SIGNED16);
@@ -92,14 +92,14 @@ BEGIN
 END UpdateMatrix;
 
 
-PROCEDURE MatrixFromArray (A: antsArrayObjects.tINTEGERObject;  VAR m: vyRealVec.tMatrixChunk;  x0, y0, w0, h0: SIGNED32;  scaleminmax: BOOLEAN);
+PROCEDURE MatrixFromArray (A: antsArrayObjects.tINTEGERObject;  VAR m: vyRealVec.tMatrixChunk;  x0, y0, w0, h0: SIZE;  scaleminmax: BOOLEAN);
 BEGIN
 	m := vyRealVec.NEWMatrix (h0, w0);
 	UpdateMatrix(A,m,x0,y0,w0,h0,scaleminmax);
 END MatrixFromArray;
 
 PROCEDURE ScaleMatrix*;
-	VAR  obj: vyBase.Object;  par: FLOAT64;  y, x: SIGNED32;
+	VAR  obj: vyBase.Object;  par: FLOAT64;  y, x: SIZE;
 BEGIN
 	antsCommands.InitScan("name=NAME scale=FLOAT32");
 	IF antsCommands.ExpectObject("name", obj) &
@@ -115,7 +115,7 @@ BEGIN
 	END
 END ScaleMatrix;
 
-PROCEDURE MatrixObjectFromArray* (A: antsArrayObjects.tINTEGERObject;  x, y, w, h: SIGNED32;  scaleminmax: BOOLEAN):
+PROCEDURE MatrixObjectFromArray* (A: antsArrayObjects.tINTEGERObject;  x, y, w, h: SIZE;  scaleminmax: BOOLEAN):
 vyRealVec.tChunkedMatrix;
 	VAR m: vyRealVec.tMatrixChunk;  data: vyRealVec.tChunkedMatrix; c: ConsistencyObject;
 BEGIN
@@ -172,7 +172,7 @@ BEGIN
 			antsCommands.GetNumberFromKeyword (l, "w", w) &
 			antsCommands.GetNumberFromKeyword (l, "h", h) THEN
 		ELSE
-			x := 0;  y := 0;  w := A.w;  h := A.h
+			x := 0;  y := 0;  w := SIGNED32(A.w);  h := SIGNED32(A.h)
 		END;
 		DataFromArray(A, name, x, y, w, h, TRUE)
 	END
@@ -236,22 +236,22 @@ BEGIN
 		v := vyRealVec.New(0);
 		A := obj(antsArrayObjects.tINTEGERObject);
 		IF vertical THEN
-			FOR x := 0 TO A.h - 1 DO
+			FOR x := 0 TO SIGNED32(A.h) - 1 DO
 				vyRealVec.Append(A.A[x, y], v)
 			END
 		ELSE
-			FOR x := 0 TO A.w - 1 DO
+			FOR x := 0 TO SIGNED32(A.w) - 1 DO
 				vyRealVec.Append(A.A[y, x], v)
 			END
 		END;
 		vyCG.RegisterNamed(v, name);
 		v := vyRealVec.New(0);
 		IF vertical THEN
-			FOR x := 0 TO A.h - 1 DO
+			FOR x := 0 TO SIGNED32(A.h) - 1 DO
 				vyRealVec.Append(x, v)
 			END
 		ELSE
-			FOR x := 0 TO A.w - 1 DO
+			FOR x := 0 TO SIGNED32(A.w) - 1 DO
 				vyRealVec.Append(x, v)
 			END
 		END;
