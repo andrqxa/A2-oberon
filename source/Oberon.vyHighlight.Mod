@@ -56,7 +56,7 @@ TYPE
 		selChanges: vyBase.tVector;   (* changes of the selection by the last action *)
 		oldSelection: vyBase.tVector;   (* safed old selection for restoring after interclick *)
 		selection: vyBase.tVector;
-		nrData-: SIGNED32;
+		nrData-: SIZE;
 
 		(* dynamic entries - not stored. May be modified *)
 		layer: vyPort.tLayer;
@@ -75,7 +75,7 @@ VAR
 	END New;
 
 	PROCEDURE HandleFileMsg( obj: tSelector;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;
+	VAR objsub: Objects.Object; c: SIGNED32;
 	BEGIN
 		IF msg.id = Objects.load THEN
 			vyBase.objecthandle( obj, msg );  Gadgets.ReadRef( msg.R, obj.lib, objsub );
@@ -86,12 +86,12 @@ VAR
 			IF (objsub # NIL ) & (objsub IS vyBase.tVector) THEN obj.oldSelection := objsub( vyBase.tVector ) END;
 			Gadgets.ReadRef( msg.R, obj.lib, objsub );
 			IF (objsub # NIL ) & (objsub IS vyBase.tVector) THEN obj.selection := objsub( vyBase.tVector ) END;
-			Files.ReadLInt( msg.R, obj.nrData )
+			Files.ReadLInt( msg.R, c); obj.nrData := c;
 		ELSIF msg.id = Objects.store THEN
 			vyBase.objecthandle( obj, msg );  Gadgets.WriteRef( msg.R, obj.lib, obj.sel );
 			Gadgets.WriteRef( msg.R, obj.lib, obj.selChanges );   (*! remove unneccessary entries *)
 			Gadgets.WriteRef( msg.R, obj.lib, obj.oldSelection );  Gadgets.WriteRef( msg.R, obj.lib, obj.selection );
-			Files.WriteLInt( msg.R, obj.nrData )
+			Files.WriteLInt( msg.R, SIGNED32(obj.nrData) )
 		ELSE vyBase.objecthandle( obj, msg )
 		END
 	END HandleFileMsg;
@@ -162,7 +162,7 @@ VAR
 		ASSERT ( (selector # NIL ) & (selector IS tSelector) );
 		WITH selector: tSelector DO
 			IF (selector.selection # NIL ) & (selector.selection.nrData = selector.nrData) THEN RETURN (selector.selection) END;
-			name := "Attr.selection ";  vyHostStrings.AppendInt( selector.nrData, 0, name );  selObj := GetAttribute( selector.nrData, 0, name );
+			name := "Attr.selection ";  vyHostStrings.AppendInt( SIGNED32(selector.nrData), 0, name );  selObj := GetAttribute( SIGNED32(selector.nrData), 0, name );
 			ASSERT ( selObj # NIL );
 			RETURN selObj( vyBase.tVector )
 		END
@@ -218,7 +218,7 @@ END ReturnToPicture;*)
 
 	PROCEDURE Actor( selector: tSelector;  x0, y0, xLast, yLast, xNew, yNew: Coordinate );
 	(*vs 0.0a1	md  17.08.94 *)
-	VAR x0R, y0R, xLastR, yLastR, xNewR, yNewR: Real;  i: SIGNED32;  x0O, y0O, x1O, y1O, x0N, y0N, x1N, y1N: Real;
+	VAR x0R, y0R, xLastR, yLastR, xNewR, yNewR: Real;  i: SIZE;  x0O, y0O, x1O, y1O, x0N, y0N, x1N, y1N: Real;
 		somethingChanged: BOOLEAN;  p: vyPort.Picture;
 
 		PROCEDURE GetRegularRect( lx0, ly0, lx1, ly1: Real;  VAR X0, Y0, X1, Y1: Real );
@@ -311,7 +311,7 @@ END ReturnToPicture;*)
 
 	PROCEDURE OpenSelector*( layer: vyPort.tLayer;  n: SIGNED32;  vizor: tVisualizer;  actor: tIdentifier;  VAR msg: Objects.ObjMsg );
 	(*vs 0.0a1	md  17.08.94 *)
-	VAR i: SIGNED32;  o: vyBase.Object;  selector: tSelector;
+	VAR i: SIZE;  o: vyBase.Object;  selector: tSelector;
 	BEGIN
 		(* heuristics: find highlight candidate *)
 		AdjustHighlight( layer );  selector := layer.highlight( tSelector );

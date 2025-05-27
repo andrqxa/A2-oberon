@@ -92,7 +92,7 @@ TYPE
 	END Cache;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, w, h, maxx, maxy: SIGNED32;  A, AOrig: antsArrayObjects.tINTEGERArray;  model: tModel;
+	VAR x, y, w, h, maxx, maxy: SIZE;  A, AOrig: antsArrayObjects.tINTEGERArray;  model: tModel;
 		AO: antsArrayObjects.tINTEGERObject;  Random: RandomArray;  ran: FLOAT64;  cpos: SIGNED32;  u: FLOAT64;  orig: Objects.Object;
 		checkerboard: BOOLEAN;
 		a: ARRAY 6 OF SIGNED16;

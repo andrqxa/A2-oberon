@@ -29,7 +29,7 @@ IMPORT  antsArrayObjects, antsCommands, vyBase, aM := antsMessages;
 
 PROCEDURE MakeEdges*;
 	VAR l: antsCommands.tScanList;   beta: FLOAT64;    obj, objh, objv: vyBase.Object;
-	A, hor, ver: antsArrayObjects.tINTEGERObject;  x, y: SIGNED32;
+	A, hor, ver: antsArrayObjects.tINTEGERObject;  x, y: SIZE;
 	pyx, pyxm, pymx : SIGNED16;
 BEGIN
 	l := antsCommands.ScanFromPar("from=OBJ ver=OBJ hor=OBJ threshold=FLOAT32 # make edge Arrays from Array ");
@@ -53,7 +53,7 @@ END MakeEdges;
 
 
 PROCEDURE MakeDiff*;
-	VAR l: antsCommands.tScanList;   obj, objh, objv: vyBase.Object; 	A, hor, ver: antsArrayObjects.tINTEGERObject;  x, y: SIGNED32;
+	VAR l: antsCommands.tScanList;   obj, objh, objv: vyBase.Object; 	A, hor, ver: antsArrayObjects.tINTEGERObject;  x, y: SIZE;
 
 BEGIN
 	l := antsCommands.ScanFromPar("from=OBJ ver=OBJ hor=OBJ  # make ABS(diff) Arrays from Array" );

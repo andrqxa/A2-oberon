@@ -14,7 +14,7 @@ or a Krylov based solver may help.
 *)
 
 IMPORT MatrixBase, MatrixLeastSquares, StatisticsFunctions, Util:=MatrixUtilities, Streams, Random, KernelLog, StatisticsBase,
-	StatisticsLinearRegression, MathL, MatrixPrincipalComponents;
+	StatisticsLinearRegression, MathL, Reals, MatrixPrincipalComponents, MatrixStandardSolvers;
 
 (* http://en.wikipedia.org/wiki/Linear_regression *)
 (**
@@ -219,38 +219,27 @@ END GeneralLinearModel;
 The Theil-Sen estimator is a simple robust estimation technique that determine the slope of a dataset
 as the median of the slopes of the lines through pairs of sample points.
 It has similar statistical efficiency properties to simple regression but is much less sensitive to outliers.
-Note that at current, this implementation limits the search to MIN(200, N/2) pairs for efficiency reasons, while a full algorithm may consider all pairs and is therefore O(N*N) with added sorting.
+Note that at current, this implementation can limit the number of pairs for efficiency reasons, while it may also consider all pairs, thus being therefore O(N*N) with added sorting.
 see http://en.wikipedia.org/wiki/Theil%E2%80%93Sen_estimator for  details
 **)
-PROCEDURE TheilSenEstimator*(CONST x: Vector; CONST y: Vector; VAR b, intercept: Scalar; VAR e: Vector);
-VAR slopes: Vector; i,j,j0,len:SIZE; dx, dy: Scalar;
+PROCEDURE TheilSenEstimator*(CONST x: Vector; CONST y: Vector; VAR b, intercept: Scalar; VAR e: Vector; nPairs:=200:SIZE);(*!tbd: reuse slopes*)
+VAR slopes: Vector; i,j,j0,len:SIZE; dx, dy, val: Scalar;
 BEGIN
-	(*choose sample pairs; here the extremal point pairs are used. Random pairs could also be used *)
-	len:=MIN (200, LEN(x,0) DIV 2);
+	(*choose sample pairs*)
+	len:=nPairs;
 	NEW(slopes, len);
 	i:=0; j:=0;
 	WHILE i<len DO
-	(*FOR i:=0 TO len-1 DO
-		j:=i;*)
 		j0:=j;
 		j:=random.Dice(SIGNED32(LEN(x,0)));
-		(*? possible improvement: randomize i, or choose i with large dx
-		VAR random:Random.Generator;
-		NEW(random);
-		j:=ENTIER(random.Uniform() * len );
-		*)
+		(*? possible improvement: also randomize i, or choose i with large dx *) 
 		dx:=x[j]-x[j0];
 		dy:=y[j]-y[j0];
-		(*dx:=x[LEN(x,0)-1-j]-x[j];
-		dy:=y[LEN(x,0)-1-j]-y[j];
-		IF dx#0 THEN	slopes[i]:=dy/dx END;*) (* dx=0 not yet handled properly, but has usually only  a minor impact *)
-		IF dx#0 THEN slopes[i]:=dy/dx; INC(i) END;
+		IF dx#0 THEN val:=dy/dx; slopes[i]:=val; INC(i) END;
 	END;
-	b := StatisticsBase.DestructiveMedian(slopes);
-	(*
-	StatisticsBase.QSort(slopes);
-	b:=slopes[len DIV 2]; (*choose median slope *)
-	*)
+	b := StatisticsBase.DestructiveMedian(slopes);(*choose median slope *)
+	(* StatisticsBase.QSort(slopes); b:=slopes[nPairs DIV 2]; *)(*choose slope at fraction[0 <..< nPairs] *)
+	(*	StatisticsBase.KSmallest(slopes,nPairs DIV 2)	*)
 	e:=y-b*x;
 	intercept:=SUM(e)/LEN(e,0);
 	e:=e-intercept;
@@ -317,14 +306,231 @@ BEGIN
 	Util.OutVector(y+e);
 END MultivariateTheilSen;
 
+(*solve P(t)= a e^(-bt) + c, for a,b,c 
+whereby b is the decay time constant (=1/tau), a is dependent on the location of the start time, and c is the limes of P() at infinite time *)
+(*mathematical solution contributed by Pascal Hunziker, 2023*)
+PROCEDURE ExponentialRegression*(p0,slope0,slope1:Scalar; t0,t1:Scalar; VAR a,b,c:Scalar);
+BEGIN
+	(*preconditions*)
+	ASSERT(slope0#0);
+	ASSERT(t0#t1);
+	ASSERT (slope1*slope0 > 0); (*same sign*)
+	
+	(*fundamental solution for t0=0 and t1=1 *)
+	b:= -MathL.ln(slope1/slope0);
+	
+	(*normalize coefficients for arbitrary t0 and t1*)
+	b := b/(t1-t0); (*longer interval=>smaller b*)
+	a := -slope0/b;
+	c := p0 - a;
+END ExponentialRegression;
+
+(* 
+Given vectors x[..] and y[..] having 'degree+1' samples (e.g., 3 samples for quadratic polynomial)
+y=a x^degree + ... + bx + c
+find the coefficients a...
+*)
+PROCEDURE PolynomRegression*(CONST x,y: Vector; x0:Scalar; VAR coeff:Vector; degree:=2:SIGNED64); 
+VAR 
+	A:Matrix; 
+	x1:Vector;
+	i:SIZE;
+	qr: MatrixStandardSolvers.QR; (*Cholesky will be faster, if matrices are positive definite*)
+BEGIN
+	(*preconditions*)
+	ASSERT(LEN(x,0)=LEN(y,0),200);
+	ASSERT(degree=2); (*implementation limitation*)
+	
+	NEW(A,LEN(x,0),degree+1);
+	x1:=x-x0;
+	A[..,degree]:=1;
+	FOR i:=degree-1 TO 0 BY -1 DO
+		A[..,i]:=A[..,i+1] .* x1;
+	END;
+
+	(*
+	A[..,0]:=x-x0; A[..,0]:=A[..,0] .* A[..,0];
+	A[..,1]:=x-x0;
+	A[..,2]:=1;*)
+	
+	NEW(qr,A);
+	coeff:=qr.Solve(y);
+END PolynomRegression;
+
+(* robust exponential regression: median of multiple exponential regressions that exploit one data point and 2 derivatives to compute parameters*)
+TYPE RobustExponentialRegression*= OBJECT (*tested for experimental decay, not yet for experimental growth*)
+	VAR 
+		A,B,C, invB (*, A1,B1,C1,invB1*): Vector;
+		avrgBeta*,avrgTau*, avrgLimes*, sdTau*, sdLimes*,sdBeta*, avrgSdBeta*, avrgSdTau*,avrgSdLimes*:MatrixBase.Datatype;(*optional bookkeeping*)
+		nSamples, nOutliers:SIZE;
+		random:Random.Generator;
+	
+	PROCEDURE &Init*(nSamples:SIZE);
+	BEGIN
+		SELF.nSamples:=nSamples;
+		NEW(A,nSamples);
+		NEW(B,nSamples);
+		NEW(invB,nSamples);
+		NEW(C,nSamples);
+		NEW(random);
+	END Init;
+	
+	PROCEDURE ReportVector*(CONST type:ARRAY OF CHAR):Vector;
+	VAR d:Vector;
+	BEGIN
+		NEW(d,nSamples);
+		IF type="a" THEN d:=A(*A1*)
+		ELSIF type="beta" THEN d:=B; (*B1;*)
+		ELSIF type="limes" THEN d:=C; (*C1;*)
+		ELSIF type="tau" THEN d:=1/B; (* invB1;*)
+		ELSE HALT(200)
+		END;
+		RETURN d
+	END ReportVector;
+	
+	(* P(t)= a e^(-bt) + c *)
+	(* tau= 1/b *)
+	PROCEDURE Sampling*(CONST wave,waveDerivative: Vector; minT,maxT:SIZE; VAR b,tau, c: Scalar;(* VAR quality:Real;*) getStats:=FALSE:BOOLEAN); 
+	VAR T0,T1:SIZE;
+		i,j,jMax:SIZE;
+		slope0,slope1,a0,b0,c0:Scalar;
+		weight:Scalar;
+		
+		(*PROCEDURE InRange(x,low,high:Scalar):BOOLEAN;
+		BEGIN
+			RETURN ~Reals.IsNaNL(x) & (x>=low) & (x<=high)
+		END InRange;*)
+		
+		BEGIN
+			i:=0; j:=0; nOutliers:=0;
+			jMax:=100*nSamples;
+		
+			WHILE i<nSamples DO
+				IF maxT>minT+1 THEN
+					T0:=minT + random.Dice(INTEGER(maxT+1-minT));
+					T1:=minT + random.Dice(INTEGER(maxT+1-minT));
+					slope0:=waveDerivative[T0];
+					slope1:=waveDerivative[T1];
+					IF (T0#T1)  & (slope0*slope1>0) & (ABS(T1-T0)>ABS(maxT-minT)/3) THEN
+						ExponentialRegression(wave[T0],slope0, slope1, T0, T1,a0,b0,c0);
+						IF  (c0<MIN(wave)) THEN (*!tbd: define criteria that to not result in wildly wrong results*)
+							A[i]:=a0; 
+							B[i]:=b0; 
+							(*invB[i]:=1/b0;*)
+							C[i]:=c0;
+							INC(i);
+						END;
+					END;
+				END;
+				INC(j); IF j>jMax THEN i:=nSamples END; (*prevent infinite loop*)
+			END;
+			IF j<jMax THEN (*robust statistics*)
+				
+				(*invB:=1 / B; 
+				tau:=StatisticsBase.DestructiveMedian(invB);*)
+				
+				b:=StatisticsBase.DestructiveMedian(B);
+				tau:=1/b;
+				c:=StatisticsBase.DestructiveMedian(C);
+				
+				(*optional bookkeeping, e.g. for use in data streams*)
+				IF getStats & ~Reals.IsNaNL(b) & (b>=0) & ~Reals.IsNaNL(c) THEN
+					sdBeta:=StatisticsBase.StandardDeviation(B); IF (avrgSdBeta=0) THEN avrgSdBeta:=sdBeta ELSE avrgSdBeta:=0.9*avrgSdBeta+0.1*sdBeta END;
+					invB:=1/B;
+					sdTau:=StatisticsBase.StandardDeviation(invB); IF (avrgSdTau=0) THEN avrgSdTau:=sdTau ELSE avrgSdTau:=0.9*avrgSdTau+0.1*sdTau END;
+					sdLimes:=StatisticsBase.StandardDeviation(C); IF (avrgSdLimes=0) THEN avrgSdLimes:=sdLimes ELSE avrgSdLimes:=0.9*avrgSdLimes+0.1*sdLimes END;
+					
+					IF (sdBeta<avrgSdBeta) & (sdLimes<avrgSdLimes) THEN weight:=0.1 ELSE weight:=0.02 END;
+					IF avrgBeta=0 	THEN avrgBeta:=b 		ELSE avrgBeta :=(1-weight)*avrgBeta+ weight*b END;
+					IF avrgTau=0 	THEN avrgTau:=tau 		ELSE avrgTau :=(1-weight)*avrgTau+ weight*tau END;
+					IF avrgLimes=0 THEN avrgLimes:=c 	ELSE avrgLimes:=(1-weight)*avrgLimes+ weight*c END;
+				END;
+			END;
+		END Sampling;
+		
+	END RobustExponentialRegression;
+	
+	(* 
+		robust spline estimate, using local polynomial approximation (oversampled) combined with  median of resulting parameters ..
+		output node locations are evenly distributed along data array indices (not necessarily evenly distributed in x axis !)
+	*)
+	TYPE RobustSplineRegression* = OBJECT
+		VAR 
+			qr: MatrixStandardSolvers.QR; (*Cholesky will be faster, if matrices are positive definite*)
+			A:Matrix; 
+			coeffsM:Matrix;
+			x1, xsamples,ysamples:Vector;
+			degree:SIZE;
+			
+		PROCEDURE &Init*(CONST x,y: Vector; nCoeffs:SIZE; VAR Coeffs:Matrix; degree:=2, oversampling:=10:SIZE);
+		VAR 
+			step:FLOAT64;
+			i,j,k,t,m,ind, stepN:SIZE;
+			PROCEDURE NoDuplicates():BOOLEAN;
+			BEGIN
+				FOR k:=0 TO i DO
+					IF x[ind]=xsamples[k] THEN RETURN FALSE END;
+				END;
+				RETURN TRUE
+			END NoDuplicates;
+		BEGIN
+			ASSERT(nCoeffs>1,200);
+			ASSERT(degree<4,201); (*implementation limitation*)
+			
+			SELF.degree:=degree;
+			NEW(xsamples,degree+1);
+			NEW(ysamples,degree+1);
+			
+			step:=(x[LEN(x,0)-1]-x[0]) / (nCoeffs-1);
+			stepN:=LEN(x,0) DIV (nCoeffs-1);
+			IF (LEN(Coeffs,0)#nCoeffs) OR (LEN(Coeffs,1)#(degree+1)) THEN NEW(Coeffs,nCoeffs,degree+1) END;
+			IF (LEN(coeffsM,0)#oversampling) OR (LEN(coeffsM,1)#(degree+1)) THEN NEW(coeffsM,oversampling,degree+1) END;
+			
+			FOR t:=0 TO nCoeffs-1 DO
+				FOR m:=0 TO oversampling-1 DO
+					FOR i:=0 TO degree DO xsamples[i]:=-i END; (*prepare for noDuplicate test*)
+					FOR i:=0 TO degree DO
+						j:=t*stepN;
+						REPEAT ind:=j-stepN DIV 2 + random.Dice(SIGNED32(stepN)+2) UNTIL (ind>=0)&(ind<LEN(x,0)) & NoDuplicates();
+						xsamples[i]:=x[ind]; ysamples[i]:=y[ind];
+					END;
+					PolynomRegression(xsamples,ysamples,x[j],coeffsM[m,..]);
+				END;
+				(*Util.Out(coeffsM);*)
+				FOR i:=0 TO degree DO
+					Coeffs[t,i]:=StatisticsBase.DestructiveMedian(coeffsM[..,i])
+				END;
+			END;
+			(*Util.Out(Coeffs);*)
+		END Init;
+		
+		PROCEDURE PolynomRegression*(CONST x,y:Vector; x0:Scalar; VAR coeff:Vector);
+			VAR 
+				i:SIZE;
+			BEGIN
+				(*preconditions*)
+				ASSERT(LEN(x,0)=LEN(y,0),200);
+				
+				IF (LEN(A,0)#LEN(x,0)) OR (LEN(A,1)#(degree+1)) THEN NEW(A,LEN(x,0),degree+1) END;
+				x1:=x-x0;
+				
+				A[..,degree]:=1;(*[[x^n,...x,1],[],..,[]]*)
+				FOR i:=degree-1 TO 0 BY -1 DO
+					A[..,i]:=A[..,i+1] .* x1;
+				END;
+				IF qr=NIL THEN NEW(qr,A) ELSE qr.Init(A) END;
+				coeff:=qr.Solve(y);
+			END PolynomRegression;			
+		END RobustSplineRegression;
+	
+
 
 	PROCEDURE Test*;
-VAR X: Matrix; x, y, B,e: Vector; b, intercept: Scalar;
+VAR X: Matrix; x, y, B,e: Vector; b,intercept:Scalar;
 BEGIN
 	y:=[1.02,2.1,2.91, 4.105, 5.0, 5.93,7.11, 8.03, 9.02, 10.01, 11.003]+2; (*note the intercept*)
 
 	w.String("Linear Regression with intercept"); w.Ln; w.Update;
-	(* X:=[[1.0,1.1,1.0],[1.0,1.9,2.1],[1,2.8, 2.9],[1,4.1,3.9],[1,5.3, 5.1],[1,5.8, 6]]; *)
 	X:=[[1.0,1.1,1.1],
 		[1.0,1.9,2],
 		[1,2.8,3.1],
@@ -362,19 +568,18 @@ BEGIN
 	w.FloatFix(e+*e, 4, 10, 0); w.Ln; w.Ln; w.Update;
 	(*
 	w.String("Univariate Robust Regression with intercept"); w.Ln; w.Update;
-	X:=[[1.1,1.1],
-		[1.9,2],
-		[2.8,3.1],
-		[4.1, 3.9],
-		[5.3,5],
-		[5.8,6],
-		[7,7.1],
-		[7.9,8],
-		[9,8.9],
-		[10.1,10],
-		[11,11.1]
-		];
-	TheilSenEstimator(X[0],y,b,intercept,e);
+	x:=[1.1,
+		1.9,
+		2.8,
+		4.1,
+		5.3,
+		5.8,
+		7,
+		7.9,
+		9,
+		10.1,
+		11];
+	TheilSenEstimator(x,y,b,intercept,e);
 	Util.OutVector(B);
 	Util.OutVector(e);
 	w.FloatFix(e+*e, 4, 10, 0); w.Ln; w.Ln; w.Update;
@@ -395,6 +600,82 @@ BEGIN
 	 Util.OutVector(x);
 END TestSort;
 
+PROCEDURE TestExponential*;
+CONST 
+	alpha=1;
+	beta=0.1;
+	gamma=1.0;
+VAR wave,waveDeriv: Vector;
+	t:SIZE; 
+	b,tau,c:Scalar;
+	expRegression:RobustExponentialRegression;
+BEGIN
+	NEW(wave,10);
+	NEW(waveDeriv,10);
+	FOR t:=0 TO LEN(wave,0)-1 DO
+		wave[t]:=alpha*MathL.exp(-beta*t)+gamma;
+	END;
+	FOR t:=1 TO LEN(waveDeriv,0)-2 DO
+		waveDeriv[t]:=(wave[t+1]-wave[t-1])/2;
+	END;
+	NEW(expRegression,20);
+	expRegression.Sampling(wave,waveDeriv,1,8,b,tau,c);
+	ASSERT(ABS(b-beta) < beta/10);
+	ASSERT(ABS(c-gamma)< gamma/10);
+END TestExponential;
+
+PROCEDURE TestSpline*;
+CONST n=30;
+VAR x,y,a,b, c: Vector;
+	Coeffs:Matrix;
+	t:SIZE; 
+	sr:RobustSplineRegression;
+BEGIN
+	NEW(x,n); 
+	NEW(y,n);
+	NEW(a,n);
+	NEW(b,n);
+	NEW(c,n);
+	
+	FOR t:=0 TO LEN(x,0)-1 DO
+		x[t]:=t;
+		y[t]:=MathL.sin(t/2);
+	END;
+	Util.OutVector(x);
+	Util.OutVector(y);
+	
+	NEW(sr, x,y, 10, Coeffs,3);
+	Util.Out(Coeffs);
+END TestSpline;
+
+PROCEDURE TestPolynom*;
+CONST n=20;
+VAR x,y,coeff,a,b, c: Vector;
+	t:SIZE; 
+BEGIN
+	NEW(x,n); 
+	NEW(y,n);
+	NEW(a,n);
+	NEW(b,n);
+	NEW(c,n);
+	
+	FOR t:=0 TO LEN(x,0)-1 DO
+		x[t]:=t;
+		y[t]:=MathL.sin(t);
+	END;
+	Util.OutVector(y);
+	FOR t:=1 TO LEN(x,0)-2 DO
+		PolynomRegression(x[t-1..t+1],y[t-1..t+1],x[t],coeff);
+		a[t]:=coeff[0];
+		b[t]:=coeff[1];
+		c[t]:=coeff[2];
+	END;
+	Util.OutVector(a); 
+	Util.OutVector(b); 
+	Util.OutVector(c); 
+END TestPolynom;
+
+
 BEGIN
 	NEW(random);
 	Streams.OpenWriter(w, KernelLog.Send);
@@ -405,6 +686,8 @@ END StatisticsRobustRegression.
 
 StatisticsRobustRegression.Test ~
 StatisticsRobustRegression.TestSort ~
+StatisticsRobustRegression.TestExponential ~
+StatisticsRobustRegression.TestSpline ~
+StatisticsRobustRegression.TestPolynom ~
 
-
-SystemTools.FreeDownTo StatisticsRobustRegression ~
+System.FreeDownTo StatisticsRobustRegression ~

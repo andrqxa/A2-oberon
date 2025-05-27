@@ -132,7 +132,7 @@ TYPE
 	END Handler;
 
 	PROCEDURE Compare( A1, A2: antsArrayObjects.tINTEGERObject ): BOOLEAN;
-	VAR y, x: SIGNED32;
+	VAR y, x: SIZE;
 	BEGIN
 		FOR y := 0 TO A1.h - 1 DO
 			FOR x := 0 TO A1.w - 1 DO

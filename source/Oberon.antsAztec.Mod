@@ -69,16 +69,16 @@ TYPE
 		model := s.par( tModel );  AO := s.A( antsArrayObjects.tINTEGERObject );
 		copy := antsArrayObjects.NewINTEGERArray( AO.w, AO.h );
 
-		FOR y := 0 TO SHORT( AO.h - 1 ) DO
-			FOR x := 0 TO SHORT( AO.w - 1 ) DO copy[y, x] := movestep( AO, y, x ) END
+		FOR y := 0 TO SIGNED16( AO.h - 1 ) DO
+			FOR x := 0 TO SIGNED16( AO.w - 1 ) DO copy[y, x] := movestep( AO, y, x ) END
 		END;
 
-		FOR y := 0 TO SHORT( AO.h - 1 ) DO
-			FOR x := 0 TO SHORT( AO.w - 1 ) DO AO.A[y, x] := copy[y, x] END
+		FOR y := 0 TO SIGNED16( AO.h - 1 ) DO
+			FOR x := 0 TO SIGNED16( AO.w - 1 ) DO AO.A[y, x] := copy[y, x] END
 		END;
 
-		FOR y := 0 TO SHORT( AO.h - 1 ) DO
-			FOR x := 0 TO SHORT( AO.w - 1 ) DO
+		FOR y := 0 TO SIGNED16( AO.h - 1 ) DO
+			FOR x := 0 TO SIGNED16( AO.w - 1 ) DO
 				IF AO.A[y, x] = 5 THEN
 					IF vyRandom.Uniform() > model.horprob THEN
 						AO.A[y, x] := 4;  AO.A[y, (x + 1) MOD AO.w] := 4;  AO.A[(y + 1) MOD AO.h, x] := 2;
@@ -93,7 +93,7 @@ TYPE
 	END OneSweep;
 
 	PROCEDURE Uniform( s: antsKernel.Kernel );
-	VAR x, y: SIGNED32;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  O: antsArrayObjects.tObject;
+	VAR x, y: SIZE;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  O: antsArrayObjects.tObject;
 	BEGIN
 		model := s.par( tModel );  AO := s.A( antsArrayObjects.tINTEGERObject );  O:= AO; O := 0;
 

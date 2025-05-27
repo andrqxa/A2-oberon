@@ -483,7 +483,7 @@ END SetGen;
 		TF( Gadgets.Frame ).W := 130;  TF( Gadgets.Frame ).H := 20;  Texts.WriteObj( w, TF );  Texts.Write( w, 09X );
 		Texts.WriteString( w, gen );  Texts.Write( w, 09X );  t := Types.TypeOf( o );
 		IF t # NIL THEN Texts.WriteString( w, t.mod.name );  Texts.WriteString( w, "." );  Texts.WriteString( w, t.name );  END;
-		Texts.Write( w, 09X );  Texts.WriteInt( w, id, 5 );  Texts.Write( w, 09X );  Texts.WriteInt( w, ADDRESSOF( o.lib^ ), 5 );
+		Texts.Write( w, 09X );  Texts.WriteInt( w, id, 5 );  Texts.Write( w, 09X );  Texts.WriteInt( w, SIGNED32(ADDRESSOF( o.lib^ )), 5 );
 		Texts.Write( w, 09X );  Texts.WriteString( w, timestamp );
 
 		Texts.WriteLn( w )

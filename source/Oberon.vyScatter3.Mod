@@ -58,7 +58,7 @@ VAR
 	END Copy;
 
 	PROCEDURE Recall( scatter: tLayer );
-	VAR i: SIGNED32;  nrData: SIGNED32;  sel: vyBase.tVector;  error: SIGNED16;  xx, yy: Coordinate;  lastx, lasty: Coordinate;  b, lastb: BOOLEAN;  boxed: BOOLEAN;
+	VAR i: SIZE;  nrData: SIZE;  sel: vyBase.tVector;  error: SIGNED16;  xx, yy: Coordinate;  lastx, lasty: Coordinate;  b, lastb: BOOLEAN;  boxed: BOOLEAN;
 	BEGIN
 		lastx := MAX( Coordinate );  nrData := scatter.x.nrData;
 		IF scatter.highlight = NIL THEN vyHighlight.AdjustHighlight( scatter ) END;
@@ -161,7 +161,7 @@ VAR
 	PROCEDURE Actor( layer: vyPort.tLayer;  sel: vyBase.tVector;  x0O, y0O, x1O, y1O, x0N, y0N, x1N, y1N: Real;
 								VAR somethingChanged: BOOLEAN );
 	(*vs 0.0a1	md  16.08.94 *)
-	VAR scatter: tLayer;  error: SIGNED16;  nrData, i: SIGNED32;  new: BOOLEAN;  X, Y, Z, vx, vy, vz: Real;
+	VAR scatter: tLayer;  error: SIGNED16;  nrData, i: SIZE;  new: BOOLEAN;  X, Y, Z, vx, vy, vz: Real;
 
 		PROCEDURE PointInRect( x, y, x0, y0, x1, y1: Real ): BOOLEAN;
 		BEGIN
@@ -184,7 +184,7 @@ VAR
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
 	VAR selector: vyHighlight.tSelector;
 	BEGIN
-		vyHighlight.OpenSelector( layer, layer.x.nrData, Vizor, Actor, event );
+		vyHighlight.OpenSelector( layer, SIGNED32(layer.x.nrData), Vizor, Actor, event );
 		selector := layer.highlight( vyHighlight.tSelector );  selector.do( selector, event );  Recall( layer );
 		vyBase.Update( layer )
 	END Select;
@@ -193,7 +193,7 @@ VAR
 	(*? should be supported as the selections with an abstract identifier *)
 	(*vs 0.0a1 *)  (* md  04.06.95 *)
 	CONST toleranz = 2;
-	VAR found, i, nrData: SIGNED32;  r: Real;  error: SIGNED16;  lx, ly, x0, y0: Coordinate;  id, val: vyName.tNameArray;
+	VAR found, i, nrData: SIZE;  r: Real;  error: SIGNED16;  lx, ly, x0, y0: Coordinate;  id, val: vyName.tNameArray;
 	BEGIN
 		found := -1;  nrData := scatter.x.nrData;  id := "";
 		WHILE event.gesture = vyEvents.EvtIdent DO
@@ -240,7 +240,7 @@ VAR
 
 	PROCEDURE Consume( o: tLayer;  msg: Display.ConsumeMsg );
 	VAR v, w, z: vyBase.tVector;  minX, maxX, minY, maxY, minZ, maxZ: Real;  data: Objects.Object;
-		c: vyLayers3d.tCoordinate3d;  pict: vyPort.Picture;  nans: SIGNED32;
+		c: vyLayers3d.tCoordinate3d;  pict: vyPort.Picture;  nans: SIZE;
 
 	BEGIN
 		pict := msg.dlink( vyPort.Picture );  data := msg.obj;  v := vyBase.GetVFromObj( data );
@@ -379,7 +379,7 @@ VAR
 
 	PROCEDURE ShowP*;
 	VAR data: Objects.Object;  F: tLayer;  c: vyLayers3d.tCoordinate3d;  pict: vyPort.Picture;
-		minX, maxX, minY, maxY, minZ, maxZ: Real;  nans: SIGNED32;
+		minX, maxX, minY, maxY, minZ, maxZ: Real;  nans: SIZE;
 	BEGIN
 		data := vyBase.NextParObj();
 		WHILE (data # NIL ) & (vyBase.parameterCount > 1) DO
@@ -392,7 +392,7 @@ VAR
 	END ShowP;
 
 	PROCEDURE ShowL*( list: vyLinks.Link );
-	VAR c: vyLayers3d.tCoordinate3d;  pict: vyPort.Picture;  minX, maxX, minY, maxY, minZ, maxZ: Real;  nans: SIGNED32;  i: SIGNED16;
+	VAR c: vyLayers3d.tCoordinate3d;  pict: vyPort.Picture;  minX, maxX, minY, maxY, minZ, maxZ: Real;  nans: SIZE;  i: SIGNED16;
 	BEGIN
 		WHILE list # NIL DO New;
 
@@ -409,7 +409,7 @@ VAR
 	END ShowL;
 
 	PROCEDURE ShowO*( x, y, z: Objects.Object );
-	VAR c: vyLayers3d.tCoordinate3d;  pict: vyPort.Picture;  minX, maxX, minY, maxY, minZ, maxZ: Real;  nans: SIGNED32;
+	VAR c: vyLayers3d.tCoordinate3d;  pict: vyPort.Picture;  minX, maxX, minY, maxY, minZ, maxZ: Real;  nans: SIZE;
 	BEGIN
 		New;  OpenO( newlayer, x, y, z );  vyTypes.VGetMinMax( newlayer.x, minX, maxX, nans );
 		vyTypes.VGetMinMax( newlayer.y, minY, maxY, nans );  vyTypes.VGetMinMax( newlayer.z, minZ, maxZ, nans );  NEW( c );

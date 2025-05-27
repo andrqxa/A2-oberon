@@ -94,23 +94,23 @@ TYPE
 
 	PROCEDURE ArrayHandleAttribute( VAR M: Objects.AttrMsg;  prefix: ARRAY OF CHAR;  VAR array: ARRAY OF FLOAT64 ): BOOLEAN;
 	VAR cur: ARRAY 64 OF CHAR;
-		i: SIGNED32;  len: SIGNED32;
+		i: SIZE;  len: SIZE;
 	BEGIN
 		len := LEN( array );
 		IF M.id = Objects.enum THEN
 			FOR i := 0 TO len - 1 DO
-				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( i, 1, cur );  vyHostStrings.Append( cur, "]" );
+				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( SIGNED32(i), 1, cur );  vyHostStrings.Append( cur, "]" );
 				M.Enum( cur )
 			END;
 			RETURN TRUE
 		ELSIF M.id = Objects.get THEN
 			FOR i := 0 TO len - 1 DO
-				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( i, 1, cur );  vyHostStrings.Append( cur, "]" );
+				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( SIGNED32(i), 1, cur );  vyHostStrings.Append( cur, "]" );
 				IF vyHostStrings.Equal( M.name, cur ) THEN M.y := array[i];  M.class := Objects.LongReal;  M.res := 0;  RETURN TRUE END
 			END
 		ELSIF M.id = Objects.set THEN
 			FOR i := 0 TO len - 1 DO
-				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( i, 1, cur );  vyHostStrings.Append( cur, "]" );
+				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( SIGNED32(i), 1, cur );  vyHostStrings.Append( cur, "]" );
 				IF vyHostStrings.Equal( M.name, cur ) THEN
 					IF M.class = Objects.LongReal THEN array[i] := M.y;  M.res := 0;  RETURN TRUE
 					ELSIF M.class = Objects.Real THEN array[i] := M.x;  M.res := 0;  RETURN TRUE

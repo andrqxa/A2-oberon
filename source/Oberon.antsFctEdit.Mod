@@ -106,7 +106,7 @@ VAR
 
 			xr := editor.xr;  dx := editor.dx;  count := ENTIER( (editor.wr + editor.dx / 2) / editor.dx );
 
-			count := LEN( editor.fcache ) - 1;
+			count := SIGNED32(LEN( editor.fcache )) - 1;
 
 			vyGraphBase.MoveTo2d( xr, editor.fcache[i] );
 			WHILE (i < count) DO

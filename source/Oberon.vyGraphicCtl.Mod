@@ -115,7 +115,7 @@ BEGIN NEW(s);  vyParser.OpenParScanner(s);
 END SetWidth;
 
 PROCEDURE SetPattern*;
-	VAR s: vyParser.Scanner;   layer: vyPort.tLayer;   name, pattern: ARRAY 32 OF CHAR;  pat: SIGNED32;
+	VAR s: vyParser.Scanner;   layer: vyPort.tLayer;   name, pattern: ARRAY 32 OF CHAR;  pat: Display.Pattern;
 BEGIN
 	NEW(s);  vyParser.OpenParScanner(s);
 

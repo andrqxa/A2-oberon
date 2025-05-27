@@ -36,12 +36,12 @@ TYPE
 		Aorig*: antsArrayObjects.tINTEGERObject;
 		Eh*, Ev*: antsArrayObjects.tINTEGERObject;   (* edges hor and ver *)
 		V*: antsArrayObjects.tINTEGERObject;   (* vertices *)
-		w*, h*: SIGNED32
+		w*, h*: SIZE
 	END;
 
 	tArray* = antsArrayObjects.tObject;
 
-	Operation* = PROCEDURE ( F: tField;  y, x: SIGNED32 );
+	Operation* = PROCEDURE ( F: tField;  y, x: SIZE );
 
 	(*
 	Coords: * Pixel, |- Edge,+ Vertice
@@ -114,7 +114,7 @@ TYPE
 		antsArrayObjects.UniformO( F.V )
 	END DoUniform;
 
-	PROCEDURE EGetENeighboursV*( F: tField;  y, x: SIGNED32;  VAR e, p1, p2: SIGNED16 );
+	PROCEDURE EGetENeighboursV*( F: tField;  y, x: SIZE;  VAR e, p1, p2: SIGNED16 );
 	BEGIN
 		(*
 	(*
@@ -132,13 +132,13 @@ TYPE
 		e := F.Ev.A[y, x];  p1 := F.A.A[y, x];  p2 := F.A.A[y, (x - 1) MOD F.w]
 	END EGetENeighboursV;
 
-	PROCEDURE EGetENeighboursH*( F: tField;  y, x: SIGNED32;  VAR e, p1, p2: SIGNED16 );
+	PROCEDURE EGetENeighboursH*( F: tField;  y, x: SIZE;  VAR e, p1, p2: SIGNED16 );
 	BEGIN
 		e := F.Eh.A[y, x];  p1 := F.A.A[y, x];  p2 := F.A.A[(y - 1) MOD F.h, x]
 	END EGetENeighboursH;
 
-	PROCEDURE EGetPNeighbours*( F: tField;  y, x: SIGNED32;  VAR p, p1, p2, p3, p4, e1, e2, e3, e4: SIGNED16 );
-	VAR w, h: SIGNED32;
+	PROCEDURE EGetPNeighbours*( F: tField;  y, x: SIZE;  VAR p, p1, p2, p3, p4, e1, e2, e3, e4: SIGNED16 );
+	VAR w, h: SIZE;
 		(*
 	0    0    1     1	2     2
 	2  	+    -    +     -
@@ -154,7 +154,7 @@ TYPE
 	END EGetPNeighbours;
 
 	PROCEDURE ESetPNeighbours*( F: tField;  y, x: SIGNED32;  p, p1, p2, p3, p4, e1, e2, e3, e4: SIGNED16 );
-	VAR w, h: SIGNED32;
+	VAR w, h: SIZE;
 	BEGIN
 		w := F.w;  h := F.h;  F.A.A[y, x] := p;  F.A.A[y, (x - 1) MOD w] := p1;  F.A.A[y, (x + 1) MOD w] := p2;
 		F.A.A[(y - 1) MOD h, x] := p3;  F.A.A[(y + 1) MOD h, x] := p4;  F.Ev.A[y, x] := e1;  F.Ev.A[y, (x + 1) MOD w] := e2;
@@ -173,31 +173,31 @@ TYPE
 		END
 	END EEdgeBetween;
 
-	PROCEDURE EVGetENeighboursH*( F: tField;  y, x: SIGNED32;  VAR e, p1, p2, v1, v2: SIGNED16 );
+	PROCEDURE EVGetENeighboursH*( F: tField;  y, x: SIZE;  VAR e, p1, p2, v1, v2: SIGNED16 );
 	BEGIN
 		EGetENeighboursH( F, y, x, e, p1, p2 );  v1 := F.V.A[y, x];  v2 := F.V.A[y, (x + 1) MOD F.w]
 	END EVGetENeighboursH;
 
-	PROCEDURE EVGetENeighboursV*( F: tField;  y, x: SIGNED32;  VAR e, p1, p2, v1, v2: SIGNED16 );
+	PROCEDURE EVGetENeighboursV*( F: tField;  y, x: SIZE;  VAR e, p1, p2, v1, v2: SIGNED16 );
 	BEGIN
 		EGetENeighboursH( F, y, x, e, p1, p2 );  v1 := F.V.A[y, x];  v2 := F.V.A[(y + 1) MOD F.h, x]
 	END EVGetENeighboursV;
 
-	PROCEDURE EVGetVNeighbours*( F: tField;  y, x: SIGNED32;  VAR v, e1, e2, e3, e4: SIGNED16 );
+	PROCEDURE EVGetVNeighbours*( F: tField;  y, x: SIZE;  VAR v, e1, e2, e3, e4: SIGNED16 );
 	BEGIN
 		v := F.V.A[y, x];  e1 := F.Eh.A[y, (x - 1) MOD F.w];  e2 := F.Eh.A[y, x];  e3 := F.Ev.A[(y - 1) MOD F.h, x];  e4 := F.Ev.A[y, x]
 	END EVGetVNeighbours;
 
-	PROCEDURE E2GetENeighboursH*( F: tField;  y, x: SIGNED32;  VAR e, e1, e2, e3, e4, e5, e6, e7, e8: SIGNED16 );
-	VAR w, h: SIGNED32;
+	PROCEDURE E2GetENeighboursH*( F: tField;  y, x: SIZE;  VAR e, e1, e2, e3, e4, e5, e6, e7, e8: SIGNED16 );
+	VAR w, h: SIZE;
 	BEGIN
 		w := F.w;  h := F.h;  e := F.Eh.A[y, x];  e1 := F.Eh.A[y, (x - 1) MOD w];  e2 := F.Eh.A[y, (x + 1) MOD w];
 		e3 := F.Ev.A[(y - 1) MOD h, x];  e4 := F.Ev.A[y, x];  e5 := F.Ev.A[(y - 1) MOD h, (x + 1) MOD w];
 		e6 := F.Ev.A[y, (x + 1) MOD w];  e7 := F.Eh.A[(y - 1) MOD h, x];  e8 := F.Eh.A[(y + 1) MOD h, x]
 	END E2GetENeighboursH;
 
-	PROCEDURE E2GetENeighboursV*( F: tField;  y, x: SIGNED32;  VAR e, e1, e2, e3, e4, e5, e6, e7, e8: SIGNED16 );
-	VAR w, h: SIGNED32;
+	PROCEDURE E2GetENeighboursV*( F: tField;  y, x: SIZE;  VAR e, e1, e2, e3, e4, e5, e6, e7, e8: SIGNED16 );
+	VAR w, h: SIZE;
 	BEGIN
 		w := F.w;  h := F.h;  e := F.Ev.A[y, x];  e1 := F.Ev.A[(y - 1) MOD h, x];  e2 := F.Ev.A[(y + 1) MOD h, x];
 		e3 := F.Eh.A[y, (x - 1) MOD w];  e4 := F.Eh.A[y, x];  e5 := F.Eh.A[(y + 1) MOD h, (x - 1) MOD w];
@@ -205,7 +205,7 @@ TYPE
 	END E2GetENeighboursV;
 
 	PROCEDURE ForAllDo*( F: tField;  O: Operation );
-	VAR x, y: SIGNED32;
+	VAR x, y: SIZE;
 	BEGIN
 		FOR y := 0 TO F.h - 1 DO
 			FOR x := 0 TO F.w - 1 DO O( F, y, x ) END
@@ -219,7 +219,7 @@ TYPE
 	END Gen;
 
 	PROCEDURE HandleFileMsg( obj: tField;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: SIGNED16;
+	VAR objsub: Objects.Object;  version: SIGNED16;c: SIGNED32;
 
 	BEGIN
 		IF msg.id = Objects.load THEN
@@ -233,12 +233,12 @@ TYPE
 			IF objsub # NIL THEN obj.V := objsub( antsArrayObjects.tINTEGERObject ) END;
 			Gadgets.ReadRef( msg.R, obj.lib, objsub );
 			IF objsub # NIL THEN obj.Aorig := objsub( antsArrayObjects.tINTEGERObject ) END;
-			Files.ReadLInt( msg.R, obj.w );  Files.ReadLInt( msg.R, obj.h )
+			Files.ReadLInt( msg.R, c); obj.w := c;  Files.ReadLInt( msg.R, c); obj.h := c;
 		ELSIF msg.id = Objects.store THEN
 			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Gadgets.WriteRef( msg.R, obj.lib, obj.A );
 			Gadgets.WriteRef( msg.R, obj.lib, obj.Ev );  Gadgets.WriteRef( msg.R, obj.lib, obj.Eh );
 			Gadgets.WriteRef( msg.R, obj.lib, obj.V );  Gadgets.WriteRef( msg.R, obj.lib, obj.Aorig );
-			Files.WriteLInt( msg.R, obj.w );  Files.WriteLInt( msg.R, obj.h )
+			Files.WriteLInt( msg.R, SIGNED32(obj.w) );  Files.WriteLInt( msg.R, SIGNED32(obj.h) )
 		ELSE vyBase.objecthandle( obj, msg )
 		END
 	END HandleFileMsg;
@@ -248,8 +248,8 @@ TYPE
 		IF M.id = Objects.enum THEN M.Enum( "Gen" );  M.Enum( "w" );  M.Enum( "h" );  vyBase.objecthandle( obj, M )
 		ELSIF M.id = Objects.get THEN
 			IF M.name = "Gen" THEN COPY( 'antsPEV.Gen', M.s );  M.class := Objects.String;  M.res := 0
-			ELSIF M.name = "w" THEN M.i := obj.w;  M.class := Objects.Int;  M.res := 0
-			ELSIF M.name = "h" THEN M.i := obj.h;  M.class := Objects.Int;  M.res := 0
+			ELSIF M.name = "w" THEN M.i := SIGNED32(obj.w);  M.class := Objects.Int;  M.res := 0
+			ELSIF M.name = "h" THEN M.i := SIGNED32(obj.h);  M.class := Objects.Int;  M.res := 0
 			ELSE vyBase.objecthandle( obj, M )
 			END
 		ELSIF M.id = Objects.set THEN vyBase.objecthandle( obj, M )

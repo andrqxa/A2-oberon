@@ -242,3 +242,4 @@ WIN64 -- 64-bit windows a2
 		FSTools.CopyFiles -o oberon => ../../LinuxARM/oberon ~
 	~ 
 
+Release.Build  --only="OberonVoyager OberonAnts" Linux64All ~ 

@@ -38,7 +38,7 @@ TYPE
 	tObjectDesc* = RECORD (vyBase.ObjDesc)
 		synced-: BOOLEAN;
 		pict*: Pictures.Picture;
-		w*, h*, depth*: antsObjects.Index;   (* cache *)
+		w*, h*: SIZE; depth*: antsObjects.Index;   (* cache *)
 		A*: antsArrayObjects.tINTEGERObject;
 		trans*: antsObjects.PAConsistTrafoProc
 	END;
@@ -59,8 +59,8 @@ TYPE
 			M.Enum( "Gen" );  M.Enum( "w" );  M.Enum( "h" );  M.Enum( "depth" );  M.Enum( "synced" );  M.Enum( "ARRAY" );  vyBase.objecthandle( o, M )
 		ELSIF M.id = Objects.get THEN
 			IF M.name = "Gen" THEN COPY( 'antsArrayPictures.Gen', M.s );  M.class := Objects.String;  M.res := 0
-			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := o.w;  M.res := 0
-			ELSIF M.name = "h" THEN M.class := Objects.Int;  M.i := o.h;  M.res := 0
+			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := SIGNED32(o.w);  M.res := 0
+			ELSIF M.name = "h" THEN M.class := Objects.Int;  M.i := SIGNED32(o.h);  M.res := 0
 			ELSIF M.name = "depth" THEN M.class := Objects.Int;  M.i := o.depth;  M.res := 0
 			ELSIF M.name = "synced" THEN M.class := Objects.Bool;  M.b := o.synced;  M.res := 0
 			ELSIF M.name = "ARRAY" THEN
@@ -98,8 +98,8 @@ TYPE
 			Gadgets.ReadRef( msg.R, obj.lib, objsub );
 			IF (objsub # NIL ) & (objsub IS antsArrayObjects.tObject) THEN obj.A := objsub( antsArrayObjects.tINTEGERObject ) END
 		ELSIF msg.id = Objects.store THEN
-			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, obj.w );
-			Files.WriteLInt( msg.R, obj.h );  Files.WriteLInt( msg.R, obj.depth );  Gadgets.WriteRef( msg.R, obj.lib, obj.pict );
+			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, SIGNED32(obj.w) );
+			Files.WriteLInt( msg.R, SIGNED32(obj.h) );  Files.WriteLInt( msg.R, obj.depth );  Gadgets.WriteRef( msg.R, obj.lib, obj.pict );
 			Gadgets.WriteRef( msg.R, obj.lib, obj.A )
 		ELSE vyBase.objecthandle( obj, msg )
 		END
@@ -109,7 +109,7 @@ TYPE
 	VAR pict: Pictures.Picture;  col: SIGNED16;  r, g, b: SIGNED16;
 	BEGIN
 		IF (obj.w # obj.A.w) OR (obj.h # obj.A.h) THEN
-			obj.w := obj.A.w;  obj.h := obj.A.h;  pict := obj.pict;  Pictures.Create( obj.pict, SHORT( obj.w ), SHORT( obj.h ), 8 );
+			obj.w := obj.A.w;  obj.h := obj.A.h;  pict := obj.pict;  Pictures.Create( obj.pict, SIGNED16( obj.w ), SIGNED16( obj.h ), 8 );
 			FOR col := 0 TO 255 DO Pictures.GetColor( pict, col, r, g, b );  Pictures.SetColor( obj.pict, col, r, g, b ) END
 		END;
 		IF (obj.depth # obj.A.depth) THEN
@@ -219,7 +219,7 @@ TYPE
 	BEGIN
 		obj.A := A;  obj.w := A.w;  obj.h := A.h;  obj.depth := A.depth;
 
-		NEW( obj.pict );  Pictures.Create( obj.pict, SHORT( obj.w ), SHORT( obj.h ), 8 );
+		NEW( obj.pict );  Pictures.Create( obj.pict, SIGNED16( obj.w ), SIGNED16( obj.h ), 8 );
 		FOR i := 0 TO obj.depth - 1 DO r := SHORT( (i) * 255 DIV (obj.depth - 1) );  g := r;  b := r;  Pictures.SetColor( obj.pict, SHORT( i ), r, g, b ) END;
 		FOR i := obj.depth TO 255 DO Pictures.SetColor( obj.pict, SHORT( i ), 255, 0, 0 ) END;
 		vyBase.Subscribe( obj.A, obj );  Sync( obj )

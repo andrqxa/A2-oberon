@@ -65,10 +65,10 @@ TYPE
 		x*: FLOAT32;   (* real var *)
 		y*: FLOAT64;   (* longreal var *)
 		s*: OPS.String;   (* string var *)
-		ptr*: SIGNED32;   (* Pointer var , if Pointer then referenced object, if basic type class then ptr to Basic type Object *)
+		ptr*: ADDRESS;   (* Pointer var , if Pointer then referenced object, if basic type class then ptr to Basic type Object *)
 		p*: ANY;   (* SYSTEM.VAL(ANY,ptr) *)
 
-		adr*: SIGNED32;   (* adress of linked object to basic type if available *)
+		adr*: ADDRESS;   (* adress of linked object to basic type if available *)
 
 		obj*: OPT.Object (* if resulting value found as OPT.Object otherwise = NIL *)
 	END;
@@ -111,7 +111,7 @@ TYPE
 	CallStack = RECORD
 		code: ARRAY 128 OF CHAR;
 		i, pc: SIGNED32;
-		resadr, npar: SIGNED32;
+		resadr: SIZE;  npar: SIGNED32;
 		class: SIGNED8;
 		obj: OPT.Object
 	END;
@@ -120,7 +120,7 @@ TYPE
 		top: Item
 	END;
 
-	PtrTable = POINTER TO ARRAY OF SIGNED32;
+	PtrTable = POINTER TO ARRAY OF SIZE;
 
 	StringStack = POINTER TO StringStackDesc;
 	StringStackDesc = RECORD
@@ -215,9 +215,9 @@ VAR
 		IF debug OR Note THEN Texts.WriteLongReal( W, x, n ) END
 	END WLongReal;
 
-	PROCEDURE WInt( i, n: SIGNED32 );
+	PROCEDURE WInt( i, n: SIZE );
 	BEGIN
-		IF debug OR Note THEN Texts.WriteInt( W, i, n ) END
+		IF debug OR Note THEN Texts.WriteInt( W, SIGNED32(i), SIGNED32(n) ) END
 	END WInt;
 
 	PROCEDURE WClass( c: SIGNED16 );
@@ -634,14 +634,14 @@ VAR
 
 	(** expression evaluation **)
 (** memo stack *)
-	PROCEDURE StringPtr( VAR s: OPS.String ): SIGNED32;
+	PROCEDURE StringPtr( VAR s: OPS.String ): ADDRESS;
 	(* create a Pointer to String, must be hold in global objects since otherwise value cleared before proc call *)
 	VAR str: StringStack;
 	BEGIN
 		NEW( str );  str.next := strings;  strings := str;  str.s := s;  RETURN ADDRESSOF( str.s )
 	END StringPtr;
 
-	PROCEDURE Ptr( ptr: SIGNED32 ): ANY;
+	PROCEDURE Ptr( ptr: ADDRESS ): ANY;
 	BEGIN
 		RETURN SYSTEM.VAL( ANY, ptr )
 	END Ptr;
@@ -650,7 +650,7 @@ VAR
 (* reading text *)
 
 
-	PROCEDURE AsPointer( a: Value;  VAR varadr: SIGNED32 ): ANY;
+	PROCEDURE AsPointer( a: Value;  VAR varadr: ADDRESS ): ANY;
 	VAR p: ANY;
 	BEGIN
 		p := NIL;
@@ -671,7 +671,7 @@ VAR
 	END ValPointer;
 
 	PROCEDURE EvalOp( VAR stack: Stack;  op: OpItem;  VAR val: Value );
-	VAR a, b: Value;  p1, p2, res: ANY;  varadr: SIGNED32;
+	VAR a, b: Value;  p1, p2, res: ANY;  varadr: ADDRESS;
 	BEGIN
 		val.class := Undef;
 		IF op.op = "+" THEN
@@ -992,7 +992,7 @@ VAR
 		IF val.class = Undef THEN err( 100 ) END
 	END EvalOp;
 
-	PROCEDURE GetRefNum( mod: Modules.Module;  VAR i, num: SIGNED32 );
+	PROCEDURE GetRefNum( mod: Modules.Module;  VAR i, num: SIZE );
 	VAR n, s: SIGNED32;  x: CHAR;
 	BEGIN
 		s := 0;  n := 0;  x := mod.refs[i];  INC( i );
@@ -1000,8 +1000,8 @@ VAR
 		num := n + ASH( ORD( x ) MOD 64 - ORD( x ) DIV 64 * 64, s )
 	END GetRefNum;
 
-	PROCEDURE FindAdr( mod: Modules.Module;  obj: OPT.Object ): SIGNED32;
-	VAR i, j, m, t, ofs: SIGNED32;  ch: CHAR;  found: BOOLEAN;
+	PROCEDURE FindAdr( mod: Modules.Module;  obj: OPT.Object ): ADDRESS;
+	VAR i, j, m, t, ofs: SIZE;  ch: CHAR;  found: BOOLEAN;
 	BEGIN
 		i := 0;  m := LEN( mod.refs^ );  ch := mod.refs[i];  INC( i );
 		WHILE (i < m) & ((ch = 0F8X) OR (ch = 0F9X)) DO  (* proc *)
@@ -1130,10 +1130,10 @@ VAR
 		END
 	END EvalConObj;
 
-	PROCEDURE FindPtrs( typ: OPT.Struct;  adr: SIGNED32 );
-	VAR fld: OPT.Object;  i, n, s: SIGNED32;  btyp: OPT.Struct;
+	PROCEDURE FindPtrs( typ: OPT.Struct;  adr: ADDRESS );
+	VAR fld: OPT.Object;  i, n, s: SIZE;  btyp: OPT.Struct;
 
-		PROCEDURE Add( adr: SIGNED32 );
+		PROCEDURE Add( adr: ADDRESS );
 		VAR table: PtrTable;
 		BEGIN
 			Ln;  Str( "Adding Pointer: " );  WInt( adr, 10 );
@@ -1223,15 +1223,15 @@ VAR
 			IF (mod # NIL ) & (item # "") THEN
 				Ln;  Str( "mod # NIL and item: " );  Str( item );  obj := FindObj( mod, item );
 				IF (obj # NIL ) & (obj.mode = Var) & (obj.vis = external) THEN
-					obj.adr := FindAdr( mod, obj );  Ln;  Str( "PopWrVar found addr: " );  WInt( obj.adr, 10 );  WLog;  WObj( obj );
+					obj.adr := SIGNED32(FindAdr( mod, obj ));  Ln;  Str( "PopWrVar found addr: " );  WInt( obj.adr, 10 );  WLog;  WObj( obj );
 					IF obj.adr # 0 THEN RETURN obj END
 				ELSIF (obj # NIL ) THEN RETURN NIL
 				END
 			END;
 			val.ptr := 0;  val.adr := 0;
 			IF EvalGlobalObj( var( NameItem ).name, val ) OR createobj THEN  (* Named Object is global *)
-				obj := OPT.NewObj();  obj.typ := OPT.NewStr( val.class, Basic );  obj.adr := val.ptr;
-				IF val.class # Pointer THEN obj.linkadr := val.adr ELSE obj.linkadr := 0 END;
+				obj := OPT.NewObj();  obj.typ := OPT.NewStr( val.class, Basic );  obj.adr := SIGNED32(val.ptr);
+				IF val.class # Pointer THEN obj.linkadr := SIGNED32(val.adr) ELSE obj.linkadr := 0 END;
 				COPY( var( NameItem ).name, obj.name );  global := TRUE;  RETURN obj
 			END
 		ELSIF var = NIL THEN nil := TRUE
@@ -1248,7 +1248,7 @@ VAR
 	END ShortInt;
 
 	PROCEDURE AssignObj*( this, res: Objects.Object ): BOOLEAN;
-	VAR t: Types.Type;  o: OPT.Object;  a2, a1: SIGNED32;
+	VAR t: Types.Type;  o: OPT.Object;  a2, a1: ADDRESS;
 	BEGIN
 		(* if same type then copy else new object *)
 		IF antsExpressionsObjects.Assign( this, res ) THEN Ln;  Str( "Assign in anteEO" );  OutType( this );  OutType( res );  RETURN TRUE END;
@@ -1271,7 +1271,7 @@ VAR
 	PROCEDURE OutFile( VAR stack: Stack;  VAR res: Value;  append: BOOLEAN );
 	VAR ptr1, ptr2: ANY;  file: Value;  f: Files.File;  R: Files.Rider;  len: SIGNED32;  l: Objects.Library;  M: Objects.BindMsg;
 		gen: ARRAY 64 OF CHAR;
-		fM: Objects.FileMsg;  n: vyName.tNameArray;  pos: SIGNED32;  varadr: SIGNED32;
+		fM: Objects.FileMsg;  n: vyName.tNameArray;  pos: SIGNED32;  varadr: ADDRESS;
 	BEGIN
 		Eval( stack, file );  Eval( stack, res );  Ln;  Str( "OutVal: " );  OutVal( res );  Ln;  Str( "To File" );  OutVal( file );
 		IF file.class = String THEN
@@ -1517,11 +1517,11 @@ VAR
 	END PushLIntPar;
 
 	PROCEDURE PushStringPar( VAR call: CallStack;  VAR s: ARRAY OF CHAR;  len: SIGNED32 ): BOOLEAN;
-	VAR i, slen, long: SIGNED32;  j: SIGNED16;  ord: SIGNED32;
+	VAR i, slen, long: SIZE;  j: SIGNED16;  ord: SIGNED32;
 
-		PROCEDURE StringSize( s: ARRAY OF CHAR ): SIGNED32;
+		PROCEDURE StringSize( s: ARRAY OF CHAR ): SIZE;
 		(* returns string size of s INCLUDING the terminator 0X *)
-		VAR i, l: SIGNED32;
+		VAR i, l: SIZE;
 		BEGIN
 			i := 0;  l := LEN( s ) - 1;
 			WHILE (s[i] # 0X) & (i < l) DO INC( i ) END;
@@ -1535,17 +1535,17 @@ VAR
 			i := 0;  j := 0;  long := 0;  ord := 1;
 			WHILE (i < slen) DO
 				IF j < 3 THEN long := long + ord * ORD( s[i] );  ord := ord * 256;  INC( j )
-				ELSE long := long + ord * ORD( s[i] );  PushLIntPar( call, long );  ord := 1;  j := 0;  long := 0
+				ELSE long := long + ord * ORD( s[i] );  PushLIntPar( call, SIGNED32(long) );  ord := 1;  j := 0;  long := 0
 				END;
 				Ln;  WInt( i, 10 );  Str( " " );  Ch( s[i] );  INC( i )
 			END;
 			WHILE (i < len) DO
 				IF j < 3 THEN long := long + ord * ORD( 0X );  ord := ord * 256;  INC( j )
-				ELSE long := long + ord * ORD( s[i] );  PushLIntPar( call, long );  ord := 1;  j := 0;  long := 0
+				ELSE long := long + ord * ORD( s[i] );  PushLIntPar( call, SIGNED32(long) );  ord := 1;  j := 0;  long := 0
 				END;
 				INC( i )
 			END;
-			IF j > 0 THEN PushLIntPar( call, long ) END;
+			IF j > 0 THEN PushLIntPar( call, SIGNED32(long) ) END;
 			WLog;  RETURN TRUE
 		END
 	END PushStringPar;
@@ -1564,7 +1564,7 @@ VAR
 	PROCEDURE PopCallPar( VAR stack: Stack;  VAR call: CallStack;  fpar: OPT.Object ): BOOLEAN;
 	VAR apar: Value;  obj: OPT.Object;  class: SIGNED8;
 		s: ARRAY 256 OF CHAR;
-		adr: SIGNED32;  global: BOOLEAN;  nil: BOOLEAN;
+		adr: ADDRESS;  global: BOOLEAN;  nil: BOOLEAN;
 
 		PROCEDURE PopString( ): BOOLEAN;
 		BEGIN
@@ -1581,7 +1581,7 @@ VAR
 			adr := ADDRESSOF(str.s);  *)
 					adr := StringPtr( apar.s );
 					(* adr := ADDRESSOF(apar.s) does NOT work, loosing object !*)
-					PushLIntPar( call, adr )
+					PushLIntPar( call, SIGNED32(adr) )
 				END;
 				PushLIntPar( call, LEN( s ) );  RETURN TRUE
 			END;
@@ -1616,7 +1616,7 @@ VAR
 			| LReal:
 					IF class = LReal THEN PushLRealPar( call, apar.y );  RETURN TRUE END
 			| Pointer:
-					IF class = Pointer THEN PushLIntPar( call, apar.ptr );   (*apar.i*) RETURN TRUE END;
+					IF class = Pointer THEN PushLIntPar( call, SIGNED32(apar.ptr) );   (*apar.i*) RETURN TRUE END;
 			| String:
 					IF class = Comp THEN
 						IF PopString() THEN RETURN TRUE END
@@ -1742,7 +1742,7 @@ VAR
 	PROCEDURE PI8Finish( VAR call: CallStack;  VAR res: Value );
 	BEGIN
 		IF call.resadr # 0 THEN
-			call.obj.adr := call.resadr;  res.class := call.class;  Ln;  Str( "evaluating res with: " );  WClass( res.class );  EvalVarObj( call.obj, res )
+			call.obj.adr := SIGNED32(call.resadr);  res.class := call.class;  Ln;  Str( "evaluating res with: " );  WClass( res.class );  EvalVarObj( call.obj, res )
 		ELSIF call.class # NoTyp THEN
 			res.class := Undef;  Ln();  Str( "Result type of procedure # NoTyp but no return address!" );
 			(* obj.adr := resadr;      EvalVarObj(obj, res) *)  (* no result ! *)
@@ -1979,13 +1979,13 @@ END EvalProcObj;
 			IF obj # NIL THEN
 				IF obj.mode = Con THEN Ln;  Str( "obj.mode=Con" );  EvalConObj( obj, val );  RETURN
 				ELSIF obj.mode = Var THEN
-					Ln;  Str( "obj.mode=Var" );  obj.adr := FindAdr( mod, obj );  Ln;  Str( "Var adr=" );  WInt( obj.adr, 10 );
+					Ln;  Str( "obj.mode=Var" );  obj.adr := SIGNED32(FindAdr( mod, obj ));  Ln;  Str( "Var adr=" );  WInt( obj.adr, 10 );
 					IF GetObjClass( obj ) = ProcTyp THEN Ln;  Str( "ProcTypVar" );  EvalProcObj( stack, obj, val );  RETURN
 
 					ELSE Ln;  Str( "No ProcTypVar" );  EvalVarObj( obj, val );  RETURN
 					END
 				ELSIF obj.mode = XProc THEN
-					Ln;  Str( "XProc , finding adr.. " );  obj.adr := FindAdr( mod, obj );  Ln;  Str( "XProc adr" );  WInt( obj.adr, 10 );  EvalProcObj( stack, obj, val );
+					Ln;  Str( "XProc , finding adr.. " );  obj.adr := SIGNED32(FindAdr( mod, obj ));  Ln;  Str( "XProc adr" );  WInt( obj.adr, 10 );  EvalProcObj( stack, obj, val );
 					RETURN
 				ELSE Ln;  Str( "unknown name type, mode: " );  WInt( obj.mode, 3 )
 				END

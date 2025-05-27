@@ -407,32 +407,39 @@ BEGIN
 	END
 END WriteInt;
 
-PROCEDURE WriteLongIntTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF SIGNED32;   start: SIGNED32;   n: SIGNED32);
+PROCEDURE WriteLongIntTab* (VAR W: Texts.Writer;   len: SIZE ;   x: ARRAY OF SIGNED32;   start: SIZE ;   n: SIZE );
 BEGIN
 	IF len <= 0 THEN RETURN END;
-	Texts.WriteInt(W, x[start], n);
+	Texts.WriteInt(W, x[start], SIGNED32(n));
 	len := len + start;   INC(start);
-	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteInt(W, x[start], n);   INC(start) END
+	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteInt(W, x[start], SIGNED32(n));   INC(start) END
 END WriteLongIntTab;
 
-
-PROCEDURE WriteIntTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF SIGNED16;   start: SIGNED32;   n: SIGNED32);
+PROCEDURE WriteSizeTab* (VAR W: Texts.Writer;   len: SIZE ;   x: ARRAY OF SIZE;   start: SIZE ;   n: SIZE );
 BEGIN
 	IF len <= 0 THEN RETURN END;
-	Texts.WriteInt(W, x[start], n);
+	Texts.WriteInt(W, SIGNED32(x[start]), SIGNED32(n));
 	len := len + start;   INC(start);
-	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteInt(W, x[start], n);   INC(start) END
+	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteInt(W, SIGNED32(x[start]), SIGNED32(n));   INC(start) END
+END WriteSizeTab;
+
+PROCEDURE WriteIntTab* (VAR W: Texts.Writer;   len:SIZE ;   x: ARRAY OF SIGNED16;   start: SIZE;   n: SIZE);
+BEGIN
+	IF len <= 0 THEN RETURN END;
+	Texts.WriteInt(W, x[start], SIGNED32(n));
+	len := len + start;   INC(start);
+	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteInt(W, x[start], SIGNED32(n));   INC(start) END
 END WriteIntTab;
 
-PROCEDURE WriteLongRealTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF FLOAT64;   start: SIGNED32;   n: SIGNED32);
+PROCEDURE WriteLongRealTab* (VAR W: Texts.Writer;   len: SIZE;   x: ARRAY OF FLOAT64;   start: SIZE;   n: SIZE);
 BEGIN
 	IF len <= 0 THEN RETURN END;
-	Texts.WriteLongReal(W, x[start], n);
+	Texts.WriteLongReal(W, x[start], SIGNED32(n));
 	len := len + start;   INC(start);
-	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteLongReal(W, x[start], n);   INC(start) END
+	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteLongReal(W, x[start], SIGNED32(n));   INC(start) END
 END WriteLongRealTab;
 
-PROCEDURE WriteLongRealFixTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF FLOAT64;   start: SIGNED32;   n, f, E: SIGNED32);
+PROCEDURE WriteLongRealFixTab* (VAR W: Texts.Writer;   len: SIZE;   x: ARRAY OF FLOAT64;   start: SIZE;   n, f, E: SIGNED32);
 BEGIN
 	IF len <= 0 THEN RETURN END;
 	Texts.WriteLongRealFix(W, x[start], n, f, E);
@@ -440,15 +447,15 @@ BEGIN
 	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteLongRealFix(W, x[start], n, f, E);   INC(start) END
 END WriteLongRealFixTab;
 
-PROCEDURE WriteRealTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF FLOAT32;   start: SIGNED32;   n: SIGNED32);
+PROCEDURE WriteRealTab* (VAR W: Texts.Writer;   len: SIZE;   x: ARRAY OF FLOAT32;   start: SIZE;   n: SIZE);
 BEGIN
 	IF len <= 0 THEN RETURN END;
-	Texts.WriteReal(W, x[start], n);
+	Texts.WriteReal(W, x[start], SIGNED32(n));
 	len := len + start;   INC(start);
-	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteReal(W, x[start], n);   INC(start) END
+	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteReal(W, x[start], SIGNED32(n));   INC(start) END
 END WriteRealTab;
 
-PROCEDURE WriteRealFixTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF FLOAT32;   start: SIGNED32;   n, f, E: SIGNED32);
+PROCEDURE WriteRealFixTab* (VAR W: Texts.Writer;   len: SIZE;   x: ARRAY OF FLOAT32;   start: SIZE;   n, f, E: SIGNED32);
 BEGIN
 	IF len <= 0 THEN RETURN END;
 	Texts.WriteRealFix(W, x[start], n, f, E);
@@ -467,7 +474,7 @@ BEGIN
 	END
 END WriteReal;
 
-PROCEDURE WriteBoolTab* (VAR w: Texts.Writer;   count: SIGNED32;   VAR a: ARRAY OF BOOLEAN;   offset, step: SIGNED32);
+PROCEDURE WriteBoolTab* (VAR w: Texts.Writer;   count: SIZE;   VAR a: ARRAY OF BOOLEAN;   offset, step: SIZE);
 BEGIN  ASSERT(offset >= 0);
 	IF count > 0 THEN
 		count := offset + count * step;
@@ -862,16 +869,27 @@ BEGIN Texts.WriteString(w, "Summary for integer array ");
 	Texts.WriteLn(w)
 END SummaryInteger;
 
-PROCEDURE SummaryLongint* (VAR w: Texts.Writer;   count: SIGNED32;   VAR a: ARRAY OF SIGNED32;   prec: SIGNED16);
-	VAR i: SIGNED32;
+PROCEDURE SummaryLongint* (VAR w: Texts.Writer;   count: SIZE;   VAR a: ARRAY OF SIGNED32;   prec: SIGNED16);
+	VAR i: SIZE;
 BEGIN Texts.WriteString(w, "Summary for longinteger array ");
-	Texts.WriteString(w, " count=");   Texts.WriteInt(w, count, 0);
+	Texts.WriteString(w, " count=");   Texts.WriteInt(w, SIGNED32(count), 0);
 	Texts.WriteLn(w);   i := 0;
 	WHILE i < count DO
 		Texts.WriteInt(w, a[i], prec);   INC(i)
 	END;
 	Texts.WriteLn(w)
 END SummaryLongint;
+
+PROCEDURE SummarySize*(VAR w: Texts.Writer;   count: SIZE;   VAR a: ARRAY OF SIZE;   prec: SIGNED16);
+	VAR i: SIZE;
+BEGIN Texts.WriteString(w, "Summary for longinteger array ");
+	Texts.WriteString(w, " count=");   Texts.WriteInt(w, SIGNED32(count), 0);
+	Texts.WriteLn(w);   i := 0;
+	WHILE i < count DO
+		Texts.WriteInt(w, SIGNED32(a[i]), prec);   INC(i)
+	END;
+	Texts.WriteLn(w)
+END SummarySize;
 
 BEGIN
 	msgsep := ' ';  hexchars := '0123456789ABCDEF';

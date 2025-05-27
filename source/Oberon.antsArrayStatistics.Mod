@@ -37,7 +37,7 @@ TYPE
 	END;
 
 	PROCEDURE Sync( o: tObject );
-	VAR x, y, x0, y0, w0, h0, x1, y1, w1, h1, fy, fx: SIGNED32;  from, to: antsArrayObjects.tINTEGERArray;  max: SIGNED32;  ival: SIGNED32;
+	VAR x, y, x0, y0, w0, h0, x1, y1, w1, h1, fy, fx: SIZE;  from, to: antsArrayObjects.tINTEGERArray;  max: SIGNED32;  ival: SIGNED32;
 	BEGIN
 		x0 := 0;  y0 := 0;  w0 := o.from.w;  h0 := o.from.h;  from := o.from.A;  max := 2;
 

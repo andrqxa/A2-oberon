@@ -79,9 +79,9 @@ VAR
 		x := seed.x;  y := seed.y;
 
 		x := 69069 * x + 1;
-		y := S.VAL( SIGNED32, S.VAL( SET, y ) / S.VAL( SET, y * c13 ) );   (* y := xor (y, lshift (y, 13)) *)
-		y := S.VAL( SIGNED32, S.VAL( SET, y ) / S.VAL( SET, y * c17 ) );  y := S.VAL( SIGNED32, S.VAL( SET, y ) / S.VAL( SET, y * c5 ) );
-		IF seed.add THEN seed.n := x + y ELSE seed.n := S.VAL( SIGNED32, S.VAL( SET, x ) / S.VAL( SET, y ) ) END;
+		y := S.VAL( SIGNED32, S.VAL( SET32, y ) / S.VAL( SET32, y * c13 ) );   (* y := xor (y, lshift (y, 13)) *)
+		y := S.VAL( SIGNED32, S.VAL( SET32, y ) / S.VAL( SET32, y * c17 ) );  y := S.VAL( SIGNED32, S.VAL( SET32, y ) / S.VAL( SET32, y * c5 ) );
+		IF seed.add THEN seed.n := x + y ELSE seed.n := S.VAL( SIGNED32, S.VAL( SET32, x ) / S.VAL( SET32, y ) ) END;
 
 		seed.x := x;  seed.y := y
 	END NextSeed;
@@ -136,7 +136,7 @@ VAR
 		WITH seed: tSeed DO
 			x := vyRanBase.DefaultLongSeed();  y := vyRanBase.DefaultLongSeed();
 			IF y = 0 THEN y := 1 END;
-			IF seed.add THEN seed.n := x + y ELSE seed.n := S.VAL( SIGNED32, S.VAL( SET, x ) / S.VAL( SET, y ) ) END;
+			IF seed.add THEN seed.n := x + y ELSE seed.n := S.VAL( SIGNED32, S.VAL( SET32, x ) / S.VAL( SET32, y ) ) END;
 			seed.x := x;  seed.y := y
 		END
 	END Reset;
@@ -227,6 +227,6 @@ VAR
 	END Install;
 
 BEGIN
-	ASSERT ( SIZEOF( SET ) >= SIZEOF( SIGNED32 ), 101 );
+	ASSERT ( SIZEOF( SET32 ) >= SIZEOF( SIGNED32 ), 101 );
 	seedAdd := TRUE
 END vyRanSupr.

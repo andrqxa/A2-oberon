@@ -95,7 +95,7 @@ VAR
 	END MoveBallTo;
 
 	PROCEDURE Recall( slider2d: tLayer;  VAR msg: Display.DisplayMsg );
-	VAR xOld, yOld, x, y, w, h: SIGNED16;  i: SIGNED32;
+	VAR xOld, yOld, x, y, w, h: SIGNED16;  i: SIZE;
 
 		PROCEDURE RecallBall( slider2d: tLayer );
 		VAR X, Y: SIGNED16;  p: SIGNED32;
@@ -141,7 +141,7 @@ VAR
 		VAR res: SIGNED16;
 		BEGIN
 			slider2d.locked := TRUE;  NEW( slider2d.slider );
-			vySlider.Open( slider2d.slider, event.dlink( vyPort.Picture ), 0, slider2d.x.nrData - 1, 0, SHORT( slider2d.x.nrData ) );
+			vySlider.Open( slider2d.slider, event.dlink( vyPort.Picture ), 0, slider2d.x.nrData - 1, 0, SIGNED16( slider2d.x.nrData ) );
 			slider2d.slider.host := slider2d;  vyPort.AddLayer( event.dlink( vyPort.Picture ), slider2d.slider );
 			vyBase.CallWString( idversion, "vySlider.Cmd", "vySlider2d.Sync", TRUE , res )
 		END Lock;
@@ -179,7 +179,7 @@ VAR
 
 	PROCEDURE Handler*( o: Objects.Object;  VAR msg: Objects.ObjMsg );
 	(*s 0.0a1	md  20.07.94 *)
-	VAR slider, copy: tLayer;  done: BOOLEAN;  i: SIGNED32;
+	VAR slider, copy: tLayer;  done: BOOLEAN;  i: SIZE;
 	BEGIN
 		slider := o( tLayer );  done := FALSE;
 
@@ -194,7 +194,7 @@ VAR
 				IF msg.callForResponder THEN Responsible( slider, msg ) ELSE
 					IF msg.gesture = vyEvents.EvtSelect THEN
 						WHILE msg.gesture = vyEvents.EvtSelect DO
-							i := (slider.pos + 1) MOD  (*slider.firstUnUsed;*) slider.x.nrData;  MoveBallTo( slider, i );
+							i := (slider.pos + 1) MOD  (*slider.firstUnUsed;*) slider.x.nrData;  MoveBallTo( slider, SIGNED32(i) );
 							vyEvents.GetEvent( msg )
 						END
 

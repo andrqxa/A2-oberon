@@ -62,7 +62,7 @@ VAR
 	END Write;
 
 	PROCEDURE RanV*( len: SIGNED32 ): vyBase.Object;
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	VAR v: vyLongrealVec.tVector;
 	BEGIN
 		v := vyLongrealVec.New( len );
@@ -90,7 +90,7 @@ VAR
 		RETURN vyLongintVec.New( len )
 	END VecL;
 
-	PROCEDURE Len*( ob: ANY ): SIGNED32;
+	PROCEDURE Len*( ob: ANY ): SIZE;
 	BEGIN
 		IF ob IS vyBase.tVector THEN
 			WITH ob: vyBase.tVector DO RETURN ob.nrData
@@ -103,10 +103,10 @@ VAR
 	VAR buf: vyBase.tBuf;
 	BEGIN
 		buf := v.buf;
-		WHILE (buf # NIL ) DO Out.Ln;  Out.String( "BUF: " );  Out.Int( buf.len, 10 );  Out.Int( buf.usedentries, 10 );  buf := buf.next END
+		WHILE (buf # NIL ) DO Out.Ln;  Out.String( "BUF: " );  Out.Int( SIGNED32(buf.len), 10 );  Out.Int( SIGNED32(buf.usedentries), 10 );  buf := buf.next END
 	END ChunkSummary;
 
-	PROCEDURE Ptr*( i: SIGNED32 ): ANY;
+	PROCEDURE Ptr*( i: SIZE ): ANY;
 	BEGIN
 		RETURN SYSTEM.VAL( ANY, i )
 	END Ptr;

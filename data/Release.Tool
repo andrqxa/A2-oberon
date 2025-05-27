@@ -229,6 +229,13 @@ BUILDS
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
+	Linux64All {
+		INCLUDE "LINUX UNIX AMD64"
+		COMPILER "Compiler.Compile"
+		COMPILEOPTIONS "-p=Unix64"
+		# EXCLUDEPACKAGES "OberonVoyager OberonAnts"
+		DISABLED "FALSE"
+	}
 	LinuxARM {
 		INCLUDE "LINUX UNIX ARM"
 		COMPILER "Compiler.Compile"
@@ -1604,7 +1611,7 @@ END
 PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon for A2"
 	# emulation modules
 	NATIVE, UNIX { Oberon.Kernel.Mod }
-	NATIVE, WIN { Oberon.Types.Mod }
+	NATIVE, WIN, UNIX { Oberon.Types.Mod }
 	WIN { Windows.Oberon.Kernel.Mod }
 	Oberon.Modules.Mod
 	NATIVE, UNIX { Oberon.FileDir.Mod Oberon.Files.Mod }
@@ -2007,7 +2014,9 @@ PACKAGE OberonVoyager ARCHIVE "OberonVoyager.zip" SOURCE "OberonVoyagerSrc.zip" 
 	Oberon.vyLinks.Mod Oberon.vyHostStrings.Mod Oberon.vyHostTexts.Mod Oberon.vyBase.Mod Oberon.vyName.Mod	# Base and Name
 	Oberon.vyScanners.Mod Oberon.vyParser.Mod Oberon.vyPars.Mod Oberon.vyIn.Mod Oberon.vyOut.Mod Oberon.vyFiles.Mod Oberon.vyTextsCtl.Mod	# In and Output
 	Oberon.vyBoolean.Mod Oberon.vyBit.Mod Oberon.vySet.Mod Oberon.vyReal.Mod Oberon.vyLongreal.Mod
-	Oberon.vyChiSquare.Mod Oberon.vyInteger.Mod Oberon.vyLongint.Mod	# 1d Arrays
+	Oberon.vyChiSquare.Mod 
+	Oberon.vySize.Mod Oberon.vySizeVec.Mod # vectors of base type size (index vectors)	
+	Oberon.vyInteger.Mod Oberon.vyLongint.Mod	# 1d Arrays
 	Oberon.vyLongintVec.Mod Oberon.vyRealVec.Mod Oberon.vyStringVec.Mod Oberon.vyReadMatrix.Mod Oberon.vyConsume.Mod
 	Oberon.vyBooleanVec.Mod Oberon.vyIntVec.Mod Oberon.vyLongrealVec.Mod Oberon.vyTypes.Mod Oberon.vyPointerVec.Mod	# 1d Vectors
 	Oberon.vyRanBase.Mod Oberon.vyRanSkeleton.Mod Oberon.vyRanParksMiller.Mod Oberon.vyRandom.Mod Oberon.vyRandu.Mod
@@ -2035,11 +2044,11 @@ PACKAGE OberonAnts ARCHIVE "OberonAnts.zip" SOURCE "OberonAntsSrc.zip" DESCRIPTI
 
 	Oberon.antsPortability.Mod	# Portability
 
-	NATIVE, WIN {
+	NATIVE, WIN, UNIX {
 		Oberon.antsExpressionsObjects.Mod Oberon.antsExpressions.Mod Oberon.antsExpressionsDefaults.Mod	# command prompt interpreter
 		Oberon.antsSecurity.Mod Oberon.antsOrganizers.Mod Oberon.antsMessages.Mod Oberon.antsScriptObjects.Mod
 	}
-	NATIVE, WIN {
+	NATIVE, WIN, UNIX {
 		Oberon.antsContainers.Mod Oberon.antsTexts.Mod Oberon.antsGlobals.Mod Oberon.antsBasicGadgets.Mod Oberon.antsOnTheFly.Mod
 		Oberon.antsConstRandom.Mod Oberon.antsFiles.Mod Oberon.antsCommands.Mod Oberon.ants.fofAutomatic.Mod Oberon.antsArrays.Mod
 		Oberon.antsReadWrite.Mod Oberon.antsCaches.Mod Oberon.antsPictCoordinate.Mod Oberon.antsBellman.Mod Oberon.antsDirSet.Mod

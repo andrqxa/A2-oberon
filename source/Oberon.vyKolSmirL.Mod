@@ -33,7 +33,7 @@ TYPE
 PROCEDURE probks* (alam: real): real;
 	(* procedure probks from numerical recipes *)
 CONST eps1 = 0.001;  eps2 = 1.D-08;
-	VAR j: SIGNED32;  a2, fac, sum, term, termbf: real;
+	VAR j: SIZE;  a2, fac, sum, term, termbf: real;
 BEGIN
 	fac := 2;  sum := 0;  termbf := 0;
 	a2 := - 2 * alam * alam;
@@ -52,9 +52,9 @@ BEGIN
 	IF x1 > x2 THEN RETURN x1 ELSE RETURN x2 END;
 END Max;
 
-PROCEDURE KS1* (data: ARRAY OF real;  n: SIGNED32;  func: Function;  VAR d, prob: real );
+PROCEDURE KS1* (data: ARRAY OF real;  n: SIZE;  func: Function;  VAR d, prob: real );
 	(* procedure ksone from numerical recipes *)
-	VAR j: SIGNED32;
+	VAR j: SIZE;
 	f0, fn, ff, en, dt: real;
 BEGIN
 	f0 := 0;
@@ -71,10 +71,10 @@ BEGIN
 END KS1;
 
 (* jb 1.11.00 *)
-PROCEDURE KS1Id* (data: ARRAY OF real;  n: SIGNED32;  VAR d, prob: real);
+PROCEDURE KS1Id* (data: ARRAY OF real;  n: SIZE;  VAR d, prob: real);
 	(*= KS1 with func = Id, to improve performance *)
 VAR
-	j: SIGNED32;
+	j: SIZE;
 	fn, ff, en, dt: real;
 BEGIN
 	en := n;
@@ -91,9 +91,9 @@ BEGIN
 	prob := probks (MathL.sqrt (en) * d);
 END KS1Id;
 
-PROCEDURE KS2* (data1: ARRAY OF real;  n1: SIGNED32;  data2: ARRAY OF real;  n2: SIGNED32;  VAR d, prob: real);
+PROCEDURE KS2* (data1: ARRAY OF real;  n1: SIZE;  data2: ARRAY OF real;  n2: SIZE;  VAR d, prob: real);
 	(* procedure kstwo from numerical recipes *)
-	VAR j1, j2: SIGNED32;
+	VAR j1, j2: SIZE;
 	en1, en2, fn1, fn2, dt, d1, d2: real;
 BEGIN
 	j1 := 1;  j2 := 1;

@@ -79,8 +79,8 @@ TYPE
 			SELF.WriteLRealsLine( antsArrays.VecFromArrayX( x^ ) )
 		END WriteX1d;
 
-		PROCEDURE  (*VAR R: Rider*) ScanMatrix*( VAR rows, cols: SIGNED32 );
-		VAR pos: SIGNED32;  min, max: SIGNED32;  v: vyLongrealVec.tVector;
+		PROCEDURE  (*VAR R: Rider*) ScanMatrix*( VAR rows, cols: SIZE );
+		VAR pos: SIZE;  min, max: SIZE;  v: vyLongrealVec.tVector; c: SIGNED32;
 		BEGIN
 			pos := SELF.Pos();
 			IF SELF.type = antsFiles.ascii THEN
@@ -98,7 +98,7 @@ TYPE
 				cols := min;
 				ASSERT ( min = max );
 				aM.SI( "Read Ascii File, end: ", SELF.Pos() );  SELF.SetPos( pos )
-			ELSE SELF.ReadLInt( rows );  SELF.ReadLInt( cols );  SELF.SetPos( pos )
+			ELSE SELF.ReadLInt( c ); rows := c;  SELF.ReadLInt( c ); cols := c;  SELF.SetPos( pos )
 			END
 		END ScanMatrix;
 
@@ -108,10 +108,10 @@ TYPE
 		END WriteNilMatrix;
 
 		PROCEDURE  (*VAR R: Rider*) WriteMatrixX*( VAR A: ARRAY OF ARRAY OF FLOAT64 );
-		VAR i: SIGNED32;
+		VAR i: SIZE;
 		BEGIN
 			IF SELF.type = antsFiles.bin THEN
-				SELF.WriteLInt( LEN( A ) );  SELF.WriteLInt( LEN( A[0] ) );
+				SELF.WriteLInt( SIGNED32(LEN( A )) );  SELF.WriteLInt( SIGNED32(LEN( A[0] )) );
 				FOR i := 0 TO LEN( A ) - 1 DO SELF.WriteLRealsFix( A[i], LEN( A[0] ) ) END
 			ELSE
 				i := 0;
@@ -133,10 +133,10 @@ TYPE
 		END ReadMatrixX;
 
 		PROCEDURE  (*VAR R: Rider*) WriteMatrixL*( VAR A: ARRAY OF ARRAY OF SIGNED32 );
-		VAR row, i: SIGNED32;
+		VAR row, i: SIZE;
 		BEGIN
 			IF SELF.type = antsFiles.bin THEN
-				SELF.WriteLInt( LEN( A ) );  SELF.WriteLInt( LEN( A[0] ) );
+				SELF.WriteLInt( SIGNED32(LEN( A )) );  SELF.WriteLInt( SIGNED32(LEN( A[0] )) );
 				FOR i := 0 TO LEN( A ) - 1 DO SELF.WriteLIntsFix( A[i], LEN( A[0] ) ) END
 			ELSE
 				row := 0;
@@ -158,10 +158,10 @@ TYPE
 		END ReadMatrixL;
 
 		PROCEDURE  (*VAR R: Rider*) WriteMatrixI*( VAR A: ARRAY OF ARRAY OF SIGNED16 );
-		VAR row, i: SIGNED32;
+		VAR row, i: SIZE;
 		BEGIN
 			IF SELF.type = antsFiles.bin THEN
-				SELF.WriteLInt( LEN( A ) );  SELF.WriteLInt( LEN( A[0] ) );
+				SELF.WriteLInt( SIGNED32(LEN( A )) );  SELF.WriteLInt( SIGNED32(LEN( A[0] )) );
 				FOR i := 0 TO LEN( A ) - 1 DO SELF.WriteIntsFix( A[i], LEN( A[0] ) ) END
 			ELSE
 				row := 0;
@@ -325,7 +325,7 @@ TYPE
 		END WriteI2d;
 
 		PROCEDURE  (*VAR R: Rider*) ReadX2d*( VAR A: antsArrays.X2d );
-		VAR rows, cols: SIGNED32;
+		VAR rows, cols: SIZE;
 		BEGIN
 			SELF.ScanMatrix( rows, cols );
 			IF (rows = 0) OR (cols = 0) THEN A := NIL;  RETURN END;
@@ -334,7 +334,7 @@ TYPE
 		END ReadX2d;
 
 		PROCEDURE  (*VAR R: Rider*) ReadI2d*( VAR A: antsArrays.I2d );
-		VAR rows, cols: SIGNED32;
+		VAR rows, cols: SIZE;
 		BEGIN
 			SELF.ScanMatrix( rows, cols );
 			IF (rows = 0) OR (cols = 0) THEN A := NIL;  RETURN END;
@@ -343,7 +343,7 @@ TYPE
 		END ReadI2d;
 
 		PROCEDURE  (*VAR R: Rider*) ReadL2d*( VAR A: antsArrays.L2d );
-		VAR rows, cols: SIGNED32;
+		VAR rows, cols: SIZE;
 		BEGIN
 			SELF.ScanMatrix( rows, cols );
 			IF (rows = 0) OR (cols = 0) THEN A := NIL;  RETURN END;
@@ -354,10 +354,10 @@ TYPE
 	END Rider;
 
 	PROCEDURE StorePGM*( VAR A: antsArrays.L2d;  fname: ARRAY OF CHAR;  d: SIGNED32 ): BOOLEAN;
-	VAR w, h: SIGNED32;  R: antsFiles.Rider;  x, y: SIGNED32;
+	VAR w, h: SIZE;  R: antsFiles.Rider;  x, y: SIZE;
 	BEGIN
 		IF ~R.New( fname ) THEN aM.eSS( "could not open ", fname );  RETURN FALSE END;
-		R.SetAscii;  R.WriteString( "P5" );  R.WriteLn();  h := LEN( A );  w := LEN( A[0] );  R.WriteLInt( w );  R.WriteLInt( h );  R.WriteLn();
+		R.SetAscii;  R.WriteString( "P5" );  R.WriteLn();  h := LEN( A );  w := LEN( A[0] );  R.WriteLInt( SIGNED32(w) );  R.WriteLInt( SIGNED32(h) );  R.WriteLn();
 		R.WriteLInt( d );  R.Write( 0DX );  R.Write( 0AX );  R.Write( 0DX );  R.Write( 0AX );  R.SetBin;
 		(* data *)
 		R.reverse := TRUE;   (*  writer higher  bits then lower  bits *)
@@ -414,7 +414,7 @@ TYPE
 	PROCEDURE Analyze*;
 	VAR l: antsCommands.tScanList;
 		str: ARRAY 64 OF CHAR;
-		rows, columns: SIGNED32;  R: Rider;
+		rows, columns: SIZE;  R: Rider;
 	BEGIN
 		l := antsCommands.ScanFromPar( "filename=STR [>ignoreNL]" );
 		IF antsCommands.ExpectStringFromKeyword( l, "filename", str ) THEN
@@ -458,7 +458,7 @@ TYPE
 	PROCEDURE Write*;
 	VAR l: antsCommands.tScanList;
 		str: ARRAY 64 OF CHAR;
-		data: vyBase.Object;  R: Rider;  len: SIGNED32;  vec: antsArrays.X1d;
+		data: vyBase.Object;  R: Rider;  len: SIZE;  vec: antsArrays.X1d;
 	BEGIN
 		l := antsCommands.ScanFromPar( "data=OBJ  filename=STR " );
 		IF antsCommands.ExpectStringFromKeyword( l, "filename", str ) & antsCommands.ExpectObjectFromKeyword( l, "data", data ) THEN
@@ -491,7 +491,7 @@ TYPE
 	END ToBin;
 
 	PROCEDURE Test*;
-	VAR i, j, rows, cols: SIGNED32;  R, RR: Rider;  AA: antsArrays.X2d;  v: vyLongrealVec.tVector;
+	VAR i, j, rows, cols: SIZE;  R, RR: Rider;  AA: antsArrays.X2d;  v: vyLongrealVec.tVector;
 	BEGIN
 	(*
 	b :=  ReadPGM(A,"private/fromPotts/patch071010.pgm",depth);

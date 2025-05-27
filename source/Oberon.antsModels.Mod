@@ -45,16 +45,16 @@ TYPE
 	END;
 
 	PROCEDURE StoreParameters( VAR R: Files.Rider;  p: Parameters;  pn: ParameterNames );
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	BEGIN
 		IF p = NIL THEN Files.WriteLInt( R, 0 )
 		ELSE
-			Files.WriteLInt( R, LEN( p ) );
+			Files.WriteLInt( R, SIGNED32(LEN( p )) );
 			FOR i := 0 TO LEN( p ) - 1 DO Files.WriteLReal( R, p[i] ) END
 		END;
 		IF pn = NIL THEN Files.WriteLInt( R, 0 )
 		ELSE
-			Files.WriteLInt( R, LEN( pn ) );
+			Files.WriteLInt( R, SIGNED32(LEN( pn )) );
 			FOR i := 0 TO LEN( pn ) - 1 DO Files.WriteString( R, pn[i] ) END
 		END
 	END StoreParameters;

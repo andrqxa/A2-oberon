@@ -106,8 +106,8 @@ BEGIN
 	END
 END Sort4;
 
-PROCEDURE EmpiricalDistributeS (VAR E: EmpiricalDistribution;   A: antsArrayObjects.tINTEGERArray;   Sx, Sy, Sw, Sh: SIGNED32);
-	VAR x, y: SIGNED32 ;     e1, e2, e3, e4: SIGNED32;
+PROCEDURE EmpiricalDistributeS (VAR E: EmpiricalDistribution;   A: antsArrayObjects.tINTEGERArray;   Sx, Sy, Sw, Sh: SIZE);
+	VAR x, y: SIZE ;     e1, e2, e3, e4: SIGNED32;
 	(* stores permuted v1,v2,v3,v4 in a sorted way *)
 BEGIN
 	IF E = NIL THEN NEW(E) END;
@@ -121,8 +121,8 @@ BEGIN
 	END
 END EmpiricalDistributeS;
 
-PROCEDURE EmpiricalDistributeCS (Eo, Ee: EmpiricalDistribution;    A: antsArrayObjects.tINTEGERArray;   Sx, Sy, Sw, Sh: SIGNED32);
-	VAR x, y: SIGNED32 ;      e1, e2, e3, e4: SIGNED32;
+PROCEDURE EmpiricalDistributeCS (Eo, Ee: EmpiricalDistribution;    A: antsArrayObjects.tINTEGERArray;   Sx, Sy, Sw, Sh: SIZE);
+	VAR x, y: SIZE ;      e1, e2, e3, e4: SIGNED32;
 	(* stores permuted v1,v2,v3,v4 in a sorted way *)
 BEGIN
 	IF Eo = NIL THEN NEW(Eo) END;
@@ -148,7 +148,7 @@ BEGIN
 	par := g.par;  ed := par.ED(EmpiricalDistribution);
 	EmpiricalDistributeS(ed, par.A.A, 1, 1, par.A.w - 3, par.A.h - 3 );
 	EmpiricalDistributeCS(par.CEDo(EmpiricalDistribution), par.CEDe(EmpiricalDistribution), par.A.A, 1, 1, par.A.w - 3, par.A.h - 3);
-	par.x := 1;  par.y := 1;  par.w := par.A.w - 2;  par.h := par.A.h - 2
+	par.x := 1;  par.y := 1;  par.w := SIGNED32(par.A.w - 2);  par.h := SIGNED32(par.A.h - 2)
 END GenerateED;
 
 

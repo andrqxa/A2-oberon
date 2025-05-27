@@ -73,8 +73,8 @@ CONST
 	BEGIN L := Reals.Expo(x); RETURN SHORT(L) END Expo;
 	*)
 
-PROCEDURE Length* (s: ARRAY OF CHAR): SIGNED32;
-	VAR VAR i, len: SIGNED32;
+PROCEDURE Length* (s: ARRAY OF CHAR): SIZE;
+VAR i, len: SIZE;
 BEGIN
 	len := LEN(s);   i := 0;   WHILE (i < len) & (s[i] # 0X) DO INC(i) END;
 	RETURN i
@@ -84,7 +84,7 @@ END Length;
 PROCEDURE Append* (VAR dest: ARRAY OF CHAR;   extra: ARRAY OF CHAR);
 	(*= Append extra to dest. Always adds a stopping 0X.
 	Argument order as in Strings. May be changed in future release!! *)
-	VAR n1, n2, i, LENdest: SIGNED32;
+	VAR n1, n2, i, LENdest: SIZE;
 BEGIN
 	n1 := Length(dest);   n2 := Length(extra);   i := 0;   LENdest := LEN(dest);
 	WHILE (i < n2) & (i + n1 < LENdest) DO dest[i + n1] := extra[i];   INC(i) END;
@@ -92,8 +92,8 @@ BEGIN
 END Append;
 
 
-PROCEDURE Insert* (source: ARRAY OF CHAR;   pos: SIGNED32;   VAR dest: ARRAY OF CHAR);
-	VAR n1, n2, i: SIGNED32;
+PROCEDURE Insert* (source: ARRAY OF CHAR;   pos: SIZE;   VAR dest: ARRAY OF CHAR);
+	VAR n1, n2, i: SIZE;
 BEGIN
 	n1 := Length(dest);   n2 := Length(source);
 	IF pos < 0 THEN pos := 0 END;
@@ -109,8 +109,8 @@ BEGIN
 END Insert;
 
 
-PROCEDURE Delete* (VAR s: ARRAY OF CHAR;   pos, n: SIGNED32);
-	VAR len, i: SIGNED32;
+PROCEDURE Delete* (VAR s: ARRAY OF CHAR;   pos, n: SIZE);
+	VAR len, i: SIZE;
 BEGIN
 	len := Length(s);
 	IF pos < 0 THEN pos := 0 ELSIF pos >= len THEN RETURN END;
@@ -122,17 +122,17 @@ BEGIN
 END Delete;
 
 
-PROCEDURE Replace* (source: ARRAY OF CHAR;   pos: SIGNED32;   VAR dest: ARRAY OF CHAR);
+PROCEDURE Replace* (source: ARRAY OF CHAR;   pos: SIZE;   VAR dest: ARRAY OF CHAR);
 BEGIN
 	Delete(dest, pos, pos + Length(source));
 	Insert(source, pos, dest)
 END Replace;
 
 
-PROCEDURE Extract* (source: ARRAY OF CHAR;   pos, n: SIGNED32;   VAR dest: ARRAY OF CHAR);
-	VAR len, destLen, i: SIGNED32;
+PROCEDURE Extract* (source: ARRAY OF CHAR;   pos, n: SIZE;   VAR dest: ARRAY OF CHAR);
+	VAR len, destLen, i: SIZE;
 BEGIN
-	len := Length(source);   destLen := SIGNED32(LEN(dest)) - 1;
+	len := Length(source);   destLen := LEN(dest) - 1;
 	IF pos < 0 THEN pos := 0 END;
 	IF pos >= len THEN dest[0] := 0X;   RETURN END;
 	i := 0;
@@ -144,8 +144,8 @@ BEGIN
 END Extract;
 
 
-PROCEDURE Pos* (pattern, s: ARRAY OF CHAR;   pos: SIGNED32): SIGNED32;
-	VAR n1, n2, i, j: SIGNED32;
+PROCEDURE Pos* (pattern, s: ARRAY OF CHAR;   pos: SIZE): SIZE;
+	VAR n1, n2, i, j: SIZE;
 BEGIN
 	n1 := Length(s);   n2 := Length(pattern);
 	IF n2 = 0 THEN RETURN 0 END;
@@ -161,14 +161,14 @@ BEGIN
 END Pos;
 
 PROCEDURE Cap* (VAR s: ARRAY OF CHAR);
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 BEGIN
 	FOR i := 0 TO Length(s) - 1 DO s[i] := CAP(s[i]) END
 END Cap;
 
 
 PROCEDURE Equal* (s1, s2: ARRAY OF CHAR): BOOLEAN;
-	VAR i, n1, n2: SIGNED32;
+	VAR i, n1, n2: SIZE;
 BEGIN
 	i := 0;   n1 := Length(s1);   n2 := Length(s2);
 	LOOP
@@ -182,7 +182,7 @@ END Equal;
 
 
 PROCEDURE Less* (s1, s2: ARRAY OF CHAR): BOOLEAN;
-	VAR i, n1, n2: SIGNED32;
+	VAR i, n1, n2: SIZE;
 BEGIN
 	i := 0;   n1 := Length(s1);   n2 := Length(s2);
 	LOOP
@@ -194,7 +194,7 @@ BEGIN
 END Less;
 
 
-PROCEDURE Diff* (s1, s2: ARRAY OF CHAR): SIGNED32;
+PROCEDURE Diff* (s1, s2: ARRAY OF CHAR): SIZE;
 BEGIN
 	IF Equal(s1, s2) THEN RETURN 0
 	ELSIF Less(s1, s2) THEN RETURN - 1
@@ -203,10 +203,10 @@ BEGIN
 END Diff;
 
 (* adapted from Texts.Mod. Calling sequence as above. Text uses destination first *)
-PROCEDURE AppendInt* (x, fieldlen: SIGNED32;   VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendInt* (x: SIGNED32; fieldlen: SIZE;   VAR dest: ARRAY OF CHAR);
 	(*= Append to dest; use at least fieldlen positions *)
-	VAR i: SIGNED32;   x0: SIGNED32;
-	a: ARRAY 11 OF CHAR;   pos: SIGNED32;
+	VAR i: SIZE ;   x0: SIGNED32;
+	a: ARRAY 11 OF CHAR;   pos: SIZE;
 BEGIN
 	i := 0;   (* FOF changed *)
 	IF x < 0 THEN
@@ -228,7 +228,7 @@ END AppendInt;
 
 PROCEDURE IntToHexStr* (x: SIGNED32;   VAR dest: ARRAY OF CHAR);
 	(* Convert SIGNED32 to 8 digit hex string. No leading space, no trailing 'H' *)
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 BEGIN
 	i := 0;
 	REPEAT
@@ -240,8 +240,8 @@ END IntToHexStr;
 
 PROCEDURE AppendHex* (x: SIGNED32;   VAR dest: ARRAY OF CHAR);
 	(* no leading space used *)
-	VAR i: SIGNED32;
-	a: ARRAY 10 OF CHAR;   pos: SIGNED32;
+	VAR i: SIZE;
+	a: ARRAY 10 OF CHAR;   pos: SIZE;
 BEGIN 		pos := Length(dest);
 	IntToHexStr(x, a);
 	i := 0;  REPEAT   dest[pos] := a[i];   INC(pos);  INC(i)  UNTIL i = 8;
@@ -269,10 +269,10 @@ PROCEDURE RealToHexStr* (x: FLOAT64;  VAR s: ARRAY OF CHAR);
 BEGIN Reals.IntL(x, h, l); IntToHexStr(h, s);  AppendHex(l, s)
 END RealToHexStr;
 
-PROCEDURE RealToStr* (x: FLOAT64;  n: SIGNED32;  VAR s: ARRAY OF CHAR);
+PROCEDURE RealToStr* (x: FLOAT64;  n: SIZE;  VAR s: ARRAY OF CHAR);
 	(*= Right adjusted in n pos. n >=9 preferred *)
 	(* from Texts.WriteLongReal *)
-	VAR e, h, l, i, len, pos: SIGNED32;  z: FLOAT64;  d: ARRAY 16 OF CHAR;
+	VAR h,l, e: SIGNED32; i: SIZE; len, pos: SIZE;  z: FLOAT64;  d: ARRAY 16 OF CHAR;
 
 PROCEDURE Wr (ch: CHAR);
 BEGIN
@@ -298,8 +298,8 @@ BEGIN
 		ELSE e := (e - 1023) * 301029 DIV 1000000;  (* ln(2)/ln(10) = 0.301029996 *)
 			z := Reals.Ten(e + 1);
 			IF x >= z THEN x := x / z;  INC(e) ELSE x := x * Reals.Ten( - e) END;
-			IF x >= 10 THEN x := x * Reals.Ten( - 1) + 0.5D0 / Reals.Ten(n);  INC(e)
-			ELSE x := x + 0.5D0 / Reals.Ten(n);
+			IF x >= 10 THEN x := x * Reals.Ten( - 1) + 0.5D0 / Reals.Ten(SIGNED32(n));  INC(e)
+			ELSE x := x + 0.5D0 / Reals.Ten(SIGNED32(n));
 				IF x >= 10 THEN x := x * Reals.Ten( - 1);  INC(e) END
 			END;
 			x := x * Reals.Ten(7);  h := ENTIER(x);  x := (x - h) * Reals.Ten(8);  l := ENTIER(x)
@@ -316,7 +316,7 @@ BEGIN
 	PROCEDURE RealToStrOld* (x: FLOAT64;  VAR s: ARRAY OF CHAR);
 		(*= Deprecated. Use new  RealToStr instead. Left adjusted. Length is determined by length of s. *)
 		(* from Strings. Modified to use E notation, using precalculated powers of ten  *)
-		VAR e, h, l, n, len: SIGNED32;  i, j, pos: SIGNED32;  z: FLOAT64;  d: ARRAY 16 OF CHAR;
+		VAR e, h, l, n: SIGNED32;  i, j, pos, len: SIZE;  z: FLOAT64;  d: ARRAY 16 OF CHAR;
 	PROCEDURE Wr (ch: CHAR);
 	BEGIN
 		IF ch = 0X THEN HALT(42) END;  (*! remove when possible *)
@@ -377,9 +377,9 @@ BEGIN
 END RealToStrOld;
 
 
-PROCEDURE RealToFixStr* (x: FLOAT64;   VAR str: ARRAY OF CHAR;   n, f, D: SIGNED32);
+PROCEDURE RealToFixStr* (x: FLOAT64;   VAR str: ARRAY OF CHAR;   n, f, D: SIZE);
 	(* from Strings. Modified to use E notation, using precalculated powers of ten *)
-	VAR pos, len, e, i, h, l: SIGNED32;   r, z: FLOAT64;   d: ARRAY 16 OF CHAR;   s: CHAR;
+	VAR pos, len: SIZE; e: SIGNED32; i: SIZE; h, l: SIGNED32;   r, z: FLOAT64;   d: ARRAY 16 OF CHAR;   s: CHAR;
 
 PROCEDURE Wr (ch: CHAR);
 BEGIN
@@ -404,13 +404,13 @@ BEGIN
 		DEC(n, f);
 		IF (e # 0) & (x < 0) THEN s := "-";   x := - x ELSE s := " "END;
 		IF e = 0 THEN
-			h := 0;   l := 0;   DEC(e, D - 1) (* no denormals *)
+			h := 0;   l := 0;   DEC(e, SIGNED32(D) - 1) (* no denormals *)
 		ELSE
 			e := (e - 1023) * 301029 DIV 1000000;   (* ln(2)/ln(10) = 0.301029996 *)
 			z := Reals.Ten(e + 1);
 			IF x >= z THEN x := x / z;   INC(e) ELSE x := x * Reals.Ten( - e) END;
-			DEC(e, D - 1);   i := - (e + f);
-			IF i <= 0 THEN r := 5 * Reals.Ten(i) ELSE r := 0 END;
+			DEC(e, SIGNED32(D) - 1);   i := - (SIGNED32(e) + f);
+			IF i <= 0 THEN r := 5 * Reals.Ten(SIGNED32(i)) ELSE r := 0 END;
 			IF x >= 10 THEN
 				x := x * TenM1 + r;   INC(e)
 			ELSE
@@ -452,7 +452,7 @@ BEGIN
 END RealToFixStr;
 
 
-PROCEDURE AppendRealFix* ( x: FLOAT64;   n, k, D: SIGNED32;   VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendRealFix* ( x: FLOAT64;   n, k, D: SIZE;   VAR dest: ARRAY OF CHAR);
 	VAR s: ARRAY 64 OF CHAR;
 BEGIN 	(*ASSERT((x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)), 100);
 	Texts.OpenWriter(W);
@@ -463,13 +463,13 @@ BEGIN 	(*ASSERT((x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)), 100);
 
 END AppendRealFix;
 
-PROCEDURE AppendLongReal* (x: FLOAT64;   n: SIGNED32;   VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendLongReal* (x: FLOAT64;   n: SIZE;   VAR dest: ARRAY OF CHAR);
 	VAR s: ARRAY maxreallen OF CHAR;
 BEGIN
 	RealToStr(x, n, s);  Append(dest, s)
 END AppendLongReal;
 
-PROCEDURE AppendReal* (x: FLOAT32;   n: SIGNED32;   VAR  dest: ARRAY OF CHAR);
+PROCEDURE AppendReal* (x: FLOAT32;   n: SIZE;   VAR  dest: ARRAY OF CHAR);
 	VAR s: ARRAY maxreallen OF CHAR;
 BEGIN 	 RealToStr(x, n, s);  Append(dest, s)
 END AppendReal;
@@ -621,7 +621,7 @@ END AppendLongRealHex;
 *)
 
 PROCEDURE AppendDate* (t, d: SIGNED32;   VAR dest: ARRAY OF CHAR);
-	VAR pos: SIGNED32;
+	VAR pos: SIZE;
 
 PROCEDURE AppendPair (ch: CHAR;   x: SIGNED32);
 BEGIN dest[pos] := ch;   INC(pos);
@@ -638,12 +638,12 @@ BEGIN
 END AppendDate;
 (*MODULE StringSearch;	(* Christoph Steindl, CS, steindl@ssw.uni-linz.ac.at, 2. May 95 *)
 *)
-PROCEDURE BruteSearch* (VAR s: ARRAY OF CHAR;   VAR pat: ARRAY OF CHAR): SIGNED32;
+PROCEDURE BruteSearch* (VAR s: ARRAY OF CHAR;   VAR pat: ARRAY OF CHAR): SIZE;
 	(** Returns the position of the first ocurrence of pat in s.
 	Time: worst case: O(strlen(s) * strlen(pat)	average: O(strlen(s) + strlen(pat)
 	Comparisons: average: strlen(s) * strlen(pat) *)
 	(* modified to return -1 if not found *)
-	VAR i, j, M, N: SIGNED32;
+	VAR i, j, M, N: SIZE;
 BEGIN
 	j := 0;   M := 0;   WHILE pat[M] # 0X DO INC(M) END;
 	i := 0;   N := 0;   WHILE s[N] # 0X DO INC(N) END;
@@ -654,14 +654,14 @@ BEGIN
 	IF j = M THEN RETURN i - M ELSE RETURN - 1 END
 END BruteSearch;
 
-PROCEDURE KMPSearch* (VAR s: ARRAY OF CHAR;   VAR pat: ARRAY OF CHAR): SIGNED32;
+PROCEDURE KMPSearch* (VAR s: ARRAY OF CHAR;   VAR pat: ARRAY OF CHAR): SIZE;
 	(** Knuth-Morris-Pratt-Search
 	Comparisons: worst case: strlen(s) * strlen(pat) *)
 	(* modified to return -1 if not found gs.*)
 
-	VAR i, j, M, N: SIGNED32;   next: ARRAY 256 OF SIGNED32;
+	VAR i, j, M, N: SIZE;   next: ARRAY 256 OF SIZE;
 PROCEDURE InitNext;
-	VAR i, j: SIGNED32;
+	VAR i, j: SIZE;
 BEGIN
 	next[0] := - 1;   i := 0;   j := - 1;
 	WHILE i < M DO
@@ -681,13 +681,13 @@ BEGIN
 	IF j = M THEN RETURN i - M ELSE RETURN - 1 END
 END KMPSearch;
 
-PROCEDURE BMSearch* (VAR s: ARRAY OF CHAR;   VAR pat: ARRAY OF CHAR): SIGNED32;
+PROCEDURE BMSearch* (VAR s: ARRAY OF CHAR;   VAR pat: ARRAY OF CHAR): SIZE;
 	(*= Boyer-Moore-Search*)
 	(* modified to return -1 if not found gs.*)
 
-	VAR i, j, t, M, N: SIGNED32;   skip: ARRAY 256 OF SIGNED32;
+	VAR i, j, t, M, N: SIZE;   skip: ARRAY 256 OF SIZE;
 PROCEDURE InitSkip;
-	VAR i, j: SIGNED32;
+	VAR i, j: SIZE;
 BEGIN
 	FOR i := 0 TO 255 DO skip[i] := M END;
 	FOR j := 0 TO M - 1 DO skip[ORD(pat[j])] := M - j - 1 END
@@ -708,14 +708,14 @@ BEGIN
 	RETURN i
 END BMSearch;
 
-PROCEDURE RKSearch* (VAR s: ARRAY OF CHAR;   VAR pat: ARRAY OF CHAR): SIGNED32;
+PROCEDURE RKSearch* (VAR s: ARRAY OF CHAR;   VAR pat: ARRAY OF CHAR): SIZE;
 	(*= Robin-Karp-Search
 	Time: average linear*)
 	(* modified to return -1 if not found gs.*)
 
 CONST q = 33554393;
 	d = 32;
-	VAR dM, h1, h2: SIGNED32;   i, M, N: SIGNED32;
+	VAR dM, h1, h2: SIZE;   i, M, N: SIZE;
 BEGIN
 	M := 0;   WHILE pat[M] # 0X DO INC(M) END;
 	N := 0;   WHILE s[N] # 0X DO INC(N) END;
@@ -735,7 +735,7 @@ BEGIN
 	RETURN i
 END RKSearch;
 
-PROCEDURE SeqName* (stub: ARRAY OF CHAR;  sep: CHAR;  seqnr: SIGNED32;  VAR res: ARRAY OF CHAR);
+PROCEDURE SeqName* (stub: ARRAY OF CHAR;  sep: CHAR;  seqnr: SIZE;  VAR res: ARRAY OF CHAR);
 CONST cseqlen = 4;
 	VAR i: SIGNED16;
 BEGIN
@@ -750,7 +750,7 @@ BEGIN
 	res[i] := CHR((seqnr MOD 10) + 30H)
 END SeqName;
 
-PROCEDURE NameToSeq* (name: ARRAY OF CHAR;   sep: CHAR;  VAR stub: ARRAY OF CHAR;  VAR seqnr: SIGNED32);
+PROCEDURE NameToSeq* (name: ARRAY OF CHAR;   sep: CHAR;  VAR stub: ARRAY OF CHAR;  VAR seqnr: SIZE);
 	VAR i: SIGNED16;  (*xname:ARRAY 32 OF CHAR;  xch:CHAR; *)
 BEGIN
 	(*	COPY(name,xname); *)

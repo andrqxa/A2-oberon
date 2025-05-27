@@ -37,7 +37,7 @@ TYPE
 
 	tObject* = POINTER TO tObjectDesc;
 	tObjectDesc* = RECORD (vyBase.ObjDesc);
-		w*, h*, d*, t*, depth*: SIGNED32;
+		w*, h*, d*, t*: SIZE; depth*: SIGNED32;
 		A*: tArray;
 		ACache*: tArray;
 		F: ants3dArrayObjects.tObject;
@@ -51,14 +51,14 @@ VAR
 	newobject-: tObject;
 
 	PROCEDURE UniformO*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;
+	VAR l, j, i, k: SIZE;  gen: vyRanBase.tRandom;
 	BEGIN
 		gen := vyRanBase.RandomGenerator;
 		IF o # NIL THEN
 			FOR k := 0 TO o.t - 1 DO
 				FOR l := 0 TO o.d - 1 DO
 					FOR j := 0 TO o.h - 1 DO
-						FOR i := 0 TO o.w - 1 DO o.A[k, l, j, i] := SHORT( gen.GetRandomL( gen, o.depth ) ) END
+						FOR i := 0 TO o.w - 1 DO o.A[k, l, j, i] := SIGNED16( gen.GetRandomL( gen, o.depth ) ) END
 					END
 				END
 			END
@@ -66,7 +66,7 @@ VAR
 	END UniformO;
 
 	PROCEDURE ExampleO*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy: FLOAT64;
+	VAR l, j, i, k: SIZE;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy: FLOAT64;
 	BEGIN
 		gen := vyRanBase.RandomGenerator;
 		IF o # NIL THEN
@@ -85,7 +85,7 @@ VAR
 	END ExampleO;
 
 	PROCEDURE ExampleOBall*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
+	VAR l, j, i, k: SIZE;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
 	CONST size = 1 / 3;
 	BEGIN
 		oms := 1 - size;  gen := vyRanBase.RandomGenerator;
@@ -111,7 +111,7 @@ VAR
 	END ExampleOBall;
 
 	PROCEDURE ExampleOBall2*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
+	VAR l, j, i, k: SIZE;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
 	CONST size = 1 / 3;
 	BEGIN
 		oms := 1 - size;  gen := vyRanBase.RandomGenerator;
@@ -139,7 +139,7 @@ VAR
 	END ExampleOBall2;
 
 	PROCEDURE ExampleOBall3*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
+	VAR l, j, i, k: SIZE;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
 	CONST size = 1 / 3;
 	BEGIN
 		oms := 1 - size;  gen := vyRanBase.RandomGenerator;
@@ -167,7 +167,7 @@ VAR
 	END ExampleOBall3;
 
 	PROCEDURE ExampleOColumn*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
+	VAR l, j, i, k: SIZE;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
 	CONST size = 1 / 5;
 	BEGIN
 		oms := 1 - size;  gen := vyRanBase.RandomGenerator;
@@ -216,7 +216,7 @@ VAR
 	PROCEDURE SetDepth*( obj: tObject;  depth: SIGNED32 );
 	(*= Set depth of an object. While any connected objects become consistent with respect to their depth, you will have to
 	call Update(obj) to get a consistent array - picture connection. *)
-	VAR olddepth: SIGNED32;  y, x, l, k: SIGNED32;
+	VAR olddepth: SIGNED32;  y, x, l, k: SIZE;
 	BEGIN
 		ASSERT ( obj # NIL , 100 );
 		ASSERT ( depth > 1, 101 );
@@ -228,7 +228,7 @@ VAR
 				FOR k := 0 TO obj.t - 1 DO
 					FOR l := 0 TO obj.d - 1 DO
 						FOR y := 0 TO obj.h - 1 DO
-							FOR x := 0 TO obj.w - 1 DO obj.A[k, l, y, x] := SHORT( ENTIER( obj.A[k, l, y, x] / olddepth * depth + 0.5 ) );  END;
+							FOR x := 0 TO obj.w - 1 DO obj.A[k, l, y, x] := SIGNED16( ENTIER( obj.A[k, l, y, x] / olddepth * depth + 0.5 ) );  END;
 						END;
 					END;
 				END;
@@ -244,8 +244,8 @@ VAR
 		Refresh( o )
 	END EmbedArray;
 
-	PROCEDURE NewArray*( w, h, d, t: SIGNED32 ): tArray;
-	VAR a: tArray;  i, k: SIGNED32;
+	PROCEDURE NewArray*( w, h, d, t: SIZE ): tArray;
+	VAR a: tArray;  i, k: SIZE;
 	BEGIN
 		ASSERT ( w > 0, 100 );
 		ASSERT ( h > 0, 101 );
@@ -257,7 +257,7 @@ VAR
 		RETURN a
 	END NewArray;
 
-	PROCEDURE NewObject*( w, h, d, t, depth: SIGNED32 ): tObject;
+	PROCEDURE NewObject*( w, h, d, t: SIZE; depth: SIGNED32 ): tObject;
 	(*= create a new instance of an array within an array object *)
 	VAR a: tArray;  A: tObject;
 	BEGIN
@@ -272,7 +272,7 @@ VAR
 	PROCEDURE ChangeSize( o: tObject;  w, h, d, t: SIGNED16 );
 	VAR oldarray: tArray;  oldw, oldh, oldd, oldt, k, y, l: SIGNED16;
 	BEGIN
-		oldw := SHORT( o.w );  oldh := SHORT( o.h );  oldd := SHORT( o.d );  oldt := SHORT( o.t );
+		oldw := SIGNED16( o.w );  oldh := SIGNED16( o.h );  oldd := SIGNED16( o.d );  oldt := SIGNED16( o.t );
 		IF (w # o.w) OR (h # o.h) OR (d # o.d) OR (t # o.t) THEN  (* ? preserve pict / array when shrinked ? *)
 			oldarray := o.A;
 
@@ -296,10 +296,10 @@ VAR
 			M.Enum( "ARRAY" );  vyBase.objecthandle( o, M )
 		ELSIF M.id = Objects.get THEN
 			IF M.name = "Gen" THEN COPY( 'ants4dArrayObjects.Gen', M.s );  M.class := Objects.String;  M.res := 0
-			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := o.w;  M.res := 0
-			ELSIF M.name = "h" THEN M.class := Objects.Int;  M.i := o.h;  M.res := 0
-			ELSIF M.name = "d" THEN M.class := Objects.Int;  M.i := o.d;  M.res := 0
-			ELSIF M.name = "t" THEN M.class := Objects.Int;  M.i := o.t;  M.res := 0
+			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := SIGNED32(o.w);  M.res := 0
+			ELSIF M.name = "h" THEN M.class := Objects.Int;  M.i := SIGNED32(o.h);  M.res := 0
+			ELSIF M.name = "d" THEN M.class := Objects.Int;  M.i := SIGNED32(o.d);  M.res := 0
+			ELSIF M.name = "t" THEN M.class := Objects.Int;  M.i := SIGNED32(o.t);  M.res := 0
 			ELSIF M.name = "depth" THEN M.class := Objects.Int;  M.i := o.depth;  M.res := 0
 			ELSIF M.name = "ViewD" THEN M.class := Objects.Int;  M.i := o.Fd;  M.res := 0;
 			ELSIF M.name = "ARRAY" THEN
@@ -312,16 +312,16 @@ VAR
 			IF M.name = "depth" THEN
 				IF M.class = Objects.Int THEN SetDepth( o, M.i );  M.res := 0 END
 			ELSIF M.name = "w" THEN
-				IF M.class = Objects.Int THEN ChangeSize( o, SHORT( M.i ), SHORT( o.h ), SHORT( o.d ), SHORT( o.t ) );  vyBase.Update( o );  M.res := 0 END
+				IF M.class = Objects.Int THEN ChangeSize( o, SIGNED16( M.i ), SIGNED16( o.h ), SIGNED16( o.d ), SIGNED16( o.t ) );  vyBase.Update( o );  M.res := 0 END
 			ELSIF M.name = "h" THEN
-				IF M.class = Objects.Int THEN ChangeSize( o, SHORT( o.w ), SHORT( M.i ), SHORT( o.d ), SHORT( o.t ) );  vyBase.Update( o );  M.res := 0 END
+				IF M.class = Objects.Int THEN ChangeSize( o, SIGNED16( o.w ), SIGNED16( M.i ), SIGNED16( o.d ), SIGNED16( o.t ) );  vyBase.Update( o );  M.res := 0 END
 			ELSIF M.name = "d" THEN
-				IF M.class = Objects.Int THEN ChangeSize( o, SHORT( o.w ), SHORT( o.h ), SHORT( M.i ), SHORT( o.t ) );  vyBase.Update( o );  M.res := 0 END
+				IF M.class = Objects.Int THEN ChangeSize( o, SIGNED16( o.w ), SIGNED16( o.h ), SIGNED16( M.i ), SIGNED16( o.t ) );  vyBase.Update( o );  M.res := 0 END
 			ELSIF M.name = "t" THEN
-				IF M.class = Objects.Int THEN ChangeSize( o, SHORT( o.w ), SHORT( o.h ), SHORT( o.d ), SHORT( M.i ) );  vyBase.Update( o );  M.res := 0 END
+				IF M.class = Objects.Int THEN ChangeSize( o, SIGNED16( o.w ), SIGNED16( o.h ), SIGNED16( o.d ), SIGNED16( M.i ) );  vyBase.Update( o );  M.res := 0 END
 			ELSIF M.name = "ViewD" THEN
 				IF M.class = Objects.Int THEN
-					o.Fd := Min( SHORT( M.i ), SHORT( o.t - 1 ) );
+					o.Fd := Min( SIGNED16( M.i ), SIGNED16( o.t - 1 ) );
 					IF o.F # NIL THEN ants3dArrayObjects.EmbedArray( o.A[o.Fd], o.F );  vyBase.Update( o.F );  END;
 				END;
 			ELSE vyBase.objecthandle( o, M )
@@ -339,12 +339,12 @@ VAR
 	END FrameLinks;
 
 	PROCEDURE StoreA( VAR R: Files.Rider;  A: tArray );
-	VAR i, j, l, k: SIGNED32;
+	VAR i, j, l, k: SIZE;
 	BEGIN
 		IF A = NIL THEN Files.WriteBool( R, FALSE )
 		ELSE
-			Files.WriteBool( R, TRUE );  Files.WriteLInt( R, LEN( A^ ) );  Files.WriteLInt( R, LEN( A[0] ) );  Files.WriteLInt( R, LEN( A[0][0] ) );
-			Files.WriteLInt( R, LEN( A[0][0][0] ) );
+			Files.WriteBool( R, TRUE );  Files.WriteLInt( R, SIGNED32(LEN( A^ )) );  Files.WriteLInt( R, SIGNED32(LEN( A[0] )) );  Files.WriteLInt( R, SIGNED32(LEN( A[0][0] )) );
+			Files.WriteLInt( R, SIGNED32(LEN( A[0][0][0] )) );
 			FOR k := 0 TO LEN( A^ ) - 1 DO
 				FOR l := 0 TO LEN( A[0] ) - 1 DO
 					FOR i := 0 TO LEN( A[0][0] ) - 1 DO
@@ -356,7 +356,7 @@ VAR
 	END StoreA;
 
 	PROCEDURE LoadA( VAR R: Files.Rider ): tArray;
-	VAR bool: BOOLEAN;  i, j, l, k: SIGNED32;  maxi, maxj, maxl, maxk: SIGNED32;  A: tArray;
+	VAR bool: BOOLEAN;  i, j, l, k: SIZE;  maxi, maxj, maxl, maxk: SIGNED32;  A: tArray;
 	BEGIN
 		Files.ReadBool( R, bool );
 		IF bool = FALSE THEN RETURN NIL END;
@@ -375,29 +375,29 @@ VAR
 	END LoadA;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR w, h, d, depth: SIGNED32;  version: SIGNED16;  objsub: Objects.Object;
+	VAR w, h, d: SIZE; depth,c: SIGNED32;  version: SIGNED16;  objsub: Objects.Object;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN
-			Files.ReadInt( msg.R, version );  vyBase.objecthandle( obj, msg );  Files.ReadLInt( msg.R, w );
-			Files.ReadLInt( msg.R, h );  Files.ReadLInt( msg.R, d );  Files.ReadLInt( msg.R, depth );
-			IF version > 0 THEN Files.ReadLInt( msg.R, obj.t ) END;
+			Files.ReadInt( msg.R, version );  vyBase.objecthandle( obj, msg );  Files.ReadLInt( msg.R,c);  w := c;
+			Files.ReadLInt( msg.R, c); h := c;  Files.ReadLInt( msg.R, c); d := c;  Files.ReadLInt( msg.R, depth );
+			IF version > 0 THEN Files.ReadLInt( msg.R, c); obj.t := c; END;
 			obj.A := LoadA( msg.R );  obj.w := w;  obj.h := h;  obj.depth := depth;  obj.d := d;  Files.ReadLInt( msg.R, obj.Fd );
 			Gadgets.ReadRef( msg.R, obj.lib, objsub );
 			IF objsub # NIL THEN
 				obj.F := objsub( ants3dArrayObjects.tObject );  ants3dArrayObjects.EmbedArray( obj.A[obj.Fd], obj.F );
 			END;
 		ELSIF msg.id = Objects.store THEN
-			Files.WriteInt( msg.R, 1 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, obj.w );
-			Files.WriteLInt( msg.R, obj.h );  Files.WriteLInt( msg.R, obj.d );  Files.WriteLInt( msg.R, obj.depth );
-			Files.WriteLInt( msg.R, obj.t );  StoreA( msg.R, obj.A );  Files.WriteLInt( msg.R, obj.Fd );
+			Files.WriteInt( msg.R, 1 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, SIGNED32(obj.w) );
+			Files.WriteLInt( msg.R, SIGNED32(obj.h) );  Files.WriteLInt( msg.R, SIGNED32(obj.d) );  Files.WriteLInt( msg.R, obj.depth );
+			Files.WriteLInt( msg.R, SIGNED32(obj.t) );  StoreA( msg.R, obj.A );  Files.WriteLInt( msg.R, obj.Fd );
 			Gadgets.WriteRef( msg.R, obj.lib, obj.F );
 		ELSE vyBase.objecthandle( obj, msg )
 		END
 	END HandleFileMsg;
 
-	PROCEDURE CopyArray*( a: tArray;  VAR A: tArray;  sx, sy, sz, st, w, h, zl, tl, dx, dy, dz, dt: SIGNED32 );
-	VAR y, x, z, t, x0, y0, z0, t0: SIGNED32;
+	PROCEDURE CopyArray*( a: tArray;  VAR A: tArray;  sx, sy, sz, st, w, h, zl, tl, dx, dy, dz, dt: SIZE );
+	VAR y, x, z, t, x0, y0, z0, t0: SIZE;
 	BEGIN
 		IF a = NIL THEN A := NIL;  RETURN END;
 		IF (A = NIL ) OR (LEN( A ) < dt + tl) OR (LEN( A[0] ) < dz + zl) OR (LEN( A[0][0] ) < dy + h) OR (LEN( A[0][0][0] ) < dx + w) THEN
@@ -416,7 +416,7 @@ VAR
 	END CopyArray;
 
 	PROCEDURE CopyArrayPart( from, to: tObject );
-	VAR i, l, k: SIGNED32;
+	VAR i, l, k: SIZE;
 	BEGIN
 		IF (from.A = NIL ) THEN RETURN END;
 		IF to.A = NIL THEN to.A := NewArray( from.w, from.h, from.d, from.t ) END;
@@ -501,7 +501,7 @@ VAR
 	END Copy;
 
 	PROCEDURE New*;
-	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  w, h, d, t, depth: SIGNED32;  obj: tObject;
+	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  w, h, d, t: SIGNED32; depth: SIGNED32;  obj: tObject;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME w=INT h=INT d=INT t=INT  depth=INT # create new 4d Object <name>" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectNumberFromKeyword( l, "w", w ) &
@@ -525,7 +525,7 @@ VAR
 	END Uniform;
 
 	PROCEDURE Channel*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  y, x, ll, k: SIGNED32;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  y, x, ll, k: SIZE;
 		ra: POINTER TO ARRAY OF FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ p=FLOAT32 # noise <name> with channel noise, prob = <p>" );
@@ -591,7 +591,7 @@ VAR
 		l := antsCommands.ScanFromPar( "name= OBJ # Take next 'slide' of 4-dim data for 3-dim data <name>" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) THEN
 			WITH obj: tObject DO
-				INC( obj.Fd );  obj.Fd := obj.Fd MOD obj.t;  ants3dArrayObjects.EmbedArray( obj.A[obj.Fd], obj.F );
+				INC( obj.Fd );  obj.Fd := SIGNED32( obj.Fd MOD obj.t);  ants3dArrayObjects.EmbedArray( obj.A[obj.Fd], obj.F );
 				Gadgets.Update( obj );
 				(* vyBase.Update(obj.F);  *)
 			END;

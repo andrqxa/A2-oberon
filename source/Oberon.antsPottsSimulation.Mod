@@ -84,7 +84,7 @@ VAR
 
 	PROCEDURE UpdatePanel*;
 
-	VAR i: SIGNED32;  R: ListRiders.Rider;  M: ListRiders.ConnectMsg;  list: Objects.Object;  textf: Objects.Object;  d: ListRiders.String;
+	VAR i: SIZE;  R: ListRiders.Rider;  M: ListRiders.ConnectMsg;  list: Objects.Object;  textf: Objects.Object;  d: ListRiders.String;
 		name: ARRAY 1024 OF CHAR;
 
 	BEGIN
@@ -273,7 +273,7 @@ VAR
 		dataname, monotonename: ARRAY 1024 OF CHAR;
 
 	BEGIN
-		antsCommands.InitScan( "function=STRING datanumber=SIGNED32 datavec=OBJ fct=OBJ monotonevec=OBJ" );
+		antsCommands.InitScan( "function=STRING datanumber=SIZE datavec=OBJ fct=OBJ monotonevec=OBJ" );
 
 		IF antsCommands.ExpectString( "function", function ) & antsCommands.ExpectNumber( "datanumber", datanumber ) &
 		    antsCommands.ExpectObject( "datavec", datavec ) & antsCommands.ExpectObject( "fct", fct ) &
@@ -841,7 +841,7 @@ VAR
 
 	PROCEDURE DelAllDegraded*;
 
-	VAR len, i: SIGNED32;
+	VAR len, i: SIZE;
 		dataname: ARRAY 1024 OF CHAR;
 		datavec, datarekovec, monotonevec, degradedvec, rekovec: vyBase.Object;
 
@@ -868,7 +868,7 @@ VAR
 
 	PROCEDURE DelAllReko*;
 
-	VAR len, i: SIGNED32;
+	VAR len, i: SIZE;
 		degradedname: ARRAY 1024 OF CHAR;
 		datavec, datarekovec, monotonevec, degradedvec, rekovec: vyBase.Object;
 
@@ -897,7 +897,7 @@ VAR
 
 	VAR dataname, datarekoname, monotonename, degradedname, rekoname: ARRAY 1024 OF CHAR;
 		data, datareko, degraded, reko, dataresults, results, diffs, estimatedNoises, meanM, medianM, hampelM, saegezahnM, huberM: antsArrays.X1d;
-		i, j, k: SIGNED32;  parameter: FLOAT64;
+		i, j, k: SIZE;  parameter: FLOAT64;
 
 	BEGIN
 		IF (set = NIL ) OR (actualDataSet = "") OR (actualData = "") THEN antsSecurity.Halt( "No data to copy !!!" );  ELSE
@@ -968,7 +968,7 @@ END Output; **)
 
 	PROCEDURE ShowAllDataRekoResults*;
 
-	VAR RR: antsFiles.Rider;  i, k, l, j: SIGNED32;
+	VAR RR: antsFiles.Rider;  i, k, l, j: SIZE;
 		outfile: ARRAY 1024 OF CHAR;
 		actualData, actualDataSet: ARRAY 1024 OF CHAR;
 		u, v, w, x, y, z: vyRealVec.tVector;  dataresults, data: antsArrays.X1d;
@@ -1013,7 +1013,7 @@ END Output; **)
 
 	PROCEDURE ShowAllRekoResults*;
 
-	VAR RR: antsFiles.Rider;  i, j, k, l, m, n: SIGNED32;
+	VAR RR: antsFiles.Rider;  i, j, k, l, m, n: SIZE;
 		outfile: ARRAY 1024 OF CHAR;
 		appendedName, actualData, actualDataSet: ARRAY 1024 OF CHAR;
 		noiseVariance: FLOAT64;  x, y: vyRealVec.tVector;  dataresults, data: antsArrays.X1d;

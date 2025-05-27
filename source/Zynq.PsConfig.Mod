@@ -77,10 +77,13 @@ VAR
 	BEGIN
 		IF assertedChannels * {4..31} # {} THEN res := InvalidChannel; RETURN FALSE; END;
 
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_UNLOCK := Platform.SlcrUnlockKey; (* enable writing to SLCR registers *)
+#END
 		Platform.slcr.FPGA_RST_CTRL := assertedChannels;
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
-
+#END
 		res := Ok;
 		RETURN TRUE;
 	END SetPlResets;
@@ -100,22 +103,24 @@ VAR
 	BEGIN
 		IF (srcSel > 0) OR (srcSel > 3) THEN res := InvalidClockSource; RETURN FALSE; END;
 		IF (divisor0 < 1) OR (divisor0 > 63) OR (divisor1 < 0) OR (divisor1 > 63) THEN res := InvalidDivisor; RETURN FALSE; END;
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_UNLOCK := Platform.SlcrUnlockKey; (* enable writing to SLCR registers *)
-
+#END
 		CASE channel OF
 			|0: Platform.slcr.FPGA0_CLK_CTRL := srcSel + LSH(divisor0,8) + LSH(divisor1,20);
 			|1: Platform.slcr.FPGA1_CLK_CTRL := srcSel + LSH(divisor0,8) + LSH(divisor1,20);
 			|2: Platform.slcr.FPGA2_CLK_CTRL := srcSel + LSH(divisor0,8) + LSH(divisor1,20);
 			|3: Platform.slcr.FPGA3_CLK_CTRL := srcSel + LSH(divisor0,8) + LSH(divisor1,20);
 		ELSE
+#IF ~UNIX THEN
 			Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
+#END
 			res := InvalidChannel;
 			RETURN FALSE;
 		END;
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
-
+#END
 		res := Ok;
 		RETURN TRUE;
 	END SetPlClock;
@@ -158,22 +163,24 @@ VAR
 	*)
 	PROCEDURE StopPlClock*(channel: SIGNED32; VAR res: INTEGER): BOOLEAN;
 	BEGIN
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_UNLOCK := Platform.SlcrUnlockKey; (* enable writing to SLCR registers *)
-
+#END
 		CASE channel OF
 			|0: Platform.slcr.FPGA0_THR_CNT := 1;
 			|1: Platform.slcr.FPGA1_THR_CNT := 1;
 			|2: Platform.slcr.FPGA2_THR_CNT := 1;
 			|3: Platform.slcr.FPGA3_THR_CNT := 1;
 		ELSE
+#IF ~UNIX THEN
 			Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
+#END
 			res := InvalidChannel;
 			RETURN FALSE;
 		END;
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
-
+#END
 		res := Ok;
 		RETURN TRUE;
 	END StopPlClock;
@@ -188,21 +195,24 @@ VAR
 	*)
 	PROCEDURE StartPlClock*(channel: SIGNED32; VAR res: INTEGER): BOOLEAN;
 	BEGIN
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_UNLOCK := Platform.SlcrUnlockKey; (* enable writing to SLCR registers *)
-
+#END
 		CASE channel OF
 			|0: Platform.slcr.FPGA0_THR_CNT := 0;
 			|1: Platform.slcr.FPGA1_THR_CNT := 0;
 			|2: Platform.slcr.FPGA2_THR_CNT := 0;
 			|3: Platform.slcr.FPGA3_THR_CNT := 0;
 		ELSE
+#IF ~UNIX THEN
 			Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
+#END
 			res := InvalidChannel;
 			RETURN FALSE;
 		END;
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
-
+#END
 		res := Ok;
 		RETURN TRUE;
 	END StartPlClock;
@@ -218,16 +228,16 @@ VAR
 	PROCEDURE StopPlClocks*(channels: SET; VAR res: INTEGER): BOOLEAN;
 	BEGIN
 		IF channels * {0,1,2,3} = {} THEN res := InvalidChannel; RETURN FALSE; END;
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_UNLOCK := Platform.SlcrUnlockKey; (* enable writing to SLCR registers *)
-
+#END
 		IF 0 IN channels THEN Platform.slcr.FPGA0_THR_CNT := 1; END;
 		IF 1 IN channels THEN Platform.slcr.FPGA1_THR_CNT := 1; END;
 		IF 2 IN channels THEN Platform.slcr.FPGA2_THR_CNT := 1; END;
 		IF 3 IN channels THEN Platform.slcr.FPGA3_THR_CNT := 1; END;
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
-
+#END
 		res := Ok;
 		RETURN TRUE;
 	END StopPlClocks;
@@ -243,16 +253,16 @@ VAR
 	PROCEDURE StartPlClocks*(channels: SET; VAR res: INTEGER): BOOLEAN;
 	BEGIN
 		IF channels * {0,1,2,3} = {} THEN res := InvalidChannel; RETURN FALSE; END;
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_UNLOCK := Platform.SlcrUnlockKey; (* enable writing to SLCR registers *)
-
+#END
 		IF 0 IN channels THEN Platform.slcr.FPGA0_THR_CNT := 0; END;
 		IF 1 IN channels THEN Platform.slcr.FPGA1_THR_CNT := 0; END;
 		IF 2 IN channels THEN Platform.slcr.FPGA2_THR_CNT := 0; END;
 		IF 3 IN channels THEN Platform.slcr.FPGA3_THR_CNT := 0; END;
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
-
+#END
 		res := Ok;
 		RETURN TRUE;
 	END StartPlClocks;
@@ -347,8 +357,9 @@ VAR
 		END;
 		baseFreq := GetPllClockFrequency(GetIoClockSource(module, res), res);
 		IF res # Ok THEN RETURN FALSE END;
-
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_UNLOCK := Platform.SlcrUnlockKey; (* enable writing to SLCR registers *)
+#END
 		CASE module OF
 			 IoUsb: (*!TODO*)
 			|IoGem: (*!TODO*)
@@ -360,7 +371,9 @@ VAR
 			|IoGpio:(*!TODO*)
 			|IoI2c:(*!TODO*)
 		END;
+#IF ~UNIX THEN
 		Platform.slcr.SLCR_LOCK := Platform.SlcrLockKey; (* disable writing to SLCR registers *)
+#END
 		RETURN TRUE
 	END SetIoClockFrequency;
 

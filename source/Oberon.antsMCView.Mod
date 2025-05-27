@@ -69,15 +69,15 @@ VAR
 	cur: vyBase.Object;  templ: tLayer;  globalCount: SIGNED32;
 
 	PROCEDURE StoreVector( VAR R: Files.Rider;  VAR V: Vector );
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	BEGIN
 		IF V = NIL THEN Files.WriteLInt( R, 0 );  RETURN END;
-		Files.WriteLInt( R, LEN( V ) );
+		Files.WriteLInt( R, SIGNED32(LEN( V )) );
 		FOR i := 0 TO LEN( V ) - 1 DO Files.WriteLReal( R, V[i] ) END
 	END StoreVector;
 
 	PROCEDURE LoadVector( VAR R: Files.Rider;  VAR V: Vector );
-	VAR i, w: SIGNED32;
+	VAR i: SIZE; w: SIGNED32;
 	BEGIN
 		Files.ReadLInt( R, w );
 		IF w = 0 THEN V := NIL;  RETURN END;
@@ -86,11 +86,11 @@ VAR
 	END LoadVector;
 
 	PROCEDURE StoreMatrix( VAR R: Files.Rider;  VAR M: Matrix );
-	VAR i, j: SIGNED32;
+	VAR i, j: SIZE;
 	BEGIN
 		IF M = NIL THEN Files.WriteLInt( R, 0 );  Files.WriteLInt( R, 0 )
 		ELSE
-			Files.WriteLInt( R, LEN( M ) );  Files.WriteLInt( R, LEN( M[0] ) );
+			Files.WriteLInt( R, SIGNED32(LEN( M )) );  Files.WriteLInt( R, SIGNED32(LEN( M[0] )) );
 			FOR i := 0 TO LEN( M ) - 1 DO
 				FOR j := 0 TO LEN( M[0] ) - 1 DO Files.WriteLReal( R, M[i, j] ) END
 			END
@@ -98,7 +98,7 @@ VAR
 	END StoreMatrix;
 
 	PROCEDURE LoadMatrix( VAR R: Files.Rider;  VAR M: Matrix );
-	VAR w, h, i, j: SIGNED32;
+	VAR w, h: SIGNED32; i, j: SIZE;
 	BEGIN
 		Files.ReadLInt( R, h );  Files.ReadLInt( R, w );
 		IF (h = 0) OR (w = 0) THEN M := NIL;  RETURN END;
@@ -109,17 +109,17 @@ VAR
 	END LoadMatrix;
 
 	PROCEDURE StoreMap( VAR R: Files.Rider;  m: Map );
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	BEGIN
 		IF m = NIL THEN Files.WriteLInt( R, 0 )
 		ELSE
-			Files.WriteLInt( R, LEN( m ) );
+			Files.WriteLInt( R, SIGNED32(LEN( m )));
 			FOR i := 0 TO LEN( m ) - 1 DO Files.WriteLInt( R, m[i] ) END
 		END
 	END StoreMap;
 
 	PROCEDURE LoadMap( VAR R: Files.Rider;  VAR m: Map );
-	VAR len, i: SIGNED32;
+	VAR len: SIGNED32; i: SIZE;
 	BEGIN
 		Files.ReadLInt( R, len );
 		IF len = 0 THEN m := NIL
@@ -130,17 +130,17 @@ VAR
 	END LoadMap;
 
 	PROCEDURE StoreUsage( VAR R: Files.Rider;  m: Usage );
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	BEGIN
 		IF m = NIL THEN Files.WriteLInt( R, 0 )
 		ELSE
-			Files.WriteLInt( R, LEN( m ) );
+			Files.WriteLInt( R, SIGNED32(LEN( m )) );
 			FOR i := 0 TO LEN( m ) - 1 DO Files.WriteBool( R, m[i] ) END
 		END
 	END StoreUsage;
 
 	PROCEDURE LoadUsage( VAR R: Files.Rider;  VAR m: Usage );
-	VAR len, i: SIGNED32;
+	VAR len: SIGNED32; i: SIZE;
 	BEGIN
 		Files.ReadLInt( R, len );
 		IF len = 0 THEN m := NIL
@@ -298,7 +298,7 @@ VAR
 	END PaintPoint2;
 
 	PROCEDURE PaintMap( q: MapQueue;  at: SIGNED32 );
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	BEGIN
 		vyGraphBase.SetForeColor( templ.style.fillcol );
 		FOR i := 0 TO LEN( q.m ) - 1 DO
@@ -542,7 +542,7 @@ VAR
 	END NewQueue;
 
 	PROCEDURE Init*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  dim: SIGNED32;  A, cA: Matrix;  c: Chain;  i, j: SIGNED32;  sum: FLOAT64;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  dim: SIGNED32;  A, cA: Matrix;  c: Chain;  i, j: SIZE;  sum: FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ [dim=INT]" );
 		IF ~antsCommands.ExpectObjectFromKeyword( l, "name", obj ) THEN RETURN END;
@@ -582,7 +582,7 @@ VAR
 
 		ELSE
 			IF c.A = NIL THEN aM.S( "Need a dimension" );  RETURN END;
-			dim := LEN( c.A )
+			dim := SIGNED32(LEN( c.A ))
 		END;
 
 		NEW( c.ran, dim );  c.dim := dim;  c.q := NewQueue( dim );  c.qlen := 0;
@@ -609,7 +609,7 @@ VAR
 	VAR q: MapQueue;  next: MapQueue;  dim: SIGNED32;  i: SIGNED32;  count: SIGNED32;
 	BEGIN
 		ASSERT ( first # NIL );
-		q := first;  dim := LEN( q.m );  next := q.next;
+		q := first;  dim := SIGNED32(LEN( q.m ));  next := q.next;
 
 		WHILE (next # NIL ) DO
 			FOR i := 0 TO dim - 1 DO next.u[i] := FALSE END;

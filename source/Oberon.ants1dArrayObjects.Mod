@@ -39,7 +39,7 @@ TYPE
 
 	tObject* = POINTER TO tObjectDesc;
 	tObjectDesc* = RECORD (vyBase.ObjDesc);
-		w*, depth*: SIGNED32;
+		w*: SIZE; depth*: SIGNED32;
 		A*: tArray;
 		ACache*: tArray
 	END;
@@ -50,30 +50,30 @@ CONST
 VAR
 	newobject-: tObject;  RandomR-: tRArray;  RandomL-: tLArray;
 
-	PROCEDURE RandomRC( w: SIGNED32 );
+	PROCEDURE RandomRC( w: SIZE );
 	BEGIN
 		IF (RandomR = NIL ) OR (LEN( RandomR^ ) < w) THEN NEW( RandomR, w );  aM.dS( "New RandomR" );  END
 	END RandomRC;
 
-	PROCEDURE RandomLC( w: SIGNED32 );
+	PROCEDURE RandomLC( w: SIZE );
 	BEGIN
 		IF (RandomL = NIL ) OR (LEN( RandomL^ ) < w) THEN NEW( RandomL, w );  aM.dS( "New RandomR" );  END
 	END RandomLC;
 
-	PROCEDURE UniformR*( w: SIGNED32 );
+	PROCEDURE UniformR*( w: SIZE );
 	VAR gen: vyRanBase.tRandom;
 	BEGIN
-		RandomRC( w );  gen := vyRanBase.RandomGenerator;  gen.GetRandomUVX( gen, w, RandomR^, 0 )
+		RandomRC( w );  gen := vyRanBase.RandomGenerator;  gen.GetRandomUVX( gen, SIGNED32(w), RandomR^, 0 )
 	END UniformR;
 
-	PROCEDURE UniformL*( w, top: SIGNED32 );
+	PROCEDURE UniformL*( w: SIZE; top: SIGNED32 );
 	VAR gen: vyRanBase.tRandom;
 	BEGIN
-		RandomLC( w );  gen := vyRanBase.RandomGenerator;  gen.GetRandomLV( gen, top, w, RandomL^, 0 )
+		RandomLC( w );  gen := vyRanBase.RandomGenerator;  gen.GetRandomLV( gen, top, SIGNED32(w), RandomL^, 0 )
 	END UniformL;
 
-	PROCEDURE UniformA*( A: tArray;  top: SIGNED32;  x, w: SIGNED32 );
-	VAR adri, adrl, adrw: SIGNED32;  val: SIGNED32;
+	PROCEDURE UniformA*( A: tArray;  top: SIGNED32;  x, w: SIZE );
+	VAR adri, adrl, adrw: ADDRESS;  val: SIGNED32;
 	CONST stepi = SIZEOF( SIGNED16 );  stepl = SIZEOF( SIGNED32 );
 	BEGIN
 		UniformL( w, top );  adri := ADDRESSOF( A[x] );  adrl := ADDRESSOF( RandomL[0] );  adrw := adri + w * stepi;
@@ -85,8 +85,8 @@ VAR
 		IF o # NIL THEN UniformA( o.A, o.depth, 0, o.w ) END
 	END UniformO;
 
-	PROCEDURE FillA*( A: tArray;  val: SIGNED16;  x, w: SIGNED32 );
-	VAR adr, adrw: SIGNED32;
+	PROCEDURE FillA*( A: tArray;  val: SIGNED16;  x, w: SIZE );
+	VAR adr, adrw: ADDRESS;
 	CONST step = SIZEOF( SIGNED16 );
 	BEGIN
 		adr := ADDRESSOF( A[x] );  adrw := adr + w * step;
@@ -119,7 +119,7 @@ VAR
 	PROCEDURE SetDepth*( obj: tObject;  depth: SIGNED32 );
 	(*= Set depth of an object. While any connected objects become consistent with respect to their depth, you will have to
 	call Update(obj) to get a consistent array - picture connection. *)
-	VAR olddepth: SIGNED32;  x: SIGNED32;
+	VAR olddepth: SIGNED32;  x: SIZE;
 	BEGIN
 		ASSERT ( obj # NIL , 100 );
 		ASSERT ( depth > 1, 101 );
@@ -139,14 +139,14 @@ VAR
 		o.A := A;  o.w := LEN( A^ );  Refresh( o )
 	END EmbedArray;
 
-	PROCEDURE NewArray*( w: SIGNED32 ): tArray;
+	PROCEDURE NewArray*( w: SIZE ): tArray;
 	VAR a: tArray;
 	BEGIN
 		ASSERT ( w > 0, 100 );
 		NEW( a, w );  FillA( a, 0, 0, w );  RETURN a
 	END NewArray;
 
-	PROCEDURE NewObject*( w, d: SIGNED32 ): tObject;
+	PROCEDURE NewObject*( w: SIZE; d: SIGNED32 ): tObject;
 	(*= create a new instance of an array within an array object *)
 	VAR a: tArray;  A: tObject;
 	BEGIN
@@ -158,16 +158,16 @@ VAR
 		IF x < y THEN RETURN x ELSE RETURN y END
 	END Min;
 
-	PROCEDURE ChangeSize( o: tObject;  w: SIGNED32 );
+	PROCEDURE ChangeSize( o: tObject;  w: SIZE );
 	VAR oldarray: tArray;  oldw: SIGNED16;
 	BEGIN
-		oldw := SHORT( o.w );
+		oldw := SIGNED16( o.w );
 		IF (w # o.w) THEN  (* ? preserve pict / array when shrinked ? *)
 			oldarray := o.A;
-			IF oldarray # NIL THEN o.A := NewArray( w );  vyInteger.Copy( Min( SHORT( w ), oldw ), oldarray^, 0, o.A^, 0 ) END;
+			IF oldarray # NIL THEN o.A := NewArray( w );  vyInteger.Copy( Min( SIGNED16( w ), oldw ), oldarray^, 0, o.A^, 0 ) END;
 			o.w := w
 		END;
-		vyHostTexts.NoteSI( vyHostTexts.cWarning, "ants1dArrayObjects Warning: Changed PictSize ", w )
+		vyHostTexts.NoteSI( vyHostTexts.cWarning, "ants1dArrayObjects Warning: Changed PictSize ", SIGNED32(w) )
 	END ChangeSize;
 
 	PROCEDURE HandleAttributes( o: tObject;  VAR M: Objects.AttrMsg );
@@ -177,7 +177,7 @@ VAR
 			vyBase.objecthandle( o, M )
 		ELSIF M.id = Objects.get THEN
 			IF M.name = "Gen" THEN COPY( 'ants1dArrayObjects.Gen', M.s );  M.class := Objects.String;  M.res := 0
-			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := o.w;  M.res := 0
+			ELSIF M.name = "w" THEN M.class := Objects.Int;  M.i := SIGNED32(o.w);  M.res := 0
 			ELSIF M.name = "depth" THEN M.class := Objects.Int;  M.i := o.depth;  M.res := 0
 			ELSIF M.name = "ARRAY" THEN
 				M.class := Objects.String;
@@ -209,8 +209,8 @@ VAR
 	BEGIN
 		IF A = NIL THEN Files.WriteBool( R, FALSE )
 		ELSE
-			Files.WriteBool( R, TRUE );  Files.WriteLInt( R, LEN( A^ ) );
-			FOR i := 0 TO LEN( A^ ) - 1 DO Files.WriteInt( R, A[i] ) END
+			Files.WriteBool( R, TRUE );  Files.WriteLInt( R, SIGNED32(LEN( A^ )) );
+			FOR i := 0 TO SIGNED32(LEN( A^ )) - 1 DO Files.WriteInt( R, A[i] ) END
 		END
 	END StoreA;
 
@@ -232,7 +232,7 @@ VAR
 			Files.ReadInt( msg.R, version );  vyBase.objecthandle( obj, msg );  Files.ReadLInt( msg.R, w );
 			Files.ReadLInt( msg.R, depth );  obj.A := LoadA( msg.R );  obj.w := w;  obj.depth := depth
 		ELSIF msg.id = Objects.store THEN
-			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, obj.w );
+			Files.WriteInt( msg.R, 0 );  vyBase.objecthandle( obj, msg );  Files.WriteLInt( msg.R, SIGNED32(obj.w) );
 			Files.WriteLInt( msg.R, obj.depth );  StoreA( msg.R, obj.A )
 		ELSE vyBase.objecthandle( obj, msg )
 		END
@@ -315,7 +315,7 @@ VAR
 	END New;
 
 	PROCEDURE FromVec*;
-	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  depth, i: SIGNED32;  obj: tObject;  aobj, bobj: vyBase.Object;
+	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  depth: SIGNED32; i: SIZE;  obj: tObject;  aobj, bobj: vyBase.Object;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME from=OBJ [depth=INT] # copy vec to new object  <name>" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectObjectFromKeyword( l, "from", bobj ) THEN
@@ -348,7 +348,7 @@ VAR
 	END Uniform;
 
 	PROCEDURE Channel*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  x: SIGNED32;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  x: SIZE;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ p=FLOAT32 ~# Add channel noise to data <name> with prob. p " );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "p", p ) THEN
@@ -366,7 +366,7 @@ VAR
 	END Channel;
 
 	PROCEDURE AddNoise*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  x: SIGNED32;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  x: SIZE;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJECT p=FLOAT32 # Add (rounded) gaussian noise with var. <p> to data <name>" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "p", p ) THEN

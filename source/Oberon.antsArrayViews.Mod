@@ -77,8 +77,8 @@ VAR
 
 		vx := c.vx;  vy := c.vy;   (* coordinates of first visible point in array coordinates*)
 		vpx := c.px;  vpy := c.py;  vpw := c.pw;  vph := c.ph;   (* coordinates of visible area in display-array coordinates (with stretching) *)
-		pw := SHORT( layer.E.w );  ph := SHORT( layer.E.h );   (* array width and height *)
-		c.pictW := pw;  c.pictH := ph;  vyRectangles.RectIntersection( vpx, vpy, vpw, vph, 0, 0, SHORT( layer.E.w ), SHORT( layer.E.h ) );
+		pw := SIGNED16( layer.E.w );  ph := SIGNED16( layer.E.h );   (* array width and height *)
+		c.pictW := pw;  c.pictH := ph;  vyRectangles.RectIntersection( vpx, vpy, vpw, vph, 0, 0, SIGNED16( layer.E.w ), SIGNED16( layer.E.h ) );
 
 		IF layer.type = Vertices THEN  (* vertices *)
 			px := vpx;  x0 := vx;
@@ -146,7 +146,7 @@ VAR
 	VAR tempLayer: tLayer;
 	BEGIN
 		tempLayer := antsViews.tempLayer( tLayer );
-		antsPictCoordinate.Center( SHORT( tempLayer.E.w ), SHORT( tempLayer.E.h ), antsPictCoordinate.tc );  vyBase.Update( tempLayer )
+		antsPictCoordinate.Center( SIGNED16( tempLayer.E.w ), SIGNED16( tempLayer.E.h ), antsPictCoordinate.tc );  vyBase.Update( tempLayer )
 	END Center;
 
 	PROCEDURE HandleFileMsg( obj: tLayer;  VAR msg: Objects.FileMsg );
@@ -253,7 +253,7 @@ VAR
 	VAR id: vyName.tNameArray;
 	BEGIN
 		Init( layer );  id := "ViewI:";  vyName.AppendObjId( E, id );  vyPort.OpenLayer( layer, id );  layer.E := E;  layer.pal.first := 0;
-		layer.pal.last := SHORT( E.depth - 1 );  antsViews.DefaultPath( layer, texture );  texture := FALSE;
+		layer.pal.last := SIGNED16( E.depth - 1 );  antsViews.DefaultPath( layer, texture );  texture := FALSE;
 
 		layer.type := type;  vyBase.Subscribe( layer.E, layer )
 	END Open;
@@ -269,7 +269,7 @@ VAR
 		NEW( layer );  Open( layer, E, type );
 		IF c = NIL THEN NEW( c );  antsPictCoordinate.OpenC( c, 1, 1 ) END;
 		IF ~add THEN
-			w := SHORT( E.w );  h := SHORT( E.h );
+			w := SIGNED16( E.w );  h := SIGNED16( E.h );
 			IF w > maxw THEN w := maxw END;
 			IF h > maxh THEN h := maxh END;
 			port := vyPort.XNewFrame( w + 2 * vyPort.Border, h + 2 * vyPort.Border );  port.W := (w + 2 * vyPort.Border);

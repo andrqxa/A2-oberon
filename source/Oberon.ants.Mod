@@ -57,14 +57,14 @@ BEGIN
 END Show;
 
 PROCEDURE getTimeSeries (x, y: SIGNED32;  o: Objects.Object;  link: Objects.Object);
-	VAR data: Objects.Object;   row: SIGNED32;   msg: vyPort.AdjustCoordMsg;  pos: SIGNED32;
+	VAR data: Objects.Object;   row: SIZE; c: SIGNED32;  msg: vyPort.AdjustCoordMsg;  pos: SIZE;
 BEGIN
 	Links.GetLink(link, "data", data);
 	WITH o: antsArrayObjects.tObject DO
 		IF (x >= o.w) OR (y >= o.h) THEN RETURN END;
 		WITH data: vyLongrealVec.tVector DO
 			row :=  y * o.w + x ;
-			pos := RR.Pos();  RR.ReadRowX(data, row);  RR.SetPos(pos);
+			pos := RR.Pos();  RR.ReadRowX(data, c); row := c;  RR.SetPos(pos);
 			IF data # NIL THEN
 				vyBase.Update(data);
 				vyBase.ForUsersHandle( data, msg )

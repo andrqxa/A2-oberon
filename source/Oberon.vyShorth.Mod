@@ -61,7 +61,7 @@ VAR
 		END;
 	VAR lenv: vyBase.tVector;  xp, yp: FLOAT32;  lenMin: FLOAT32;  dataSpan: FLOAT32;
 		penVec: ARRAY cPens + 1 OF tPoint;
-		yFac: FLOAT32;  delta: SIGNED16;  I, J, rightLim, leftLim, dataPoint, count: SIGNED32;
+		yFac: FLOAT32;  delta: SIGNED16;  I, J, rightLim, leftLim, dataPoint, count: SIZE;
 	BEGIN
 		IF shorth.x # NIL THEN
 			count := shorth.x.nrData;
@@ -127,7 +127,7 @@ VAR
 	END Consume;
 
 	PROCEDURE AdjustCoord( pict: vyPort.Picture;  obj: tLayer );
-	VAR minX, maxX: FLOAT32;  nans: SIGNED32;
+	VAR minX, maxX: FLOAT32;  nans: SIZE;
 	BEGIN
 		IF pict # NIL THEN
 			IF obj.x # NIL THEN vyTypes.VGetMinMaxR( obj.x, minX, maxX, nans ) ELSE minX := 0;  maxX := 1 END;
@@ -189,7 +189,7 @@ VAR
 	END New;
 
 	PROCEDURE Handler*( obj: Objects.Object;  VAR msg: Objects.ObjMsg );   (*vs 0.0a1	md  20.07.94 *)
-	VAR minX, maxX: FLOAT32;  pict: vyPort.Picture;  nans: SIGNED32;
+	VAR minX, maxX: FLOAT32;  pict: vyPort.Picture;  nans: SIZE;
 	BEGIN
 		WITH obj: tLayer DO
 			IF msg IS Display.DisplayMsg THEN

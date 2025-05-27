@@ -186,13 +186,13 @@ END LayerInit;
 						END
 					ELSIF M.id = Objects.set THEN
 						IF M.name = "x" THEN
-							IF M.class = Objects.Int THEN o.x := SHORT( M.i );  M.res := 0;  vyBase.Update( o ) END
+							IF M.class = Objects.Int THEN o.x := SIGNED16( M.i );  M.res := 0;  vyBase.Update( o ) END
 						ELSIF M.name = "y" THEN
-							IF M.class = Objects.Int THEN o.y := SHORT( M.i );  M.res := 0;  vyBase.Update( o ) END
+							IF M.class = Objects.Int THEN o.y := SIGNED16( M.i );  M.res := 0;  vyBase.Update( o ) END
 						ELSIF M.name = "w" THEN
-							IF M.class = Objects.Int THEN o.w := SHORT( M.i );  M.res := 0;  vyBase.Update( o ) END
+							IF M.class = Objects.Int THEN o.w := SIGNED16( M.i );  M.res := 0;  vyBase.Update( o ) END
 						ELSIF M.name = "h" THEN
-							IF M.class = Objects.Int THEN o.h := SHORT( M.i );  M.res := 0;  vyBase.Update( o ) END
+							IF M.class = Objects.Int THEN o.h := SIGNED16( M.i );  M.res := 0;  vyBase.Update( o ) END
 						ELSE vyBase.objecthandle( o, M )
 						END
 					ELSE vyBase.objecthandle( o, M )
@@ -292,8 +292,8 @@ r.x := x0;  r.y := y0;  r.w := x1 - x0+1;  r.h := y1 - y0+1 ;
 r.dlink := A;
 IF r.x < 0 THEN INC(r.w, r.x);  r.x := 0 END;
 IF r.y < 0 THEN INC(r.h, r.y);  r.y := 0 END;
-IF r.x + r.w > A.w - 1 THEN r.w := SHORT(A.w) - r.x  END;
-IF r.y + r.h > A.h - 1 THEN r.h := SHORT(A.h) - r.y  END;
+IF r.x + r.w > A.w - 1 THEN r.w := SIGNED16(A.w) - r.x  END;
+IF r.y + r.h > A.h - 1 THEN r.h := SIGNED16(A.h) - r.y  END;
 r.valid := (r.w > 0) & (r.h > 0);
 vyBase.Update(r)
 ELSE
@@ -343,8 +343,8 @@ END DoSelectRegion;
 					r.dlink := A;
 					IF r.x < 0 THEN INC( r.w, r.x );  r.x := 0 END;
 					IF r.y < 0 THEN INC( r.h, r.y );  r.y := 0 END;
-					IF r.x + r.w > A.w - 1 THEN r.w := SHORT( A.w ) - r.x END;
-					IF r.y + r.h > A.h - 1 THEN r.h := SHORT( A.h ) - r.y END;
+					IF r.x + r.w > A.w - 1 THEN r.w := SIGNED16( A.w ) - r.x END;
+					IF r.y + r.h > A.h - 1 THEN r.h := SIGNED16( A.h ) - r.y END;
 					r.valid := (r.w > 0) & (r.h > 0);  vyBase.Update( r )
 				END;
 			ELSE r.valid := FALSE
@@ -365,7 +365,7 @@ END DoSelectRegion;
 	PROCEDURE Get*( r: tRegion;  A: antsArrayObjects.tObject;  VAR x, y, w, h: SIGNED32 );
 	VAR xi, yi, wi, hi: SIGNED16;
 	BEGIN
-		xi := 0;  yi := 0;  wi := SHORT( A.w );  hi := SHORT( A.h );
+		xi := 0;  yi := 0;  wi := SIGNED16( A.w );  hi := SIGNED16( A.h );
 		IF r # NIL THEN vyRectangles.RectIntersection( xi, yi, wi, hi, r.x, r.y, r.w, r.h ) END;
 		x := xi;  y := yi;  h := hi;  w := wi
 	END Get;

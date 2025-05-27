@@ -49,8 +49,8 @@ TYPE
 VAR
 	tempLayer: tView;
 
-	PROCEDURE GetPosition*( o: tObject;  x, y, epsx, epsy: FLOAT64 ): SIGNED32;
-	VAR i, len: SIGNED32;
+	PROCEDURE GetPosition*( o: tObject;  x, y, epsx, epsy: FLOAT64 ): SIZE;
+	VAR i, len: SIZE;
 	BEGIN
 		len := vyLongrealVec.Len( o.x );
 		FOR i := 0 TO len - 1 DO
@@ -59,7 +59,7 @@ VAR
 		RETURN -1
 	END GetPosition;
 
-	PROCEDURE SetXY*( o: tObject;  x, y: FLOAT64;  pos: SIGNED32 ): BOOLEAN;
+	PROCEDURE SetXY*( o: tObject;  x, y: FLOAT64;  pos: SIZE ): BOOLEAN;
 	VAR lx, rx, ly, ry, tx, ty: FLOAT64;
 	BEGIN
 		IF pos = 0 THEN RETURN FALSE END;
@@ -90,7 +90,7 @@ VAR
 	END GetValue;
 
 	PROCEDURE AddPoint*( o: tObject;  x: FLOAT64 ): BOOLEAN;
-	VAR x0, cval: FLOAT64;  pos, len, cur: SIGNED32;  y: FLOAT64;
+	VAR x0, cval: FLOAT64;  pos, len, cur: SIZE;  y: FLOAT64;
 	BEGIN
 		IF (x < o.x0) OR (x >= o.x0 + o.w) THEN RETURN FALSE END;
 		len := vyLongrealVec.Len( o.x );
@@ -124,7 +124,7 @@ VAR
 	END AddPoint;
 
 	PROCEDURE AddGenericPoint*( o: tObject );
-	VAR max, mean: FLOAT64;  len, i: SIGNED32;
+	VAR max, mean: FLOAT64;  len, i: SIZE;
 	BEGIN
 		max := MIN( FLOAT64 );  len := vyLongrealVec.Len( o.x );
 		FOR i := 0 TO len - 2 DO
@@ -175,7 +175,7 @@ VAR
 	(*vs 0.0a1   md  14.02.95 *)
 	VAR
 
-		xr, yr, epsx, epsy: FLOAT64;  pos: SIGNED32;  gesture: SIGNED16;
+		xr, yr, epsx, epsy: FLOAT64;  pos: SIZE;  gesture: SIGNED16;
 	BEGIN
 		(*
 	Out.Ln; Out.String("edit");
@@ -218,7 +218,7 @@ VAR
 	END Responsible;
 
 	PROCEDURE Recall( layer: tView );
-	VAR i: SIGNED32;  len: SIGNED32;  x0, y0, x1, y1: SIGNED16;
+	VAR i: SIZE;  len: SIZE;  x0, y0, x1, y1: SIGNED16;
 	BEGIN
 		IF layer.o = NIL THEN RETURN END;
 		len := vyLongrealVec.Len( layer.o.x );

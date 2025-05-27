@@ -90,7 +90,7 @@ VAR
 	PROCEDURE SelectionActor( layer: vyPort.tLayer;  sel: vyBase.tVector;  x0O, y0O, x1O, y1O, x0N, y0N, x1N, y1N: Real;
 												VAR somethingChanged: BOOLEAN );
 	(*vs 0.0a1	md  16.08.94 *)
-	VAR histogram: tLayer;  r: Real;  nrData, i: SIGNED32;  new: BOOLEAN;
+	VAR histogram: tLayer;  r: Real;  nrData, i: SIZE;  new: BOOLEAN;
 	BEGIN
 		histogram := layer( tLayer );  nrData := histogram.x.nrData;
 		FOR i := 0 TO nrData - 1 DO
@@ -102,10 +102,10 @@ VAR
 	END SelectionActor;
 
 	PROCEDURE InstallBins( hist: tLayer );
-	VAR dataRec, sel: vyBase.tVector;  i: SIGNED32;  bin: SIGNED16;  r, x0, dx: Real;  max, min, maxh, minh: Real;  nans: SIGNED32;
+	VAR dataRec, sel: vyBase.tVector;  i: SIGNED32;  bin: SIGNED16;  r, x0, dx: Real;  max, min, maxh, minh: Real;  nans: SIZE;
 	BEGIN
 		IF hist.x # NIL THEN
-			dataRec := hist.x;  vyTypes.VGetMinMax( dataRec, min, max, nans );  hist.nans := nans;
+			dataRec := hist.x;  vyTypes.VGetMinMax( dataRec, min, max, nans );  hist.nans := SIGNED32(nans);
 
 			IF hist.respectBounds THEN minh := hist.leftBound;  maxh := hist.rightBound
 			ELSE minh := min;  maxh := max;  hist.leftBound := min;  hist.rightBound := max
@@ -131,7 +131,7 @@ VAR
 
 			FOR i := 0 TO maxBins - 1 DO hist.bins[i] := 0 END;
 			hist.toosmall := 0;  hist.toolarge := 0;
-			FOR i := 0 TO dataRec.nrData - 1 DO
+			FOR i := 0 TO SIGNED32(dataRec.nrData) - 1 DO
 				r := vyTypes.VGetR( dataRec, i );
 				IF r < minh THEN INC( hist.toosmall )
 				ELSIF r > maxh THEN INC( hist.toolarge )
@@ -152,7 +152,7 @@ VAR
 			hist.highlight := NIL;  vyHighlight.AdjustHighlight( hist );  sel := vyHighlight.GetSelectionAttribute( hist.highlight );
 
 			FOR i := 0 TO maxBins - 1 DO hist.selectBins[i] := 0 END;
-			FOR i := 0 TO dataRec.nrData - 1 DO
+			FOR i := 0 TO SIGNED32(dataRec.nrData) - 1 DO
 				IF sel.nrData > i THEN  (* hack against invalid access , fof 020213 *)
 					IF vyBooleanVec.Get( sel, i ) THEN
 						r := vyTypes.VGetR( dataRec, i );
@@ -217,7 +217,7 @@ VAR
 	PROCEDURE Select( histogram: tLayer;  VAR event: vyEvents.EventMsg );
 	VAR selector: vyHighlight.tSelector;
 	BEGIN
-		vyHighlight.OpenSelector( histogram, histogram.x.nrData, Vizor, SelectionActor, event );
+		vyHighlight.OpenSelector( histogram, SIGNED32(histogram.x.nrData), Vizor, SelectionActor, event );
 		selector := histogram.highlight( vyHighlight.tSelector );  gTop := histogram.maxBinHeight;
 		selector.do( selector, event )
 	END Select;
@@ -249,7 +249,7 @@ VAR
 	END PointInRight;
 
 	PROCEDURE PointInHistogram( x, y: Coordinate;  hist: tLayer ): BOOLEAN;
-	VAR x0, y0: Real;  min, max: Real;  nans: SIGNED32;
+	VAR x0, y0: Real;  min, max: Real;  nans: SIZE;
 
 		PROCEDURE PointInRect( X, Y, X0, Y0, X1, Y1: Real ): BOOLEAN;
 		BEGIN
@@ -328,7 +328,7 @@ VAR
 	END Responsible;
 
 	PROCEDURE Consume( o: tLayer;  msg: Display.ConsumeMsg );
-	VAR v: vyBase.tVector;  minX, maxX: Real;  pict: vyPort.Picture;  nans: SIGNED32;
+	VAR v: vyBase.tVector;  minX, maxX: Real;  pict: vyPort.Picture;  nans: SIZE;
 	BEGIN
 		pict := msg.dlink( vyPort.Picture );  v := vyBase.GetVFromObj( msg.obj );
 		IF v # NIL THEN vyBase.UnSubscribe( o.x, o );
@@ -372,7 +372,7 @@ VAR
 	END HandleAttributes;
 
 	PROCEDURE AdjustCoord( pict: vyPort.Picture;  obj: tLayer );
-	VAR minX, maxX: FLOAT32;  nans: SIGNED32;
+	VAR minX, maxX: FLOAT32;  nans: SIZE;
 	BEGIN
 		IF pict # NIL THEN
 			IF obj.x # NIL THEN
@@ -460,7 +460,7 @@ VAR
 	END Load0;
 
 	PROCEDURE Handler*( obj: Objects.Object;  VAR msg: Objects.ObjMsg );   (*vs 0.0a1	md  20.07.94 *)
-	VAR minX, maxX: FLOAT64;  pict: vyPort.Picture;  nans: SIGNED32;
+	VAR minX, maxX: FLOAT64;  pict: vyPort.Picture;  nans: SIZE;
 	BEGIN
 		WITH obj: tLayer DO
 			IF msg IS Display.DisplayMsg THEN
@@ -520,7 +520,7 @@ VAR
 	END Handler;
 
 	PROCEDURE Init*( F: tLayer;  data: Objects.Object );
-	VAR id: vyName.tNameArray;  min, max: Real;  nans: SIGNED32;
+	VAR id: vyName.tNameArray;  min, max: Real;  nans: SIZE;
 	BEGIN
 		F.handle := Handler;  F.x := vyBase.GetVFromObj( data );  COPY( "histogram: ", id );
 		IF (F.x = NIL ) & (data # NIL ) THEN vyHostTexts.Note( vyHostTexts.cWarning, "vyHistogram: can't plot this data as a histogram: not the right type!" );  END;
@@ -536,7 +536,7 @@ VAR
 	END Init;
 
 	PROCEDURE ShowP*;
-	VAR data: Objects.Object;  minX, maxX: Real;  nans: SIGNED32;
+	VAR data: Objects.Object;  minX, maxX: Real;  nans: SIZE;
 	BEGIN
 		data := vyBase.NextParObj();
 		WHILE data # NIL DO
@@ -553,7 +553,7 @@ VAR
 	END ShowP;
 
 	PROCEDURE ShowL*( list: vyLinks.Link );
-	VAR nans: SIGNED32;  minX, maxX: Real;
+	VAR nans: SIZE;  minX, maxX: Real;
 	BEGIN
 		WHILE list # NIL DO
 			New;  Init( newlayer, list.obj );  vyTypes.VGetMinMax( newlayer.x, minX, maxX, nans );
@@ -567,7 +567,7 @@ VAR
 	END ShowL;
 
 	PROCEDURE ShowO*( obj: Objects.Object );
-	VAR nans: SIGNED32;  minX, maxX: Real;
+	VAR nans: SIZE;  minX, maxX: Real;
 	BEGIN
 		New;  Init( newlayer, obj );  vyTypes.VGetMinMax( newlayer.x, minX, maxX, nans );
 		(*pict := vyPort.InsertNewCPicture (0, 0, 1, 1, vyDisplay2d.NewC2d ( minX-F.width, 0, maxX-minX+2*F.width, F.x.nrData/3));

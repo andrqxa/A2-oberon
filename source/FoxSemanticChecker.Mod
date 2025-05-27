@@ -6710,7 +6710,7 @@ TYPE
 					IF (super = NIL) & procedure.isOverride THEN
 						Error(procedure.position,"the new procedure/operator cannot be marked as overridden");
 					ELSIF (super # NIL) & ~procedure.isOverride & ~procedure.isConstructor & ~procedure.isFinalizer THEN
-						Warning(procedure.position, "the inherited procedure/operator is hidden; use the {override} modifier");
+						(*Warning(procedure.position, "the inherited procedure/operator is hidden; use the {override} modifier");*)
 						procedure.SetOverride(TRUE); (*!*)
 					ELSIF (super # NIL) & super.isFinal & procedure.isOverride THEN
 						Error(procedure.position, "cannot override final method");

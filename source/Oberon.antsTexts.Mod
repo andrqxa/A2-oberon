@@ -31,11 +31,11 @@ IMPORT Texts, Objects, (* Log,*)Strings, aM := antsMessages;
 
 
 
-PROCEDURE CheckPattern (t: Texts.Text;  VAR pattern: ARRAY OF CHAR;  len, pos: SIGNED32): BOOLEAN;
-	VAR r: Texts.Reader;  ch: CHAR;  i: SIGNED32;
+PROCEDURE CheckPattern (t: Texts.Text;  VAR pattern: ARRAY OF CHAR;  len, pos: SIZE): BOOLEAN;
+	VAR r: Texts.Reader;  ch: CHAR;  i: SIZE;
 BEGIN
 	i := 0;
-	Texts.OpenReader(r, t, pos);
+	Texts.OpenReader(r, t, SIGNED32(pos));
 	Texts.Read(r, ch);
 	ASSERT(ch = pattern[0]);
 	WHILE(i < len) DO
@@ -45,13 +45,13 @@ BEGIN
 	RETURN TRUE
 END CheckPattern;
 
-PROCEDURE FindPattern* (t: Texts.Text;  pattern: ARRAY OF CHAR;  len: SIGNED32;  VAR pos: SIGNED32): BOOLEAN;
+PROCEDURE FindPattern* (t: Texts.Text;  pattern: ARRAY OF CHAR;  len: SIZE;  VAR pos: SIZE): BOOLEAN;
 	VAR  ch, first: CHAR;  r: Texts.Reader;
 BEGIN
 	(* Log.Ln; Log.Str("Finding patter: "); Log.Str(pattern); *)
 
 	nls[0] := 0DX;  nll := 1;
-	Texts.OpenReader(r, t, pos);
+	Texts.OpenReader(r, t, SIGNED32(pos));
 	first := pattern[0];
 	Texts.Read(r, ch);
 	WHILE ~r.eot DO
@@ -60,7 +60,7 @@ BEGIN
 			nls[nll] := ch;  INC(nll)
 		END;
 		IF ch = first THEN
-			IF CheckPattern(t, pattern, len, pos) THEN (* Log.Ln; Log.Str("found!"); *)RETURN TRUE END
+			IF CheckPattern(t, pattern, len,pos) THEN (* Log.Ln; Log.Str("found!"); *)RETURN TRUE END
 		END;
 		Texts.Read(r, ch);  INC(pos)
 	END;
@@ -68,7 +68,7 @@ BEGIN
 	RETURN FALSE
 END FindPattern;
 
-PROCEDURE MakeBuf (s: ARRAY OF CHAR;  len: SIGNED32;  NL: BOOLEAN): Texts.Buffer;
+PROCEDURE MakeBuf (s: ARRAY OF CHAR;  len: SIZE;  NL: BOOLEAN): Texts.Buffer;
 	VAR W: Texts.Writer;  i: SIGNED32;
 BEGIN
 	Texts.OpenWriter(W);
@@ -83,7 +83,7 @@ BEGIN
 	RETURN W.buf
 END MakeBuf;
 
-PROCEDURE CheckLen (VAR s: ARRAY OF CHAR;  VAR len: SIGNED32);
+PROCEDURE CheckLen (VAR s: ARRAY OF CHAR;  VAR len: SIZE);
 	VAR i: SIGNED16;
 BEGIN
 	i := 0;
@@ -92,33 +92,33 @@ BEGIN
 END CheckLen;
 
 
-PROCEDURE ReplacePatterns* (t: Texts.Text;  pattern: ARRAY OF CHAR;  slen: SIGNED32;  by: ARRAY OF CHAR;  dlen: SIGNED32);
-	VAR pos: SIGNED32;
+PROCEDURE ReplacePatterns* (t: Texts.Text;  pattern: ARRAY OF CHAR;  slen: SIZE;  by: ARRAY OF CHAR;  dlen: SIZE);
+	VAR pos: SIZE;
 BEGIN
 	CheckLen(pattern, slen);  CheckLen(by, dlen);
 	pos := 0;
 	WHILE(FindPattern(t, pattern, slen, pos)) DO
-		Texts.Replace(t, pos, pos + slen, MakeBuf(by, dlen, FALSE));  INC(pos)
+		Texts.Replace(t, SIGNED32(pos), SIGNED32(pos + slen), MakeBuf(by, dlen, FALSE));  INC(pos)
 	END
 END ReplacePatterns;
 
-PROCEDURE AppendPatterns* (t: Texts.Text;  pattern: ARRAY OF CHAR;  slen: SIGNED32;  by: ARRAY OF CHAR;  dlen: SIGNED32);
-	VAR pos: SIGNED32;
+PROCEDURE AppendPatterns* (t: Texts.Text;  pattern: ARRAY OF CHAR;  slen: SIZE;  by: ARRAY OF CHAR;  dlen: SIZE);
+	VAR pos: SIZE;
 BEGIN
 	CheckLen(pattern, slen);  CheckLen(by, dlen);
 	pos := 0;
 	WHILE(FindPattern(t, pattern, slen, pos)) DO
-		Texts.Insert(t, pos + slen, MakeBuf(by, dlen, FALSE));  INC(pos)
+		Texts.Insert(t, SIGNED32(pos + slen), MakeBuf(by, dlen, FALSE));  INC(pos)
 	END
 END AppendPatterns;
 
-PROCEDURE AppendPatternsNl* (t: Texts.Text;  pattern: ARRAY OF CHAR;  slen: SIGNED32;  by: ARRAY OF CHAR;  dlen: SIGNED32);
-	VAR pos: SIGNED32;
+PROCEDURE AppendPatternsNl* (t: Texts.Text;  pattern: ARRAY OF CHAR;  slen: SIZE;  by: ARRAY OF CHAR;  dlen: SIZE);
+	VAR pos: SIZE;
 BEGIN
 	CheckLen(pattern, slen);  CheckLen(by, dlen);
 	pos := 0;
 	WHILE(FindPattern(t, pattern, slen, pos)) DO
-		Texts.Insert(t, pos + slen, MakeBuf(by, dlen, TRUE));  INC(pos)
+		Texts.Insert(t, SIGNED32(pos + slen), MakeBuf(by, dlen, TRUE));  INC(pos)
 	END
 END AppendPatternsNl;
 
@@ -136,16 +136,16 @@ BEGIN
 	END
 END Copy;
 
-PROCEDURE ReplaceTextPart* (T: Texts.Text;  begpat, endpat: ARRAY OF CHAR;  by: Texts.Buffer;  VAR pos0: SIGNED32): BOOLEAN;
+PROCEDURE ReplaceTextPart* (T: Texts.Text;  begpat, endpat: ARRAY OF CHAR;  by: Texts.Buffer;  VAR pos0: SIZE): BOOLEAN;
 	(* replaces part of Text t beginning with begpat ending with endpat by contents of Text by *)
-	VAR beg, end: SIGNED32;
+	VAR beg, end: SIZE;
 BEGIN
 	IF FindPattern(T, begpat, Strings.Length(begpat), pos0) THEN
 		beg := pos0;
 		ASSERT( FindPattern(T, endpat, Strings.Length(endpat), pos0), 104);
 		end := pos0 + Strings.Length(endpat);
-		Texts.Delete(T, beg, end);
-		Texts.Insert(T, beg, by);
+		Texts.Delete(T, SIGNED32(beg), SIGNED32(end));
+		Texts.Insert(T, SIGNED32(beg), by);
 		pos0 := beg + by.len;
 		RETURN TRUE
 	ELSE
@@ -153,15 +153,15 @@ BEGIN
 	END
 END ReplaceTextPart;
 
-PROCEDURE GetTextPart*(T: Texts.Text;  begpat, endpat: ARRAY OF CHAR; VAR in: Texts.Buffer; VAR pos0: SIGNED32): BOOLEAN;
-	VAR beg, end: SIGNED32;
+PROCEDURE GetTextPart*(T: Texts.Text;  begpat, endpat: ARRAY OF CHAR; VAR in: Texts.Buffer; VAR pos0: SIZE): BOOLEAN;
+	VAR beg, end: SIZE;
 BEGIN
 	IF FindPattern(T, begpat, Strings.Length(begpat), pos0) THEN
 		beg := pos0;
 		ASSERT( FindPattern(T, endpat, Strings.Length(endpat), pos0), 104);
 		end := pos0 + Strings.Length(endpat);
 		Texts.OpenBuf(in);
-		Texts.Save(T, beg+Strings.Length(begpat), end-Strings.Length(endpat),in);
+		Texts.Save(T, SIGNED32(beg+Strings.Length(begpat)), SIGNED32(end-Strings.Length(endpat)),in);
 		(* Texts.Insert(T, beg, by);*)
 		pos0 := end;
 		RETURN TRUE

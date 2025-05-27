@@ -37,7 +37,7 @@ TYPE
 		n-: antsNeighbourhoods.Neighbours;
 		r-: antsRegions.tRegion;
 		mapping: antsFunctions.Function;
-		maxx, maxy: SIGNED32;
+		maxx, maxy: SIZE;
 		dim: SIGNED16;
 		Correlations: POINTER TO ARRAY OF antsArrayObjects.tLONGINTArray;
 		isotropic: BOOLEAN
@@ -45,7 +45,7 @@ TYPE
 VAR
 
 	PROCEDURE Recall( layer: tLayer );
-	VAR cells: SIGNED32;  cellsize: FLOAT64;  i, j: SIGNED32;  A: antsArrayObjects.tINTEGERObject;  x, y: SIGNED32;  ry, rx: SIGNED32;  vx, vn: SIGNED32;  rx1, ry1, rx2, ry2: SIGNED32;
+	VAR cells: SIZE;  cellsize: FLOAT64;  i, j: SIGNED32;  A: antsArrayObjects.tINTEGERObject;  x, y: SIZE;  ry, rx: SIZE;  vx, vn: SIGNED32;  rx1, ry1, rx2, ry2: SIGNED32;
 
 		PROCEDURE PaintCell( x, y: SIGNED32 );
 		VAR
@@ -194,18 +194,18 @@ VAR
 	END Select;
 
 	PROCEDURE HandleFileMsg( obj: tLayer;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: SIGNED16;
+	VAR objsub: Objects.Object;  version: SIGNED16;c: SIGNED32;
 
 	BEGIN
 		IF msg.id = Objects.load THEN
-			Files.ReadInt( msg.R, version );  vyPort.LayerHandler( obj, msg );  Files.ReadLInt( msg.R, obj.maxx );
-			Files.ReadLInt( msg.R, obj.maxy );  Files.ReadBool( msg.R, obj.isotropic );
+			Files.ReadInt( msg.R, version );  vyPort.LayerHandler( obj, msg );  Files.ReadLInt( msg.R, c); obj.maxx := c;
+			Files.ReadLInt( msg.R, c); obj.maxy := c;  Files.ReadBool( msg.R, obj.isotropic );
 			Gadgets.ReadRef( msg.R, obj.lib, objsub );
 			IF objsub # NIL THEN obj.n := objsub( antsNeighbourhoods.Neighbours ) END
 
 		ELSIF msg.id = Objects.store THEN
-			Files.WriteInt( msg.R, 0 );  vyPort.LayerHandler( obj, msg );  Files.WriteLInt( msg.R, obj.maxx );
-			Files.WriteLInt( msg.R, obj.maxy );  Files.WriteBool( msg.R, obj.isotropic );  Gadgets.WriteRef( msg.R, obj.lib, obj.n )
+			Files.WriteInt( msg.R, 0 );  vyPort.LayerHandler( obj, msg );  Files.WriteLInt( msg.R, SIGNED32(obj.maxx) );
+			Files.WriteLInt( msg.R, SIGNED32(obj.maxy) );  Files.WriteBool( msg.R, obj.isotropic );  Gadgets.WriteRef( msg.R, obj.lib, obj.n )
 		ELSE vyPort.LayerHandler( obj, msg )
 		END
 	END HandleFileMsg;

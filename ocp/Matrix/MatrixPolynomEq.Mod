@@ -182,7 +182,7 @@ END new;
 	END Cubic;
 
 (** solve the quadratic equation x^2 + bx + c = 0 *)
-	PROCEDURE Quadratic*( b, c: Datatype ): Vector;
+(*	PROCEDURE Quadratic*( b, c: Datatype ): Vector;
 	VAR dis, rtdis: Datatype;  roots: Vector;
 	BEGIN
 		dis := b * b - 4 * c;
@@ -206,6 +206,33 @@ END new;
 			(*nroots := 0;*)
 		END;
 		RETURN roots
+	END Quadratic;*)
+
+(** solve the quadratic equation x^2 + bx + c = 0 *)
+	PROCEDURE Quadratic*( b, c: Datatype ): Vector;
+	VAR dis, rtdis: Datatype;
+	BEGIN
+		dis := b * b - 4 * c;
+		IF b = 0 THEN
+			IF c = 0 THEN RESULT := [0, 0];
+			ELSIF c < 0 THEN
+				new(RESULT, 2 );  RESULT[0] := MathL.sqrt( -c );  RESULT[1] := -RESULT[0];
+			ELSE
+				(*nRESULT := 0;*)
+			END;
+		ELSIF c = 0 THEN
+			new( RESULT, 2 );  RESULT[0] := -b;   (*RESULT[1]:=0; *)
+		ELSIF dis >= 0 THEN
+			new( RESULT, 2 );
+			rtdis := MathL.sqrt( dis );
+			IF b > 0 THEN RESULT[0] := (-b - rtdis) * 0.5;
+			ELSE RESULT[0] := (-b + rtdis) * 0.5;
+			END;
+			IF RESULT[0] = 0 THEN RESULT[1] := -b;  ELSE RESULT[1] := c / RESULT[0];  END;
+		ELSE
+			(*nroots := 0;*)
+		END;
+		RETURN RESULT
 	END Quadratic;
 
 (** solve the quadratic equation  x^4 +a*x^3 +b*x^2 + cx + d = 0 *)

@@ -49,31 +49,31 @@ TYPE
 
 	tMatrix* = POINTER TO tMatrixDesc;
 	tMatrixDesc* = RECORD
-		rows-, columns-: SIGNED32;
+		rows-, columns-: SIZE;
 		transposed-: BOOLEAN;
 		(* rowlabels*,collabels*:tLabel;*)
 		rowlabels*, collabels*: labels;
 		(*
 		data:
-		Get: PROCEDURE (me:tMatrix;row,col:SIGNED32):basetype;
-		Set: PROCEDURE (me:tMatrix;row,col:SIGNED32; val:basetype);
+		Get: PROCEDURE (me:tMatrix;row,col:SIZE):basetype;
+		Set: PROCEDURE (me:tMatrix;row,col:SIZE; val:basetype);
 		*)
 		firstrow: tRow;
 		rowcache: tRow;
-		cachedrow: SIGNED32;
+		cachedrow: SIZE;
 		rParsCache, cParsCache: pars
 	END;
 
-	tIntGetProc = PROCEDURE ( me: tMatrix;  row, col: SIGNED32 ): SIGNED16;
-	tIntSetProc = PROCEDURE ( val: SIGNED16;  me: tMatrix;  row, col: SIGNED32 );
+	tIntGetProc = PROCEDURE ( me: tMatrix;  row, col: SIZE ): SIGNED16;
+	tIntSetProc = PROCEDURE ( val: SIGNED16;  me: tMatrix;  row, col: SIZE );
 	tIntMatrix = POINTER TO tIntMatrixDesc;
 	tIntMatrixDesc = RECORD (tMatrixDesc)
 		Get: tIntGetProc;
 		Set: tIntSetProc
 	END;
 
-	tRealGetProc = PROCEDURE ( me: tMatrix;  row, col: SIGNED32 ): FLOAT32;
-	tRealSetProc = PROCEDURE ( val: FLOAT32;  me: tMatrix;  row, col: SIGNED32 );
+	tRealGetProc = PROCEDURE ( me: tMatrix;  row, col: SIZE ): FLOAT32;
+	tRealSetProc = PROCEDURE ( val: FLOAT32;  me: tMatrix;  row, col: SIZE );
 	tRealMatrix = POINTER TO tRealMatrixDesc;
 	tRealMatrixDesc = RECORD (tMatrixDesc)
 		Get: tRealGetProc;
@@ -91,8 +91,8 @@ TYPE
 		l2[t] := l1[t]
 	END copyLabel;
 
-	PROCEDURE InsertLabel( from: labels;  at: SIGNED32;  s: ARRAY OF CHAR ): labels;
-	VAR NewLabels: labels;  t: SIGNED32;
+	PROCEDURE InsertLabel( from: labels;  at: SIZE;  s: ARRAY OF CHAR ): labels;
+	VAR NewLabels: labels;  t: SIZE;
 	BEGIN
 		NEW( NewLabels, LEN( from^ ) + 1 );
 		FOR t := 0 TO at - 1 DO copyLabel( from[t], NewLabels[t] ) END;
@@ -100,8 +100,8 @@ TYPE
 		COPY( s, NewLabels[at] );  RETURN NewLabels
 	END InsertLabel;
 
-	PROCEDURE DoInsertNewRow( me: tMatrix;  at: SIGNED32;  typ: vyBase.OPTStruct );
-	VAR i: SIGNED32;  next: tRow;  trow: tRow;
+	PROCEDURE DoInsertNewRow( me: tMatrix;  at: SIZE;  typ: vyBase.OPTStruct );
+	VAR i: SIZE;  next: tRow;  trow: tRow;
 	BEGIN
 	(* ASSERT(at<=me.rows,100); (* gs 28.01.97*) *)  (* in case of transposition m.rows plays the role of m.columns !!*)
 		trow := me.firstrow;  i := 0;
@@ -117,8 +117,8 @@ TYPE
 		trow.next := next
 	END DoInsertNewRow;
 
-	PROCEDURE DoInsertNewCol( me: tMatrix;  at: SIGNED32;  typ: vyBase.OPTStruct );
-	VAR i: SIGNED32;  trow: tRow;
+	PROCEDURE DoInsertNewCol( me: tMatrix;  at: SIZE;  typ: vyBase.OPTStruct );
+	VAR i: SIZE;  trow: tRow;
 	BEGIN
 		i := 0;  trow := me.firstrow;
 		WHILE (trow # NIL ) DO
@@ -134,20 +134,20 @@ TYPE
 		END
 	END DoInsertNewCol;
 
-	PROCEDURE InsertNewRow*( me: tMatrix;  at: SIGNED32 );
+	PROCEDURE InsertNewRow*( me: tMatrix;  at: SIZE );
 	BEGIN
 		IF ~me.transposed THEN DoInsertNewRow( me, at, vyBase.realtyp ) ELSE DoInsertNewCol( me, at, vyBase.realtyp ) END;
 		INC( me.rows );  me.rowlabels := InsertLabel( me.rowlabels, at, "NEW" )
 	END InsertNewRow;
 
-	PROCEDURE InsertNewColumn*( me: tMatrix;  at: SIGNED32 );
+	PROCEDURE InsertNewColumn*( me: tMatrix;  at: SIZE );
 	BEGIN
 		IF me.transposed THEN DoInsertNewRow( me, at, vyBase.realtyp ) ELSE DoInsertNewCol( me, at, vyBase.realtyp ) END;
 		INC( me.columns );  me.collabels := InsertLabel( me.collabels, at, "NEW" )
 	END InsertNewColumn;
 
-	PROCEDURE DoDeleteRow( M: tMatrix;  at: SIGNED32 );
-	VAR i: SIGNED32;  trow: tRow;
+	PROCEDURE DoDeleteRow( M: tMatrix;  at: SIZE );
+	VAR i: SIZE;  trow: tRow;
 	BEGIN
 		trow := M.firstrow;  i := 0;
 		IF at = 0 THEN M.firstrow := trow.next ELSE
@@ -157,8 +157,8 @@ TYPE
 		M.rParsCache := NIL;  M.cParsCache := NIL
 	END DoDeleteRow;
 
-	PROCEDURE DoDeleteColumn( M: tMatrix;  at: SIGNED32 );
-	VAR trow: tRow;  i, t: SIGNED32;  rows, cols: SIGNED32;
+	PROCEDURE DoDeleteColumn( M: tMatrix;  at: SIZE );
+	VAR trow: tRow;  i, t: SIZE;  rows, cols: SIZE;
 	BEGIN
 		IF M.transposed THEN rows := M.columns - 1;  cols := M.rows - 1 ELSE rows := M.rows - 1;  cols := M.columns - 1 END;
 		trow := M.firstrow;
@@ -169,8 +169,8 @@ TYPE
 		M.rParsCache := NIL;  M.cParsCache := NIL
 	END DoDeleteColumn;
 
-	PROCEDURE DeleteRow*( M: tMatrix;  at: SIGNED32 );
-	VAR t: SIGNED32;
+	PROCEDURE DeleteRow*( M: tMatrix;  at: SIZE );
+	VAR t: SIZE;
 	BEGIN
 		IF M.transposed THEN DoDeleteColumn( M, at ) ELSE DoDeleteRow( M, at ) END;
 		DEC( M.rows );
@@ -178,8 +178,8 @@ TYPE
 		M.cachedrow := 0;  M.rowcache := M.firstrow
 	END DeleteRow;
 
-	PROCEDURE DeleteColumn*( M: tMatrix;  at: SIGNED32 );
-	VAR t: SIGNED32;
+	PROCEDURE DeleteColumn*( M: tMatrix;  at: SIZE );
+	VAR t: SIZE;
 	BEGIN
 		ASSERT ( at < M.columns, 100 );
 		IF ~M.transposed THEN DoDeleteColumn( M, at ) ELSE DoDeleteRow( M, at ) END;
@@ -187,46 +187,46 @@ TYPE
 		FOR t := at TO M.columns - 1 DO copyLabel( M.collabels[t + 1], M.collabels[t] ) END
 	END DeleteColumn;
 (** Integer **)
-	PROCEDURE GetInt*( me: tMatrix;  row, col: SIGNED32 ): SIGNED16;
+	PROCEDURE GetInt*( me: tMatrix;  row, col: SIZE ): SIGNED16;
 	BEGIN
 		ASSERT ( me IS tIntMatrix, 100 );
 		WITH me: tIntMatrix DO RETURN me.Get( me, row, col )
 		END
 	END GetInt;
 
-	PROCEDURE SetInt*( val: SIGNED16;  me: tMatrix;  row, col: SIGNED32 );
+	PROCEDURE SetInt*( val: SIGNED16;  me: tMatrix;  row, col: SIZE );
 	BEGIN
 		ASSERT ( me IS tIntMatrix, 100 );
 		WITH me: tIntMatrix DO me.Set( val, me, row, col )
 		END
 	END SetInt;
 
-	PROCEDURE GetIRow*( M: tMatrix;  row: SIGNED32 ): vyBase.tVector;
-	VAR v: vyBase.tVector;  t: SIGNED32;
+	PROCEDURE GetIRow*( M: tMatrix;  row: SIZE ): vyBase.tVector;
+	VAR v: vyBase.tVector;  t: SIZE;
 	BEGIN
 		v := vyIntVec.New( M.columns );
 		FOR t := 0 TO M.columns - 1 DO vyIntVec.Set( GetInt( M, row, t ), v, t ) END;
 		RETURN v
 	END GetIRow;
 
-	PROCEDURE GetICol*( M: tMatrix;  col: SIGNED32 ): vyBase.tVector;
-	VAR v: vyBase.tVector;  t: SIGNED32;
+	PROCEDURE GetICol*( M: tMatrix;  col: SIZE ): vyBase.tVector;
+	VAR v: vyBase.tVector;  t: SIZE;
 	BEGIN
 		v := vyIntVec.New( M.rows );
 		FOR t := 0 TO M.rows - 1 DO vyIntVec.Set( GetInt( M, t, col ), v, t ) END;
 		RETURN v
 	END GetICol;
 
-	PROCEDURE SetIRow*( v: vyBase.tVector;  M: tMatrix;  row: SIGNED32 );
-	VAR t: SIGNED32;
+	PROCEDURE SetIRow*( v: vyBase.tVector;  M: tMatrix;  row: SIZE );
+	VAR t: SIZE;
 	BEGIN
 		FOR t := 0 TO M.columns - 1 DO
 			SetInt( vyIntVec.Get( v, t ), M, row, t ) (*! use / implement Types CopyVector *)
 		END
 	END SetIRow;
 
-	PROCEDURE SetICol*( v: vyBase.tVector;  M: tMatrix;  col: SIGNED32 );
-	VAR t: SIGNED32;
+	PROCEDURE SetICol*( v: vyBase.tVector;  M: tMatrix;  col: SIZE );
+	VAR t: SIZE;
 	BEGIN
 		FOR t := 0 TO M.rows - 1 DO
 			SetInt( vyIntVec.Get( v, t ), M, t, col ) (*! use / implement Types CopyVector *)
@@ -234,53 +234,53 @@ TYPE
 	END SetICol;
 
 (** Real **)
-	PROCEDURE GetReal*( me: tMatrix;  row, col: SIGNED32 ): FLOAT32;
+	PROCEDURE GetReal*( me: tMatrix;  row, col: SIZE ): FLOAT32;
 	BEGIN
 		ASSERT ( me IS tRealMatrix, 100 );
 		WITH me: tRealMatrix DO RETURN me.Get( me, row, col )
 		END
 	END GetReal;
 
-	PROCEDURE SetReal*( val: FLOAT32;  me: tMatrix;  row, col: SIGNED32 );
+	PROCEDURE SetReal*( val: FLOAT32;  me: tMatrix;  row, col: SIZE );
 	BEGIN
 		ASSERT ( me IS tRealMatrix, 100 );
 		WITH me: tRealMatrix DO me.Set( val, me, row, col )
 		END
 	END SetReal;
 
-	PROCEDURE GetRRow*( M: tMatrix;  row: SIGNED32 ): vyBase.tVector;
-	VAR v: vyBase.tVector;  t: SIGNED32;
+	PROCEDURE GetRRow*( M: tMatrix;  row: SIZE ): vyBase.tVector;
+	VAR v: vyBase.tVector;  t: SIZE;
 	BEGIN
 		v := vyRealVec.New( M.columns );
 		FOR t := 0 TO M.columns - 1 DO vyRealVec.Set( GetReal( M, row, t ), v, t ) END;
 		RETURN v
 	END GetRRow;
 
-	PROCEDURE GetRCol*( M: tMatrix;  col: SIGNED32 ): vyBase.tVector;
-	VAR v: vyBase.tVector;  t: SIGNED32;
+	PROCEDURE GetRCol*( M: tMatrix;  col: SIZE ): vyBase.tVector;
+	VAR v: vyBase.tVector;  t: SIZE;
 	BEGIN
 		v := vyRealVec.New( M.rows );
 		FOR t := 0 TO M.rows - 1 DO vyRealVec.Set( GetReal( M, t, col ), v, t ) END;
 		RETURN v
 	END GetRCol;
 
-	PROCEDURE SetRRow*( v: vyBase.tVector;  M: tMatrix;  row: SIGNED32 );
-	VAR t: SIGNED32;
+	PROCEDURE SetRRow*( v: vyBase.tVector;  M: tMatrix;  row: SIZE );
+	VAR t: SIZE;
 	BEGIN
 		FOR t := 0 TO M.columns - 1 DO
 			SetReal( vyRealVec.Get( v, t ), M, row, t ) (*! use / implement Types CopyVector *)
 		END
 	END SetRRow;
 
-	PROCEDURE SetRCol*( v: vyBase.tVector;  M: tMatrix;  col: SIGNED32 );
-	VAR t: SIGNED32;
+	PROCEDURE SetRCol*( v: vyBase.tVector;  M: tMatrix;  col: SIZE );
+	VAR t: SIZE;
 	BEGIN
 		FOR t := 0 TO M.rows - 1 DO
 			SetReal( vyRealVec.Get( v, t ), M, t, col ) (*! use / implement Types CopyVector *)
 		END
 	END SetRCol;
 
-	PROCEDURE InsertRow*( M: tMatrix;  rowv: vyBase.tVector;  at: SIGNED32 );
+	PROCEDURE InsertRow*( M: tMatrix;  rowv: vyBase.tVector;  at: SIZE );
 	BEGIN
 		InsertNewRow( M, at );  SetRRow( rowv, M, at )
 	END InsertRow;
@@ -291,7 +291,7 @@ TYPE
 		InsertRow( M, rowv, M.rows )
 	END AppendR;
 
-	PROCEDURE InsertColumn*( M: tMatrix;  colv: vyBase.tVector;  at: SIGNED32 );
+	PROCEDURE InsertColumn*( M: tMatrix;  colv: vyBase.tVector;  at: SIZE );
 	BEGIN
 		InsertNewColumn( M, at );  SetRCol( colv, M, at )
 	END InsertColumn;
@@ -303,7 +303,7 @@ TYPE
 	END AppendC;
 
 	PROCEDURE rParsCache( M: tMatrix );
-	VAR r, min, max, mean: FLOAT64;  row, i, l: SIGNED32;
+	VAR r, min, max, mean: FLOAT64;  row, i, l: SIZE;
 	BEGIN
 		NEW( M.rParsCache, M.rows );
 		FOR row := 0 TO M.rows - 1 DO
@@ -322,14 +322,14 @@ TYPE
 		END
 	END rParsCache;
 
-	PROCEDURE GetRPars*( M: tMatrix;  row: SIGNED32;  VAR min, max, mean: FLOAT64 );
+	PROCEDURE GetRPars*( M: tMatrix;  row: SIZE;  VAR min, max, mean: FLOAT64 );
 	BEGIN
 		IF M.rParsCache = NIL THEN rParsCache( M ) END;
 		min := M.rParsCache[row].min;  max := M.rParsCache[row].max;  mean := M.rParsCache[row].mean
 	END GetRPars;
 
 	PROCEDURE cParsCache( M: tMatrix );
-	VAR r, min, max, mean: FLOAT64;  col, i, l: SIGNED32;
+	VAR r, min, max, mean: FLOAT64;  col, i, l: SIZE;
 	BEGIN
 		NEW( M.cParsCache, M.columns );
 		FOR col := 0 TO M.columns - 1 DO
@@ -347,14 +347,14 @@ TYPE
 		END
 	END cParsCache;
 
-	PROCEDURE GetCPars*( M: tMatrix;  col: SIGNED32;  VAR min, max, mean: FLOAT64 );
+	PROCEDURE GetCPars*( M: tMatrix;  col: SIZE;  VAR min, max, mean: FLOAT64 );
 	BEGIN
 		IF M.cParsCache = NIL THEN cParsCache( M ) END;
 		min := M.cParsCache[col].min;  max := M.cParsCache[col].max;  mean := M.cParsCache[col].mean
 	END GetCPars;
 
 	PROCEDURE GetPars*( M: tMatrix;  VAR min, max, mean: FLOAT64 );
-	VAR i, j: SIGNED32;  r: FLOAT64;  l: SIGNED32;
+	VAR i, j: SIZE;  r: FLOAT64;  l: SIZE;
 	BEGIN
 		min := MAX( FLOAT32 );  max := MIN( FLOAT32 );  mean := 0;  l := M.rows;
 		FOR j := 0 TO M.columns - 1 DO
@@ -371,21 +371,21 @@ TYPE
 		mean := mean / l
 	END GetPars;
 
-	PROCEDURE DoGetReal( M: tMatrix;  row, col: SIGNED32 ): FLOAT32;
-	VAR trow: tRow;  i, ilow: SIGNED32;
+	PROCEDURE DoGetReal( M: tMatrix;  row, col: SIZE ): FLOAT32;
+	VAR trow: tRow;  i, ilow: SIZE;
 	BEGIN
 		IF row >= M.cachedrow THEN ilow := M.cachedrow;  trow := M.rowcache ELSE ilow := 0;  trow := M.firstrow END;
 		FOR i := ilow TO row - 1 DO trow := trow.next END;
 		M.cachedrow := row;  M.rowcache := trow;  RETURN vyRealVec.Get( trow.v, col )
 	END DoGetReal;
 
-	PROCEDURE DoGetRealTransposed( me: tMatrix;  row, col: SIGNED32 ): FLOAT32;
+	PROCEDURE DoGetRealTransposed( me: tMatrix;  row, col: SIZE ): FLOAT32;
 	BEGIN
 		RETURN DoGetReal( me, col, row )
 	END DoGetRealTransposed;
 
-	PROCEDURE DoSetReal( val: FLOAT32;  M: tMatrix;  row, col: SIGNED32 );
-	VAR trow: tRow;  i, ilow: SIGNED32;
+	PROCEDURE DoSetReal( val: FLOAT32;  M: tMatrix;  row, col: SIZE );
+	VAR trow: tRow;  i, ilow: SIZE;
 	BEGIN
 		IF row >= M.cachedrow THEN ilow := M.cachedrow;  trow := M.rowcache ELSE ilow := 0;  trow := M.firstrow END;
 		ASSERT ( trow # NIL );
@@ -393,22 +393,22 @@ TYPE
 		M.cachedrow := row;  M.rowcache := trow;  vyRealVec.Set( val, trow.v, col );  M.rParsCache := NIL;  M.cParsCache := NIL
 	END DoSetReal;
 
-	PROCEDURE DoSetRealTransposed( val: FLOAT32;  me: tMatrix;  row, col: SIGNED32 );
+	PROCEDURE DoSetRealTransposed( val: FLOAT32;  me: tMatrix;  row, col: SIZE );
 	BEGIN
 		DoSetReal( val, me, col, row )
 	END DoSetRealTransposed;
 
-	PROCEDURE setRLabel*( s: ARRAY OF CHAR;  M: tMatrix;  row: SIGNED32 );
+	PROCEDURE setRLabel*( s: ARRAY OF CHAR;  M: tMatrix;  row: SIZE );
 	BEGIN
 		COPY( s, M.rowlabels[row] )
 	END setRLabel;
 
-	PROCEDURE setCLabel*( s: ARRAY OF CHAR;  M: tMatrix;  col: SIGNED32 );
+	PROCEDURE setCLabel*( s: ARRAY OF CHAR;  M: tMatrix;  col: SIZE );
 	BEGIN
 		COPY( s, M.collabels[col] )
 	END setCLabel;
 
-	PROCEDURE getRLabel*( VAR s: ARRAY OF CHAR;  M: tMatrix;  row: SIGNED32 );
+	PROCEDURE getRLabel*( VAR s: ARRAY OF CHAR;  M: tMatrix;  row: SIZE );
 	VAR i: SIGNED16;
 	BEGIN
 		i := 0;
@@ -416,7 +416,7 @@ TYPE
 		s[i] := 0X
 	END getRLabel;
 
-	PROCEDURE getCLabel*( VAR s: ARRAY OF CHAR;  M: tMatrix;  col: SIGNED32 );
+	PROCEDURE getCLabel*( VAR s: ARRAY OF CHAR;  M: tMatrix;  col: SIZE );
 	VAR i: SIGNED16;
 	BEGIN
 		i := 0;
@@ -436,14 +436,14 @@ TYPE
 	END AdjustAccess;
 
 	PROCEDURE Transpose*( m: tMatrix );
-	VAR temp: SIGNED32;  templ: labels;
+	VAR temp: SIZE;  templ: labels;
 	BEGIN
 		m.transposed := ~m.transposed;  temp := m.rows;  m.rows := m.columns;  m.columns := temp;  templ := m.rowlabels;
 		m.rowlabels := m.collabels;  m.collabels := templ;  AdjustAccess( m )
 	END Transpose;
 
-	PROCEDURE Init*( m: tMatrix;  rows, columns: SIGNED32 );
-	VAR i: SIGNED32;  row: tRow;
+	PROCEDURE Init*( m: tMatrix;  rows, columns: SIZE );
+	VAR i: SIZE;  row: tRow;
 	BEGIN
 		m.rows := rows;  m.columns := columns;  m.transposed := FALSE;
 
@@ -453,11 +453,11 @@ TYPE
 		END;
 
 		NEW( m.collabels, columns );  NEW( m.rowlabels, rows );
-		FOR i := 0 TO rows - 1 DO m.rowlabels[i] := "R#";  vyHostStrings.AppendInt( i + 1, 1, m.rowlabels[i] ) END;
-		FOR i := 0 TO columns - 1 DO m.collabels[i] := "C#";  vyHostStrings.AppendInt( i + 1, 1, m.collabels[i] ) END
+		FOR i := 0 TO rows - 1 DO m.rowlabels[i] := "R#";  vyHostStrings.AppendInt( SIGNED32(i) + 1, 1, m.rowlabels[i] ) END;
+		FOR i := 0 TO columns - 1 DO m.collabels[i] := "C#";  vyHostStrings.AppendInt( SIGNED32(i) + 1, 1, m.collabels[i] ) END
 	END Init;
 
-	PROCEDURE NewRealMatrix*( rows, columns: SIGNED32 ): tMatrix;
+	PROCEDURE NewRealMatrix*( rows, columns: SIZE ): tMatrix;
 	VAR M: tRealMatrix;
 	BEGIN
 		NEW( M );  Init( M, rows, columns );  AdjustAccess( M );  RETURN M
@@ -468,7 +468,7 @@ TYPE
 (*! support NaNs *)
 
 	PROCEDURE L1Dist*( v1, v2: vyBase.tVector ): FLOAT64;
-	VAR temp: FLOAT64;  k: SIGNED32;
+	VAR temp: FLOAT64;  k: SIZE;
 	BEGIN
 		ASSERT ( v1.nrData = v2.nrData, 101 );
 		temp := 0;
@@ -485,7 +485,7 @@ TYPE
 	END L1Dist;
 
 	PROCEDURE L2Dist*( v1, v2: vyBase.tVector ): FLOAT64;
-	VAR temp: FLOAT64;  k: SIGNED32;
+	VAR temp: FLOAT64;  k: SIZE;
 	BEGIN
 		ASSERT ( v1.nrData = v2.nrData, 101 );
 		temp := 0;
@@ -508,7 +508,7 @@ TYPE
 	END L2Dist;
 
 	PROCEDURE CorrDist*( v1, v2: vyBase.tVector ): FLOAT64;
-	VAR temp: FLOAT64;  xstat, ystat: vyQFisher.Stattyp;  xyssq: FLOAT64;  k: SIGNED32;
+	VAR temp: FLOAT64;  xstat, ystat: vyQFisher.Stattyp;  xyssq: FLOAT64;  k: SIZE;
 	BEGIN
 		ASSERT ( v1.nrData = v2.nrData, 101 );
 		temp := 0;  vyQFisher.initstat( xstat );  vyQFisher.initstat( ystat );  xyssq := 0;
@@ -530,7 +530,7 @@ TYPE
 	END CorrDist;
 
 	PROCEDURE NewRowDistMatrix*( data: tMatrix;  distf: VDist ): tMatrix;
-	VAR M: tRealMatrix;  i, j: SIGNED32;  vi, vj: vyBase.tVector;  temp: FLOAT64;
+	VAR M: tRealMatrix;  i, j: SIZE;  vi, vj: vyBase.tVector;  temp: FLOAT64;
 	BEGIN
 		NEW( M );  Init( M, data.rows, data.rows );  AdjustAccess( M );
 		FOR i := 0 TO data.rows - 1 DO
@@ -543,7 +543,7 @@ TYPE
 	END NewRowDistMatrix;
 
 	PROCEDURE NewColDistMatrix*( data: tMatrix;  distf: VDist ): tMatrix;
-	VAR M: tRealMatrix;  i, j: SIGNED32;  vi, vj: vyBase.tVector;  temp: FLOAT64;
+	VAR M: tRealMatrix;  i, j: SIZE;  vi, vj: vyBase.tVector;  temp: FLOAT64;
 	BEGIN
 		NEW( M );  Init( M, data.columns, data.columns );  AdjustAccess( M );
 		FOR i := 0 TO data.columns - 1 DO
@@ -556,9 +556,9 @@ TYPE
 	END NewColDistMatrix;
 
 	PROCEDURE WriteMatrix*( M: tMatrix );
-	VAR cols, rows: SIGNED32;
+	VAR cols, rows: SIZE;
 		s: ARRAY 32 OF CHAR;
-		i, j: SIGNED32;  row, col: SIGNED32;  r: FLOAT32;
+		i, j: SIZE;  row, col: SIZE;  r: FLOAT32;
 	BEGIN
 		vyHostTexts.WriteTableStyle( vyHostTexts.w );  cols := M.columns - 1;  rows := M.rows - 1;
 		FOR i := 0 TO cols DO

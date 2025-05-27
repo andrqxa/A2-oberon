@@ -44,7 +44,7 @@ replace scanner stuff somewhere else
 IMPORT	Oberon, Math := MathL IN A2, Files,
 	vyHostTexts,  vyBase,
 	vyRealVec, vyGraphBase, Display, Out, Gadgets, Objects,
-	vyHostDisplay := vyGraphBase, vyPort, vyPHIGS3D, vyPaint3d, SYSTEM, vyLongreal;
+	vyHostDisplay := vyGraphBase, vyPort, vyPHIGS3D, vyPaint3d, SYSTEM, vyLongreal, vySize;
 
 CONST
 	idversion* = 	"vyPolyWorld v0r0d5";
@@ -119,7 +119,7 @@ VAR
 	lightDirX, lightDirY, lightDirZ: Real;      	(* light direction: this vector have to be normed to 1 *)
 	maxFaces: SIGNED32;
 	faceDepths: POINTER TO ARRAY OF FLOAT64;
-	faceIndex: POINTER TO ARRAY OF SIGNED32;  (* POINTER ! *)
+	faceIndex: POINTER TO ARRAY OF SIZE;  (* POINTER ! *)
 	triangulate: BOOLEAN;
 	lines: BOOLEAN;
 	colorTable*: ColorMap;
@@ -255,7 +255,7 @@ END ReplCol;
 
 BEGIN  t := Oberon.Time ();
 	ASSERT (o3d IS tMap);      map := o3d(tMap);
-	m := map.mdata.buf;      row := m.row;      col := m.col;      dx := map.x1 - map.x0;      dy := map.y1 - map.y0;
+	m := map.mdata.buf;      row := SIGNED16(m.row);      col := SIGNED16(m.col);      dx := map.x1 - map.x0;      dy := map.y1 - map.y0;
 	FOR r := 0 TO row - 1  DO ReplRow (r) END;
 	FOR c := 0 TO col - 1   DO ReplCol (c) END
 END ReplOnTheFly;
@@ -265,7 +265,7 @@ PROCEDURE WireFrameMapH (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 14:55:52 *)
 	VAR map: tMap;      m: vyRealVec.tMatrixChunk;      row, col, i, j: SIGNED32;      dx, dy, x, y, z: Real;
 BEGIN ASSERT (o3d IS tMap);      map := o3d(tMap);
-	m := map.mdata.buf;      row := m.row;      col := m.col;      dx := map.x1 - map.x0;      dy := map.y1 - map.y0;
+	m := map.mdata.buf;      row := SIGNED16(m.row);      col := SIGNED16(m.col);      dx := map.x1 - map.x0;      dy := map.y1 - map.y0;
 	FOR i := 0 TO row - 1 DO
 		x := map.x0;
 		y := i * dy / (row - 1) + map.y0;
@@ -283,7 +283,7 @@ PROCEDURE WireFrameMapV (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 14:55:52 *)
 	VAR map: tMap;      m: vyRealVec.tMatrixChunk;      row, col, i, j: SIGNED32;      dx, dy, x, y, z: Real;
 BEGIN ASSERT (o3d IS tMap);      map := o3d(tMap);
-	m := map.mdata.buf;      row := m.row;      col := m.col;      dx := map.x1 - map.x0;      dy := map.y1 - map.y0;
+	m := map.mdata.buf;      row := SIGNED16(m.row);      col := SIGNED16(m.col);      dx := map.x1 - map.x0;      dy := map.y1 - map.y0;
 	FOR j := 0 TO col - 1 DO
 		x := j * dx / (col - 1) + map.x0;
 		y := map.y0;
@@ -479,14 +479,14 @@ END NewFace;
 BEGIN
 	IF ~update THEN
 		faces := 0;
-		m := map.mdata.buf;      row := SHORT(m.row);      col := SHORT(m.col);
+		m := map.mdata.buf;      row := SIGNED16(m.row);      col := SIGNED16(m.col);
 		dx := map.x1 - map.x0;      dy := map.y1 - map.y0;
 		NEW (lastVertex);      map.firstVertex := lastVertex;      						(* dummy *)
 		NEW (lastFace);      lastFace.nsz := - 999;      map.firstFace := lastFace;      		(* dummy *)
 		FOR i := 1 TO  row - 1  DO
 			FOR j := 1 TO col - 1 DO
 				IF ~triangulate THEN
-					face := NewFace (i, j, 1);
+					face := NewFace (SIGNED16(i), SIGNED16(j), 1);
 					lastFace.next := face;   lastFace := face
 
 				ELSE
@@ -568,7 +568,7 @@ BEGIN
 	face := m.firstFace.next;  count := 0;
 	WHILE(face # NIL) DO
 		(* SYSTEM.GET((face), *)
-		faceIndex[count] := SYSTEM.VAL(SIGNED32, face);
+		faceIndex[count] := SYSTEM.VAL(SIZE, face);
 		faceDepths[count] :=  GetFaceDepth (face);
 		face := face.next;  INC(count)
 	END;
@@ -1127,7 +1127,7 @@ PROCEDURE ReplNiveauColoring (map: tMap);
 	m: vyRealVec.tMatrixChunk;     row, col, k, l: SIGNED32;     r, min, max: Real;
 BEGIN ResetDoneMarker (map);
 	face := map.lastFace;
-	m := map.mdata.buf;     row := m.row;     col := m.col;
+	m := map.mdata.buf;     row := SIGNED16(m.row);     col := SIGNED16(m.col);
 	min := vyRealVec.ReadMatrix (m, 0, 0);     max := vyRealVec.ReadMatrix (m, 0, 0);
 	FOR k := 0 TO row - 1 DO
 		FOR l := 0 TO col - 1 DO

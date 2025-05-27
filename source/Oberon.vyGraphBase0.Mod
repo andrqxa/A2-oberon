@@ -87,7 +87,7 @@ VAR
 	contextfcol-, contextbcol-: Display.Color;
 	contextmode: SIGNED16;
 	contextstyle: SET;
-	contextpattern: SIGNED32;
+	contextpattern: ADDRESS;
 	contextpensize: SIGNED16;
 	contextfnt: ARRAY 64 OF CHAR;
 	tmpr, tmpg, tmpb: SIGNED16;
@@ -160,7 +160,7 @@ PROCEDURE SetDisplayMode* (m: SIGNED16);
 BEGIN	contextmode := m 	END SetDisplayMode;
 PROCEDURE SetDisplayStyle* (s: SET);
 BEGIN	contextstyle := s 	END SetDisplayStyle;
-PROCEDURE SetDisplayPattern* (p: SIGNED32);
+PROCEDURE SetDisplayPattern* (p: Display.Pattern);
 BEGIN contextpattern := p 	END SetDisplayPattern;
 PROCEDURE SetFont* (f: ARRAY OF CHAR);
 BEGIN COPY(f, contextfnt) 	END SetFont;
@@ -1438,7 +1438,7 @@ BEGIN
 	ELSE
 		Files.WriteInt(R, sgn.w);
 		Files.WriteInt(R, sgn.h);
-		Files.WriteLInt(R, sgn.pat);  (*! Is the store of sgn.pat allright*)
+		Files.WriteLInt(R, SIGNED32(sgn.pat));  (*! Is the store of sgn.pat allright*)
 		(*! How could sgn.print be stored?*)
 	END
 END StorePattern;

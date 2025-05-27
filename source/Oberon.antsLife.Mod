@@ -46,7 +46,7 @@ TYPE
 	END LoadM;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, maxx, maxy: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  ym, yp, xm, xp, config: SIGNED32;  model: tModel;
+	VAR x, y, maxx, maxy: SIZE;  A: antsArrayObjects.tINTEGERArray;  ym, yp, xm, xp:SIZE; config: SIGNED32;  model: tModel;
 		AO: antsArrayObjects.tINTEGERObject;  tempA: antsArrayObjects.tINTEGERObject;  orig: Objects.Object;
 
 		PROCEDURE DistriFromLocalChar;

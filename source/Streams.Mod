@@ -927,7 +927,7 @@ TYPE
 		END HInt;
 
 		PROCEDURE Int64*( VAR x: SIGNED64;  hex: BOOLEAN );
-		VAR try := 0: UNSIGNED64; sgn: INTEGER; ch: CHAR; ok: BOOLEAN;
+		VAR try := 0: UNSIGNED64; sgn := 1: INTEGER; ch: CHAR; ok: BOOLEAN;
 		BEGIN
 			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
 			UInt64(try, hex);
@@ -957,7 +957,7 @@ TYPE
 
 	 (** Read a size value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
 		PROCEDURE Size*( VAR x: SIZE;  hex: BOOLEAN );
-		VAR try := 0: ADDRESS; sgn: INTEGER; ch: CHAR; ok: BOOLEAN;
+		VAR try := 0: ADDRESS; sgn := 1 : INTEGER; ch: CHAR; ok: BOOLEAN;
 		BEGIN
 			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
 			Address(try, hex);

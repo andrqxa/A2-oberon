@@ -161,7 +161,7 @@ VAR
 		RETURN Math.exp( UP( a ) )
 	END EP;
 
-	PROCEDURE DistriFromLocalChar( F: antsPEV.tField;  y, x: SIGNED32 );
+	PROCEDURE DistriFromLocalChar( F: antsPEV.tField;  y, x: SIZE );
 	VAR po, p, p1, p2, p3, p4, e1, e2, e3, e4: SIGNED16;  nges, prob, rand: FLOAT64;
 	BEGIN
 		(* insert penalization to AOrig here *)
@@ -179,7 +179,7 @@ VAR
 	END DistriFromLocalChar;
 
 	PROCEDURE FastestC( F: antsPEV.tField );
-	VAR y, x, w, h, offset: SIGNED32;  p: SIGNED16;
+	VAR y, x, w, h, offset: SIZE;  p: SIGNED16;
 		a: ARRAY 11 OF SIGNED16;
 		rand: FLOAT64;  c: antsCaches.FullCache;  A, H, V, O: antsArrayObjects.tINTEGERArray;
 	BEGIN
@@ -206,7 +206,7 @@ VAR
 		RETURN Math.exp( UE( a ) )
 	END EE;
 
-	PROCEDURE DistriFromLocalCharE( F: antsPEV.tField;  y, x: SIGNED32 );
+	PROCEDURE DistriFromLocalCharE( F: antsPEV.tField;  y, x: SIZE );
 	VAR e, p1, p2, v1, v2: SIGNED16;  nges, ges, prob: FLOAT64;
 	BEGIN
 		antsPEV.EVGetENeighboursH( F, y, x, e, p1, p2, v1, v2 );  e := 0;  nges := f1( e, v1, v2 ) + f3( e, p1, p2 ) + f5( e );  e := 1;
@@ -218,7 +218,7 @@ VAR
 	END DistriFromLocalCharE;
 
 	PROCEDURE FastestEC( F: antsPEV.tField );
-	VAR y, x, w, h, offset: SIGNED32;
+	VAR y, x, w, h, offset: SIZE;
 		a: ARRAY 11 OF SIGNED16;
 		c: antsCaches.FullCache;  A, H, V, VV: antsArrayObjects.tINTEGERArray;
 	BEGIN
@@ -248,7 +248,7 @@ VAR
 		RETURN Math.exp( UV( a ) )
 	END EV;
 
-	PROCEDURE DistriFromLocalCharV( F: antsPEV.tField;  y, x: SIGNED32 );
+	PROCEDURE DistriFromLocalCharV( F: antsPEV.tField;  y, x: SIZE );
 	VAR e1, e2, e3, e4, v: SIGNED16;  nges, ges, prob: FLOAT64;
 	BEGIN
 		antsPEV.EVGetVNeighbours( F, y, x, v, e1, e2, e3, e4 );  v := 0;  nges := f2( v, e1, e2, e3, e4 ) + f6( v );  v := 1;
@@ -257,7 +257,7 @@ VAR
 	END DistriFromLocalCharV;
 
 	PROCEDURE FastestVC( F: antsPEV.tField );
-	VAR y, x, w, h, offset: SIGNED32;
+	VAR y, x, w, h, offset: SIZE;
 		a: ARRAY 11 OF SIGNED16;
 		c: antsCaches.FullCache;  A, H, V, VV: antsArrayObjects.tINTEGERArray;
 	BEGIN
@@ -351,9 +351,9 @@ VAR
 	END Uniform;
 
 	PROCEDURE WriteArray( VAR R: Files.Rider;  VAR A: ARRAY OF FLOAT64 );
-	VAR i: SIGNED32;
+	VAR i: SIZE;
 	BEGIN
-		Files.WriteLInt( R, LEN( A ) );  aM.launch;
+		Files.WriteLInt( R, SIGNED32(LEN( A )) );  aM.launch;
 		FOR i := 0 TO LEN( A ) - 1 DO Files.WriteLReal( R, A[i] ) END
 	END WriteArray;
 
@@ -377,23 +377,23 @@ VAR
 
 	PROCEDURE ArrayHandleAttribute( VAR M: Objects.AttrMsg;  prefix: ARRAY OF CHAR;  VAR array: ARRAY OF FLOAT64 ): BOOLEAN;
 	VAR cur: ARRAY 64 OF CHAR;
-		i: SIGNED32;  len: SIGNED32;
+		i: SIZE;  len: SIZE;
 	BEGIN
 		len := LEN( array );
 		IF M.id = Objects.enum THEN
 			FOR i := 0 TO len - 1 DO
-				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( i, 1, cur );  vyHostStrings.Append( cur, "]" );
+				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( SIGNED32(i), 1, cur );  vyHostStrings.Append( cur, "]" );
 				M.Enum( cur )
 			END;
 			RETURN TRUE
 		ELSIF M.id = Objects.get THEN
 			FOR i := 0 TO len - 1 DO
-				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( i, 1, cur );  vyHostStrings.Append( cur, "]" );
+				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( SIGNED32(i), 1, cur );  vyHostStrings.Append( cur, "]" );
 				IF vyHostStrings.Equal( M.name, cur ) THEN M.y := array[i];  M.class := Objects.LongReal;  M.res := 0;  RETURN TRUE END
 			END
 		ELSIF M.id = Objects.set THEN
 			FOR i := 0 TO len - 1 DO
-				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( i, 1, cur );  vyHostStrings.Append( cur, "]" );
+				COPY( prefix, cur );  vyHostStrings.Append( cur, "[" );  vyHostStrings.AppendInt( SIGNED32(i), 1, cur );  vyHostStrings.Append( cur, "]" );
 				IF vyHostStrings.Equal( M.name, cur ) THEN
 					IF M.class = Objects.LongReal THEN array[i] := M.y;  M.res := 0;  RETURN TRUE
 					ELSIF M.class = Objects.Real THEN array[i] := M.x;  M.res := 0;  RETURN TRUE

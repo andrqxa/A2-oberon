@@ -142,9 +142,9 @@ CONST
 		END
 	END New;
 
-	PROCEDURE ksmallest( VAR a: ARRAY OF FLOAT64;  n, k: SIGNED32 ): FLOAT64;
+	PROCEDURE ksmallest( VAR a: ARRAY OF FLOAT64;  n, k: SIZE ): FLOAT64;
 	(* algorithm of Nikolaus Wirth *)
-	VAR i, j, l, m: SIGNED32;  x: FLOAT64;
+	VAR i, j, l, m: SIZE;  x: FLOAT64;
 
 		PROCEDURE swap( VAR x, y: FLOAT64 );
 		VAR z: FLOAT64;
@@ -167,7 +167,7 @@ CONST
 		RETURN a[k]
 	END ksmallest;
 
-	PROCEDURE Median( VAR a: ARRAY OF FLOAT64;  n: SIGNED32 ): FLOAT64;
+	PROCEDURE Median( VAR a: ARRAY OF FLOAT64;  n: SIZE ): FLOAT64;
 	BEGIN
 		RETURN ksmallest( a, n, n DIV 2 )
 	END Median;
@@ -182,7 +182,7 @@ CONST
 	END WeightsToMedian;
 
 	PROCEDURE ApplyFilter( A: antsArrayObjects.tINTEGERArray;  VAR res: antsArrayObjects.tINTEGERArray;  filter: tFilter );
-	VAR W, H: SIGNED32;  weight, weights, value: FLOAT64;  wx, wy, y, x, count, len: SIGNED32;
+	VAR W, H: SIZE;  weight, weights, value: FLOAT64;  wx, wy, y, x, count, len: SIZE;
 		a: POINTER TO ARRAY OF FLOAT64;
 	BEGIN
 		W := LEN( A[0] );  H := LEN( A );  NEW( res, H, W );
@@ -198,7 +198,7 @@ CONST
 							value := value + weight * A[wy, wx]
 						END
 					END;
-					res[y, x] := SHORT( ENTIER( value / weights + 0.5 ) )
+					res[y, x] := SIGNED16( ENTIER( value / weights + 0.5 ) )
 				END
 			END
 
@@ -221,9 +221,9 @@ CONST
 						*)
 						END
 					END;
-					IF filter.type = median THEN res[y, x] := SHORT( ENTIER( Median( a^, len ) + 0.5 ) )
-					ELSIF filter.type = inf THEN res[y, x] := SHORT( ENTIER( ksmallest( a^, len, 0 ) + 0.5 ) )
-					ELSIF filter.type = sup THEN res[y, x] := SHORT( ENTIER( ksmallest( a^, len, len - 1 ) + 0.5 ) )
+					IF filter.type = median THEN res[y, x] := SIGNED16( ENTIER( Median( a^, len ) + 0.5 ) )
+					ELSIF filter.type = inf THEN res[y, x] := SIGNED16( ENTIER( ksmallest( a^, len, 0 ) + 0.5 ) )
+					ELSIF filter.type = sup THEN res[y, x] := SIGNED16( ENTIER( ksmallest( a^, len, len - 1 ) + 0.5 ) )
 					END
 				END
 			END
@@ -234,7 +234,7 @@ CONST
 
 (*bestimmt den min und max Eintrag in der Matrix S (und deren Position)*)
 	PROCEDURE MinMax( VAR S: ARRAY OF ARRAY OF SIGNED16;  VAR min, max: SIGNED16 );
-	VAR h, i, minpos, currentminpos, maxpos, currentmaxpos, na: SIGNED32;  currentmax, currentmin: SIGNED16;
+	VAR h, i, minpos, currentminpos, maxpos, currentmaxpos, na: SIZE;  currentmax, currentmin: SIGNED16;
 	BEGIN
 		h := LEN( S );  min := MAX( SIGNED16 );  max := MIN( SIGNED16 );
 		FOR i := 0 TO h - 1 DO
@@ -245,7 +245,7 @@ CONST
 	END MinMax;
 
 	PROCEDURE Rescale*( A: antsArrayObjects.tINTEGERArray;  VAR depth: SIGNED32 );
-	VAR min, max: SIGNED16;  y, x: SIGNED32;
+	VAR min, max: SIGNED16;  y, x: SIZE;
 	BEGIN
 		MinMax( A^, min, max );
 		IF (min >= 0) & (max < depth) THEN RETURN END;
