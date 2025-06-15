@@ -7,6 +7,7 @@ Heaps
 Modules
 Objects
 Kernel
+RealConversions
 Strings
 KernelLog
 Streams
@@ -27,7 +28,12 @@ StringPool
 ObjectFile
 GenericLinker
 Loader
+Options
+ProcessInfo0
+ProcessInfo
+Plugins
+CRC
+SystemVersion
 System
 StdIOShell
 Shell
-~

@@ -1,6 +1,8 @@
 Builtins
 Trace
-Kernel32
+Glue
+Unix
+Machine
 Heaps
 Modules
 Objects
@@ -9,8 +11,13 @@ Strings
 KernelLog
 Streams
 Commands
+Pipes
+StdIO
+TrapWriters
+Reflection
+Traps
 Files
-WinFS
+UnixFiles
 Clock
 Dates
 Reals
@@ -19,9 +26,7 @@ BitSets
 StringPool
 ObjectFile
 GenericLinker
-Reflection
-Traps
 Loader
-Shell
-StdIOShell
 System
+StdIOShell
+Shell
