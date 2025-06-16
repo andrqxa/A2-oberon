@@ -22,7 +22,7 @@ Note that, to keep the repository size manageable, we use GitLab's Large File St
 
 If you cannot or prefer not to install Git LFS, you need to manually download the corresponding ZIP files from the GitLab project page. Without LFS, Git will only download placeholder files. You can identify this by their size: if the ZIP files in the root directory of the project are only a few bytes in size, LFS is not installed.
 
-Most of the ZIP files requiring LFS are located in the `data` directory.
+**Most of the ZIP files requiring LFS are located in the `data` directory.**
 
 Please let me know if you need developer access to the repository, encounter any missing files, or would like assistance with the setup.
 
@@ -44,26 +44,7 @@ git lfs pull
 
 ## Build Server
 
-The previously existing build-server is being replaced by the CI/CD pipeline in this gitlab. Currently, the pipeline builds the binaries for each commit in a zip file. The zip-files comprise the most-recent binaries and can be downloaded from the pipeline artifacts. More tests will follow.
-
----
-
-## Active Object System (AOS aka A2) Git repository (from 9.12.2022)
-
-In order to run A2 on your Windows- or Linux-based system, clone this repository and unzip the appropriate binary within the repository. Example (Linux, AMD64):
-
-```bash
-git clone https://gitlab.inf.ethz.ch/felixf/oberon.git
-cd oberon
-unzip Linux64
-Linux64/a2.sh
-```
-
-Note that in order to keep size of the repository reasonable, we do not commit binary files directly into the git repository. Instead, we use the large file storage (LFS) support of GitLab in order to keep these files out of local git storage of your computer.
-
-If you cannot or do not want to install LFS for Git, you need to download the corresponding zip file from this GitLab website because then Git is downloading only a stub of the files. You can identify this with file sizes: if the zip files in the root directory of this project are a few bytes small, then you do not have LFS installed.
-
-Please inform me if you need developer access to the repository, if you observe missing files, or if you want to help setting this up.
+The previously existing build-server is being replaced by the CI/CD pipeline in this gitlab. Currently, the pipeline builds the binaries for each commit. More tests will follow.
 
 ---
 
