@@ -296,7 +296,7 @@ tasks:
         source {{.PLATFORM_ENV}}
         echo "Using module list: $MODULE_LIST"
         echo "Release.Build --build --path=bin/ {{.PLATFORM}} ~" > "{{.BUILD_DIR}}/{{.PLATFORM}}/combined.txt"
-        echo "Linker.Link -p={{.PLATFORM}} --path=bin/ $FILEFORMAT --fileName=$FILENAME --extension=$EXTENSION $DISPLACEMENT" >> "{{.BUILD_DIR}}/{{.PLATFORM}}/combined.txt"
+        echo "Linker.Link $( [ '{{.PLATFORM}}' = 'Win32' ] || [ '{{.PLATFORM}}' = 'Win64' ] || echo -p={{.PLATFORM}} ) --path=bin/ $FILEFORMAT --fileName=$FILENAME --extension=$EXTENSION $DISPLACEMENT" >> "{{.BUILD_DIR}}/{{.PLATFORM}}/combined.txt"
 
   add-module-list:
     desc: Added list of modules to Linker
@@ -312,12 +312,12 @@ tasks:
         echo "~" >> "{{.BUILD_DIR}}/{{.PLATFORM}}/combined.txt"
 
   create-compile-ini:
-    desc: Create oberonCompile.ini file
+    desc: Create oberonCompile.cfg file
     vars:
       PLATFORM: "{{.PLATFORM}}"
     cmds:
       - |
-        cat > {{.BUILD_DIR}}/{{.PLATFORM}}/oberonCompile.ini << EOF
+        cat > {{.BUILD_DIR}}/{{.PLATFORM}}/oberonCompile.cfg << EOF
         Heaps.SetMetaData~
         Files.AddSearchPath {{.BUILD_DIR}}/{{.PLATFORM}}/bin~
         Files.AddSearchPath data~
@@ -332,7 +332,7 @@ tasks:
     cmds:
       - |
         cd {{.BUILD_DIR}}/{{.PLATFORM}} && {{.TOOL}} do "
-          System.DoFile oberonCompile.ini ~
+          System.DoFile oberonCompile.cfg ~
           Files.SetWorkPath {{.BUILD_DIR}}/{{.PLATFORM}} ~
           System.DoFile {{.BUILD_DIR}}/{{.PLATFORM}}/combined.txt ~
         "
@@ -362,13 +362,13 @@ tasks:
           PLATFORM: "{{.PLATFORM}}"
 
   create-a2-txt:
-    desc: Create a2.txt file
+    desc: Create a2.cfg file
     vars:
       PLATFORM: "{{.PLATFORM}}"
     cmds:
       - |
-        cat > {{.BUILD_DIR}}/{{.PLATFORM}}/a2.txt << EOF
-        System.DoFile oberon.ini~
+        cat > {{.BUILD_DIR}}/{{.PLATFORM}}/a2.cfg << EOF
+        System.DoFile oberon.cfg~
         Display.Install~
         WindowManager.Install~
         Clipboard.Install~
@@ -376,12 +376,12 @@ tasks:
         EOF
 
   create-oberon-ini:
-    desc: Create oberon.ini file
+    desc: Create oberon.cfg file
     vars:
       PLATFORM: "{{.PLATFORM}}"
     cmds:
       - |
-        cat > {{.BUILD_DIR}}/{{.PLATFORM}}/oberon.ini << EOF
+        cat > {{.BUILD_DIR}}/{{.PLATFORM}}/oberon.cfg << EOF
         Heaps.SetMetaData~
         Files.AddSearchPath bin~
         Files.AddSearchPath source~
@@ -400,16 +400,16 @@ tasks:
       - |
         case "{{.PLATFORM}}" in
           Linux64|Linux32|LinuxARM)
-            echo './oberon run a2.txt' > {{.BUILD_DIR}}/{{.PLATFORM}}/a2.sh
+            echo './oberon run a2.cfg' > {{.BUILD_DIR}}/{{.PLATFORM}}/a2.sh
             chmod +x {{.BUILD_DIR}}/{{.PLATFORM}}/a2.sh
-            echo 'KbdMouse.DisableMouseEmulation~' >> {{.BUILD_DIR}}/{{.PLATFORM}}/a2.txt
-            echo 'DisplayRefresher.Install~' >> {{.BUILD_DIR}}/{{.PLATFORM}}/a2.txt
+            echo 'KbdMouse.DisableMouseEmulation~' >> {{.BUILD_DIR}}/{{.PLATFORM}}/a2.cfg
+            echo 'DisplayRefresher.Install~' >> {{.BUILD_DIR}}/{{.PLATFORM}}/a2.cfg
             ;;
           Win32|Win64)
             echo '@echo off' > {{.BUILD_DIR}}/{{.PLATFORM}}/a2.bat
-            echo 'oberon.exe run a2.txt' >> {{.BUILD_DIR}}/{{.PLATFORM}}/a2.bat
-            echo 'Machine.SetTraceFile~' >> {{.BUILD_DIR}}/{{.PLATFORM}}/oberon.ini
-            echo 'Traps.Install~' >> {{.BUILD_DIR}}/{{.PLATFORM}}/oberon.ini
+            echo 'oberon.exe run a2.cfg' >> {{.BUILD_DIR}}/{{.PLATFORM}}/a2.bat
+            echo 'Machine.SetTraceFile~' >> {{.BUILD_DIR}}/{{.PLATFORM}}/oberon.cfg
+            echo 'Traps.Install~' >> {{.BUILD_DIR}}/{{.PLATFORM}}/oberon.cfg
             ;;
         esac
 
@@ -443,7 +443,7 @@ tasks:
     cmds:
       - |
         rm -f {{.BUILD_DIR}}/{{.PLATFORM}}/oberon.log
-        rm -f {{.BUILD_DIR}}/{{.PLATFORM}}/oberonCompile.ini
+        rm -f {{.BUILD_DIR}}/{{.PLATFORM}}/oberonCompile.cfg
         rm -f {{.BUILD_DIR}}/{{.PLATFORM}}/combined.txt
         rm -f {{.PLATFORM_ENV}}
 
@@ -490,7 +490,7 @@ tasks:
       - echo "Running tests for host {{.HOST}}"
       - |
         cd {{.BUILD_DIR}}/{{.HOST}} && {{.TOOL}} do "
-          System.DoFile oberon.ini ~
+          System.DoFile oberon.cfg ~
           FoxTest.Compile --verbose -l=TestCompilation.Log Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~
           FoxTest.Compile --verbose -l=TestExecution.Log Oberon.Execution.Test Oberon.Execution.AMD64TestDiff ~
         "
