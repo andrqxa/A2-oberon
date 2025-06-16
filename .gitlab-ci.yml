@@ -5,17 +5,16 @@ stages:
 default:
   image: debian:latest
   before_script:
-    - echo "Before script"
-    - apt update
-    - apt install make -y
+    - apt update && apt install -y curl git git-lfs
+    - curl -sL https://taskfile.dev/install.sh | sh
+    - mv ./bin/task /usr/local/bin/task
+    - git lfs install
+    - git lfs pull
 
 buildLinuxARM:
   stage: build
   script:
-    - make LinuxARM
-  cache:
-    paths:
-      - target/LinuxARM
+    - task LinuxARM
   artifacts:
     paths:
       - target/LinuxARM
@@ -23,12 +22,8 @@ buildLinuxARM:
 buildLinuxAMD:
   stage: build
   script:
-    - make Linux32
-    - make Linux64
-  cache:
-    paths:
-      - target/Linux32
-      - target/Linux64
+    - task Linux32
+    - task Linux64
   artifacts:
     paths:
       - target/Linux32
@@ -37,12 +32,8 @@ buildLinuxAMD:
 buildWinAMD:
   stage: build
   script:
-    - make Win32
-    - make Win64
-  cache:
-    paths:
-      - target/Win32
-      - target/Win64
+    - task Win32
+    - task Win64
   artifacts:
     paths:
       - target/Win32
@@ -51,5 +42,4 @@ buildWinAMD:
 test:
   stage: test
   script:
-    - echo "Tests are starting:"
-    - make test
+    - task test
