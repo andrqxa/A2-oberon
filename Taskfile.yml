@@ -152,6 +152,7 @@ tasks:
           | sed 's/$/ DependencyWalker.Mod/' \
           | sed 's/.*/export MODULES="&"/' \
           > {{.BUILD_DIR}}/{{.HOST}}/.modules_env
+          rm "{{.BUILD_DIR}}/{{.HOST}}/.modules"
     sources:
       - "{{.BUILD_DIR}}/{{.HOST}}/.modules"
     generates:
@@ -172,6 +173,7 @@ tasks:
           done < <(sort -u {{.BUILD_DIR}}/{{.HOST}}/.modules)
           {{.TOOL}} DependencyWalker.Walk $DEFINES --fileExtension=.$EXTENSION $module_files {{.DEPENDENCY_WALKER}} | tr -d '\r' | grep "^.*\\.$EXTENSION:" > {{.BUILD_DIR}}/{{.HOST}}/.dependencies
           echo "FoxArrayBase.$EXTENSION: source/ComplexNumbers.$EXTENSION" >> {{.BUILD_DIR}}/{{.HOST}}/.dependencies
+          rm "{{.BUILD_DIR}}/{{.HOST}}/.modules"
     sources:
       - "{{.BUILD_DIR}}/{{.HOST}}/.modules"
     generates:
@@ -179,7 +181,6 @@ tasks:
 
   compile-module:
     desc: Compile a single module (internal task)
-    # internal: true
     vars:
       MODULE: '{{.MODULE}}'    
     deps: 
@@ -235,9 +236,9 @@ tasks:
           cp {{.BUILD_DIR}}/{{.HOST}}/$FILENAME {{.COMPILERS}}/{{.HOST}}/$FILENAME.new
           mv {{.COMPILERS}}/{{.HOST}}/$FILENAME.new {{.COMPILERS}}/{{.HOST}}/$FILENAME
           chmod +x {{.COMPILERS}}/{{.HOST}}/$FILENAME
-      - task: update-module-list
-        vars:
-          PLATFORM: "{{.PLATFORM}}"
+      # - task: update-module-list
+      #   vars:
+      #     PLATFORM: "{{.PLATFORM}}"
       - task: clean-temporary-files
         vars:
           PLATFORM: "{{.PLATFORM}}"
@@ -272,9 +273,9 @@ tasks:
       - task: compile-platform
         vars:
           PLATFORM: "{{.PLATFORM}}"
-      - task: update-module-list
-        vars:
-          PLATFORM: "{{.PLATFORM}}"
+      # - task: update-module-list
+      #   vars:
+      #     PLATFORM: "{{.PLATFORM}}"
       - task: create-runtime-files
         vars:
           PLATFORM: "{{.PLATFORM}}"
